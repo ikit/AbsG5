@@ -5,7 +5,7 @@ test:
 	python tests.py
 
 app:
-	python annso_server.py
+	python server.py
 
 reset:
 	psql -U postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'annso'"

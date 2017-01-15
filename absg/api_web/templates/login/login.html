@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Absolument G</title>
+
+
+    <!-- Base -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-migrate-3.0.0.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="assets/login/css/login.css">
+    <link rel="stylesheet" href="assets/common/font-awesome-4.6.3/css/font-awesome.min.css">
+    
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <h1>"Bon, mais t'es qui toi ?"</h1>
+                <div id="output"  role="alert"></div>
+                <div class="form-box">
+                    <form action="" method="">
+                        <input name="user" type="text" placeholder="Login">
+                        <input type="password" placeholder="Mot de passe">
+                        <button class="btn btn-info btn-block login" type="submit">Se connecter</button>
+                    </form>
+                    <a href="">J'ai oublié mon mot de passe !</a>
+                </div>
+            </div>  
+    </div>
+
+
+
+    <script>
+        var rootURL = "http://{{ hostname }}";
+
+        var ws = new WebSocket('ws://{{ hostname }}/ws');
+        var $message = $('#message');
+
+
+        $(function()
+        {
+            var textfield = $("input[name=user]");
+            $('button[type="submit"]').click(function(e) 
+            {
+                e.preventDefault();
+                //little validation just to check username
+                if (textfield.val() != "") 
+                {
+                    //$("body").scrollTo("#output");
+                    $("#output").addClass("alert alert-success animated fadeInUp").html("Welcome back " + "<span style='text-transform:uppercase'>" + textfield.val() + "</span>");
+                    $("#output").removeClass(' alert-danger');
+                    $("input").css({
+                        "height":"0",
+                        "padding":"0",
+                        "margin":"0",
+                        "opacity":"0"
+                    });
+                    //change button text 
+                    $('button[type="submit"]')
+                        .html("continue")
+                        .removeClass("btn-info")
+                        .addClass("btn-default").click(function()
+                    {
+                        $("input").css({
+                        "height":"auto",
+                        "padding":"10px",
+                        "opacity":"1"
+                        }).val("");
+                    });
+                    
+                    //show avatar
+                    $(".avatar").css({
+                        "background-image": "url('https://randomuser.me/api/portraits/women/28.jpg')"
+                    });
+                } else {
+                    //remove success mesage replaced with error message
+                    $("#output").removeClass('alert alert-success');
+                    $("#output").addClass("alert alert-danger").html("Merci de remplir correctement le formulaire.");
+                }
+                //console.log(textfield.val());
+
+            });
+        });
+        
+
+
+
+
+
+
+
+
+
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+        /* WEBSOCKETS SESSION
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+        ws.onopen = function()
+        {
+            $message.attr("class", 'label label-success');
+            $message.text('open');
+
+            ws.send('{"action" : "authent", "data" : "Chrome"}')
+        };
+        ws.onmessage = function(ev)
+        {
+            $message.attr("class", 'label label-info');
+            var json = JSON.parse(ev.data);
+
+
+            dt = new Date()
+            $message.html(dt.toLocaleTimeString() + ' ' + json["action"] + ' : ' + json["data"]);
+
+            switch(json["action"])
+            {
+                case 'online_user':
+                    var uTxt = ""
+                    $.each(json["data"], function (idx, val)
+                    {
+                        uTxt += "<li>" + val + "</li>"
+                    })
+                    $('#userList').html(uTxt)
+                    break;
+
+                case 'run_changed':
+                    ws_run_changed(json["data"])
+                    break;
+                case 'file_changed':
+                    ws_file_changed(json["data"])
+                    break;
+            }
+        };
+        ws.onclose = function(ev)
+        {
+            $message.attr("class", 'label label-important');
+            $message.text('closed');
+        };
+        ws.onerror = function(ev)
+        {
+            $message.attr("class", 'label label-warning');
+            $message.text('error occurred');
+        };
+        </script>
+</body>
+</html> 
