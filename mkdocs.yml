@@ -22,7 +22,7 @@ pages:
     - 'Forum': 'user/forum.md'
     - 'Agenda': 'user/agenda.md'
     - 'Web3G': 'user/web.md'
-    - 'AGPA': 'user/AGPA.md'
+    - 'AGPA': 'user/agpa.md'
     - 'Grenier': 'user/grenier.md'
     - 'FAQ': 'user/faq.md'
  - 'MAINTENANCE':
