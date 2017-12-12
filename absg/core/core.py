@@ -1,12 +1,12 @@
 #!env/python3
 # coding: utf-8
-import ipdb
-
+import os
+from importlib import import_module
 
 import config as C
 from core.framework.common import *
-from core.model import *
-from core.managers import *
+# from core.model import *
+# from core.managers import *
 
 
 
@@ -20,7 +20,7 @@ from core.managers import *
 # =====================================================================================================================
 # CORE MAIN OBJECT
 # =====================================================================================================================
-def notify_all_print(self, data):
+def default_notify_all(data):
     """
         Default delegate used by the core for notification.
     """
@@ -29,33 +29,23 @@ def notify_all_print(self, data):
 
 class Core:
     def __init__(self):
-        # Pirus part (Pipeline and job management)
-        self.files = FileManager()
-        self.pipelines = PipelineManager()
-        self.jobs = JobManager()
-        self.container_managers = {}
-        self.container_managers["lxd"] = LxdManager()
-        # Annso part (Annotations and variant management)
-        self.analyses = AnalysisManager()
-        self.samples = SampleManager()
-        self.variants = VariantManager()
-        self.annotations = AnnotationManager()
-        self.filters = FilterEngine()
-        # Regovar Part (User, project, SLI management)
-        self.users = UserManager()
-        self.projects = ProjectManager()
-        self.events = EventManager()
-        self.subjects = SubjectManager()
-        self.admin = AdminManager()
-
-
-        # method handler to notify all
+        # Managers
+        # self.files = FileManager()
+        
+        # Notify all method
         # according to api that will be pluged on the core, this method should be overriden 
-        # to really do a notification. (See how api_rest override this method)
-        self.notify_all = notify_all_print
+        # (See how api_rest override this method in api_rest/rest.py)
+        self.notify_all = default_notify_all
 
 
-
+    def notify_all(self, data):
+        """
+            Default delegate used by the core for notification.
+            according to api that will be pluged on the core, this method should be overriden 
+            (See how api_rest override this method in api_rest/rest.py)
+        """
+        print(str(data))
+    
 
     def user_authentication(self, login, pwd):
         """
@@ -68,11 +58,10 @@ class Core:
 
 
 
-
 # =====================================================================================================================
 # INIT OBJECTS
 # =====================================================================================================================
 
 core = Core()
-log('Regovar core initialised. Server ready !')
+log('AbsG core initialised. Server ready !')
 

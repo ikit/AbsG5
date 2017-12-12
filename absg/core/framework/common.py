@@ -2,6 +2,7 @@
 # coding: utf-8
 import ipdb
 import os
+import hashlib
 import datetime
 import logging
 import uuid
@@ -9,16 +10,13 @@ import time
 import asyncio
 import subprocess
 import re
+import json
+import requests
 
 
-from config import LOG_DIR
+from config import LOG_DIR, CACHE_DIR, CACHE_EXPIRATION_SECONDS
 
 
-
-#
-# As Pirus is a subproject of Regovar, thanks to keep framework complient
-# TODO : find a way to manage it properly with github (subproject ?)
-#
 
 
 class Singleton(type):
@@ -73,23 +71,14 @@ def notify_all(msg):
     print(str(msg))
 
 
+
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # TOOLS
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-    
-
-def get_pipeline_forlder_name(name:str):
-    """
-        Todo : doc
-    """
-    cheked_name = ""
-    for l in name:
-        if l.isalnum() or l in [".", "-", "_"]:
-            cheked_name += l
-        if l == " ":
-            cheked_name += "_"
-    return cheked_name;
 
 
 
@@ -158,23 +147,63 @@ def array_merge(array1, array2):
 
 
 
+
 # =====================================================================================================================
-# DATA MODEL TOOLS
+# CACHE TOOLS
 # =====================================================================================================================
-CHR_DB_MAP = {1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10", 11: "11", 12: "12", 13: "13", 14: "14", 15: "15", 16: "16", 17: "17", 18: "18", 19: "19", 20: "20", 21: "21", 22: "22", 23: "X", 24: "Y", 25: "M"}
-CHR_DB_RMAP = {"1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "11": 11, "12": 12, "13": 13, "14": 14, "15": 15, "16": 16, "17": 17, "18": 18, "19": 19, "20": 20, "21": 21, "22": 22, "X": 23, "Y": 24, "M": 25}
+def get_cached_url(url, prefix="", headers={}):
+    """
+        Return cache response if exists, otherwise, execute request and store result in cache before return.
+    """
+    # encrypt url to md5 to avoid problem with special characters
+    uri = prefix + hashlib.md5(url.encode('utf-8')).hexdigest()
+    result = get_cache(uri)
+
+    if result is None:
+        res = requests.get(url, headers=headers)
+        if res.ok:
+            try:
+                result = json.loads(res.content.decode())
+                set_cache(uri, result)
+            except Exception as ex:
+                raise RegovarException("Unable to cache result of the query: " + url, ex)
+    return result
 
 
-def chr_from_db(chr_value):
-    if chr_value in CHR_DB_MAP.keys():
-        return CHR_DB_MAP[chr_value]
+
+
+
+def get_cache(uri):
+    """
+        Return the cached json corresponding to the uri if exists; None otherwise
+    """
+    cache_file = CACHE_DIR + "/" + uri
+    if os.path.exists(cache_file):
+        s=os.stat(cache_file)
+        date = datetime.datetime.utcfromtimestamp(s.st_ctime)
+        ellapsed = datetime.datetime.now() - date
+        if ellapsed.total_seconds() < CACHE_EXPIRATION_SECONDS:
+            # Return result as json
+            with open(cache_file, 'r') as f:
+                return json.loads(f.read())
+        else:
+            # Too old, remove cache entry
+            os.remove(cache_file)
     return None
 
 
-def chr_to_db(chr_value):
-    if chr_value in CHR_DB_RMAP.keys():
-        return CHR_DB_RMAP[chr_value]
-    return None
+
+
+def set_cache(uri, data):
+    """
+        Put the data in the cache
+    """
+    if not uri or not data: return
+    cache_file = CACHE_DIR + "/" + uri
+    with open(cache_file, 'w') as f:
+        f.write(json.dumps(data))
+        f.close()
+    
 
 
 
@@ -186,7 +215,7 @@ def chr_to_db(chr_value):
 # LOGS MANAGEMENT
 # =====================================================================================================================
 
-regovar_logger = None 
+absg_logger = None 
 
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
@@ -206,7 +235,7 @@ def setup_logger(logger_name, log_file, level=logging.INFO):
 
 
 def log(msg):
-    global regovar_logger
+    global absg_logger
     msgs = msg.split('\n')
     finals = []
     for m in msgs:
@@ -216,20 +245,20 @@ def log(msg):
             finals.append("\t" + m[0:200])
             m = m[200:]
     for m in finals:
-        regovar_logger.info(m)
+        absg_logger.info(m)
 
 
 def war(msg):
-    global regovar_logger
-    regovar_logger.warning(msg)
+    global absg_logger
+    absg_logger.warning(msg)
 
 
 def err(msg, exception=None):
-    global regovar_logger
-    regovar_logger.error(msg)
-    if exception and not isinstance(exception, RegovarException):
+    global absg_logger
+    absg_logger.error(msg)
+    if exception and not isinstance(exception, AbsgException):
         # To avoid to log multiple time the same exception when chaining try/catch
-        regovar_logger.exception(exception)
+        absg_logger.exception(exception)
 
 
 
@@ -242,23 +271,23 @@ def err(msg, exception=None):
 
 
 
-class RegovarException(Exception):
+class AbsgException(Exception):
     """
-        Regovar exception
+        Absg exception
     """
     msg = "Unknow error :/"
     code = "E000000"
 
     def __init__(self, msg: str, code: str=None, exception: Exception=None, logger: logging.Logger=None):
-        self.code = code or RegovarException.code
-        self.msg = msg or RegovarException.msg
+        self.code = code or AbsgException.code
+        self.msg = msg or AbsgException.msg
         self.id = str(uuid.uuid4())
         self.date = datetime.datetime.utcnow().timestamp()
         self.log = "ERROR {} [{}] {}".format(self.code, self.id, self.msg)
 
         if logger:
             logger.error(self.log)
-            if exception and not isinstance(exception, RegovarException):
+            if exception and not isinstance(exception, AbsgException):
                 # To avoid to log multiple time the same exception when chaining try/catch
                 logger.exception(exception)
         else:
@@ -269,7 +298,7 @@ class RegovarException(Exception):
         return self.log
 
 
-def log_snippet(longmsg, exception: RegovarException=None):
+def log_snippet(longmsg, exception: AbsgException=None):
     """
         Log the provided msg into a new log file and return the generated log file
         To use when you want to log a long text (like a long generated sql query by example) to 
@@ -307,12 +336,12 @@ class Timer(object):
         self.secs = self.end - self.start
         self.msecs = self.secs * 1000  # millisecs
         if self.verbose:
-            log(self.msecs, ' ms')
+            log("{} ms".format(self.msecs))
 
     def __str__(self):
         if self.msecs >= 1000:
-            return "{0} s".format(self.secs)
-        return "{0} ms".format(self.msecs)
+            return "{} s".format(self.secs)
+        return "{} ms".format(self.msecs)
 
     def total_ms(self):
         return self.msecs
@@ -334,5 +363,5 @@ class Timer(object):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 # Create logger
-setup_logger('regovar', os.path.join(LOG_DIR, "regovar.log"))
-regovar_logger = logging.getLogger('regovar')
+setup_logger('regovar', os.path.join(LOG_DIR, "absg.log"))
+absg_logger = logging.getLogger('absg')
