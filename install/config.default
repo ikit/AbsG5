@@ -8,7 +8,7 @@ DEBUG = True
 
 # HOST (internal)
 HOST = "127.0.0.1"
-PORT = 9000
+PORT = 8900
 VERSION = "5.0.dev"
 HOSTNAME = "{}:{}".format(HOST, PORT)  # This is the internal host on which aioHTTP will run the service.
 # HOST (public)
