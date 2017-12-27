@@ -53,5 +53,11 @@ test:
 	mv config.py config.test
 	mv config.py.bak config.py
 	sudo -u postgres psql -c "DROP DATABASE IF EXISTS $(database_name)_test"
+
+
+# DUMP Database
+dump:
+  pg_dump -U absg -d absg > dump.sql
+
 	
 .PHONY: app clear_files destroy list_db init install install_hpo setup terminate_queries test update_hpo
