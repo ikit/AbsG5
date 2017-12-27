@@ -32,10 +32,9 @@ DATABASE_POOL_SIZE = 7
 
 
 # FILESYSTEM
-FILES_DIR = "/var/absg/files"
-TEMP_DIR = "/var/absg/downloads"
-CACHE_DIR = "/var/absg/cache"
-DATABASES_DIR = "/var/absg/databases"
+FILES_DIR = "/var/absg/v5/dev/files"
+TEMP_DIR = "/var/absg/v5/dev/downloads"
+CACHE_DIR = "/var/absg/v5/dev/cache"
 
 
 CACHE_EXPIRATION_SECONDS = 2592000 # 30 days = 60*60*24*30
