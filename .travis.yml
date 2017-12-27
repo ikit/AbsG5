@@ -28,11 +28,10 @@ before_script:
 
 script:
   - pip install -r requirements.txt
+  - pip install blessings
   - cd absg
   - make init
   - make install
-  - psql -U absg -d absg -f tests/init_fake_data.sql
-  - pip install blessings
   - echo "TODO ! python tests.py"
 
 
