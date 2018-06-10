@@ -1,0 +1,42 @@
+version: '3.5'
+services:
+    
+  {docker_pg}:
+    container_name: {docker_pg}
+    image: postgres
+    restart: always
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - {root_path}/pgdata:/var/lib/postgresql/data
+      - {root_path}/config/postgres.conf:/etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_USER={db_user}
+      - POSTGRES_PASSWORD={db_pwd}
+      - POSTGRES_DB={db_name}
+    user: {absg_user}
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - {docker_net}
+
+
+
+  {docker_app}:
+    container_name: {docker_app}
+    build: .
+    image: absg
+    volumes:
+      - {root_path}:/var/absg
+      - {git_path}/absg:/var/absg_app
+    ports:
+      - "{absg_port}:{absg_port}"
+    depends_on:
+      - {docker_pg}
+    working_dir: /var/absg_app
+    command: python absg.py
+    networks:
+      - {docker_net}
+
+
+networks:
+  {docker_net}:
+    name: {docker_net}

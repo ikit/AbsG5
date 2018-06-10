@@ -1,24 +1,32 @@
+# Docker manual command
+# docker run -a stdin -a stdout -it -v /var/absg5:/var/absg:rw -v /home/olivier/git/AbsG5/install/../absg:/var/absg_app:rw -w /var/absg_app --network absg5_net -p 8600:8600 --name absg5_app absg_img python absg.py
 
-database_name=$(shell sed -n 's/^\s*DATABASE_NAME\s*=\s*"\([^"]\+\)".*/\1/p' config.py)
-database_path=$(shell sed -n 's/^\s*DATABASES_DIR\s*=\s*"\([^"]\+\)".*/\1/p' config.py)
+start:
+	docker start absg5_app
 
-app:
-	python3 -Wdefault server.py
 
-init:
-	cp ../install/config.default ./config.py
-	echo "Please, edit the $PWD/config.py file before proceed to the installation with the command 'make install'"
+debug:
+	docker start -ai absg5_app
+
+
+stop:
+	docker stop absg5_app
+
+pp:
+	docker rm -f absg_debug || true
+	docker run -a stdin -a stdout -it -v /var/absg5:/var/absg:rw -v /home/olivier/git/AbsG5/install/../absg:/var/absg_app:rw -w /var/absg_app --network absg5_net -p 8600:8600 --name absg_debug absg sh
+
+
+
 
 #Database utils
 terminate_queries:
-	sudo -u postgres psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$(database_name)'"
+	docker exec absg5_pg psql -U absg -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'absg'"
 
-destroy: terminate_queries
-	sudo -u postgres psql -c "DROP DATABASE IF EXISTS $(database_name)"
-	sudo -u postgres psql -c "CREATE DATABASE $(database_name) OWNER absg"
+
 
 list_db:
-	psql -U absg -d $(database_name) -c "SELECT relname as Table, pg_size_pretty(pg_total_relation_size(relid)) As Size, pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as ExternalSize, rowcount as RowCount \
+	docker exec absg5_pg psql -U absg -d absg -c "SELECT relname as Table, pg_size_pretty(pg_total_relation_size(relid)) As Size, pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as ExternalSize, rowcount as RowCount \
     FROM pg_catalog.pg_statio_user_tables  \
     LEFT JOIN ( \
         SELECT table_name, n_tup_ins - n_tup_del as rowcount  \
@@ -26,24 +34,12 @@ list_db:
         LEFT JOIN pg_stat_all_tables ON table_name=relname ORDER BY table_name) AS _sub ON table_name=relname \
     ORDER BY table_name ASC"
 
-#Install
-install: destroy setup
-
-setup:
-	psql -U absg -d $(database_name) -f ../install/create_all.sql
-	psql -U absg -d $(database_name) -f ../install/install_hg19.sql
-	psql -U absg -d $(database_name) -f ../install/install_hg38.sql
-
-#Clean up
-clear_files:
-	rm -rf /var/absg/v5/dev/files/*
-	rm -rf /var/absg/v5/dev/downloads/*
-	rm -rf /var/absg/v5/dev/cache/*
 
 #Tests
 test:
 	test -n $(database_name)
 	sudo -u postgres psql -c "DROP DATABASE IF EXISTS $(database_name)_test"
+	psql -U postgres -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
 	sudo -u postgres psql -c "CREATE DATABASE $(database_name)_test OWNER absg"
 	psql -U absg -d $(database_name)_test -f ../install/create_all.sql
 	psql -U absg -d $(database_name)_test -f tests/init_fake_data.sql
@@ -55,9 +51,4 @@ test:
 	sudo -u postgres psql -c "DROP DATABASE IF EXISTS $(database_name)_test"
 
 
-# DUMP Database
-dump:
-  pg_dump -U absg -d absg > dump.sql
-
-	
-.PHONY: app clear_files destroy list_db init install install_hpo setup terminate_queries test update_hpo
+.PHONY: start list_db test

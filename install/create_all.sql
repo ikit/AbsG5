@@ -76,21 +76,6 @@ CREATE TABLE public.user_daily
 
 
 
-CREATE TABLE public.user_session
-(
-    token character varying(32) NOT NULL COLLATE pg_catalog."C",
-    creation_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    expiration_date timestamp without time zone NOT NULL,
-    last_activity timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    user_id integer NOT NULL,
-    user_agent text,
-    ip inet NOT NULL,
-    context json,
-    CONSTRAINT user_session_pkey PRIMARY KEY (token)
-);
-
-
-
 CREATE TABLE public.file
 (
     id serial NOT NULL,
