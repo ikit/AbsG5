@@ -21,17 +21,12 @@ def user_init(self, loading_depth=0, force=False):
             - email         : str       : email
             - function      : str       : the function of the user
             - location      : str       : the location of the user
-            - settings      : dict      : dict with regovar settings used by the user (language, prefered referencial, etc)
-            - roles         : dict      : dict with roles of the user on Regovar application (Administrator, Pipeline installer, etc)
+            - is_admin      : bool      : is the user an admin or not
             - is_activated  : bool      : is the user activated or not
             - sandbox_id    : int       : this id refer to the sandbox project of the user
             - update_date   : datetime  : the last time that the object have been updated
             - create_date   : datetime  : the date when the object have been created
-            - projects_ids  : [int]     : The list of ids of projects that the user can access
-            - subjects_ids  : [int]     : The list of ids of subjets that the user can access
         If loading_depth is > 0, Following properties fill be loaded : (Max depth level is 2)
-            - projects      : [Project] : The list of projects that the user can access
-            - subjects      : [Subject] : The list of subjets that the user can access
             - sandbox       : Project   : The sandbox project of the user
     """
     from core.model.project import Project
@@ -42,17 +37,11 @@ def user_init(self, loading_depth=0, force=False):
         self.loading_depth = min(2, loading_depth)
 
     try:
-        self.subjects_ids = [s.id for s in self.get_subjects()]
-        self.projects_ids = [p.id for p in self.get_projects()]
-        self.projects = []
-        self.subjects = []
         self.sandbox = None
         if self.loading_depth > 0:
-            self.projects = self.get_projects(self.loading_depth-1)
-            self.subjects = self.get_subjects(self.loading_depth-1)
             self.sandbox = Project.from_id(self.sandbox_id, self.loading_depth-1)
     except Exception as ex:
-        raise RegovarException("User data corrupted (id={}).".format(self.id), "", ex)
+        raise AbsgException("User data corrupted (id={}).".format(self.id), "", ex)
 
 
 
@@ -62,8 +51,10 @@ def user_from_id(user_id, loading_depth=0):
     """
         Retrieve user with the provided id in the database
     """
-    user = session().query(User).filter_by(id=user_id).first()
-    if user : user.init(loading_depth)
+    user = Session().query(User).filter_by(id=user_id).first()
+    if user : 
+        Session().refresh(user)
+        user.init(loading_depth)
     return user
 
 
@@ -73,8 +64,9 @@ def user_from_ids(user_ids, loading_depth=0):
     """
     users = []
     if user_ids and len(user_ids) > 0:
-        users = session().query(User).filter(User.id.in_(user_ids)).all()
+        users = Session().query(User).filter(User.id.in_(user_ids)).all()
         for u in users:
+            Session().refresh(u)
             u.init(loading_depth)
     return users
 
@@ -83,7 +75,7 @@ def user_from_credential(login, pwd):
     """
         Retrieve File with the provided login+pwd in the database
     """
-    user = session().query(User).filter_by(login=login).first()
+    user = Session().query(User).filter_by(login=login).first()
     if user:
         user.init()
         if user.password is None:
@@ -109,8 +101,6 @@ def user_to_json(self, fields=None, loading_depth=-1):
                 result.update({f: eval("self." + f + ".isoformat()")})
             elif f in ["sandbox"] and self.loading_depth > 0:
                 result.update({f: eval("self.{}.to_json(None, loading_depth-1)".format(f))})
-            elif f in ["projects", "subjects"] and self.loading_depth > 0:
-                result.update({f: [o.to_json(None, loading_depth-1) for o in eval("self." + f)]})
             else:
                 result.update({f: eval("self." + f)})
     return result
@@ -123,29 +113,26 @@ def user_load(self, data):
         Note that following properties cannot be set by this ways :
             - sandbox_id / sandbox (which MUST not be changed)
             - update_date / create_date (which are managed automaticaly by the server)
-            - projects_ids / projects / subjects_ids / subjects (which are too complex to be set directly. 
-              Need to use UserProjectSharing and UserSubjectSharing objects to update these associations)
     """
     try:
         # Required fields
-        if "login" in data.keys() : self.login = data["login"]
-        if "firstname" in data.keys() : self.firstname = data["firstname"]
-        if "lastname" in data.keys() : self.lastname = data["lastname"]
-        if "email" in data.keys() : self.email = data["email"]
-        if "function" in data.keys() : self.function = data["function"]
-        if "location" in data.keys() : self.location = data["location"]
-        if "settings" in data.keys() : self.settings = data["settings"]
-        if "roles" in data.keys() : self.roles = data["roles"]
-        if "is_activated" in data.keys() : self.is_activated = data["is_activated"]
+        if "login" in data.keys() : self.login = check_string(data["login"])
+        if "firstname" in data.keys() : self.firstname = check_string(data["firstname"])
+        if "lastname" in data.keys() : self.lastname = check_string(data["lastname"])
+        if "email" in data.keys() : self.email = check_string(data["email"])
+        if "function" in data.keys() : self.function = check_string(data["function"])
+        if "location" in data.keys() : self.location = check_string(data["location"])
+        if "is_admin" in data.keys() : self.is_admin = data["is_admin"]
+        if "is_activated" in data.keys() : self.is_activated = check_bool(data["is_activated"])
         # Update password
-        if "password" in data.keys() : 
-            self.erase_password(data["password"])
+        if "password" in data.keys() and check_string(data["password"]) and "oldpassword" in data.keys() and check_string(data["oldpassword"]): 
+            self.set_password(check_string(data["oldpassword"]), check_string(data["password"]))
         self.save()
     
         # reload dynamics properties
         self.init(self.loading_depth, True)
     except KeyError as e:
-        raise RegovarException('Invalid input project: missing ' + e.args[0])
+        raise AbsgException('Invalid input project: missing ' + e.args[0])
     return self
 
 
@@ -170,30 +157,6 @@ def user_erase_password(self, new):
     return True
 
 
-def user_is_admin(self):
-    """
-        Return True if user have administration rights; False otherwise
-    """
-    return isinstance(self, User) and isinstance(self.roles, dict) and "Administration" in self.roles.keys() and self.roles["Administration"] == "Write"
-
-
-
-def user_get_projects(self, loading_depth=0):
-    """
-        Return the list of projects that can access the user
-    """
-    from core.model.project import Project
-    return session().query(Project).filter_by(is_folder=False).all()
-
-
-
-def user_get_subjects(self, loading_depth=0):
-    """
-        Return the list of subjects that can access the user
-    """
-    from core.model.subject import Subject
-    return session().query(Subject).all()
-
 
 
 
@@ -206,7 +169,7 @@ def user_delete(user_id):
     u = User.from_id(user_id)
     if u:
         Project.delete(u.sandbox_id)
-        session().query(User).filter_by(id=user_id).delete(synchronize_session=False)
+        Session().query(User).filter_by(id=user_id).delete(synchronize_session=False)
         
 
 
@@ -236,32 +199,22 @@ def user_new(login=None):
     try:
         u.save()
     except Exception as ex:
-        raise RegovarException("Unable to create new user with provided informations.", "", ex)
+        raise AbsgException("Unable to create new user with provided informations.", "", ex)
     return u
     
 
 
 User = Base.classes.user
-User.public_fields = ["id", "firstname", "lastname", "login", "email", "function", "location", "update_date", "create_date", "settings", "roles", "projects_ids", "subjects_ids", "sandbox_id", "sandbox", "projects", "subjects"]
+User.public_fields = ["id", "firstname", "lastname", "login", "email", "function", "location", "update_date", "create_date", "sandbox_id", "sandbox", "is_activated", "is_admin"]
 User.init = user_init
 User.from_id = user_from_id
 User.from_ids = user_from_ids
 User.from_credential = user_from_credential
 User.load = user_load
 User.to_json = user_to_json
-User.get_projects = user_get_projects
-User.get_subjects = user_get_subjects
 User.set_password = user_set_password
 User.erase_password = user_erase_password
-User.is_admin = user_is_admin
 User.save = generic_save
 User.new = user_new
 User.count = user_count
 User.delete = user_delete
-
-
-
-
-
-
-

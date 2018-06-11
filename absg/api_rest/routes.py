@@ -12,7 +12,7 @@ from aiohttp_security import setup as setup_security
 from aiohttp_security import SessionIdentityPolicy
 
 from config import *
-from api_rest.policy import RegovarAuthorizationPolicy
+from api_rest.policy import AbsgAuthorizationPolicy
 from api_rest.rest import *
 from api_rest.handlers import *
 
@@ -33,7 +33,7 @@ key = base64.b64encode(PRIVATE_KEY32.encode()).decode()
 # Create server app
 app = web.Application()
 setup_session(app, EncryptedCookieStorage(key, max_age=SESSION_MAX_DURATION))
-setup_security(app, SessionIdentityPolicy(session_key='regovar_session_token'), RegovarAuthorizationPolicy())
+setup_security(app, SessionIdentityPolicy(session_key='absg_session_token'), AbsgAuthorizationPolicy())
 app['websockets'] = []
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(TEMPLATE_DIR)) 
 
@@ -48,9 +48,8 @@ app.on_shutdown.append(on_shutdown)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # ROUTES
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-app.router.add_route('GET',    "/",       apiHandler.welcom)                                                     # Get "welcom page of the rest API"
+app.router.add_route('GET',    "/",       apiHandler.welcome)                                                     # Get "welcom page of the rest API"
 app.router.add_route('GET',    "/config", apiHandler.config)                                                     # Get config of the server
-app.router.add_route('GET',    "/config/tools", apiHandler.get_tools)                                            # Get list of tools deployed on the server (variant export/report generator)
 app.router.add_route('GET',    "/api",    apiHandler.api)                                                        # Get html test api page
 app.router.add_route('GET',    "/ws",     websocket.get)                                                         # Websocket url to use with ws or wss protocol
 

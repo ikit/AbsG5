@@ -20,12 +20,12 @@ if not os.path.exists(FILES_DIR):
     raise AbsgException("ERROR : File directory doesn't exists : " + FILES_DIR)
 
 # Load rest of pirus application shall be done after celery init
+from asyncio import AbstractEventLoop
 from aiohttp import web
 from api_rest import *
 
 
-
-# Start the absg server
+# Start the pirus server
 if __name__ == '__main__':
     try:
         web.run_app(app, host=HOST, port=PORT)

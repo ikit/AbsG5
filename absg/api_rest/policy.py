@@ -9,7 +9,7 @@ import asyncio
 from core.model import *
 
 
-class RegovarAuthorizationPolicy(AbstractAuthorizationPolicy):
+class AbsgAuthorizationPolicy(AbstractAuthorizationPolicy):
     def __init__(self):
         pass
 
@@ -27,10 +27,6 @@ class RegovarAuthorizationPolicy(AbstractAuthorizationPolicy):
         if user:
             if permission == 'Authenticated':
                 return True
-
-            role, access = permission.split(':')
-            print ("Check authent [{}+{}] for {} ({})".format(role, access, user.login, user.roles_dic))
-            if role in user.roles_dic.keys() and user.roles_dic[role] == access:
-                return True
+            if permission == 'Administrator':
+                return user.is_admin
         return False
-

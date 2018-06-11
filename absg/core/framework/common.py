@@ -5,6 +5,7 @@ import os
 import hashlib
 import datetime
 import logging
+import traceback
 import uuid
 import time
 import asyncio
@@ -12,11 +13,23 @@ import subprocess
 import re
 import json
 import requests
+import concurrent.futures
 
 
-from config import LOG_DIR, CACHE_DIR, CACHE_EXPIRATION_SECONDS
+from config import LOG_DIR, CACHE_DIR, CACHE_EXPIRATION_SECONDS, DEBUG
 
 
+main_loop = asyncio.get_event_loop()
+
+
+if DEBUG:
+    main_loop.set_debug(enabled=True)
+
+
+#
+# As Pirus is a subproject of Regovar, thanks to keep framework complient
+# TODO : find a way to manage it properly with github (subproject ?)
+#
 
 
 class Singleton(type):
@@ -35,7 +48,8 @@ def run_until_complete(future):
     """
         Allow calling of an async method into a "normal" method (which is not a coroutine)
     """
-    asyncio.get_event_loop().run_until_complete(future)
+    #main_loop.run_until_complete(future)
+    asyncio.run_coroutine_threadsafe(future, main_loop)
 
 
 def run_async(future, *args):
@@ -43,7 +57,13 @@ def run_async(future, *args):
         Call a "normal" method into another thread 
         (don't block the caller method, but cannot retrieve result)
     """
-    asyncio.get_event_loop().run_in_executor(None, future, *args)
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            # Execute the query in another thread via coroutine
+            main_loop.run_in_executor(None, future, *args)
+    except Exception as ex:
+        err("Asynch method failed.", ex) 
+
 
 
 def exec_cmd(cmd, asynch=False):
@@ -55,8 +75,8 @@ def exec_cmd(cmd, asynch=False):
         subprocess.Popen(cmd, stdout=open(os.devnull, 'w'), stderr=open(os.devnull, 'w'))
         return True, None, None
 
-    out_tmp = '/tmp/regovar_exec_cmd_out'
-    err_tmp = '/tmp/regovar_exec_cmd_err'
+    out_tmp = '/tmp/asg_exec_cmd_out'
+    err_tmp = '/tmp/absg_exec_cmd_err'
     print("execute command sync : {}".format(" ".join(cmd)))
     res = subprocess.call(cmd, stdout=open(out_tmp, "w"), stderr=open(err_tmp, "w"))
     out = open(out_tmp, "r").read()
@@ -64,11 +84,6 @@ def exec_cmd(cmd, asynch=False):
     return res, out, err
 
 
-def notify_all(msg):
-    """
-        Default delegate used by the core for notification.
-    """
-    print(str(msg))
 
 
 
@@ -79,6 +94,19 @@ def notify_all(msg):
 # TOOLS
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
+    
+
+def get_pipeline_forlder_name(name:str):
+    """
+        Todo : doc
+    """
+    cheked_name = ""
+    for l in name:
+        if l.isalnum() or l in [".", "-", "_"]:
+            cheked_name += l
+        if l == " ":
+            cheked_name += "_"
+    return cheked_name;
 
 
 
@@ -144,6 +172,87 @@ def array_merge(array1, array2):
 
 
 
+def check_date(value, default=None):
+    """
+        Secure method to get datetime from unknow value
+    """
+    if isinstance(value, datetime.datetime): 
+        return value
+    elif isinstance(value, str):
+        try:
+            return datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f") if len(value) > 10 else datetime.datetime.strptime(value, "%Y-%m-%d")
+        except Exception:
+            return default
+    return default
+
+
+def check_int(value, default=None):
+    """
+        Secure method to get int from unknow value
+    """
+    if isinstance(value, int):
+        return value
+    else:
+        try:
+            return int(value)
+        except Exception:
+            return default
+    return default
+
+
+def check_float(value, default=None):
+    """
+        Secure method to get float from unknow value
+    """
+    if isinstance(value, float):
+        return value
+    else:
+        try:
+            return float(value)
+        except Exception:
+            return default
+    return default
+
+
+def check_bool(value, default=None):
+    """
+        Secure method to get bool from unknow value
+    """
+    if isinstance(value, bool):
+        return value
+    else:
+        try:
+            return bool(value)
+        except Exception:
+            return default
+    return default
+
+
+def check_string(value, default=None):
+    """
+        Secure method to get string from unknow value
+    """
+    if isinstance(value, str):
+        return value
+    else:
+        try:
+            return str(value)
+        except Exception:
+            return default
+    return default
+
+
+def remove_duplicates(source):
+    """
+        Remove duplicates in the provided list (keeping elements order)
+    """
+    if isinstance(source, list):
+        result = []
+        for i in source:
+            if i not in result:
+                result.append(i)
+        return result
+    return source
 
 
 
@@ -166,8 +275,13 @@ def get_cached_url(url, prefix="", headers={}):
                 result = json.loads(res.content.decode())
                 set_cache(uri, result)
             except Exception as ex:
-                raise RegovarException("Unable to cache result of the query: " + url, ex)
+                raise AbsgException("Unable to cache result of the query: " + url, ex)
     return result
+
+
+
+
+
 
 
 
@@ -192,8 +306,6 @@ def get_cache(uri):
     return None
 
 
-
-
 def set_cache(uri, data):
     """
         Put the data in the cache
@@ -207,6 +319,27 @@ def set_cache(uri, data):
 
 
 
+
+# =====================================================================================================================
+# DATA MODEL TOOLS
+# =====================================================================================================================
+CHR_DB_MAP = {1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10", 11: "11", 12: "12", 13: "13", 14: "14", 15: "15", 16: "16", 17: "17", 18: "18", 19: "19", 20: "20", 21: "21", 22: "22", 23: "X", 24: "Y", 25: "M"}
+CHR_DB_RMAP = {"1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "11": 11, "12": 12, "13": 13, "14": 14, "15": 15, "16": 16, "17": 17, "18": 18, "19": 19, "20": 20, "21": 21, "22": 22, "23": 23, "24": 24, "25": 25, "X": 23, "Y": 24, "M": 25}
+
+
+def chr_from_db(chr_value):
+    if chr_value in CHR_DB_MAP.keys():
+        return CHR_DB_MAP[chr_value]
+    return None
+
+
+def chr_to_db(chr_value):
+    if chr_value in CHR_DB_RMAP.keys():
+        return CHR_DB_RMAP[chr_value]
+    return None
+
+
+
     
 
 
@@ -217,6 +350,7 @@ def set_cache(uri, data):
 
 absg_logger = None 
 
+    
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
     """
@@ -255,11 +389,35 @@ def war(msg):
 
 def err(msg, exception=None):
     global absg_logger
-    absg_logger.error(msg)
-    if exception and not isinstance(exception, AbsgException):
-        # To avoid to log multiple time the same exception when chaining try/catch
-        absg_logger.exception(exception)
+    log_file = log_snippet(msg, exception)
+    absg_logger.error("[{}] ".format(log_file) + msg)
+    if exception:
+        absg_logger.error("-----------------------------")
+        e_traceback = traceback.format_exception(exception.__class__, exception, exception.__traceback__)
+        for line in e_traceback:
+            absg_logger.error(line)
+        absg_logger.error("=============================")
+    return log_file
+    
 
+
+def log_snippet(longmsg, exception:BaseException=None):
+    """
+        Log the provided msg into a new log file and return the generated log file
+        To use when you want to log a long text (like a long generated sql query by example) to 
+        avoid to poluate the main log with too much code.
+    """
+    uid = str(uuid.uuid4())
+    filename = os.path.join(LOG_DIR, "Error_{}.log".format(uid))
+    with open(filename, 'w+') as f:
+        if exception:
+            # Retrieve stack trace of the exception
+            e_traceback = traceback.format_exception(exception.__class__, exception, exception.__traceback__)
+            for line in e_traceback:
+                f.write(line)
+            f.write("\n=============================\n")
+        f.write(longmsg)
+    return "Error_{}.log".format(uid)
 
 
 
@@ -273,42 +431,30 @@ def err(msg, exception=None):
 
 class AbsgException(Exception):
     """
-        Absg exception
+        Regovar exception
     """
-    msg = "Unknow error :/"
+    msg = "Unknow error :("
     code = "E000000"
 
-    def __init__(self, msg: str, code: str=None, exception: Exception=None, logger: logging.Logger=None):
+    def __init__(self, msg: str=None, code: str=None, args=[], exception: Exception=None, logger: logging.Logger=None):
         self.code = code or AbsgException.code
-        self.msg = msg or AbsgException.msg
-        self.id = str(uuid.uuid4())
-        self.date = datetime.datetime.utcnow().timestamp()
-        self.log = "ERROR {} [{}] {}".format(self.code, self.id, self.msg)
-
-        if logger:
-            logger.error(self.log)
-            if exception and not isinstance(exception, AbsgException):
-                # To avoid to log multiple time the same exception when chaining try/catch
-                logger.exception(exception)
+        
+        # If code set, we can retrieve default error message from error_list, else get message or unknow message
+        if code and not msg: 
+            from core.framework.errors_list import ERR
+            self.msg = eval("ERR.{}".format(code))
+            self.msg = self.msg.format(*args)
         else:
-            err(self.log, exception)
+            self.msg = msg or AbsgException.msg
+        self.date = datetime.datetime.utcnow().timestamp()
+        self.log = "ERROR {} - {}".format(self.code, self.msg)
 
 
     def __str__(self):
         return self.log
 
 
-def log_snippet(longmsg, exception: AbsgException=None):
-    """
-        Log the provided msg into a new log file and return the generated log file
-        To use when you want to log a long text (like a long generated sql query by example) to 
-        avoid to poluate the main log with too much code.
-    """
-    uid = exception.id if exception else str(uuid.uuid4())
-    filename = os.path.join(LOG_DIR,"snippet_{}.log".format(uid))
-    with open(filename, 'w+') as f:
-        f.write(longmsg)
-    return filename
+
 
 
 
@@ -363,5 +509,5 @@ class Timer(object):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 # Create logger
-setup_logger('regovar', os.path.join(LOG_DIR, "absg.log"))
+setup_logger('absg', os.path.join(LOG_DIR, "absg.log"), logging.DEBUG if DEBUG else logging.INFO)
 absg_logger = logging.getLogger('absg')

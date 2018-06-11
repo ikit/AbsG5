@@ -18,7 +18,7 @@ CREATE TYPE topic_type   AS ENUM ('thread', 'important','article');
 -- CORE TABLES
 --
 
-CREATE TABLE public.parameter
+CREATE TABLE parameter
 (
     key character varying(255) COLLATE pg_catalog."C",
     value character varying(255) COLLATE pg_catalog."C",
@@ -28,7 +28,7 @@ CREATE TABLE public.parameter
 
 
 
-CREATE TABLE public.log
+CREATE TABLE log
 (
     user_id integer NOT NULL,
     datetime timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
@@ -41,7 +41,7 @@ CREATE TABLE public.log
 
 
 
-CREATE TABLE public.rank
+CREATE TABLE rank
 (
     code character varying(2) NOT NULL COLLATE pg_catalog."C",
     title character varying(20) NOT NULL COLLATE pg_catalog."C",
@@ -52,7 +52,7 @@ CREATE TABLE public.rank
 
 
 
-CREATE TABLE public.user
+CREATE TABLE user
 (
     id serial NOT NULL,
     people_id integer,
@@ -67,7 +67,7 @@ CREATE TABLE public.user
 );
 
 
-CREATE TABLE public.user_daily
+CREATE TABLE user_daily
 (
     datetime timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     user_id integer NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE public.user_daily
 
 
 
-CREATE TABLE public.file
+CREATE TABLE file
 (
     id serial NOT NULL,
     creation_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
@@ -97,7 +97,7 @@ CREATE TABLE public.file
 --
 -- CITATION Module
 --
-CREATE TABLE public.citation
+CREATE TABLE citation
 (
     id serial NOT NULL,
     poster_id integer NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE public.citation
 --
 -- AGENDA Module
 --
-CREATE TABLE public.people
+CREATE TABLE people
 (
     id serial NOT NULL,
     firstname character varying(255) COLLATE pg_catalog."C",
@@ -135,7 +135,7 @@ CREATE TABLE public.people
 );
 
 
-CREATE TABLE public.event
+CREATE TABLE event
 (
     id serial NOT NULL,
     start_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
@@ -148,7 +148,7 @@ CREATE TABLE public.event
 );
 
 
-CREATE TABLE public.people_event
+CREATE TABLE people_event
 (
     people_id integer NOT NULL,
     event_id integer NOT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE public.people_event
 --
 -- Forum Module
 --
-CREATE TABLE public.forum
+CREATE TABLE forum
 (
     id serial NOT NULL,
     parent_id integer,
@@ -177,7 +177,7 @@ CREATE TABLE public.forum
     CONSTRAINT forum_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.topic
+CREATE TABLE topic
 (
     id serial NOT NULL,
     forum_id integer,
@@ -196,7 +196,7 @@ CREATE TABLE public.topic
     CONSTRAINT topic_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.message
+CREATE TABLE message
 (
     id serial NOT NULL,
     forum_id integer NOT NULL,
@@ -207,7 +207,7 @@ CREATE TABLE public.message
     CONSTRAINT message_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.message_file
+CREATE TABLE message_file
 (
     message_id integer NOT NULL,
     file_id integer NOT NULL,
@@ -222,7 +222,7 @@ CREATE TABLE public.message_file
 --
 -- GTheque Module (gtheque_)
 --
-CREATE TABLE public.gtheque_book
+CREATE TABLE gtheque_book
 (
     isbn varchar(25) NOT NULL,
     firstname character varying(255) COLLATE pg_catalog."C",
@@ -261,7 +261,8 @@ CREATE TABLE public.gtheque_book
 -- DATA
 --
 
-INSERT INTO public.parameter (key, value) VALUES
+INSERT INTO parameter (key, value) VALUES
+('database_version', '1'),
 ('agpa_phase_boundaries', '1/1-24/12-26/12-27/12-28/12-30/12'),
 ('log_last_autocheck', '1484437405'),
 ('site_offline', ''),
@@ -272,11 +273,11 @@ INSERT INTO public.parameter (key, value) VALUES
 
 
 
-INSERT INTO public.rank (code, title, g_note) VALUES
+INSERT INTO rank (code, title, g_note) VALUES
 ('00', 'Fi G', 0);
 
 
-INSERT INTO public.user (id, people_id, username, username_clean) VALUES
+INSERT INTO "user" (id, people_id, username, username_clean) VALUES
 (1, 1, 'Zaffa', 'zaffa'),
 (2, 2, 'Olive', 'olive');;
 

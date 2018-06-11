@@ -1,6 +1,6 @@
 #!env/python3
 # coding: utf-8
-import ipdb; 
+import ipdb
 
 
 import os
@@ -39,87 +39,78 @@ class ApiHandler:
     def __init__(self):
         pass
 
-    def welcom(self, request):
-        
-        # Retrieve github informations
-        response = requests.get("https://api.github.com/repos/ikit/AbsG5/milestones")
-        data = False
-        if response.ok:
-            data = json.loads(response.content.decode())
-
+    
+    @user_role('Authenticated')
+    def welcome(self, request):
+        """
+            Get all data to init/refresh data client side
+            /!\ Result answer may be heavy
+        """
 
         result = {
-            "api_url": HOST_P,
-            "title": "Regovar Service API",
-            "version": VERSION,
-            "website" : "http://regovar.org",
-            "last_events": [],
-            "milestones" : data
+            # "analyses": core.analyses.list(),
+            # "subjects": core.subjects.list(),
+            # "samples": core.samples.list(),
+            # "projects": core.projects.list(),
+            # "panels": core.panels.list(),
+            # "pipelines": core.pipelines.list(),
+            # "jobs": core.jobs.list(),
+            # "users": core.users.list(),
+            # "last_events": core.events.list(),
+            # "last_analyses": self.get_last_analyses(),
+            # "last_subjects" : self.get_last_subjects(),
+            # "references" : [{"id": ref[0], "name": ref[1]} for ref in core.annotations.ref_list.items()]
         }
-
-        return rest_success(result)
+        return rest_success(check_local_path(result))
 
 
 
     def config(self, request):
+        """
+            Return the server configuration and planned milestones for server and official client
+        """
+        # Retrieve github informations
+        response = requests.get("https://api.github.com/repos/ikit/Girouette/milestones")
+        cdata = False
+        if response.ok:
+            cdata = json.loads(response.content.decode())
+        response = requests.get("https://api.github.com/repos/ikit/Absg5/milestones")
+        sdata = False
+        if response.ok:
+            sdata = json.loads(response.content.decode())
+
+        # Get message
+        sql = "SELECT value FROM parameter WHERE key = 'message'"
+        message = {"type": "info", "message": ""}
+        for res in execute(sql):
+            message = json.loads(res.value)
+
         return rest_success({
-            "version" : VERSION,
+            "website": "http://dev.absolumentg.fr",
+            "version" : core.version,
+            "db_version": core.db_version,
             "host" : HOST_P,
             "pagination_default_range": RANGE_DEFAULT,
-            "pagination_max_range": RANGE_MAX
+            "pagination_max_range": RANGE_MAX,
+            "server_milestones" : sdata,
+            "client_milestones" : cdata,
+            "message": message
             })
-    
-    def get_tools(self, request):
-        return rest_success(self.get_tools_list())
-    
-    
-    
     
     
     
     @aiohttp_jinja2.template('api_test.html')
     def api(self, request):
         return {
-            "version" : VERSION,
-            "hostname" : HOST_P,
-            "file_public_fields" : ", ".join(File.public_fields)
-            }
+            "version" : core.version,
+            "hostname" : HOST_P
+        }
     
-    
-    
-    
-    def get_tools_list(self):
-        result = { "exporters" : [], "reporters" : [] }
-        exporters = core.exporters.copy()
-        for t in exporters: 
-            if "mod" in exporters[t]: 
-                exporters[t].pop("mod")
-            result["exporters"].append(exporters[t])
-        reporters = core.reporters.copy()
-        for t in reporters: 
-            if "mod" in reporters[t]: 
-                reporters[t].pop("mod")
-            result["reporters"].append(reporters[t])
-        return result
-    
-    
-    def get_last_analyses(self):
-        """
-            Return last analyses
-        """
-        result = session().query(Analysis).order_by(Analysis.update_date.desc(), Analysis.name.asc()).limit(10).all()
-        for res in result: res.init(0)
-        fields = Analysis.public_fields + ["project"]
-        return [r.to_json(fields) for r in result]
-    
-    
-    def get_last_subjects(self):
-        """
-            Return last subjects
-        """
-        result = session().query(Subject).order_by(Subject.update_date.desc(), Subject.lastname.asc()).limit(10).all()
-        for res in result: res.init(0)
-        return [r.to_json() for r in result]
 
-    
-    
+
+
+
+
+
+
+

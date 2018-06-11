@@ -33,9 +33,9 @@ VCF_IMPORT_MAX_THREAD = 7
 
 
 # FILESYSTEM
-FILES_DIR = "/var/absg5/files"
-TEMP_DIR = "/var/absg5/downloads"
-CACHE_DIR = "/var/absg5/cache"
+FILES_DIR = "/var/absg/files"
+TEMP_DIR = "/var/absg/downloads"
+CACHE_DIR = "/var/absg/cache"
 
 CACHE_EXPIRATION_SECONDS = 2592000 # 30 days = 60*60*24*30
 
