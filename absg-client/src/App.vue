@@ -1,0 +1,196 @@
+<template>
+  <v-app id="inspire">
+    <v-navigation-drawer
+      fixed
+      :clipped="$vuetify.breakpoint.mdAndUp"
+      app
+      v-model="drawer">
+      <v-list dense>
+        <template v-for="item in items">
+          <v-list-group
+            v-if="item.children"
+            v-model="item.model"
+            :key="item.text"
+            :prepend-icon="item.model ? item.icon : item['icon-alt']"
+            append-icon="">
+            <v-list-tile slot="activator">
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  {{ item.text }}
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile v-for="(child, i) in item.children" :key="i" :to="child.route">
+              <v-list-tile-action v-if="child.icon">
+                <v-icon>{{ child.icon }}</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>
+                  {{ child.text }}
+                </v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list-group>
+          <v-list-tile v-else :key="item.text" :to="item.route">
+            <v-list-tile-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>
+                {{ item.text }}
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </template>
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-toolbar
+      color="primary"
+      dark
+      app
+      :clipped-left="$vuetify.breakpoint.mdAndUp"
+      fixed>
+      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+        <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <span class="hidden-sm-and-down">
+          <v-tooltip bottom>
+            <span slot="activator"><router-link to="/">Absolument G</router-link></span>
+            <span>Revenir à l'accueil</span>
+          </v-tooltip>
+          </span>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-badge color="red" overlap>
+        <span slot="badge">8</span>
+        <v-btn icon>
+          <v-icon>fas fa-bell</v-icon>
+        </v-btn>
+      </v-badge>
+      <v-btn color="primary" dark>
+        Bébé Ma'anne
+        <v-icon right>fas fa-user-circle</v-icon>
+      </v-btn>
+    </v-toolbar>
+    <v-content>
+      <router-view class="view"></router-view>
+    </v-content>
+    <v-btn
+      fab
+      bottom
+      right
+      color="accent"
+      dark
+      fixed
+      @click.stop="dialog = !dialog">
+      <v-icon>fas fa-plus</v-icon>
+    </v-btn>
+
+    <v-dialog v-model="dialog" width="800px">
+      <v-card>
+        <v-card-title
+          class="grey lighten-4 py-4 title"
+        >
+          Create contact
+        </v-card-title>
+        <v-container grid-list-sm class="pa-4">
+          <v-layout row wrap>
+            <v-flex xs12 align-center justify-space-between>
+              <v-layout align-center>
+                <v-avatar size="40px" class="mr-3">
+                  <img
+                    src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
+                    alt=""
+                  >
+                </v-avatar>
+                <v-text-field
+                  placeholder="Name"
+                ></v-text-field>
+              </v-layout>
+            </v-flex>
+            <v-flex xs6>
+              <v-text-field
+                prepend-icon="business"
+                placeholder="Company"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs6>
+              <v-text-field
+                placeholder="Job title"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                prepend-icon="mail"
+                placeholder="Email"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                type="tel"
+                prepend-icon="phone"
+                placeholder="(000) 000 - 0000"
+                mask="phone"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                prepend-icon="notes"
+                placeholder="Notes"
+              ></v-text-field>
+            </v-flex>
+          </v-layout>
+        </v-container>
+        <v-card-actions>
+          <v-btn flat color="primary">More</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn flat color="primary" @click="dialog = false">Cancel</v-btn>
+          <v-btn flat @click="dialog = false">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-app>
+</template>
+
+<script>
+import HelloWorld from './components/HelloWorld';
+
+export default {
+  name: 'App',
+  el: '#app',
+  components: {
+    HelloWorld,
+  },
+  data() {
+    return {
+      dialog: false,
+      drawer: null,
+      items: [
+        { icon: 'fas fa-home', text: 'Accueil', route: '/' },
+        { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
+        { icon: 'fas fa-image', text: 'Images du moment', route: '/immt' },
+        { icon: 'fas fa-comment', text: 'Discussions', route: '/forum' },
+        { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
+        { icon: 'far fa-calendar-alt', text: 'Calendrier', route: '/calendrier' },
+        { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
+        { icon: 'fas fa-cloud', text: 'Cloud', route: '/cloud' },
+        { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
+        { icon: 'fas fa-flask', text: 'Labo', route: '/lab' },
+        {
+          icon: 'fas fa-chevron-up',
+          'icon-alt': 'fas fa-chevron-down',
+          text: 'Avancé',
+          model: false,
+          children: [
+            { icon: 'fas fa-search', text: 'Rechercher', route: '/recherche' },
+            { icon: 'fas fa-wrench', text: 'Paramètres', route: '/parametres' },
+            { icon: 'fas fa-chart-bar', text: 'Statistiques', route: '/stats' },
+            { icon: 'fas fa-tools', text: 'Administration', route: '/zaffa' },
+            { icon: 'fas fa-question', text: 'Aide', route: '/aide' },
+          ]
+        },
+      ]
+    };
+  },
+};
+</script>
