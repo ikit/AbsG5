@@ -10,23 +10,18 @@
         </v-flex>
       </v-layout>
       <v-layout justify-center row>
-        <v-flex shrink md6 xl6 >
-          <v-card class="absgCard">
-            <v-card-title primary-title>
-              <p class="citation-header">
-                <span class="citation-icon">
-                  <v-icon>fas fa-quote-left</v-icon>
-                </span>
-                Alain
-              </p>
-              <p class="citation">"C'est dans la baignoire qu'on se douche !"</p>
-            </v-card-title>
+        <v-flex sm8 md6>
+          <v-card class="absgCard" style="margin: auto">
+            <div style="float:left; margin: 10px;">
+              <v-icon>fas fa-quote-left</v-icon> <span style="font-weight: bold; font-size: 1.3em; color: #555; margin-left: 10px;">Alain</span>
+            </div>
+              <div class="citation">"C'est dans la baignoire qu'on se douche !"</div>
           </v-card>
         </v-flex>
       </v-layout>
-      <v-layout justify-center row style="margin-top: 20px;">
+      <v-layout justify-center wrap style="margin-top: 20px;">
         
-        <v-flex md6 lg5 xl3 align-self-center>
+        <v-flex sm12 md6 lg4 align-self-center>
           <v-card >
             <v-card-title primary-title>
               <h1>Dernières activités</h1>
@@ -72,7 +67,7 @@
           </v-card>
         </v-flex>
         
-        <v-flex md6 xl3 align-self-center>
+        <v-flex sm12 md6 lg4 align-self-center>
           <v-card >
             
             <v-img
@@ -106,6 +101,14 @@
     background-repeat: no-repeat; 
     background-image: url('../assets/zaffaneries/005/rang-05.png.v.png');
     max-width: 600px;
+    min-height: 100px;
+
+  }
+  .citation {
+    display: block;
+    clear: both;
+    text-align: center;
+    font-size: 1.1em;
   }
 </style>
 
