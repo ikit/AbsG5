@@ -63,35 +63,41 @@
       <v-spacer></v-spacer>
       <v-badge color="red" overlap>
         <span slot="badge">8</span>
-        <v-btn icon>
+        <v-btn icon
+          @click.stop="dialog = !dialog">
           <v-icon>fas fa-bell</v-icon>
         </v-btn>
       </v-badge>
-      <v-btn color="primary" dark>
-        Bébé Ma'anne
-        <v-icon right>fas fa-user-circle</v-icon>
-      </v-btn>
+      <v-menu offset-y bottom left>
+        <v-btn color="primary" dark slot="activator">
+          Bébé Ma'anne
+          <v-icon right>fas fa-user-circle</v-icon>
+        </v-btn>
+        <v-list>
+          <v-list-tile>
+            <v-list-tile-title :key="0" @click="">Mes informations</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile>
+            <v-list-tile-title :key="1" @click="">Mes statistiques</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile>
+            <v-list-tile-title :key="2" @click="">Changer mot de passe</v-list-tile-title>
+          </v-list-tile>
+          <v-list-tile>
+            <v-list-tile-title :key="3" @click="">Déconnexion</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
     </v-toolbar>
     <v-content>
       <router-view class="view"></router-view>
     </v-content>
-    <v-btn
-      fab
-      bottom
-      right
-      color="accent"
-      dark
-      fixed
-      @click.stop="dialog = !dialog">
-      <v-icon>fas fa-plus</v-icon>
-    </v-btn>
-
     <v-dialog v-model="dialog" width="800px">
       <v-card>
         <v-card-title
           class="grey lighten-4 py-4 title"
         >
-          Create contact
+          Notifications
         </v-card-title>
         <v-container grid-list-sm class="pa-4">
           <v-layout row wrap>
@@ -142,10 +148,9 @@
           </v-layout>
         </v-container>
         <v-card-actions>
-          <v-btn flat color="primary">More</v-btn>
+          <v-btn flat color="primary">Supprimer toutes les notifications</v-btn>
           <v-spacer></v-spacer>
-          <v-btn flat color="primary" @click="dialog = false">Cancel</v-btn>
-          <v-btn flat @click="dialog = false">Save</v-btn>
+          <v-btn flat @click="dialog=false">Fermer</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

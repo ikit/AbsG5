@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
-import CitationsBrowser from './views/CitationsBrowser.vue';
+import Citations from './views/Citations.vue';
 
 Vue.use(Router);
 
@@ -17,7 +17,7 @@ export default new Router({
     {
       path: '/citations',
       name: 'home',
-      component: CitationsBrowser,
+      component: Citations,
     },
     {
       path: '/citations',
@@ -25,7 +25,7 @@ export default new Router({
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "citations" */ './views/CitationsBrowser.vue'),
+      component: () => import(/* webpackChunkName: "citations" */ './views/Citations.vue'),
     },
   ],
 });
