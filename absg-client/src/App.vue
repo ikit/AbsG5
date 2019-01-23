@@ -31,7 +31,7 @@
               </v-list-tile-content>
             </v-list-tile>
           </v-list-group>
-          <v-list-tile v-else :key="item.text" :to="item.route">
+          <v-list-tile v-else :key="item.text" :to="item.route" active-class="primary--text">
             <v-list-tile-action>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
@@ -69,7 +69,7 @@
         </v-btn>
       </v-badge>
       <v-menu offset-y bottom left>
-        <v-btn color="primary" dark slot="activator">
+        <v-btn color="primary" dark depressed slot="activator">
           Bébé Ma'anne
           <v-icon right>fas fa-user-circle</v-icon>
         </v-btn>
@@ -177,6 +177,7 @@ export default {
         { icon: 'fas fa-comment', text: 'Discussions', route: '/forum' },
         { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
         { icon: 'far fa-calendar-alt', text: 'Calendrier', route: '/calendrier' },
+        { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
         { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
         { icon: 'fas fa-cloud', text: 'Cloud', route: '/cloud' },
         { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },

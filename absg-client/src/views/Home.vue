@@ -86,31 +86,7 @@
   
 </template>
 
-<style scoped>
-  h1 {
-    color: rgba(0, 0, 0, 0.5);
-    text-shadow: 0 1px #fff;
-    font-size: 25px;
-    font-weight: 100;
-    margin-top: 70px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-  }
 
-  .absgCard{
-    background-position: bottom left; 
-    background-repeat: no-repeat; 
-    background-image: url('../assets/zaffaneries/005/rang-05.png.v.png');
-    max-width: 600px;
-    min-height: 100px;
-
-  }
-  .citation {
-    display: block;
-    clear: both;
-    text-align: center;
-    font-size: 1.1em;
-  }
-</style>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
@@ -175,3 +151,30 @@ export class Home extends Vue {
 
 }
 </script>
+
+
+<style scoped>
+  h1 {
+    color: rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px #fff;
+    font-size: 25px;
+    font-weight: 100;
+    margin-top: 70px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .absgCard{
+    background-position: bottom left; 
+    background-repeat: no-repeat; 
+    background-image: url('../assets/zaffaneries/005/rang-05.png.v.png');
+    max-width: 600px;
+    min-height: 100px;
+
+  }
+  .citation {
+    display: block;
+    clear: both;
+    text-align: center;
+    font-size: 1.1em;
+  }
+</style>
