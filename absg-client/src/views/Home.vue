@@ -1,5 +1,5 @@
 <template>
-  <div class="home" style="margin-top: 50px;">
+  <div class="home" style="margin-top: 50px;" v-cloak>
     <v-container fluid grid-list-md align-center>
       <v-layout justify-center row>
         <v-flex shrink>
@@ -13,9 +13,9 @@
         <v-flex sm8 md6>
           <v-card class="absgCard" style="margin: auto">
             <div style="float:left; margin: 10px;">
-              <v-icon>fas fa-quote-left</v-icon> <span style="font-weight: bold; font-size: 1.3em; color: #555; margin-left: 10px;">Alain</span>
+              <v-icon>fas fa-quote-left</v-icon> <span style="font-weight: bold; font-size: 1.3em; color: #555; margin-left: 10px;">{{citation.author}}</span>
             </div>
-              <div class="citation">"C'est dans la baignoire qu'on se douche !"</div>
+              <div class="citation">{{citation.citation}}</div>
           </v-card>
         </v-flex>
       </v-layout>
@@ -27,7 +27,7 @@
               <h1>Dernières activités</h1>
             </v-card-title>
             <v-list two-line>
-              <template v-for="(item, index) in items">
+              <template v-for="(item, index) in logs">
                 <v-list-tile
                   :key="item.title"
                   avatar
@@ -59,7 +59,7 @@
 
                 </v-list-tile>
                 <v-divider
-                  v-if="index + 1 < items.length"
+                  v-if="index + 1 < logs.length"
                   :key="index"
                 ></v-divider>
               </template>
@@ -91,63 +91,56 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-export default {
-    data () {
-      return {
-        selected: [2],
-        items: [
-          {
-            action: '15 min',
-            headline: 'Brunch this weekend?',
-            title: 'Ali Connors',
-            subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
-          },
-          {
-            action: '2 hr',
-            headline: 'Summer BBQ',
-            title: 'me, Scrott, Jennifer',
-            subtitle: "Wish I could come, but I'm out of town this weekend."
-          },
-          {
-            action: '6 hr',
-            headline: 'Oui oui',
-            title: 'Sandra Adams',
-            subtitle: 'Do you have Paris recommendations? Have you ever been?'
-          },
-          {
-            action: '12 hr',
-            headline: 'Birthday gift',
-            title: 'Trevor Hansen',
-            subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
-          },
-          {
-            action: '18hr',
-            headline: 'Recipe to try',
-            title: 'Britta Holt',
-            subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
-          }
-        ]
-      }
-    },
-
-    methods: {
-      toggle (index) {
-        const i = this.selected.indexOf(index)
-
-        if (i > -1) {
-          this.selected.splice(i, 1)
-        } else {
-          this.selected.push(index)
-        }
-      }
-    }
+@Component({
+})
+export default class Home extends Vue {
+  citation = {
+    author: "Alain",
+    citation: "C'est dans la baignoire qu'on se douche !",
   };
-
-
-@Component({})
-export class Home extends Vue {
+  selected = [2];
+  logs = [
+    {
+      action: '15 min',
+      headline: 'Brunch this weekend?',
+      title: 'Ali Connors',
+      subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+    },
+    {
+      action: '2 hr',
+      headline: 'Summer BBQ',
+      title: 'me, Scrott, Jennifer',
+      subtitle: "Wish I could come, but I'm out of town this weekend."
+    },
+    {
+      action: '6 hr',
+      headline: 'Oui oui',
+      title: 'Sandra Adams',
+      subtitle: 'Do you have Paris recommendations? Have you ever been?'
+    },
+    {
+      action: '12 hr',
+      headline: 'Birthday gift',
+      title: 'Trevor Hansen',
+      subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
+    },
+    {
+      action: '18hr',
+      headline: 'Recipe to try',
+      title: 'Britta Holt',
+      subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
+    }
+  ];
   
+  toggle (index: number) {
+    const i = this.selected.indexOf(index)
 
+    if (i > -1) {
+      this.selected.splice(i, 1)
+    } else {
+      this.selected.push(index)
+    }
+  }
 
 }
 </script>
