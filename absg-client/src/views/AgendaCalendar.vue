@@ -1,6 +1,6 @@
 <template>
   <div class="home" style="margin-top: 50px;">
-    <h1>Calendrier Absolument G {{ toto }}</h1>
+    <h1>Calendrier Absolument G</h1>
 
     
     <v-card style="margin: 14px;">
@@ -18,7 +18,6 @@ import { Calendar } from 'dayspan';
 @Component({})
 export default class AgendaCalendar extends Vue {
   calendar = Calendar.months();
-  toto = "salut";
 
 
 }

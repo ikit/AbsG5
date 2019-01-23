@@ -6,7 +6,6 @@
 
 <script>
 import { Component, Vue } from 'vue-property-decorator';
-import { Calendar } from 'dayspan';
 
 @Component({})
 export default class CalendarG extends Vue {
