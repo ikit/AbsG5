@@ -16,20 +16,17 @@ export default new Router({
     {
       path: '/citations',
       name: 'citations',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "citations" */ './views/Citations.vue'),
+      component: () => import('./views/Citations.vue'),
     },
     {
       path: '/immt',
       name: 'immt',
-      component: () => import( './views/Immt.vue'),
+      component: () => import('./views/Immt.vue'),
     },
     {
       path: '/calendrier',
       name: 'calendrier',
-      component: () => import( './views/AgendaCalendar.vue'),
+      component: () => import('./views/AgendaCalendar.vue'),
     },
   ],
 })
