@@ -88,60 +88,58 @@
 
 
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+<script>
 
-@Component({
-})
-export default class Home extends Vue {
-  citation = {
-    author: "Alain",
-    citation: "C'est dans la baignoire qu'on se douche !",
-  };
-  selected = [2];
-  logs = [
-    {
-      action: '15 min',
-      headline: 'Brunch this weekend?',
-      title: 'Ali Connors',
-      subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+export default  {
+  data: () => ({
+    citation: {
+      author: "Alain",
+      citation: "C'est dans la baignoire qu'on se douche !",
     },
-    {
-      action: '2 hr',
-      headline: 'Summer BBQ',
-      title: 'me, Scrott, Jennifer',
-      subtitle: "Wish I could come, but I'm out of town this weekend."
-    },
-    {
-      action: '6 hr',
-      headline: 'Oui oui',
-      title: 'Sandra Adams',
-      subtitle: 'Do you have Paris recommendations? Have you ever been?'
-    },
-    {
-      action: '12 hr',
-      headline: 'Birthday gift',
-      title: 'Trevor Hansen',
-      subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
-    },
-    {
-      action: '18hr',
-      headline: 'Recipe to try',
-      title: 'Britta Holt',
-      subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
+    selected: [2],
+    logs: [
+      {
+        action: '15 min',
+        headline: 'Brunch this weekend?',
+        title: 'Ali Connors',
+        subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+      },
+      {
+        action: '2 hr',
+        headline: 'Summer BBQ',
+        title: 'me, Scrott, Jennifer',
+        subtitle: "Wish I could come, but I'm out of town this weekend."
+      },
+      {
+        action: '6 hr',
+        headline: 'Oui oui',
+        title: 'Sandra Adams',
+        subtitle: 'Do you have Paris recommendations? Have you ever been?'
+      },
+      {
+        action: '12 hr',
+        headline: 'Birthday gift',
+        title: 'Trevor Hansen',
+        subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
+      },
+      {
+        action: '18hr',
+        headline: 'Recipe to try',
+        title: 'Britta Holt',
+        subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
+      }
+    ],
+    methods: {
+      toggle: function (index) {
+        const i = this.selected.indexOf(index)
+        if (i > -1) {
+          this.selected.splice(i, 1)
+        } else {
+          this.selected.push(index)
+        }
+      }
     }
-  ];
-  
-  toggle (index: number) {
-    const i = this.selected.indexOf(index)
-
-    if (i > -1) {
-      this.selected.splice(i, 1)
-    } else {
-      this.selected.push(index)
-    }
-  }
-
+  })
 }
 </script>
 
@@ -155,14 +153,12 @@ export default class Home extends Vue {
     margin-top: 70px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   }
-
   .absgCard{
     background-position: bottom left; 
     background-repeat: no-repeat; 
-    background-image: url('../assets/zaffaneries/005/rang-05.png.v.png');
+    /*background-image: url('../assets/zaffaneries/005/rang-05.png.v.png');*/
     max-width: 600px;
     min-height: 100px;
-
   }
   .citation {
     display: block;

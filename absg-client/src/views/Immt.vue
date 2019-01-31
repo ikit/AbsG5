@@ -71,13 +71,10 @@
 
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-
-@Component({})
-export default class Immt extends Vue {
-  posters = ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'];
-
-
+export default  {
+    data: () => ({
+        posters: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie']
+    })
 }
 </script>
 
@@ -92,7 +89,6 @@ export default class Immt extends Vue {
     margin-inline-start: 0px;
     margin-inline-end: 0px;
     font-weight: bold;
-
     text-align: center;
     color: $primary;
     text-shadow: 0 -1px #000;

@@ -1,9 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
-import Citations from './views/Citations.vue';
 
-Vue.use(Router);
+Vue.use(Router)
 
 export default new Router({
   mode: 'history',
@@ -13,11 +12,6 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home,
-    },
-    {
-      path: '/citations',
-      name: 'home',
-      component: Citations,
     },
     {
       path: '/citations',
@@ -38,4 +32,4 @@ export default new Router({
       component: () => import( './views/AgendaCalendar.vue'),
     },
   ],
-});
+})

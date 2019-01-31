@@ -2,7 +2,8 @@
   <v-container>
     <v-layout
       text-xs-center
-      wrap>
+      wrap
+    >
       <v-flex xs12>
         <v-img
           :src="require('../assets/logo.svg')"
@@ -83,10 +84,6 @@
   </v-container>
 </template>
 
-<style>
-
-</style>
-
 <script>
   export default {
     data: () => ({
@@ -144,3 +141,7 @@
     })
   }
 </script>
+
+<style>
+
+</style>
