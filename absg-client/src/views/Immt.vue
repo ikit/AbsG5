@@ -70,7 +70,7 @@
 
 
 
-<script lang="ts">
+<script>
 export default  {
     data: () => ({
         posters: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie']

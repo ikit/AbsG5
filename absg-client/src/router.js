@@ -28,5 +28,10 @@ export default new Router({
       name: 'calendrier',
       component: () => import('./views/AgendaCalendar.vue'),
     },
+    {
+      path: '/cloud',
+      name: 'cloud',
+      component: () => import('./views/Cloud.vue'),
+    },
   ],
 })
