@@ -1,109 +1,85 @@
 
 # Installation du serveur Regovar
 
-## Pré-requis
+À terme, Regovar pourra être installé via un paquet .deb. À l'heure actuelle, deux modes de déploiement pour le serveur sont proposés :
+ - directement sur le serveur (installation et configuration automatisées via SaltStack) ;
+ - via Docker où Regovar est lui-même encapsulé dans un conteneur.
+La première méthode est prévue pour un déploiement et une utilisation de Regovar sur une machine dédiée, tandis que la seconde permet une installation rapide et simple sans impact sur la configuration de la machine hôte.
 
- * Linux Ubuntu Xenial (la seule distribution testé à ce jour).
- * Les droits admins sur le serveur
+### Via SaltStack
+
+Référez-vous au [README](https://github.com/REGOVAR/ServerConfiguration/blob/master/README.md) de la configuration utilisée pour le déploiement au CHU d'Angers et de Nancy.
+
+Une fois le serveur installé, vous pouvez le démarrer.
+```sh
+cd ~/Regovar/regovar
+sudo -u regovar python3 regovar.py
+```
+
+### Via Docker
+
+La procédure reste relativement simple grâce à un script `install.sh` qui va vous poser quelques questions afin de configurer et créer pour vous les conteneurs docker, le proxy nginx et l'application regovar.  
+
+####Pré-requis
+
+ * Ubuntu Xenial LTS (pipelines et analyse de variants) ou Debian Stretch ou supérieur (analyse de variants uniquement)
+ * Droits root sur le serveur
  * Accès internet depuis le serveur
- * Python 3.6
- * [Dépôt pour PostgresSQL 9.6](https://askubuntu.com/questions/831292/how-to-install-postgresql-9-6-on-any-ubuntu-version) ?
+ * Git
+ * [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+ * [Docker-compose](https://docs.docker.com/compose/install/#install-compose)
+ * Ne pas oublier de s'autoriser à utiliser Docker directement avec la commande ci-dessous
 
-
-## Installation
-
-Les commandes préfixées par '#' sont a exécuter en tant que root.
-
-
-```
-    # apt update && apt upgrade
-    # apt install git ca-certificates nginx postgresql-9.6 build-essential libssl-dev libffi-dev python3.6-dev virtualenv libpq-dev libmagickwand-dev python3-venv
-    # useradd regovar --create-home
-    # adduser regovar sudo # We need sudo power 
-    # sudo -u postgres createuser -P -s regovar # type "regovar" as password
-    # sudo -u postgres createdb regovar
-    # mkdir -p /var/regovar/{cache,downloads,files,pipelines,jobs,databases/hg19,databases/hg38}
-    # cd /var/regovar/databases/hg38
-    # wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/refGene.txt.gz
-    # gunzip refGene.txt.gz
-    # cd /var/regovar/databases/hg19
-    # wget http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz
-    # gunzip refGene.txt.gz
-    # chown -R regovar:regovar /var/regovar
-    # su regovar
-    $ cd
-    $ git clone https://github.com/REGOVAR/Regovar.git ~/Regovar
-    $ cd ~/Regovar
-    $ virtualenv -p /usr/bin/python3.6 venv
-    $ source venv/bin/activate
-    => CHECK that you are using python 3.6
-    $ python --version
-    $ pip --version
-    $ pip install -r requirements.txt
-    $ cd regovar
-    $ make init
-    => Please, edit the $PWD/config.py file before proceed to the installation with the command 'make install'
-    $ make install 
-    $ make update_hpo
+```sh
+sudo usermod -a -G docker $USER
 ```
 
-### If you get 'error FATAL peer authentication'
-You need to update the postgresql server config to allow "trus connection" : /etc/postgresql/9.6/main/pg_hba.conf
+N'oubliez pas de vous déconnecter de la session en cours et de vous reconnecter pour que l'ajout au groupe soit pris en compte.
 
+####Procédure
+
+```sh
+git clone https://github.com/REGOVAR/Regovar.git ~/Regovar
+cd ~/Regovar/install
+./install.sh
 ```
-# "local" is for Unix domain socket connections only
-local   all             all                                     trust
+Laissez-vous guider en répondant aux différentes questions. Il vous sera demandé une clé API OMIM, que vous pouvez obtenir à [cette adresse](https://www.omim.org/api).
+
+Une fois l'installation terminée, vous devez mettre à jour les informations HPO.
 ```
-
-## Configuration avec NginX
-
-
-```
-    $ nano ./config.py # edit the config file with your settings
-    # echo 'upstream aiohttp_regovar
-    {
-        server 127.0.0.1:8500 fail_timeout=0;
-    }
-
-    server
-    {
-        listen 80;
-        listen [::]:80;
-        server_name dev.regovar.org;
-        
-        location / {
-            # Need for websockets
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_redirect off;
-            proxy_buffering off;
-            proxy_pass http://aiohttp_regovar;
-        }
-
-        location /static {
-            root /var/regovar/regovar;
-        }
-    }' > /etc/nginx/sites-available/regovar
-    # rm /etc/nginx/sites-enabled/default
-    # ln -s /etc/nginx/sites-available/regovar /etc/nginx/sites-enabled
-    # /etc/init.d/nginx restart
+cd /var/regovar/app
+make update_hpo
+make update_panels
+make start
 ```
 
+####Check final
 
-## Configurer HTTPS et la certification
-
-TODO
-
-
-
-## Démarrer et tester le serveur
-
-
+Si vous laissez tous les choix par défaut, à la fin de l'installation vous pourrez voir deux conteneurs dans docker.
 ```
-    $ make app &!
+➜  regovar git:(dev) docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+be2506e3b293        regovar             "python regovar.py"      24 minutes ago      Up 24 minutes       0.0.0.0:8500->8500/tcp   regovar_app
+0fb1c4b61d4d        postgres            "docker-entrypoint.s…"   24 minutes ago      Up 24 minutes       5432/tcp                 regovar_pg
 ```
+
+ * `regovar_pg`: est la base de donnée (postgreSQL 9.6) dont le contenu est écrit dans /var/regovar/pgdata;
+ * `regovar_app`: est l'application regovar mappée sur le port 8500 de votre serveur;
+
+Le code source de votre serveur est mappé sur le dépot GitHub que vous avez cloné : `~/Regovar`.
+```
+➜  regovar git:(dev) ll /var/regovar 
+total 32K
+lrwxrwxrwx  1 olivier olivier   44 May  2 13:45 app -> /home/olivier/git/Regovar/install/../regovar
+drwxr-xr-x  2 olivier olivier 4.0K May  2 13:14 cache
+drwxr-xr-x  2 olivier olivier 4.0K May  2 13:45 config
+drwxr-xr-x  4 olivier olivier 4.0K May  2 13:14 databases
+drwxr-xr-x  2 olivier olivier 4.0K May  2 13:14 downloads
+drwxr-xr-x  2 olivier olivier 4.0K May  2 13:14 files
+drwxr-xr-x  2 olivier olivier 4.0K May  2 13:14 jobs
+drwx------ 19 olivier olivier 4.0K May  2 13:45 pgdata
+drwxr-xr-x  2 olivier olivier 4.0K May  2 13:14 pipelines
+```
+ 
+ - `/var/regovar/config` répertorie l'ensemble des fichiers configurables de l'application.
 

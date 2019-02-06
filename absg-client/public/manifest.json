@@ -1,6 +1,6 @@
 {
-  "name": "Absolument G",
-  "short_name": "AbsG",
+  "name": "absg-client",
+  "short_name": "absg-client",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",

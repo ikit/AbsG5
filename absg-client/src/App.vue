@@ -75,16 +75,16 @@
         </v-btn>
         <v-list>
           <v-list-tile>
-            <v-list-tile-title :key="0" @click="">Mes informations</v-list-tile-title>
+            <v-list-tile-title :key="0">Mes informations</v-list-tile-title>
           </v-list-tile>
           <v-list-tile>
-            <v-list-tile-title :key="1" @click="">Mes statistiques</v-list-tile-title>
+            <v-list-tile-title :key="1">Mes statistiques</v-list-tile-title>
           </v-list-tile>
           <v-list-tile>
-            <v-list-tile-title :key="2" @click="">Changer mot de passe</v-list-tile-title>
+            <v-list-tile-title :key="2">Changer mot de passe</v-list-tile-title>
           </v-list-tile>
           <v-list-tile>
-            <v-list-tile-title :key="3" @click="">Déconnexion</v-list-tile-title>
+            <v-list-tile-title :key="3">Déconnexion</v-list-tile-title>
           </v-list-tile>
         </v-list>
       </v-menu>
@@ -158,16 +158,10 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
 
-export default {
-  name: 'App',
-  el: '#app',
-  components: {
-    HelloWorld,
-  },
-  data() {
-    return {
+  export default {
+    name: 'App',
+    data: () => ({
       dialog: false,
       drawer: null,
       items: [
@@ -196,7 +190,9 @@ export default {
           ]
         },
       ]
-    };
-  },
-};
+    }),
+    props: {
+      source: String
+    }
+  }
 </script>

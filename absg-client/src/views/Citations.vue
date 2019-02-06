@@ -66,7 +66,6 @@
               v-else
               :key="item.title"
               avatar
-              @click=""
             >
               <v-list-tile-avatar>
                 <img :src="item.avatar">
@@ -85,18 +84,11 @@
 
 
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import CitationsList from '@/components/CitationsList.vue';
-
-@Component({
-  components: {
-    CitationsList,
-  },
-})
-export default class Citations extends Vue {
-  authors = ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'];
-  items = [
+<script>
+export default  {
+    data: () => ({
+        authors: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'],
+        items: [
           {
             avatar: 'http://absolumentg.fr/assets/img/avatars/005.png',
             title: 'Brunch this weekend?',
@@ -114,8 +106,8 @@ export default class Citations extends Vue {
             title: 'Oui oui',
             subtitle: "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
           }
-        ];
-
+        ]
+    })
 }
 </script>
 
@@ -130,7 +122,6 @@ export default class Citations extends Vue {
     margin-inline-start: 0px;
     margin-inline-end: 0px;
     font-weight: bold;
-
     text-align: center;
     color: $primary;
     text-shadow: 0 -1px #000;
