@@ -1,5 +1,3 @@
-<img src="https://raw.githubusercontent.com/REGOVAR/Regovar/master/logo/logotitle.color.png" height="150px"/>
-
 # AbsG5
 
 5ème version du site web familliale Absolument G. Cette version se base côté serveur sur [NodeJS](https://nodejs.org/en/) ([express](https://expressjs.com/fr/)), une base de donnée [postgreSQL](https://www.postgresql.org/) et un client web [pwa](https://progressive-web-apps.fr/definition-progressive-web-apps-pwa) utilisant la librairie [Vue.js](https://vuejs.org/) et [Vuetify](https://vuetifyjs.com/en).
