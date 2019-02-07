@@ -8,7 +8,7 @@ module.exports = {
     'eslint:recommended'
   ],
   rules: {
-    'no-unused-vars': 'warning',
+    "no-unused-vars": ["warning", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
