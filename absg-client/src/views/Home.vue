@@ -71,7 +71,7 @@
           <v-card >
             
             <v-img
-              src="http://absolumentg.fr/assets/img/immt/2019_003.jpg"
+              src="http://absolumentg.fr/assets/img/immt/2019_037.jpg"
               aspect-ratio="1"
             ></v-img>
             <v-card-title primary-title>
