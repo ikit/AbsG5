@@ -7,32 +7,30 @@ networks:
 services:
   absg5_nextcloud_db:
     container_name: absg5_nextcloud_db
-    image: mariadb
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    image: postgres
     restart: always
     volumes:
-      - /var/absg5/nextcloud_db:/var/lib/mysql
+      - /var/absg5/nextcloud_db:/var/lib/postgresql/data
     environment:
-      - MYSQL_ROOT_PASSWORD=absg
-      - MYSQL_PASSWORD=absg
-      - MYSQL_DATABASE=absg
-      - MYSQL_USER=absg
+      - POSTGRES_PASSWORD=nextcloud
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
     networks:
       - absg5_net
-    user: "${UID}:${GID}"
 
   absg5_nextcloud:
     container_name: absg5_nextcloud
-    image: nextcloud:fpm
-    links:
-      - absg5_nextcloud_db
+    image: nextcloud:apache
     volumes:
       - /var/absg5/nextcloud:/var/www/html
     depends_on:
       - absg5_nextcloud_db
-    restart: always
+    environment:
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_PASSWORD=nextcloud
+      - POSTGRES_HOST=absg5_nextcloud_db
     networks:
       - absg5_net
-    user: "${UID}:${GID}"
     ports:
-      - "10010:9000"
+      - "10011:80"
