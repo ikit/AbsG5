@@ -1,9 +1,5 @@
 version: '3.5'
 
-volumes:
-  absg5_v_nextcloud:
-  absg5_v_nextcloud_db:
-
 networks:
   absg5_net:
     name: absg5_net
