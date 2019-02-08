@@ -24,11 +24,6 @@ export default new Router({
       component: () => import('./views/Immt.vue'),
     },
     {
-      path: '/calendrier',
-      name: 'calendrier',
-      component: () => import('./views/AgendaCalendar.vue'),
-    },
-    {
       path: '/cloud',
       name: 'cloud',
       component: () => import('./views/Cloud.vue'),
