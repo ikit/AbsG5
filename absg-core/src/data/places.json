@@ -1,2 +1,17 @@
-[
-]
+[{
+    "name": "Vezoule",
+    "description": "Maison familliale de la famille Chun",
+    "location": "46.627543, 7.265516"
+}, {
+    "name": "La cabochette",
+    "description": "Gîte de vacance",
+    "location": "46.624676, 7.625812"
+}, {
+    "name": "Saint-Grégoire Sous Marouflette",
+    "description": null,
+    "location": "46.497664, 7.714800"
+}, {
+    "name": "Laboratoire du docteur X",
+    "description": "Top secret",
+    "location": "46.705378, 7.682598"
+}]

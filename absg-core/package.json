@@ -4,6 +4,7 @@
    "description": "Core of the Absolument G application.",
    "devDependencies": {
       "@types/node": "^8.10.38",
+      "jest": "^24.1.0",
       "ts-node": "3.3.0",
       "ts-node-dev": "^1.0.0-pre.31",
       "typescript": "2.5.2"
@@ -28,6 +29,7 @@
    },
    "scripts": {
       "start": "cross-env NODE_ENV=production ts-node src/api.ts",
-      "dev": "ts-node-dev src/api.ts"
+      "dev": "ts-node-dev src/api.ts",
+      "test": "jest"
    }
 }
