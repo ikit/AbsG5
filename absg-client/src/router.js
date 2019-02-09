@@ -28,5 +28,10 @@ export default new Router({
       name: 'cloud',
       component: () => import('./views/Cloud.vue'),
     },
+    {
+      path: '/voyag',
+      name: 'voyag',
+      component: () => import('./views/VoyaG.vue'),
+    },
   ],
 })
