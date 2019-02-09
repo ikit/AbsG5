@@ -38,6 +38,9 @@
 - `git clone https://github.com/ikit/AbsG5.git`
 
 ### 2- NextCloud
+
+**Mise en place des containers Docker**
+
 - `cd /var/absg5/git/Absg5/install`
 - personnaliser le fichier `absg_nextcloud.yml` selon vos préférences (changer en particulier les [mots de passes](https://passwordsgenerator.net/))
   - `MYSQL_ROOT_PASSWORD`
@@ -45,12 +48,50 @@
 - `docker-compose -f absg_nextcloud.yml up -d`: pour créer et démarrer les containers
 - `docker-compose -f absg_nextcloud.yml down`: pour tuer et arrêter les containers sans perdre les données. 
 - `docker-compose -f absg_nextcloud.yml down --volumes`: pour supprimer tout (y compris les données stocké sur le serveur)
+- `curl localhost:10011`: pour vérifier que nextcloud répond bien sur le port prévu
+
+
+**Configuration NginX et SSL via Let's Encrypt**
+
+- `sudo apt install letsencrypt -y`: installation des outils Let's Encrypt
+- `sudo /etc/init.d/nginx stop`: on arrête nginx le temps de la manoeuvre
+- `sudo letsencrypt certonly --standalone -d cloud.absolumentg.fr`: on génère un certificat pour l'accès direct au cloud' 
+- Une fois accepté les conditions, et fourni un email, le certificat est généré dans le répertoire `/etc/letsencrypt/live/cloud.absolumentg.fr`
+- `sudo cp ./nginx_absg5_cloud /etc/nginx/sites-available/absg5_cloud`: on copie le fichier conf nginx (penser à modifier l'emplacement des certificats et du nom de domaine si besoin)
+- `sudo ln -s /etc/nginx/sites-available/absg5_cloud /etc/nginx/sites-enabled/absg5_cloud`: on indique à nginx que cette configuration est active
+- `sudo /etc/init.d/nginx start`: on redémarre nginx, et on peut tester via son navigateur que le site est accessible
+
+**Configuration de NextCloud**
+
+- La première chose à faire est de créer un compte admin
+- login: Admin
+- mdp : [mots de passes](https://passwordsgenerator.net/)
+- A noter que la première tentative de connexion peut se solder par un timeout côté client, car c'est à ce moment là que nextcloud va tout initialiser...
+- Si ça arrive, reconnecter vous à nouveau.
+
+- Une fois que vous êtes connecté aux nextcloud en admin:
+- Supprimer tout les documents mis par défaut
+- Renseigner les informations relatives au compte admin: email, fuseau horaire, ...
+- Brancher vous sur LDAP si besoin
+
 
 ### 3- Absolument G
 TODO
 
 ### 4- NginX et SSL via Let's Encrypt
-TODO
+- `sudo apt install letsencrypt -y`: installation des outils Let's Encrypt
+- `sudo /etc/init.d/nginx stop`: on arrête nginx le temps de la manoeuvre
+- `sudo letsencrypt certonly --standalone -d cloud.absolumentg.fr`: on génère un certificat pour l'accès direct au cloud' 
+- `sudo letsencrypt certonly --standalone -d absolumentg.fr`: on génère un certificat pour l'accès à l'application 
+- Une fois accepté les conditions, et fourni un email, le certificat est généré dans le répertoire `/etc/letsencrypt/live/cloud.absolumentg.fr`
+- `sudo cp ./nginx_absg5_cloud /etc/nginx/sites-available/absg5_cloud`
+- `sudo cp ./nginx_absg5 /etc/nginx/sites-available/absg5`
+- `sudo ln -s /etc/nginx/sites-available/absg5_cloud /etc/nginx/sites-enabled/absg5_cloud`
+- `sudo ln -s /etc/nginx/sites-available/absg5 /etc/nginx/sites-enabled/absg5`
+- `sudo /etc/init.d/nginx start`: on redémarre nginx, et on peut tester via son navigateur que le site est accessible
+
+### 5- Créer le 
+
 
 ### 5- [Optionnel] Supervision avec Graphana
 TODO
