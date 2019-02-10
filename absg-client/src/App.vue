@@ -2,9 +2,10 @@
 <v-app id="inspire" :dark="darkMode">
     <v-navigation-drawer
         fixed
-        :clipped="$vuetify.breakpoint.mdAndUp"
+        :clipped="$vuetify.breakpoint.smAndUp"
         app
-        v-model="drawer">
+        v-model="drawer"
+        style="z-index: 2100">
     <v-list dense>
         <template v-for="item in items">
         <v-list-group
@@ -46,7 +47,8 @@
         dark
         app
         :clipped-left="$vuetify.breakpoint.mdAndUp"
-        fixed>
+        fixed
+        style="z-index: 2000">
         <v-toolbar-title class="ml-0 pl-3">
             <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
             <span class="hidden-sm-and-down">

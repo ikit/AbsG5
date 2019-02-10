@@ -1,85 +1,100 @@
 <template>
-  <div class="home" style="margin-top: 58px;">
+<div class="home" style="margin-top: 58px;">
     <h1>Les citations cultes</h1>
-    <!-- <CitationsList/> -->
     <v-card style="margin: 14px;">
-      <v-form v-model="valid">
-    <v-container>
-      <v-layout>
-        <v-flex
-          sm12
-          md3
-        >
-          <v-text-field
-            v-model="firstname"
-            label="Rechercher"
-          ></v-text-field>
-        </v-flex>
+        <img src="../assets/images/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-85px; left: 20px;"/>
+        <v-form v-model="citationEditor.isValid">
+            <v-container>
+            <v-layout>
+                <v-flex sm12 md3>
+                <v-text-field
+                    v-model="query"
+                    label="Rechercher">
+                </v-text-field>
+                </v-flex>
 
-        <v-flex
-          sm12
-          md3
-        >
-          <v-select
-          :items="authors"
-          label="Sélectionner un auteur"
-        ></v-select>
-        </v-flex>
+                <v-flex sm12 md3>
+                <v-select
+                    :items="authors"
+                    label="Sélectionner un auteur">
+                </v-select>
+                </v-flex>
 
-        <v-flex
-          sm12
-          md3
-        >
-          
-        </v-flex>
-        <v-flex
-          sm12
-          md3
-        >
-        <v-btn color="accent" slot="activator">
-          <v-icon left>fas fa-plus</v-icon>
-          Nouvelle citation
-        </v-btn>
-        </v-flex>
+                <v-flex sm12 md3></v-flex>
 
-      </v-layout>
-    </v-container>
-  </v-form>
+                <v-flex sm12 md3 style="text-align: right;">
+                    <v-btn 
+                        color="accent"
+                        style="height: 80%"
+                        @click.stop="resetDialog(true)">
+                        <v-icon left>fas fa-plus</v-icon>Nouvelle citation
+                    </v-btn>
+                </v-flex>
+
+            </v-layout>
+            </v-container>
+        </v-form>
     </v-card>
     <v-card style="margin: 14px;">
-    <v-list two-line>
-          <template v-for="(item, index) in items">
-            <v-subheader
-              v-if="item.header"
-              :key="item.header"
-            >
-              {{ item.header }}
-            </v-subheader>
-
-            <v-divider
-              v-else-if="item.divider"
-              :inset="item.inset"
-              :key="index"
-            ></v-divider>
-
-            <v-list-tile
-              v-else
-              :key="item.title"
-              avatar
-            >
-              <v-list-tile-avatar>
-                <img :src="item.avatar">
-              </v-list-tile-avatar>
-
-              <v-list-tile-content>
-                <v-list-tile-title v-html="item.title"></v-list-tile-title>
-                <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
-              </v-list-tile-content>
+    <v-list>
+        <template v-for="(item, index) in citations">
+            <v-list-tile :key="index" avatar>
+                <v-list-tile-avatar>
+                    <img :src="item.authorAvatar" :alt="item.authorName">
+                </v-list-tile-avatar>
+                <v-list-tile-content>
+                    <v-list-tile-title v-html="item.citation"></v-list-tile-title>
+                </v-list-tile-content>
             </v-list-tile>
-          </template>
+        </template>
         </v-list>
     </v-card>
-  </div>
+
+    
+    <v-dialog v-model="citationEditor.open" width="800px">
+    <v-card>
+        <v-card-title class="grey lighten-4 py-4 title">
+        Nouvelle citation
+        </v-card-title>
+        <v-container grid-list-sm class="pa-4">
+        <v-layout row wrap>
+            <v-flex xs12>
+                <v-text-field
+                    prepend-icon="fas fa-user"
+                    placeholder="Autheur de la citation"
+                    v-model="citationEditor.author">
+                </v-text-field>
+            </v-flex>
+            <v-flex xs12>
+                <v-text-field
+                    prepend-icon="fas fa-quote-left"
+                    placeholder="La citation"
+                    v-model="citationEditor.citation">
+                </v-text-field>
+            </v-flex>
+            <v-flex xs12>
+                <v-card>
+                    <div style="position: relative;">
+
+                        <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
+                        <p style="margin-left: 50px; padding: 10px; font-style: italic">
+                            N'oubliez pas de mettre les guillemets doubles autour de la citation. 
+                            Si vous ajoutez des précisions à la citation, merci de les mettre entre double parenthèses: "La citation" ((ma précision)).
+                        </p>
+                    </div>
+                </v-card>
+                
+            </v-flex>
+        </v-layout>
+        </v-container>
+        <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
+        <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
+        </v-card-actions>
+    </v-card>
+    </v-dialog>
+</div>
 </template>
 
 
@@ -87,27 +102,52 @@
 <script>
 export default  {
     data: () => ({
+        citationEditor: {
+            open: false,
+            citationId: null,
+            citation: null,
+            author: null,
+            isValid: true
+        },
+        query: "",
         authors: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'],
-        items: [
-          {
-            avatar: 'http://absolumentg.fr/assets/img/avatars/005.png',
-            title: 'Brunch this weekend?',
-            subtitle: "<span class='text--primary'>Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'http://absolumentg.fr/assets/img/avatars/012.png',
-            title: 'Summer BBQ <span class="grey--text text--lighten-1">4</span>',
-            subtitle: "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend."
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'http://absolumentg.fr/assets/img/avatars/013.png',
-            title: 'Oui oui',
-            subtitle: "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
-          }
-        ]
-    })
+        citations: [
+        {
+            authorAvatar: 'http://absolumentg.fr/assets/img/avatars/005.png',
+            authorId: 5,
+            authorName: 'Flo',
+            citation: '"Brunch this weekend?"',
+        },
+        {
+            authorAvatar: 'http://absolumentg.fr/assets/img/avatars/012.png',
+            authorId: 12,
+            authorName: 'Annie',
+            citation: '"Summer BBQ" <span class="grey--text text--lighten-1">(lol)</span>',
+        },
+        {
+            authorAvatar: 'http://absolumentg.fr/assets/img/avatars/013.png',
+            authorId: 13,
+            authorName: 'Poupette',
+            citation: '"Ouech gros"',
+        }],
+    }),
+    methods: {
+        resetDialog(open = false) {
+            this.citationEditor.open = open;
+            this.citationEditor.citationId = null;
+            this.citationEditor.citation = null;
+            this.citationEditor.author = null;
+        },
+        saveCitation: function() {
+            this.citations.push({
+                authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
+                authorId: 16,
+                authorName: this.citationEditor.author,
+                citation: this.citationEditor.citation,
+            });
+            this.resetDialog();
+        }
+    }
 }
 </script>
 

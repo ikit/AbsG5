@@ -33,15 +33,9 @@
                 </l-tooltip>
             </l-marker>
         </l-map>
-        <div style="position: absolute; top: 0; bottom: 0; right: 0; width: 70px; background-color: rgba(0,0,0,0.8); z-index: 2000; text-align: center">
+        <div style="position: absolute; top: 0; left: 0; z-index: 2000; text-align: center">
             <v-btn color="accent" fab small dark>
               <v-icon>far fa-clock</v-icon>
-            </v-btn>
-            <v-btn color="primary" fab small dark>
-              <v-icon>fas fa-user</v-icon>
-            </v-btn>
-            <v-btn color="primary" fab small dark>
-              <v-icon>fas fa-home</v-icon>
             </v-btn>
             <v-btn color="primary" fab small dark>
               <v-icon>fas fa-map-pin</v-icon>
