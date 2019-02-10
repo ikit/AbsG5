@@ -1,5 +1,5 @@
 <template>
-  <div class="home" style="margin-top: 50px;">
+  <div class="home" style="margin-top: 58px;">
     <h1>Les citations cultes</h1>
     <!-- <CitationsList/> -->
     <v-card style="margin: 14px;">
@@ -36,7 +36,7 @@
           sm12
           md3
         >
-        <v-btn color="primary" slot="activator">
+        <v-btn color="accent" slot="activator">
           <v-icon left>fas fa-plus</v-icon>
           Nouvelle citation
         </v-btn>
@@ -112,9 +112,9 @@ export default  {
 </script>
 
 <style lang="scss" scoped>
-  @import '../assets/fonts.css';
-  @import '../assets/global.scss';
-  h1 {
+@import '../assets/global.scss';
+
+h1 {
     display: block;
     font-size: 2em;
     margin-block-start: 0.67em;
@@ -127,7 +127,7 @@ export default  {
     text-shadow: 0 -1px #000;
     text-shadow: 0 1px #aaa;
     font-size: 40px;
-    font-family: "AbsgFont", sans-serif;
+    font-family: "Comfortaa", sans-serif;
     margin: 20px 0 60px 0;
-  }
+}
 </style>

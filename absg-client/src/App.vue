@@ -1,5 +1,5 @@
 <template>
-<v-app id="inspire">
+<v-app id="inspire" :dark="darkMode">
     <v-navigation-drawer
         fixed
         :clipped="$vuetify.breakpoint.mdAndUp"
@@ -27,7 +27,7 @@
                 </v-list-tile-content>
             </v-list-tile>
         </v-list-group>
-        <v-list-tile v-else :key="item.text" :to="item.route" active-class="primary--text">
+        <v-list-tile v-else :key="item.text" :to="item.route" active-class="accent--text">
             <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-action>
@@ -47,17 +47,18 @@
         app
         :clipped-left="$vuetify.breakpoint.mdAndUp"
         fixed>
-        <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+        <v-toolbar-title class="ml-0 pl-3">
             <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
             <span class="hidden-sm-and-down">
-            <v-tooltip bottom>
-                <span slot="activator"><router-link to="/">Absolument G</router-link></span>
-                <span>Revenir à l'accueil</span>
-            </v-tooltip>
+                <span class="absg">Absolument <span>G</span></span>
+                <v-tooltip bottom>
+                    <span slot="activator"><router-link to="/">Absolument G</router-link></span>
+                    <span>Revenir à l'accueil</span>
+                </v-tooltip>
             </span>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-badge color="red" overlap>
+        <v-badge color="accent" overlap>
             <span slot="badge">8</span>
             <v-btn icon
                 @click.stop="dialog = !dialog">
@@ -71,22 +72,30 @@
             </v-btn>
             <v-list>
             <v-list-tile>
-                <v-list-tile-title :key="0">Mes informations</v-list-tile-title>
+                <v-list-tile-title :key="0"> 
+                    <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations
+                </v-list-tile-title>
             </v-list-tile>
             <v-list-tile>
-                <v-list-tile-title :key="1">Mes statistiques</v-list-tile-title>
+                <v-list-tile-title :key="1"> 
+                    <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-chart-bar</v-icon>Mes statistiques
+                </v-list-tile-title>
             </v-list-tile>
             <v-list-tile>
-                <v-list-tile-title :key="2">Changer mot de passe</v-list-tile-title>
+                <v-list-tile-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-tile-title>
             </v-list-tile>
             <v-list-tile>
-                <v-list-tile-title :key="3">Déconnexion</v-list-tile-title>
+                <v-switch label="Mode nuit" v-model="darkMode"></v-switch>
+            </v-list-tile>
+            <v-divider></v-divider>
+            <v-list-tile>
+                <v-list-tile-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Déconnexion</v-list-tile-title>
             </v-list-tile>
             </v-list>
         </v-menu>
     </v-toolbar>
-    <v-content>
-    <router-view class="view"></router-view>
+    <v-content id="bgcontent">
+        <router-view class="view"></router-view>
     </v-content>
     <v-dialog v-model="dialog" width="800px">
     <v-card>
@@ -154,6 +163,7 @@ export default {
     name: 'App',
     data: () => ({
     dialog: false,
+    darkMode: false,
     drawer: null,
     items: [
         { icon: 'fas fa-home', text: 'Accueil', route: '/' },
@@ -187,3 +197,24 @@ export default {
     }
 }
 </script>
+
+
+<style lang="scss" scoped>
+@import './assets/global.scss';
+.absg {
+    font-size: 1.5em;
+    line-height: 1.5em;
+    font-family: "Comfortaa", sans-serif;
+}
+.absg span {
+    color: $accent;
+}
+#bgcontent {
+    width: 100%;
+    height: 100%;
+    background-image: url('http://absolumentg.fr//assets/img/rangs/r00-maxi.png'); 
+    background-position: center; 
+    background-size: cover;
+    position: relative;
+}
+</style>

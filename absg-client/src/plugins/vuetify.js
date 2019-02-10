@@ -5,13 +5,16 @@ import fr from 'vuetify/es5/locale/fr'
 
 Vue.use(Vuetify, {
   theme: {
-    primary: '#0277bd',
-    secondary: '#263238',
+    primary: '#37474f',
+    secondary: '#26a69a',
     accent: '#26a69a',
-    error: '#FF5252',
-    info: '#2196F3',
-    success: '#4CAF50',
-    warning: '#FFC107',
+    info: '#4fc3f7',
+    success: '#2e7d32',
+    warning: '#ff8f00',
+    error: '#d32f2f',
+    group1: '#039be5', // Gueudelot
+    group2: '#4caf50', // Guibert
+    group3: '#ff7043', // Guyomard
   },
   customProperties: true,
   iconfont: 'fa',

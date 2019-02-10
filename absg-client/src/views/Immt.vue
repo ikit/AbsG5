@@ -79,7 +79,6 @@ export default  {
 </script>
 
 <style lang="scss" scoped>
-  @import '../assets/fonts.css';
   @import '../assets/global.scss';
   h1 {
     display: block;
