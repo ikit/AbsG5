@@ -2,11 +2,6 @@
     <div class="home" style="margin-top: 50px;" v-cloak>
         <v-container fluid grid-list-md align-center>
         <v-layout justify-center row>
-            <v-flex shrink>
-            <v-img :src="require('../assets/logo.png')"></v-img>
-            </v-flex>
-        </v-layout>
-        <v-layout justify-center row>
             <v-flex sm8 md6>
             <v-card class="absgCard">
                 <div style="float:left; margin: 10px;">
