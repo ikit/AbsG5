@@ -107,7 +107,7 @@ export default  {
             citationId: null,
             citation: null,
             author: null,
-            isValid: true
+            isValid: true,
         },
         query: "",
         authors: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'],
