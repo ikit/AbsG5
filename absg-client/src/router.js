@@ -33,5 +33,10 @@ export default new Router({
       name: 'voyag',
       component: () => import('./views/VoyaG.vue'),
     },
+    {
+      path: '/discussions',
+      name: 'discussions',
+      component: () => import('./views/Discussions.vue'),
+    },
   ],
 })

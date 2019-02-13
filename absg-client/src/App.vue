@@ -171,7 +171,7 @@ export default {
         { icon: 'fas fa-home', text: 'Accueil', route: '/' },
         { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
         { icon: 'fas fa-image', text: 'Images du moment', route: '/immt' },
-        { icon: 'fas fa-comment', text: 'Discussions', route: '/forum' },
+        { icon: 'fas fa-comment', text: 'Discussions', route: '/discussions' },
         { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
         { icon: 'far fa-calendar-alt', text: 'Calendrier', route: '/calendrier' },
         { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },

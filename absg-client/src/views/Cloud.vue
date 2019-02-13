@@ -16,15 +16,16 @@
 
 <script>
 
-// const { createClient } = require("webdav");
+const { createClient } = require("webdav");
  
-// const client = createClient(
-//     "http://cloud.absolumentg.fr",
-//     {
-//         username: "absolumentg",
-//         password: "@bsolument3G"
-//     }
-// );
+const client = createClient(
+    "http://cloud.absolumentg.fr",
+    {
+        username: "olivier",
+        password: "$phynx Sibyll1"
+    }
+);
+
 
 export default  {
     data: () => ({
@@ -34,7 +35,7 @@ export default  {
     }),
     methods: {
         getUserData: async function() {
-            // this.directoryItems = await client.getDirectoryContents("/")
+            this.directoryItems = await client.getDirectoryContents("/")
         }
     }
 }
