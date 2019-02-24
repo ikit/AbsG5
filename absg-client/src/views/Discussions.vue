@@ -12,7 +12,7 @@
         <p>Dernier message : <span class="group1-fg">Annie</span> le 5/6 à 17h35</p>
         <p>5/7 événements</p>
     </v-card>
-    
+
     <v-card class="box archives">
         <h2>Arhives du forum</h2>
         <div class="row">
@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="row">
-            <span>Message au hasard :</span> 
+            <span>Message au hasard :</span>
             <div class="column">
                 <span>Emmanuel le 5/6/2008 à 17h54</span>: "Salut les Copains ! [...]"
             </div>
@@ -36,25 +36,22 @@
 </div>
 </template>
 
-
-
 <script>
-export default  {
+export default {
     data: () => ({
-        query: "",
+        query: '',
         tbz: {
-            title: "Nouvelles de février",
+            title: 'Nouvelles de février',
             totalMessages: 13,
             lastAuthor: {
                 userID: 12,
-                username: "Annie",
-                class: "group1",
+                username: 'Annie',
+                class: 'group1',
                 date: new Date(),
-
             },
             evenements: {
                 total: 10,
-                passed: 7
+                passed: 7,
             },
         },
         blabla: {
@@ -65,17 +62,17 @@ export default  {
         },
         currentUser: {
             id: 2,
-            username: "Olivier"
+            username: 'Olivier'
         }
     }),
     methods: {
-        resetDialog(open = false) {
+        resetDialog (open = false) {
             this.citationEditor.open = open;
             this.citationEditor.citationId = null;
             this.citationEditor.citation = null;
             this.citationEditor.author = null;
         },
-        saveCitation: function() {
+        saveCitation: function () {
             this.citations.push({
                 authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
                 authorId: 16,
@@ -85,7 +82,7 @@ export default  {
             this.resetDialog();
         }
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -117,6 +114,4 @@ h2 {
     text-shadow: 0 1px #aaa;
     font-family: "Comfortaa", sans-serif;
 }
-
-
 </style>

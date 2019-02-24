@@ -6,12 +6,10 @@
             :center="center"
             :options="mapOptions"
             @update:center="centerUpdate"
-            @update:zoom="zoomUpdate"
-        >
+            @update:zoom="zoomUpdate">
             <l-tile-layer
                 :url="url"
-                :attribution="attribution"
-            />
+                :attribution="attribution"/>
             <l-marker :lat-lng="withPopup">
                 <l-popup>
                 <div @click="innerClick">
@@ -35,30 +33,27 @@
         </l-map>
         <div style="position: absolute; top: 0; left: 0; z-index: 2000; text-align: center">
             <v-btn color="accent" fab small dark>
-              <v-icon>far fa-clock</v-icon>
+                <v-icon>far fa-clock</v-icon>
             </v-btn>
             <v-btn color="primary" fab small dark>
-              <v-icon>fas fa-map-pin</v-icon>
+                <v-icon>fas fa-map-pin</v-icon>
             </v-btn>
             <v-btn color="primary" fab small dark>
-              <v-icon>fas fa-search</v-icon>
+                <v-icon>fas fa-search</v-icon>
             </v-btn>
             <v-btn color="primary" fab small dark>
-              <v-icon>fas fa-layer-group</v-icon>
+                <v-icon>fas fa-layer-group</v-icon>
             </v-btn>
             <v-btn color="primary" fab small dark>
-              <v-icon>fas fa-crosshairs</v-icon>
+                <v-icon>fas fa-crosshairs</v-icon>
             </v-btn>
         </div>
     </div>
 </template>
 
-
-
 <script>
 
-import { L } from 'vue2-leaflet';
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet';
+import { L, LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet';
 
 export default {
     name: 'Example',
@@ -89,22 +84,21 @@ export default {
     },
     methods: {
         zoomUpdate (zoom) {
-        this.currentZoom = zoom;
+            this.currentZoom = zoom;
         },
         centerUpdate (center) {
-        this.currentCenter = center;
+            this.currentCenter = center;
         },
         showLongText () {
-        this.showParagraph = !this.showParagraph;
+            this.showParagraph = !this.showParagraph;
         },
         innerClick () {
-        alert('Click!');
+            alert('Click!');
         }
     }
 };
 
 </script>
-
 
 <style scoped>
 
