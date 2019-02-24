@@ -1,29 +1,29 @@
 <template>
-    <div class="home" style="margin-top: 50px;" v-cloak>
+    <div class="home" v-cloak>
         <v-container fluid grid-list-md align-center>
         <v-layout justify-center row>
-            <v-flex sm8 md6>
-            <v-card class="absgCard">
-                <div style="float:left; margin: 10px;">
-                <v-icon>fas fa-quote-left</v-icon> <span style="font-weight: bold; font-size: 1.3em; color: #555; margin-left: 10px;">{{citation.author}}</span>
-                </div>
-                <div class="citation">{{citation.citation}}</div>
-            </v-card>
+            <v-flex >
+                <div class="citation"><b>Alain :</b> {{citation.citation}}</div>
             </v-flex>
         </v-layout>
-        <v-layout justify-center wrap style="margin-top: 20px;">
-            <v-flex sm12 md6 lg4 align-self-center>
-            <v-card >
+        <v-layout justify-center wrap>
+            <v-flex>
+            <v-card class="absgCard">
                 <v-card-title primary-title>
-                    <h1>Dernières activités</h1>
+                    <h1>Passa G</h1>
                 </v-card-title>
-                <v-list two-line>
+                <v-list two-line class="absgCard">
                 <template v-for="(item, index) in logs">
                     <v-list-tile
                         :key="item.title"
                         avatar
                         ripple
                         @click="toggle(index)">
+
+                    <v-list-tile-avatar>
+                        <img :src="item.avatar">
+                    </v-list-tile-avatar>
+
                     <v-list-tile-content>
                         <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                         <v-list-tile-sub-title class="text--primary">{{ item.headline }}</v-list-tile-sub-title>
@@ -32,8 +32,8 @@
 
                     <v-list-tile-action>
                         <v-list-tile-action-text>{{ item.action }}</v-list-tile-action-text>
-                        <v-icon v-if="selected.indexOf(index) < 0" color="grey lighten-1">star_border</v-icon>
-                        <v-icon v-else color="yellow darken-2">star</v-icon>
+                        <v-icon v-if="selected.indexOf(index) < 0" color="grey lighten-1">fas fa-star</v-icon>
+                        <v-icon v-else color="yellow darken-2">fas fa-star</v-icon>
                     </v-list-tile-action>
 
                     </v-list-tile>
@@ -44,7 +44,7 @@
                 </v-list>
             </v-card>
             </v-flex>
-            <v-flex sm12 md6 lg4 align-self-center>
+            <v-flex >
             <v-card >
                 <v-img
                     src="http://absolumentg.fr/assets/img/immt/2019_037.jpg"
@@ -70,34 +70,29 @@ export default  {
         selected: [2],
         logs: [
         {
-            action: '15 min',
-            headline: 'Brunch this weekend?',
-            title: 'Ali Connors',
-            subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+            user: '012',
+            username: 'Fanny',
+            date: '12h50',
         },
         {
-            action: '2 hr',
-            headline: 'Summer BBQ',
-            title: 'me, Scrott, Jennifer',
-            subtitle: "Wish I could come, but I'm out of town this weekend."
+            user: '012',
+            username: 'Fanny',
+            date: '12h50',
         },
         {
-            action: '6 hr',
-            headline: 'Oui oui',
-            title: 'Sandra Adams',
-            subtitle: 'Do you have Paris recommendations? Have you ever been?'
+            user: '012',
+            username: 'Fanny',
+            date: '12h50',
         },
         {
-            action: '12 hr',
-            headline: 'Birthday gift',
-            title: 'Trevor Hansen',
-            subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
+            user: '012',
+            username: 'Fanny',
+            date: '12h50',
         },
         {
-            action: '18hr',
-            headline: 'Recipe to try',
-            title: 'Britta Holt',
-            subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
+            user: '012',
+            username: 'Fanny',
+            date: '12h50',
         }],
         methods: {
             toggle: function (index) {
@@ -114,24 +109,30 @@ export default  {
 </script>
 
 
-<style scoped>
+
+<style lang="scss" scoped>
+@import '../assets/global.scss';
 h1 {
-    color: rgba(0, 0, 0, 0.5);
-    text-shadow: 0 1px #fff;
-    font-size: 25px;
-    font-weight: 100;
-    margin-top: 70px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: center;
+    color: $primary;
+    text-shadow: 0 -1px #000;
+    text-shadow: 0 1px #aaa;
+    font-size: 1.5em;
+    font-family: "Comfortaa", sans-serif;
+    font-weight: bold;
+    margin: 10px 0;
 }
 .absgCard{
-    max-width: 600px;
-    min-height: 100px;
-    margin: auto;
+    // background-color: rgba($color: #ffffff, $alpha: 0)
 }
 .citation {
-    display: block;
-    clear: both;
     text-align: center;
-    font-size: 1.1em;
+    font-size: 1.5em;
+    margin-bottom: 40px;
+
 }
 </style>

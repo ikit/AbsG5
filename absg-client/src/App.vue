@@ -214,7 +214,7 @@ export default {
 #bgcontent {
     width: 100%;
     height: 100%;
-    background-image: url('http://absolumentg.fr//assets/img/rangs/r00-maxi.png'); 
+    background-image: url('./assets/images/background/r00.png'); 
     background-position: center; 
     background-size: cover;
     position: relative;
