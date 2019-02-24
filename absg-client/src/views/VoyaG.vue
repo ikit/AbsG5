@@ -68,8 +68,8 @@ export default {
         return {
             zoom: 13,
             center: L.latLng(47.413220, -1.219482),
-            url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            url: 'https://{s}.tile.osm.org/{z}/{x}/{y}.png',
+            attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
             withPopup: L.latLng(47.413220, -1.219482),
             withTooltip: L.latLng(47.414220, -1.250482),
             currentZoom: 11.5,

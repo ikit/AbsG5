@@ -23,7 +23,7 @@
                 <v-flex sm12 md3></v-flex>
 
                 <v-flex sm12 md3 style="text-align: right;">
-                    <v-btn 
+                    <v-btn
                         color="accent"
                         style="height: 80%"
                         @click.stop="resetDialog(true)">
@@ -50,7 +50,7 @@
         </v-list>
     </v-card>
 
-    
+
     <v-dialog v-model="citationEditor.open" width="800px">
     <v-card>
         <v-card-title class="grey lighten-4 py-4 title">
@@ -78,12 +78,12 @@
 
                         <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
                         <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                            N'oubliez pas de mettre les guillemets doubles autour de la citation. 
+                            N'oubliez pas de mettre les guillemets doubles autour de la citation.
                             Si vous ajoutez des précisions à la citation, merci de les mettre entre double parenthèses: "La citation" ((ma précision)).
                         </p>
                     </div>
                 </v-card>
-                
+
             </v-flex>
         </v-layout>
         </v-container>
@@ -132,13 +132,13 @@ export default  {
         }],
     }),
     methods: {
-        resetDialog(open = false) {
+        resetDialog (open = false) {
             this.citationEditor.open = open;
             this.citationEditor.citationId = null;
             this.citationEditor.citation = null;
             this.citationEditor.author = null;
         },
-        saveCitation: function() {
+        saveCitation: function () {
             this.citations.push({
                 authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
                 authorId: 16,
@@ -148,7 +148,7 @@ export default  {
             this.resetDialog();
         }
     }
-}
+};
 </script>
 
 <style lang="scss" scoped>

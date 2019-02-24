@@ -43,5 +43,10 @@ export default new Router({
             name: 'calendar',
             component: () => import('./views/Calendar.vue'),
         },
+        {
+            path: '/agenda',
+            name: 'agenda',
+            component: () => import('./views/Agenda.vue'),
+        },
     ]
 });
