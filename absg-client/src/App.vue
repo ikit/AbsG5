@@ -74,12 +74,12 @@
             </v-btn>
             <v-list>
             <v-list-tile>
-                <v-list-tile-title :key="0"> 
+                <v-list-tile-title :key="0">
                     <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations
                 </v-list-tile-title>
             </v-list-tile>
             <v-list-tile>
-                <v-list-tile-title :key="1"> 
+                <v-list-tile-title :key="1">
                     <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-chart-bar</v-icon>Mes statistiques
                 </v-list-tile-title>
             </v-list-tile>
@@ -214,9 +214,10 @@ export default {
 #bgcontent {
     width: 100%;
     height: 100%;
-    background-image: url('./assets/images/background/r00.png'); 
-    background-position: center; 
+    background-image: url('./assets/images/background/r00.png');
+    background-position: center;
     background-size: cover;
+    background-attachment: fixed;
     position: relative;
 }
 </style>
