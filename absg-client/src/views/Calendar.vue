@@ -1,66 +1,124 @@
 <template>
-    <v-layout style="position: relative; height:100%">
-        <v-flex  height="100%">
-        <v-sheet height="100%">
-            <v-calendar
-            :now="today"
-            :value="today"
-            color="primary">
-            <template
-                slot="day"
-                slot-scope="{ date }">
-                <template v-for="event in eventsMap[date]">
-                <v-menu
-                    :key="event.title"
-                    v-model="event.open"
-                    full-width
-                    offset-x>
-                    <div
-                        v-if="!event.time"
-                        slot="activator"
-                        v-ripple
-                        class="my-event"
-                        v-html="event.title">
-                    </div>
-                    <v-card
-                        color="grey lighten-4"
-                        min-width="350px"
-                        flat>
-                        <v-toolbar
-                            color="primary"
-                            dark>
-                            <v-btn icon>
-                                <v-icon>fas fa-edit</v-icon>
-                            </v-btn>
-                            <v-toolbar-title v-html="event.title"></v-toolbar-title>
-                            <v-spacer></v-spacer>
-                            <v-btn icon>
-                                <v-icon>fas fa-favorite</v-icon>
-                            </v-btn>
-                            <v-btn icon>
-                                <v-icon>fas fa-star</v-icon>
-                            </v-btn>
-                        </v-toolbar>
-                        <v-card-title primary-title>
-                            <span v-html="event.details"></span>
-                        </v-card-title>
-                        <v-card-actions>
-                            <v-btn flat color="secondary">Cancel</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-menu>
+<div>
+    <v-card style="margin: 15px">
+        <v-form>
+            <v-container>
+            <v-layout>
+                <v-flex>
+                    <v-btn color="accent">Aujourd'hui</v-btn>
+                    <v-btn flat icon>
+                        <v-icon left>fas fa-angle-left</v-icon>
+                    </v-btn>
+                    <v-btn flat icon>
+                        <v-icon left>fas fa-angle-right</v-icon>
+                    </v-btn>
+                </v-flex>
+
+                <v-flex>
+                    <v-menu
+                        ref="menu"
+                        v-model="menu"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        lazy
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                        min-width="290px"
+                        >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                v-model="date"
+                                label="Mois en cours"
+                                prepend-icon="far fa-calendar-alt"
+                                readonly
+                                v-on="on"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            ref="picker"
+                            v-model="date"
+                            :max="new Date().toISOString().substr(0, 10)"
+                            min="1800-01-01"
+                            type="month"
+                            @change="save"
+                        ></v-date-picker>
+                    </v-menu>
+                </v-flex>
+
+                <v-flex>
+                    <v-text-field
+                        label="Rechercher">
+                    </v-text-field>
+                </v-flex>
+
+            </v-layout>
+            </v-container>
+        </v-form>
+    </v-card>
+    <v-card style="margin: 15px">
+            <v-sheet style="height: 500px" >
+                <v-calendar
+                :now="today"
+                :value="today"
+                color="primary">
+                <template
+                    slot="day"
+                    slot-scope="{ date }">
+                    <template v-for="event in eventsMap[date]">
+                    <v-menu
+                        :key="event.title"
+                        v-model="event.open"
+                        full-width
+                        offset-x>
+                        <div
+                            v-if="!event.time"
+                            slot="activator"
+                            v-ripple
+                            class="my-event"
+                            v-html="event.title">
+                        </div>
+                        <v-card
+                            color="grey lighten-4"
+                            min-width="350px"
+                            flat>
+                            <v-toolbar
+                                color="primary"
+                                dark>
+                                <v-btn icon>
+                                    <v-icon>fas fa-edit</v-icon>
+                                </v-btn>
+                                <v-toolbar-title v-html="event.title"></v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon>
+                                    <v-icon>fas fa-favorite</v-icon>
+                                </v-btn>
+                                <v-btn icon>
+                                    <v-icon>fas fa-star</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                            <v-card-title primary-title>
+                                <span v-html="event.details"></span>
+                            </v-card-title>
+                            <v-card-actions>
+                                <v-btn flat color="secondary">Cancel</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-menu>
+                    </template>
                 </template>
-            </template>
-            </v-calendar>
-        </v-sheet>
-        </v-flex>
-    </v-layout>
+                </v-calendar>
+            </v-sheet>
+        </v-card>
+    </div>
 </template>
 
 
 <script>
 export default {
     data: () => ({
+        date: null,
+        menu: false,
         today: new Date(),
         events: [
             {
@@ -113,6 +171,11 @@ export default {
             }
         ]
     }),
+    watch: {
+        menu (val) {
+            val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));
+        }
+    },
     computed: {
         // convert the list of events into a map of lists keyed by date
         eventsMap () {
@@ -124,6 +187,9 @@ export default {
     methods: {
         open (event) {
             alert(event.title);
+        },
+        save (date) {
+            this.$refs.menu.save(date);
         }
     }
 };

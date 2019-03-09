@@ -100,7 +100,7 @@
 
 
 <script>
-export default  {
+export default {
     data: () => ({
         citationEditor: {
             open: false,
@@ -109,26 +109,26 @@ export default  {
             author: null,
             isValid: true,
         },
-        query: "",
+        query: '',
         authors: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'],
         citations: [
         {
             authorAvatar: 'http://absolumentg.fr/assets/img/avatars/005.png',
             authorId: 5,
             authorName: 'Flo',
-            citation: '"Brunch this weekend?"',
+            citation: '"C\'est toujours les meilleurs qui s\'en aillent !"',
         },
         {
             authorAvatar: 'http://absolumentg.fr/assets/img/avatars/012.png',
             authorId: 12,
             authorName: 'Annie',
-            citation: '"Summer BBQ" <span class="grey--text text--lighten-1">(lol)</span>',
+            citation: '"Bon, allez ! Ce soir, on regarde un Bermuda." <span class="grey--text text--lighten-1">(un Burma)</span>',
         },
         {
             authorAvatar: 'http://absolumentg.fr/assets/img/avatars/013.png',
             authorId: 13,
             authorName: 'Poupette',
-            citation: '"Ouech gros"',
+            citation: '"Où l\'est, mes grolles ?" <span class="grey--text text--lighten-1">(à deux ans)</span>',
         }],
     }),
     methods: {
