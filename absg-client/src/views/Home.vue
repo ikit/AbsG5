@@ -1,64 +1,64 @@
 <template>
     <div class="home" v-cloak>
-        <v-container fluid grid-list-md align-center>
-            <div class="citation"><b>Alain :&nbsp;</b> {{citation.citation}} </div>
-            <v-layout>
-                <v-flex style="margin-right: 15px;">
-                <v-card>
-                    <v-card-title>
-                        <h1>Passa G
+        <div class="citation"><b>Alain :&nbsp;</b> {{citation.citation}} </div>
+        <v-container fluid grid-list-xl>
+            <v-layout row wrap>
+                <v-flex xs12 sm12 md6 lg4 xl4>
+                    <v-card>
+                        <v-card-title>
+                            <h1>Passa G
 
 
-                        <v-btn flat
-                            style="position: absolute; right: 15px; top: 15px;"
-                            @click.stop="">
-                            <v-icon left>far fa-clock</v-icon>historique
-                        </v-btn>
+                            <v-btn flat
+                                style="position: absolute; right: 15px; top: 15px;"
+                                @click.stop="">
+                                <v-icon left>far fa-clock</v-icon>historique
+                            </v-btn>
 
-                        </h1>
-                    </v-card-title>
+                            </h1>
+                        </v-card-title>
 
-                    <v-list class="passage">
-                    <template v-for="(item, i1) in passage">
-                        <v-list-tile
-                            :key="item.title"
-                            ripple>
+                        <v-list class="passage">
+                        <template v-for="(item, i1) in passage">
+                            <v-list-tile
+                                :key="item.title"
+                                ripple>
 
-                            <div style="position: absolute; right: 15px; color: #aaa;" v-if="item.date">{{ item.date }}</div>
-                            <div style="width: 50px;">{{ item.time }}</div>
-                            <template v-for="(user, i2) in item.passage">
-                                <v-tooltip :key="i2" bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <img :key="i2" :src="user.avatar" :alt="user.username" v-on="on" height="40px" />
-                                    </template>
-                                    <span>{{ user.username }}</span>
-                                </v-tooltip>
+                                <div style="position: absolute; right: 15px; color: #aaa;" v-if="item.date">{{ item.date }}</div>
+                                <div style="width: 50px;">{{ item.time }}</div>
+                                <template v-for="(user, i2) in item.passage">
+                                    <v-tooltip :key="i2" bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <img :key="i2" :src="user.avatar" :alt="user.username" v-on="on" height="40px" />
+                                        </template>
+                                        <span>{{ user.username }}</span>
+                                    </v-tooltip>
 
 
-                            </template>
+                                </template>
 
-                        </v-list-tile>
-                        <v-divider
-                            v-if="i1 + 1 < passage.length"
-                            :key="i1"></v-divider>
-                    </template>
-                    </v-list>
-                </v-card>
+                            </v-list-tile>
+                            <v-divider
+                                v-if="i1 + 1 < passage.length"
+                                :key="i1"></v-divider>
+                        </template>
+                        </v-list>
+                    </v-card>
                 </v-flex>
-                <v-flex >
-                <v-card >
-                    <silentbox-single src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" description="Bonne année 2019 !">
-                        <v-img src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" height="500px"></v-img>
-                    </silentbox-single>
+                <v-flex xs12 sm12 md6 lg8 xl8>
+                    <v-card >
+                        <silentbox-single src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" description="Bonne année 2019 !">
+                            <v-img src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" height="500px"></v-img>
+                        </silentbox-single>
 
-                    <v-card-title primary-title>
-                    <p style="text-align:center;">Bonne année 2019 !</p>
-                    </v-card-title>
-                </v-card>
+                        <v-card-title primary-title>
+                        <p style="text-align:center;">Bonne année 2019 !</p>
+                        </v-card-title>
+                    </v-card>
                 </v-flex>
             </v-layout>
-            <v-layout style="margin-top: 20px">
-                <v-flex md4 style="margin-right: 15px;">
+            <v-layout row wrap>
+                <v-flex xs12 sm12 md4>
                     <v-card class="statBox">
                         <div class="statIcon">
                             <v-icon left>fas fa-user</v-icon>
@@ -70,7 +70,7 @@
                     </v-card>
                 </v-flex>
 
-                <v-flex md4 style="margin-right: 15px;">
+                <v-flex xs12 sm12 md4>
                     <v-card class="statBox">
                         <div class="statIcon">
                             <v-icon left>fas fa-users</v-icon>
@@ -82,7 +82,7 @@
                     </v-card>
                 </v-flex>
 
-                <v-flex md4>
+                <v-flex xs12 sm12 md4>
                     <v-card class="statBox">
                         <div class="statIcon">
                             <v-icon left>fas fa-database</v-icon>
@@ -101,15 +101,15 @@
 
 
 <script>
-import Vue from 'vue'
-import VueSilentbox from 'vue-silentbox'
+import Vue from 'vue';
+import VueSilentbox from 'vue-silentbox';
 Vue.use(VueSilentbox);
 
-export default  {
+export default {
     data: () => ({
         citation: {
-            author: "Alain",
-            citation: "\"C'est dans la baignoire qu'on se douche !\"",
+            author: 'Alain',
+            citation: '"C\'est dans la baignoire qu\'on se douche !"',
         },
         selected: [2],
         passage: [
@@ -117,7 +117,8 @@ export default  {
             date: null,
             time: '1h',
             passage: [
-                { username: 'Bébé Ma\'anne', avatar: `./img/avatars/009.png` },],
+                { username: 'Bébé Ma\'anne', avatar: `./img/avatars/009.png` },
+            ],
         },
         {
             date: '12/03/2019',
@@ -126,14 +127,16 @@ export default  {
                 { username: 'Sev', avatar: `./img/avatars/010.png` },
                 { username: 'Olive', avatar: `./img/avatars/002.png` },
                 { username: 'Fannette', avatar: `./img/avatars/018.png` },
-                { username: 'Manouel', avatar: `./img/avatars/004.png` },],
+                { username: 'Manouel', avatar: `./img/avatars/004.png` },
+            ],
         },
         {
             date: null,
             time: '23h',
             passage: [
                 { username: 'Fannette', avatar: `./img/avatars/018.png` },
-                { username: 'Olive', avatar: `./img/avatars/002.png` }],
+                { username: 'Olive', avatar: `./img/avatars/002.png` },
+            ],
         },
         {
             date: null,
@@ -148,7 +151,9 @@ export default  {
         {
             date: null,
             time: '21h',
-            passage: [{ username: 'Annie', avatar: `./img/avatars/012.png` },],
+            passage: [
+                { username: 'Annie', avatar: `./img/avatars/012.png` },
+            ],
         },
         {
             date: null,
@@ -160,7 +165,8 @@ export default  {
             time: '19h',
             passage: [
                 { username: 'Annie', avatar: `./img/avatars/012.png` },
-                { username: 'Olive', avatar: `./img/avatars/002.png` },],
+                { username: 'Olive', avatar: `./img/avatars/002.png` },
+            ],
         },
         {
             date: null,
@@ -179,16 +185,16 @@ export default  {
         }],
         methods: {
             toggle: function (index) {
-                const i = this.selected.indexOf(index)
+                const i = this.selected.indexOf(index);
                 if (i > -1) {
-                this.selected.splice(i, 1)
+                    this.selected.splice(i, 1);
                 } else {
-                this.selected.push(index)
+                    this.selected.push(index);
                 }
             }
         }
     })
-}
+};
 </script>
 
 

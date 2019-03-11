@@ -1,58 +1,60 @@
 <template>
-<div>
-    <v-card style="margin: 15px">
+<div class="home" style="margin-top: 58px;">
+    <h1>Le calendrier de la famille</h1>
+    <v-card style="margin: 14px">
+        <img src="../assets/images/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-85px; left: 20px;"/>
         <v-form>
             <v-container>
-            <v-layout>
-                <v-flex>
-                    <v-btn color="accent">Aujourd'hui</v-btn>
-                    <v-btn flat icon>
-                        <v-icon left>fas fa-angle-left</v-icon>
-                    </v-btn>
-                    <v-btn flat icon>
-                        <v-icon left>fas fa-angle-right</v-icon>
-                    </v-btn>
-                </v-flex>
-
-                <v-flex>
-                    <v-menu
-                        ref="menu"
-                        v-model="menu"
-                        :close-on-content-click="false"
-                        :nudge-right="40"
-                        lazy
-                        transition="scale-transition"
-                        offset-y
-                        full-width
-                        min-width="290px"
-                        >
-                        <template v-slot:activator="{ on }">
-                            <v-text-field
+                <v-layout>
+                    <v-flex stretch>
+                        <v-menu
+                            ref="menu"
+                            v-model="menu"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            lazy
+                            transition="scale-transition"
+                            offset-y
+                            max-width="90%"
+                            >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                    v-model="date"
+                                    label="Mois en cours"
+                                    prepend-icon="far fa-calendar-alt"
+                                    readonly
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                            style="position: absolute; left: 200px;"
+                                ref="picker"
                                 v-model="date"
-                                label="Mois en cours"
-                                prepend-icon="far fa-calendar-alt"
-                                readonly
-                                v-on="on"
-                            ></v-text-field>
-                        </template>
-                        <v-date-picker
-                            ref="picker"
-                            v-model="date"
-                            :max="new Date().toISOString().substr(0, 10)"
-                            min="1800-01-01"
-                            type="month"
-                            @change="save"
-                        ></v-date-picker>
-                    </v-menu>
-                </v-flex>
-
-                <v-flex>
-                    <v-text-field
-                        label="Rechercher">
-                    </v-text-field>
-                </v-flex>
-
-            </v-layout>
+                                :max="new Date().toISOString().substr(0, 10)"
+                                min="1800-01-01"
+                                type="month"
+                                @change="save"
+                            ></v-date-picker>
+                        </v-menu>
+                    </v-flex>
+                    <v-flex shrink>
+                        <v-btn fab small color="accent">
+                            <v-icon>fas fa-angle-left</v-icon>
+                        </v-btn>
+                        <v-btn fab small color="accent">
+                            <v-icon>fas fa-angle-right</v-icon>
+                        </v-btn>
+                        <v-btn fab small color="accent">
+                            <v-icon>fas fa-th-list</v-icon>
+                        </v-btn>
+                        <v-btn fab small color="accent">
+                            <v-icon>fas fa-search</v-icon>
+                        </v-btn>
+                        <v-btn fab small color="accent">
+                            <v-icon>fas fa-plus</v-icon>
+                        </v-btn>
+                    </v-flex>
+                </v-layout>
             </v-container>
         </v-form>
     </v-card>
@@ -197,7 +199,25 @@ export default {
 
 
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../assets/global.scss';
+
+h1 {
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    text-align: center;
+    color: $primary;
+    text-shadow: 0 -1px #000;
+    text-shadow: 0 1px #aaa;
+    font-size: 40px;
+    font-family: "Comfortaa", sans-serif;
+    margin: 20px 0 60px 0;
+}
 .my-event {
     overflow: hidden;
     text-overflow: ellipsis;
