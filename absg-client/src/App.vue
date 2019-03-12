@@ -202,22 +202,22 @@ export default {
 
 
 <style lang="scss" scoped>
-@import './assets/global.scss';
-.absg {
-    font-size: 1.5em;
-    line-height: 1.5em;
-    font-family: "Comfortaa", sans-serif;
-}
-.absg span {
-    color: $accent;
-}
-#bgcontent {
-    width: 100%;
-    height: 100%;
-    background-image: url('./assets/images/background/r00.png');
-    background-position: center;
-    background-size: cover;
-    background-attachment: fixed;
-    position: relative;
-}
+// @import './assets/global.scss';
+// .absg {
+//     font-size: 1.5em;
+//     line-height: 1.5em;
+//     font-family: "Comfortaa", sans-serif;
+// }
+// .absg span {
+//     color: $accent;
+// }
+// #bgcontent {
+//     width: 100%;
+//     height: 100%;
+//     background-image: url('./assets/images/background/r00.png');
+//     background-position: center;
+//     background-size: cover;
+//     background-attachment: fixed;
+//     position: relative;
+// }
 </style>
