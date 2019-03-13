@@ -6,7 +6,7 @@
         <v-form>
             <v-container>
                 <v-layout>
-                    <v-flex stretch>
+                    <v-flex shrink>
                         <v-menu
                             ref="menu"
                             v-model="menu"
@@ -14,39 +14,62 @@
                             :nudge-right="40"
                             lazy
                             transition="scale-transition"
-                            offset-y
-                            max-width="90%"
-                            >
+                            offset-y>
                             <template v-slot:activator="{ on }">
                                 <v-text-field
                                     v-model="date"
-                                    label="Mois en cours"
+                                    label="Date"
                                     prepend-icon="far fa-calendar-alt"
                                     readonly
                                     v-on="on"
                                 ></v-text-field>
                             </template>
                             <v-date-picker
-                            style="position: absolute; left: 200px;"
                                 ref="picker"
                                 v-model="date"
-                                :max="new Date().toISOString().substr(0, 10)"
+                                max="2100-12-31"
                                 min="1800-01-01"
-                                type="month"
-                                @change="save"
-                            ></v-date-picker>
+                                @change="save">
+                            </v-date-picker>
                         </v-menu>
                     </v-flex>
                     <v-flex shrink>
-                        <v-btn fab small color="accent">
+                        <v-select
+                            v-model="type"
+                            :items="typeOptions"
+                            label="Affichage">
+                        </v-select>
+                    </v-flex>
+                    <v-flex stretch>
+                    </v-flex>
+
+                    <v-flex shrink>
+                        <v-btn fab small color="accent"
+                            @click="$refs.calendar.prev()">
                             <v-icon>fas fa-angle-left</v-icon>
                         </v-btn>
-                        <v-btn fab small color="accent">
+                        <v-btn fab small color="accent"
+                            @click="$refs.calendar.next()">
                             <v-icon>fas fa-angle-right</v-icon>
                         </v-btn>
-                        <v-btn fab small color="accent">
-                            <v-icon>fas fa-th-list</v-icon>
-                        </v-btn>
+                        <v-menu offset-y :close-on-content-click="false">
+                            <v-btn fab small
+                                color="accent"
+                                slot="activator">
+                                <v-icon>fas fa-th-list</v-icon>
+                            </v-btn>
+                            <v-list>
+                                <v-list-tile
+                                    v-for="(filter, index) in filters"
+                                    :key="index">
+                                    <v-list-tile-action>
+                                        <v-checkbox v-model="filter.selected"></v-checkbox>
+                                    </v-list-tile-action>
+                                    <v-list-tile-title>{{ filter.text }}</v-list-tile-title>
+                                </v-list-tile>
+                            </v-list>
+                        </v-menu>
+
                         <v-btn fab small color="accent">
                             <v-icon>fas fa-search</v-icon>
                         </v-btn>
@@ -59,10 +82,12 @@
         </v-form>
     </v-card>
     <v-card style="margin: 15px">
-            <v-sheet style="height: 500px" >
-                <v-calendar
+        <v-sheet style="height: 500px" >
+            <v-calendar
+                ref="calendar"
+                :type="type"
                 :now="today"
-                :value="today"
+                v-model="date"
                 color="primary">
                 <template
                     slot="day"
@@ -109,25 +134,33 @@
                     </v-menu>
                     </template>
                 </template>
-                </v-calendar>
-            </v-sheet>
-        </v-card>
-    </div>
+            </v-calendar>
+        </v-sheet>
+    </v-card>
+</div>
 </template>
 
 
 <script>
 export default {
     data: () => ({
-        date: null,
         menu: false,
-        today: new Date(),
+        today: new Date().toISOString().substr(0, 10),
+        date: new Date().toISOString().substr(0, 10),
+        type: 'month',
+        typeOptions: [
+            { text: 'Journée', value: 'day' },
+            { text: 'Semaine', value: 'week' },
+            { text: 'Mois', value: 'month' }
+        ],
         events: [
             {
                 title: 'Vacation',
                 details: 'Going to the beach!',
-                date: '2018-12-30',
-                open: false
+                date: '2019-03-10',
+                open: false,
+          time: '09:00',
+          duration: 45
             },
             {
                 title: 'Vacation',
@@ -171,6 +204,13 @@ export default {
                 date: '2019-02-01',
                 open: false
             }
+        ],
+        filters: [
+            { text: 'Naissances', value: 'birth', selected: true },
+            { text: 'Fêtes nationales', value: 'firstname', selected: true },
+            { text: 'Gueudelot', value: 'firsname2', selected: true },
+            { text: 'Guibert', value: 'age', selected: true },
+            { text: 'Guyomard', value: 'home', selected: true },
         ]
     }),
     watch: {
