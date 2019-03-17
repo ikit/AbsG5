@@ -113,19 +113,19 @@ export default {
         authors: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'],
         citations: [
         {
-            authorAvatar: 'http://absolumentg.fr/assets/img/avatars/005.png',
+            authorAvatar: `./img/avatars/005.png`,
             authorId: 5,
             authorName: 'Flo',
             citation: '"C\'est toujours les meilleurs qui s\'en aillent !"',
         },
         {
-            authorAvatar: 'http://absolumentg.fr/assets/img/avatars/012.png',
+            authorAvatar: `./img/avatars/012.png`,
             authorId: 12,
             authorName: 'Annie',
             citation: '"Bon, allez ! Ce soir, on regarde un Bermuda." <span class="grey--text text--lighten-1">(un Burma)</span>',
         },
         {
-            authorAvatar: 'http://absolumentg.fr/assets/img/avatars/013.png',
+            authorAvatar: `./img/avatars/013.png`,
             authorId: 13,
             authorName: 'Poupette',
             citation: '"Où l\'est, mes grolles ?" <span class="grey--text text--lighten-1">(à deux ans)</span>',
@@ -140,7 +140,7 @@ export default {
         },
         saveCitation: function () {
             this.citations.push({
-                authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
+                authorAvatar: `./img/avatars/016.png`,
                 authorId: 16,
                 authorName: this.citationEditor.author,
                 citation: this.citationEditor.citation,

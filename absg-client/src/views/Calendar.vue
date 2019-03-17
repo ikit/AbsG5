@@ -21,8 +21,8 @@
                                     label="Date"
                                     prepend-icon="far fa-calendar-alt"
                                     readonly
-                                    v-on="on"
-                                ></v-text-field>
+                                    v-on="on">
+                                </v-text-field>
                             </template>
                             <v-date-picker
                                 ref="picker"
@@ -70,9 +70,20 @@
                             </v-list>
                         </v-menu>
 
-                        <v-btn fab small color="accent">
-                            <v-icon>fas fa-search</v-icon>
-                        </v-btn>
+                        <v-menu offset-y :close-on-content-click="false" style="background-color: white;">
+                            <v-btn fab small
+                                color="accent"
+                                slot="activator">
+                                <v-icon>fas fa-search</v-icon>
+                            </v-btn>
+                            <div style="background-color: white; padding: 10px; min-width: 400px;">
+                                <v-text-field
+                                    v-model="query"
+                                    label="Rechercher un événement"
+                                    required>
+                                </v-text-field>
+                            </div>
+                        </v-menu>
                         <v-btn fab small color="accent">
                             <v-icon>fas fa-plus</v-icon>
                         </v-btn>
@@ -112,23 +123,17 @@
                             <v-toolbar
                                 color="primary"
                                 dark>
-                                <v-btn icon>
-                                    <v-icon>fas fa-edit</v-icon>
-                                </v-btn>
                                 <v-toolbar-title v-html="event.title"></v-toolbar-title>
                                 <v-spacer></v-spacer>
                                 <v-btn icon>
-                                    <v-icon>fas fa-favorite</v-icon>
-                                </v-btn>
-                                <v-btn icon>
-                                    <v-icon>fas fa-star</v-icon>
+                                    <v-icon>fas fa-edit</v-icon>
                                 </v-btn>
                             </v-toolbar>
                             <v-card-title primary-title>
                                 <span v-html="event.details"></span>
                             </v-card-title>
                             <v-card-actions>
-                                <v-btn flat color="secondary">Cancel</v-btn>
+                                <v-btn flat color="secondary">Fermer</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-menu>

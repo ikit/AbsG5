@@ -3,7 +3,7 @@
         <div class="citation"><b>Alain :&nbsp;</b> {{citation.citation}} </div>
         <v-container fluid grid-list-xl>
             <v-layout row wrap>
-                <v-flex xs12 sm12 md6 lg4 xl4>
+                <v-flex sm12 md6 lg4>
                     <v-card>
                         <v-card-title>
                             <h1>Passa G
@@ -45,7 +45,7 @@
                         </v-list>
                     </v-card>
                 </v-flex>
-                <v-flex xs12 sm12 md6 lg8 xl8>
+                <v-flex sm12 md6 lg8>
                     <v-card >
                         <silentbox-single src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" description="Bonne année 2019 !">
                             <v-img src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" height="500px"></v-img>
@@ -58,7 +58,7 @@
                 </v-flex>
             </v-layout>
             <v-layout row wrap>
-                <v-flex xs12 sm12 md4>
+                <v-flex sm12 md4>
                     <v-card class="statBox">
                         <div class="statIcon">
                             <v-icon left>fas fa-user</v-icon>
@@ -70,7 +70,7 @@
                     </v-card>
                 </v-flex>
 
-                <v-flex xs12 sm12 md4>
+                <v-flex sm12 md4>
                     <v-card class="statBox">
                         <div class="statIcon">
                             <v-icon left>fas fa-users</v-icon>
@@ -82,7 +82,7 @@
                     </v-card>
                 </v-flex>
 
-                <v-flex xs12 sm12 md4>
+                <v-flex sm12 md4>
                     <v-card class="statBox">
                         <div class="statIcon">
                             <v-icon left>fas fa-database</v-icon>
