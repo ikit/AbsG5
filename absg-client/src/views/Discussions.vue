@@ -1,97 +1,177 @@
 <template>
 <div class="home" style="margin-top: 58px;">
-    <h1>Les forums</h1>
-        <v-container fluid grid-list-xl>
+    <h1>Les discussions</h1>
+    <v-container fluid grid-list-xl>
+        <v-layout row wrap>
+            <v-flex xs12>
+                <v-card class="box tbz">
+                    <v-tooltip right>
+                        <template v-slot:activator="{ on }">
+                            <h2 v-on="on">
+                                <a href="discussions/forum/1">T.B.Z.</a>
+                            </h2>
+                        </template>
+                        <span>Accéder à l'ensemble des discussions T.B.Z.</span>
+                    </v-tooltip>
+
+                    <v-list two-line style="background: none;">
+                        <template v-for="(item, index) in tbz.lastActivities">
+
+                            <v-list-tile
+                                :key="item.title"
+                                avatar
+                                @click="">
+                            <v-list-tile-avatar>
+                                <img :src="item.user.avatar">
+                            </v-list-tile-avatar>
+
+                            <v-list-tile-content>
+                                <v-list-tile-title>{{ item.title }}
+                                    <span v-if="item.notifications > 0" class="notif"> {{ item.notifications }}</span>
+                                </v-list-tile-title>
+                                <v-list-tile-sub-title>
+                                    <span :class="item.user.rootFamilly">{{ item.user.username }}</span> <span class="date"> le {{ item.date }}:</span> {{ item.message }}
+                                </v-list-tile-sub-title>
+                            </v-list-tile-content>
+                            </v-list-tile>
+                            <v-divider v-if="index != 2" :key="index" inset="true"></v-divider>
+                        </template>
+                    </v-list>
+                </v-card>
+            </v-flex>
+            <v-flex xs12>
+                <v-card class="box blabla">
+                    <v-tooltip right>
+                        <template v-slot:activator="{ on }">
+                            <h2 v-on="on">
+                                <a href="discussions/forum/2">Blabla !</a>
+                            </h2>
+                        </template>
+                        <span>Accéder à l'ensemble des discussions Blabla</span>
+                    </v-tooltip>
+                    <v-list two-line style="background: none;">
+                        <template v-for="(item, index) in blabla.lastActivities">
+
+                            <v-list-tile
+                                :key="item.title"
+                                avatar
+                                @click="">
+                            <v-list-tile-avatar>
+                                <img :src="item.user.avatar">
+                            </v-list-tile-avatar>
+
+                            <v-list-tile-content>
+                                <v-list-tile-title>{{ item.title }}
+                                    <span v-if="item.notifications > 0" class="notif"> {{ item.notifications }}</span>
+                                </v-list-tile-title>
+                                <v-list-tile-sub-title>
+                                    <span :class="item.user.rootFamilly">{{ item.user.username }}</span> <span class="date"> le {{ item.date }}:</span> {{ item.message }}
+                                </v-list-tile-sub-title>
+                            </v-list-tile-content>
+                            </v-list-tile>
+                            <v-divider v-if="index != 2" :key="index" inset="true"></v-divider>
+                        </template>
+                    </v-list>
+                </v-card>
+            </v-flex>
+        </v-layout>
+
+        <v-layout row wrap>
+            <v-flex sm12 md4>
+                <v-card class="box stats">
+                    <h2>Statistiques</h2>
+                    <div class="row">
+                        <div class="column">
+                            <span>13 465</span> messages
+                        </div>
+                        <div class="column">
+                            <span>7 935</span> sujets
+                        </div>
+                        <div class="column">
+                            <span>1,3</span> messages/jour
+                        </div>
+                    </div>
+                </v-card>
+            </v-flex>
+            <!-- <v-flex sm12 md8>
+                <v-card class="box archives" style="height: 114px;">
+                    <h2>Arhives du forum</h2>
+                    <div class="row">
+                        <span>Consultez, ou recherchez parmi les vieux message</span>
+                    </div>
+                </v-card>
+            </v-flex> -->
+            <v-flex sm12 md8 style="text-align: right;">
+                <v-btn
+                    color="accent"
+                    @click.stop="resetDialog(true)">
+                    <v-icon left>fas fa-archive</v-icon>Voir les archives
+                </v-btn>
+                <v-btn
+                    color="accent"
+                    @click.stop="newDiscussion()">
+                    <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
+                </v-btn>
+            </v-flex>
+        </v-layout>
+    </v-container>
+    <v-dialog v-model="newDiscussionDialog" width="800px">
+        <v-card>
+            <v-card-title class="grey lighten-4 py-4 title">
+            Créez une nouvelle discussion dans Blabla
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
             <v-layout row wrap>
-                <v-flex xs12>
-                    <v-card class="box tbz">
-                        <h2>T.B.Z.</h2>
-                        <v-list two-line style="background: none;">
-                            <template v-for="(item, index) in tbz.lastActivities">
-
-                                <v-list-tile
-                                    :key="item.title"
-                                    avatar
-                                    @click="">
-                                <v-list-tile-avatar>
-                                    <img :src="item.user.avatar">
-                                </v-list-tile-avatar>
-
-                                <v-list-tile-content>
-                                    <v-list-tile-title>{{ item.title }}
-                                        <span v-if="item.notifications > 0" class="notif"> {{ item.notifications }}</span>
-                                    </v-list-tile-title>
-                                    <v-list-tile-sub-title>
-                                        <span :class="item.user.rootFamilly">{{ item.user.username }}</span> <span class="date"> le {{ item.date }}:</span> {{ item.message }}
-                                    </v-list-tile-sub-title>
-                                </v-list-tile-content>
-                                </v-list-tile>
-                                <v-divider v-if="index != 2" :key="index" inset="true"></v-divider>
-                            </template>
-                        </v-list>
-                    </v-card>
+                <v-flex xs12 align-center justify-space-between>
+                <v-layout align-center>
+                    <v-avatar size="40px" class="mr-3">
+                    <img
+                        src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
+                        alt="">
+                    </v-avatar>
+                    <v-text-field placeholder="Name"></v-text-field>
+                </v-layout>
+                </v-flex>
+                <v-flex xs6>
+                <v-text-field
+                    prepend-icon="business"
+                    placeholder="Company">
+                </v-text-field>
+                </v-flex>
+                <v-flex xs6>
+                <v-text-field
+                    placeholder="Job title">
+                </v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                    <v-card class="box blabla">
-                        <h2>Blabla !</h2>
-                        <v-list two-line style="background: none;">
-                            <template v-for="(item, index) in blabla.lastActivities">
-
-                                <v-list-tile
-                                    :key="item.title"
-                                    avatar
-                                    @click="">
-                                <v-list-tile-avatar>
-                                    <img :src="item.user.avatar">
-                                </v-list-tile-avatar>
-
-                                <v-list-tile-content>
-                                    <v-list-tile-title>{{ item.title }}
-                                        <span v-if="item.notifications > 0" class="notif"> {{ item.notifications }}</span>
-                                    </v-list-tile-title>
-                                    <v-list-tile-sub-title>
-                                        <span :class="item.user.rootFamilly">{{ item.user.username }}</span> <span class="date"> le {{ item.date }}:</span> {{ item.message }}
-                                    </v-list-tile-sub-title>
-                                </v-list-tile-content>
-                                </v-list-tile>
-                                <v-divider v-if="index != 2" :key="index" inset="true"></v-divider>
-                            </template>
-                        </v-list>
-                    </v-card>
+                <v-text-field
+                    prepend-icon="mail"
+                    placeholder="Email">
+                </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                <v-text-field
+                    type="tel"
+                    prepend-icon="phone"
+                    placeholder="(000) 000 - 0000"
+                    mask="phone">
+                </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                <v-text-field
+                    prepend-icon="notes"
+                    placeholder="Notes">
+                </v-text-field>
                 </v-flex>
             </v-layout>
-
-            <v-layout row wrap>
-                <v-flex sm12 md6>
-                    <v-card class="box stats">
-                        <h2>Statistiques</h2>
-                        <div class="row">
-                            <div class="column">
-                                <span>13 465</span> messages
-                            </div>
-                            <div class="column">
-                                <span>7 935</span> sujets
-                            </div>
-                            <div class="column">
-                                <span>1,3</span> messages/jour
-                            </div>
-                        </div>
-                    </v-card>
-                </v-flex>
-                <v-flex sm12 md6>
-                    <v-card class="box archives">
-                        <h2>Arhives du forum</h2>
-                        <div class="row">
-                            <span>Message au hasard :</span>
-                            <div class="column">
-                                <span>Emmanuel le 5/6/2008 à 17h54</span>: "Salut les Copains ! [...]"
-                            </div>
-                        </div>
-                    </v-card>
-                </v-flex>
-            </v-layout>
-        </v-container>
-
+            </v-container>
+            <v-card-actions>
+            <v-btn flat color="primary">Supprimer toutes les notifications</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn flat @click="dialog=false">Fermer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 
 </div>
 </template>
@@ -100,6 +180,7 @@
 export default {
     data: () => ({
         query: '',
+        newDiscussionDialog: false,
         tbz: {
             lastActivities: [
                 {
@@ -244,7 +325,7 @@ h1 {
 }
 
 h2 {
-    display: block;
+    display: inline-block;
     font-size: 1.5em;
     font-weight: bold;
     text-align: left;
@@ -252,6 +333,9 @@ h2 {
     text-shadow: 0 -1px #000;
     text-shadow: 0 1px #aaa;
     font-family: "Comfortaa", sans-serif;
+}
+h2 a {
+    text-decoration: none;
 }
 
 .notif {

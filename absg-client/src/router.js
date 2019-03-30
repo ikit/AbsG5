@@ -39,6 +39,11 @@ export default new Router({
             component: () => import('./views/Discussions.vue'),
         },
         {
+            path: '/discussions/forum/:id',
+            name: 'forum',
+            component: () => import('./views/Forum.vue'),
+        },
+        {
             path: '/calendrier',
             name: 'calendar',
             component: () => import('./views/Calendar.vue'),
