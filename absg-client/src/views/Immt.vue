@@ -21,9 +21,9 @@
                 </v-flex>
 
                 <v-flex sm12 md3></v-flex>
-                
+
                 <v-flex sm12 md3 style="text-align: right;">
-                    <v-btn 
+                    <v-btn
                         color="accent"
                         style="height: 80%"
                         @click.stop="resetDialog(true)">
@@ -60,7 +60,8 @@
         Nouvelle image du moment
         </v-card-title>
         <v-container grid-list-sm class="pa-4">
-            <ImageInput/>
+            <ImageUpload v-model='immtEditor.image'/>
+            <v-text-field label="Donnez un titre à l'image" v-model='immtEditor.title' prepend-icon='fas fa-feather-alt'></v-text-field>
         </v-container>
         <v-card-actions>
         <v-spacer></v-spacer>
@@ -76,7 +77,14 @@
 
 <script>
 
+//Vue.component('my-component-name', {});
+import ImageUpload from '../components/ImageUpload.vue';
+
+
 export default  {
+    components: {
+        ImageUpload
+    },
     data: () => ({
         immtEditor: {
             open: false,
