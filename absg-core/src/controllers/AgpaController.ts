@@ -1,16 +1,17 @@
 import { getRepository } from "typeorm";
 import { JsonController, Param, Body, Get, Post, Delete, NotFoundError } from "routing-controllers";
-import { Citation, AgpaPhoto, AgpaAward } from "../entities";
+import { AgpaPhoto, AgpaAward } from "../entities";
+import { AgpaService } from "../services/AgpaService";
+import { citationService } from "../services";
 
 @JsonController('/agpa')
-export class CitationController {
+export class AgpaController {
 
     private photosRepo = getRepository(AgpaPhoto);
 
-
     @Get('')
     welcome() {
-        return "this.citationsRepo.find()";
+        return citationService.welcom();
     }
 
     @Get('/rules')
@@ -19,8 +20,9 @@ export class CitationController {
     }
 
     @Get('/ceremony/:year')
-    getCeremony(@Param("year") year: number) {
-        return { categories: [], photos: [], awards: [], stats: {} };
+    async getCeremony(@Param("year") year: number) {
+        const rawData = await this.photosRepo.query(`SELECT * FROM agpa_photo LIMIT 2`);
+        return { categories: [], photos: rawData, awards: [], stats: {} };
     }
 
     @Get('/archives')

@@ -6,7 +6,7 @@ import * as bodyParser from "body-parser";
 import * as morgan from 'morgan';
 import rfs from 'rotating-file-stream';
 import { Init } from './init';
-import { jwtAuthorizationChecker, currentUserChecker } from "./middlewares";
+import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 
 const ormconfig = require(`../ormconfig.${process.env.NODE_ENV}.json`);
 

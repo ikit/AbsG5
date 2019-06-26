@@ -4,7 +4,7 @@ import { getConnection, QueryRunner, getRepository } from "typeorm";
 //import * as csv from 'csvtojson';
 
 @JsonController('/imports')
-export class ExportController {
+export class ImportController {
 /*
     @Post('/')
     async import(@UploadedFile("file") file: any) {

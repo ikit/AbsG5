@@ -16,7 +16,7 @@ export class User {
     @Column({ comment: 'clean name of the user used for login' })
     usernameClean: string;
 
-    @Column({ comment: 'hash of the user password', unique: true })
+    @Column({ comment: 'hash of the user password', nullable: true })
     passwordHash: string;
 
     @Column({ comment: 'Authentication token', nullable: true })
@@ -27,4 +27,9 @@ export class User {
 
     @Column("json", { comment: 'use to compute notifications for the user', nullable: true })
     lastActivity: any;
+
+
+    public fromJSON(json: any) {
+        // TODO
+    }
 }

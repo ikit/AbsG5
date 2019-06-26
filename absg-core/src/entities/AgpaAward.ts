@@ -1,4 +1,4 @@
-import { Entity, OneToOne, Column, JoinColumn, PrimaryColumn, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, OneToOne, Column, JoinColumn, PrimaryColumn, Index, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { AgpaCategory } from "./AgpaCategory";
 import { AgpaPhoto } from "./AgpaPhoto";
 import { User } from "./User";
@@ -22,18 +22,18 @@ export class AgpaAward {
     @Column({ comment: 'Année d\'attribution de l\'agpa', width: 4 })
     year: number;
 
-    @OneToOne(type => AgpaCategory)
+    @ManyToOne(type => AgpaCategory)
     @JoinColumn()
     category: AgpaCategory;
 
-    @OneToOne(type => User)
+    @ManyToOne(type => User)
     @JoinColumn()
     user: User;
 
-    @Column({ comment: 'L\'agpa décerné' })
+    @Column("enum", { enum: ['honor', 'nominated', 'bronze', 'sylver', 'gold', 'diamond'], comment: `'L\'agpa décerné` })
     award: AgpaAwardType;
 
-    @OneToOne(type => User)
+    @ManyToOne(type => AgpaPhoto)
     @JoinColumn()
     photo: AgpaPhoto;
 }

@@ -4,7 +4,7 @@ import { AuthService } from "../services/AuthService";
 import { User } from "../entities";
 
 @JsonController('/users')
-export class AuthController {
+export class UserController {
 
     private userRepo = getRepository(User);
     private authService = new AuthService();

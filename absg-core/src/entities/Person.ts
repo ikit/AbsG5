@@ -31,7 +31,7 @@ export class Person {
     @Column("enum", { enum: ['female', 'male', 'undefined'], comment: `Sexe`, default: 'undefined' })
     sex: Sex;
 
-    @Column({ comment: `Date de naissance` })
+    @Column({ nullable: true,comment: `Date de naissance` })
     dateOfBirth: Date;
 
     @Column({ nullable: true, comment: 'Date du décé' })
@@ -48,7 +48,7 @@ export class Person {
     @Column({ nullable: true, comment: `Numéro de téléphone personnel` })
     phone: string;
 
-    @Column({ default: 1, comment: `Email` })
+    @Column({ nullable: true, comment: `Email` })
     email: string;
 
     @OneToMany(type => Website, website => website.id)
