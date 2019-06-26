@@ -1,3 +1,5 @@
+import { getRepository } from "typeorm";
+import { AgpaPhoto } from "../entities";
 
 
 // // PALMARES -----------------------------------------------------------------------------------------------------------------------------------------
@@ -191,123 +193,166 @@
 
 
 
-// /**
-//  * buildArchiveMenu
-//  * Récupère les infos a afficher pour le menu des archives
-//  *
-//  * @param $ctx [array], le contexte avec toutes les infos nécessaire.
-//  * @return $ctx [array] le contexte mis à jour avec les infos relatives aux anciennes éditions des agpas
-//  */
-// if ( ! function_exists('buildArchiveMenu'))
-// {
-//     function buildArchiveMenu(&$ctx)
+/**
+ * buildArchiveMenu
+ * Récupère les infos a afficher pour le menu des archives
+ *
+ * @return les infos pour construire le menu principal des archives
+ */
+
+export async function buildArchiveSummary(): Promise<any>
+{
+    const archivesSummary = [];
+    // On récupère les photos et met à jour le contexte 
+    const repo = getRepository(AgpaPhoto);
+
+    // On récupère les photos pour chaque éditions
+    const photos = new Map<Number, AgpaPhoto[]>();
+    let sql = `SELECT p.*, a.award, a."userId" from agpa_photo p
+        INNER JOIN agpa_award a ON p.id = a."photoId"
+        order by p.year desc, p."categoryId" ASC, a.award ASC`;
+    // On récupère les données
+    let result = await repo.query(sql);
+    for (const row of result)
+    {
+        const p = new AgpaPhoto();
+        p.fromJSON(row);
+        if (photos.has(p.year)) {
+            photos.get(p.year).push(p);
+        } else {
+            photos.set(p.year, [p]);
+        }
+    }
+    
+    // On récupère les meilleurs photographes
+    const authors = new Map<Number, any[]>();
+    sql = `SELECT a.year, a."categoryId", a."userId", u.username, a.award 
+        FROM agpa_award a 
+        INNER JOIN "user" u ON u.id = a."userId" 
+        WHERE "categoryId"=-1 
+        order by "year" desc, a."award" ASC `;
+    result = await repo.query(sql);
+    for (const row of result)
+    {
+        if (authors.has(row.year)) {
+            authors.get(row.year).push(row);
+        } else {
+            authors.set(row.year, [row]);
+        }
+    }
+
+    // On récupère les données
+    sql = `SELECT year, count(*) AS photos FROM agpa_photo GROUP BY year ORDER BY year DESC`;
+    result = await repo.query(sql);
+    for (const row of result)
+    {
+        archivesSummary.push({
+            year: row.year, 
+            totalPhotos: (row.photos as number),
+            photos: photos.has(row.year) ? photos.get(row.year) : [],
+            authors: authors.has(row.year) ? authors.get(row.year) : []
+        });
+    }
+    
+
+    return archivesSummary;
+}
+
+
+// const maxYear = new Date().getFullYear();
+
+// if ($year >= 2006 && $year < $maxYear)
 //     {
-//         $CI = get_instance();
-// 		$data = array();
+//         // On recupere toutes les donnees sur les photos de cette annee la
+//         $AGPA_PHOTOS = initAGPA($year);
 
-//         // On détermine la date limite
-//         $maxYear = date("Y");
-//         if ($ctx['current_phase'] <= 4) $maxYear --;
+//         // Donnees generales du template
+//         $l_title = 'AGPA - Les archives de l\'&eacute;dition '.$year;
+
+//         $navbar[2] = array('Edition '.$year, append_sid("{$phpbb_root_path}agpa.$phpEx", "section=archives&amp;year=$year"));
+//         $template->assign_vars(array('SOMMAIRE_ARCHIVES' => false));
         
-// 		print_r($ctx);
-//         if ($year >= 2006 && $year < $maxYear)
+        
+//         // Analyser les principaux resultat pour l'annee $annee
+//         $sql = "SELECT * FROM agpa_awards WHERE year = $year  ORDER BY category ASC, award ASC";
+//         $result = $db->sql_query($sql);
+        
+//         // save informations about the edition
+//         $infosEdition = array();
+//         while ($row = $db->sql_fetchrow($result))
 //         {
-//             // On recupere toutes les donnees sur les photos de cette annee la
-//             $AGPA_PHOTOS = initAGPA($year);
-
-//             // Donnees generales du template
-//             $l_title = 'AGPA - Les archives de l\'&eacute;dition '.$year;
-
-//             $navbar[2] = array('Edition '.$year, append_sid("{$phpbb_root_path}agpa.$phpEx", "section=archives&amp;year=$year"));
-//             $template->assign_vars(array('SOMMAIRE_ARCHIVES' => false));
-            
-            
-//             // Analyser les principaux resultat pour l'annee $annee
-//             $sql = "SELECT * FROM agpa_awards WHERE year = $year  ORDER BY category ASC, award ASC";
-//             $result = $db->sql_query($sql);
-            
-//             // save informations about the edition
-//             $infosEdition = array();
-//             while ($row = $db->sql_fetchrow($result))
-//             {
-//                 $infosEdition[$row['category']][$row['award']] = $row;
-//             }
-//             $db->sql_freeresult($result);
-            
-//             // foreach category, fill data template and complete some extra statistics
-//             $usersNumber = 0;
-//             $photosNumber = 0;
-//             foreach ($infosEdition as $catId => $categoryInformations)
-//             {
-//                 if ($catId == -1) // AGPA meilleur photographe
-//                 {
-//                     if (isset($categoryInformations['diamant']))
-//                     {
-//                         analyseHC1( $categoryInformations['diamant'] );
-//                     }
-//                     else
-//                     {
-//                         analyseHC1( $categoryInformations['or'] );
-//                     }
-//                 }
-//                 else if ($catId == -2) // AGPA de la meilleur photo
-//                 {
-//                     if (isset($categoryInformations['diamant']))
-//                     {
-//                         analyseHC2( $categoryInformations['diamant'] );
-//                     }
-//                     else
-//                     {
-//                         analyseHC2( $categoryInformations['or'] );
-//                     }
-//                 }
-//                 else // categorie normal
-//                 {
-//                     $photosInTheCategory = 0;
-//                     $photosNumber += sizeof($AGPA_PHOTOS[$catId]);
-                    
-//                     $template->assign_block_vars('categories', array(
-//                             'ID' => $catId,
-//                             'TITLE'       => $ctx['categories'][$catId]['title'],
-//                             'DESCRIPTION' => $ctx['categories'][$catId]['description'],
-//                             'NBR_PHOTOS'  => $photosNumber,
-//                             'SPECIAL'     => ($catId < 0) ? $catId : false)
-//                         );
-                    
-//                     // afficher les 3 meilleurs photos (ordre avec lequel on appel analyseSC est important)
-//                     if (isset($categoryInformations['diamant']))
-//                     {
-//                         analyseSC( $categoryInformations['diamant'] );
-//                     }
-//                     else
-//                     {
-//                         analyseSC( $categoryInformations['or'] );
-//                     }
-//                     analyseSC( $categoryInformations['argent'] );
-//                     analyseSC( $categoryInformations['bronze'] );
-//                 }
-
-//             }
-            
-//             // TODO : récupérer le nombre de participant (requete SQL basique)
-            
-//             $template->assign_vars(array(
-//                 'EDITION_YEAR'     => $year,
-//                 'NBR_PHOTOS'       => $photosNumber,
-//                 'NBR_PHOTOGRAPHER' => $usersNumber)
-//             );
+//             $infosEdition[$row['category']][$row['award']] = $row;
 //         }
-//         else 
-//         { 
-//             // si pas d'annee precise, on considere qu'il s'agit de l'accueil des archives.
-//             displayArchivesSummary(ctx, $page, 10);
+//         $db->sql_freeresult($result);
+        
+//         // foreach category, fill data template and complete some extra statistics
+//         $usersNumber = 0;
+//         $photosNumber = 0;
+//         foreach ($infosEdition as $catId => $categoryInformations)
+//         {
+//             if ($catId == -1) // AGPA meilleur photographe
+//             {
+//                 if (isset($categoryInformations['diamant']))
+//                 {
+//                     analyseHC1( $categoryInformations['diamant'] );
+//                 }
+//                 else
+//                 {
+//                     analyseHC1( $categoryInformations['or'] );
+//                 }
+//             }
+//             else if ($catId == -2) // AGPA de la meilleur photo
+//             {
+//                 if (isset($categoryInformations['diamant']))
+//                 {
+//                     analyseHC2( $categoryInformations['diamant'] );
+//                 }
+//                 else
+//                 {
+//                     analyseHC2( $categoryInformations['or'] );
+//                 }
+//             }
+//             else // categorie normal
+//             {
+//                 $photosInTheCategory = 0;
+//                 $photosNumber += sizeof($AGPA_PHOTOS[$catId]);
+                
+//                 $template->assign_block_vars('categories', array(
+//                         'ID' => $catId,
+//                         'TITLE'       => $ctx['categories'][$catId]['title'],
+//                         'DESCRIPTION' => $ctx['categories'][$catId]['description'],
+//                         'NBR_PHOTOS'  => $photosNumber,
+//                         'SPECIAL'     => ($catId < 0) ? $catId : false)
+//                     );
+                
+//                 // afficher les 3 meilleurs photos (ordre avec lequel on appel analyseSC est important)
+//                 if (isset($categoryInformations['diamant']))
+//                 {
+//                     analyseSC( $categoryInformations['diamant'] );
+//                 }
+//                 else
+//                 {
+//                     analyseSC( $categoryInformations['or'] );
+//                 }
+//                 analyseSC( $categoryInformations['argent'] );
+//                 analyseSC( $categoryInformations['bronze'] );
+//             }
+
 //         }
+        
+//         // TODO : récupérer le nombre de participant (requete SQL basique)
+        
+//         $template->assign_vars(array(
+//             'EDITION_YEAR'     => $year,
+//             'NBR_PHOTOS'       => $photosNumber,
+//             'NBR_PHOTOGRAPHER' => $usersNumber)
+//         );
 //     }
-// }
-
-
-
-
+//     else 
+//     { 
+//         // si pas d'annee precise, on considere qu'il s'agit de l'accueil des archives.
+//         displayArchivesSummary(ctx, $page, 10);
+//     }
 
 
 // /**

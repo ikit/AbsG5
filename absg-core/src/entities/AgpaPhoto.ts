@@ -48,7 +48,8 @@ export class AgpaPhoto {
     error: any;
 
     // Transient properties
-    awards: Map<string, string> = null;
+    awards: Map<number, string> = null; // catId => award
+    categoryId: number;
 
     public fromJSON(json: any) {
         this.id = json.id ? json.id : null;
@@ -68,12 +69,24 @@ export class AgpaPhoto {
             const user = new User();
             user.fromJSON(json.user);
             this.user = user;
+        } else if (json.username) {
+            const user = new User();
+            user.id = json.userId;
+            user.username = json.username;
+            this.user = user;
         }
         if (json.category) {
             const category = new AgpaCategory();
             category.fromJSON(json.category);
             this.category = category;
+            this.categoryId = category.id;
+        } else if (json.categoryId) {
+            this.categoryId = json.categoryId;
         }
 
+        this.awards = new Map<number, string>();
+        if (json.award && this.category) {
+            this.awards.set(this.category.id, json.award);
+        }
     }
 }

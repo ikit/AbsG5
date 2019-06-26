@@ -3,162 +3,54 @@ import { AgpaPhoto, AgpaAward, AgpaAwardType, AgpaCategory, AgpaVote, User } fro
 import { AgpaContext } from "./model/AgpaContext";
 import { getRepository } from "typeorm";
 import { stringify } from "querystring";
+import { AgpaPhase } from "./model/AgpaPhase";
 
-// Les informations utiles pour chaque phase du concours
-export const phasesData =  [
-    { id:1, pxlStart: 1,   pxlSize: 238, startDate: null}, 
-    { id:2, pxlStart: 239, pxlSize: 88,  startDate: null}, 
-    { id:3, pxlStart: 327, pxlSize: 153, startDate: null}, 
-    { id:4, pxlStart: 481, pxlSize: 135, startDate: null},
-    { id:5, pxlStart: 500, pxlSize: 0,   startDate: null}
-];
-
-/**
- * Retourne les informations de la phase du concours correspondant à la date donnée
- * @param date
- * @return phase data
- */
-export function getPhase(date: Date): any {
-    if (!phasesData[0].startDate) {
-        console.log('ERROR: phasesData not initialized. Call initPhotosAwardsData first');
-        return null;
-    }
-
-    let result = phasesData[0];
-    for (let idx=0; idx < phasesData.length; idx++) {
-        if (date > phasesData[idx].startDate) {
-            result = phasesData[idx];
-        } else {
-            break;
-        }
-    }
-    return result;
-}
-
-
-
-/**
- * setupTimeLine
- * Fait les calcul nécéssaire afin d'afficher la frise chronologique des AGPA
- *
- * @param ctx, le contexte avec toutes les infos nécessaire.
- * @param phaseDate, la date à prendre en compte pour le calcul de phase
- * @param phasesDayDuration, le nombre de jour que dure chaque phases des AGPA.
- * @return [int] le nombre de seconde qu'il reste avant de passer à la phase suivante
- *               renvoie false si la phase indiqué ne correspond pas aux dates.
- *
- * Rappel des phase :
- *   1 : enregistrement des oeuvre        [ du 1er au 15 décembre ]
- *   2 : vérification des photos          [ du 15 au 17 décembre ]
- *   3 : votes                            [ du 17 au 21 décembre ]
- *   4 : calculs et préparation cérémonie [ du 21 au 24 décembre ]
- *   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ]
- */
-export function setupTimeLine(ctx: AgpaContext, phaseDate: Date, phasesDayDuration: number[])
-{
-    /*
-    // init 
-    let pixels = 0;
-    let timeLeft = -1;
-    let timeLeftLabel = '';
-
-    // init phases limit with date
-    const now = new Date(Date.now());
-    const year = now.getFullYear();
-    phasesData[0].startDate = new Date(year, 11, 1);
-    for (let phase = 1; phase < phasesData.length; phase ++) {
-        phasesData[phase].startDate = addDays(phasesData[phase-1].startDate, phasesDayDuration[phase-1])
-    }
-    
-    if (getPhase(phaseDate).id == 5)
-    {
-        pixels = phasesData[4].pxlStart + phasesData[4].pxlSize;
-    }
-    else
-    {
-
-        const endMkt   = new Date( phasesLimits[phase][1],   phasesLimits[phase][0], date('Y'));
-        const startMkt = new Date( phasesLimits[phase-1][1], phasesLimits[phase-1][0], date('Y'));
-        const actualMkt = Date.now();
-
-        // le nombre d'heure entre la date de début de la phase et aujourd'hui
-        const deltaHr  = Math.max ( (actualMkt - startMkt) / 3600, 0) ;
-        // le nombre d'heure que dure la phase en entier (du début à la fin)
-        const totalHr  = (endMkt-startMkt) / 3600;
-        
-        // le nombre de pixel a afficher de l'image
-        pixels = phasesPixelsLenght[phase].pxlStart + Math.min( ( (phasesPixelsLenght[phase].pxlSize * deltaHr) / totalHr * 100 ) / 100, phasesPixelsLenght[phase].pxlSize);
-        
-
-
-        timeLeft = endMkt-actualMkt;
-    }
-
-
-
-    // Conversion du temps restant en string
-    if (timeLeft)
-    {
-        const jours = timeLeft/86400;
-        timeLeft -= jours*86400;
-        const heures = timeLeft/3600;
-        timeLeft -= heures*3600;
-        const minutes = timeLeft/60;
-
-        timeLeftLabel  = `${jours} jour` + ((jours > 1)?'s':'');
-        timeLeftLabel += `, ${heures} heure` + ((heures > 1)?'s':'');
-        timeLeftLabel += ` et ${minutes} minute` + ((minutes > 1)?'s':'');
-    }
-
-    ctx.phaseTimelineProgression = pixels;
-    ctx.phaseTimeleft = timeLeftLabel;
-    */
-}
+export const agpaCtx = new AgpaContext();
 
 
 /**
  * initPhotosData
  * Crée le "contexte" pour une édition des agpa, c'est à dire l'ensemble des données concernant l'édition
  *
- * @param year, l'année de l'édition
+ * @param date, la date à prendre en compte pour l'édition
  * @return le "contexte"
  */
-export async function initAGPAContext(year: number): Promise<AgpaContext>
+export async function initAGPAContext(date: Date): Promise<AgpaContext>
 {
+    if (!agpaCtx.shallBeReset(date)) return agpaCtx;
+
+    // On intiitalise le contexte en fonction de la date
+    await agpaCtx.reset(date);
+
+    // On récupère les photos et met à jour le contexte 
     const repo = getRepository(AgpaPhoto);
-    const photos = [];  // l'ensemble des photos du concours (de l'édition en cours)
     let sql = `SELECT p.*, U.username, a.award, a."categoryId" as "awardCategoryId"
         FROM agpa_photo p 
             INNER JOIN "user" u ON U.id = p."userId" 
             LEFT JOIN agpa_award a ON a."photoId" = p.id 
-        WHERE p.year=${year}
+        WHERE p.year=${agpaCtx.editionYear}
         ORDER BY p."categoryId" ASC, p.gscore DESC, p.number ASC`;
-    
-    
-    // On réinit les infos
-    const ctx = new AgpaContext();
-    await ctx.reset(year);
 
     // On récupère les données
     const result = await repo.query(sql);
     for (const row of result)
     {
         // On vérifie que la photo n'est pas déjà enregistré (peux arriver si la photo à plusieurs award (Agpa bronze + meilleur titre par exemple)
-        if (!ctx.photos.has(row.id))
+        if (!agpaCtx.photos.has(row.id))
         {
             // On augmente le nombre de photo inscrite dans la catégorie concernée
-            ctx.categories.get(row.categoryId).photos.push(row.id);
-            ctx.categories.get(row.categoryId).nbrPhotos++;
-            ctx.totalPhotos++;
+            agpaCtx.categories.get(row.categoryId).photos.push(row.id);
+            agpaCtx.categories.get(row.categoryId).nbrPhotos++;
+            agpaCtx.totalPhotos++;
             
             // On ajoute l'autheur si il ne l'a pas déjà été
-            if (!ctx.authors.has(row.userId)) {
-                ctx.authors.set(row.userId, row.username);
-                ctx.totalAuthors++;
+            if (!agpaCtx.authors.has(row.userId)) {
+                agpaCtx.authors.set(row.userId, row.username);
+                agpaCtx.totalAuthors++;
             }
             
             // On reformate les infos des awards (en liste car une photos peut en avoir plusieurs)
-            let awards = new Map<string, string>();
+            let awards = new Map<number, string>();
             if (row.award != null)
             {
                 awards.set(row.awardCategoryId, row.award);
@@ -169,16 +61,16 @@ export async function initAGPAContext(year: number): Promise<AgpaContext>
             photo.fromJSON(row);
             photo.awards = awards;
 
-            ctx.photos.set(photo.id, photo);
+            agpaCtx.photos.set(photo.id, photo);
         }
         else
         {
             // on ajoute l'award 
-            ctx.photos.get(row.id).awards.set(row.awardCategoryId, row.award);
+            agpaCtx.photos.get(row.id).awards.set(row.awardCategoryId, row.award);
         }
     }
 
-    return ctx;
+    return agpaCtx;
 }
 
 

@@ -1,8 +1,7 @@
 import { getRepository } from "typeorm";
 import { JsonController, Param, Body, Get, Post, Delete, NotFoundError } from "routing-controllers";
 import { AgpaPhoto, AgpaAward } from "../entities";
-import { AgpaService } from "../services/AgpaService";
-import { citationService } from "../services";
+import { agpaService } from "../services/AgpaService";
 
 @JsonController('/agpa')
 export class AgpaController {
@@ -11,7 +10,7 @@ export class AgpaController {
 
     @Get('')
     welcome() {
-        return citationService.welcom();
+        return agpaService.welcom();
     }
 
     @Get('/rules')
@@ -27,7 +26,7 @@ export class AgpaController {
 
     @Get('/archives')
     archives() {
-        return { years: [], stats: {} };
+        return agpaService.archivesSummary();
     }
 
     @Get('/archives/:year')
