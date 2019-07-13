@@ -53,5 +53,10 @@ export default new Router({
             name: 'agenda',
             component: () => import('./views/Agenda.vue'),
         },
+        {
+            path: '/agpa',
+            name: 'agpa',
+            component: () => import('./views/Agpa.vue'),
+        },
     ]
 });

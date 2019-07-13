@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { AgpaPhoto } from "../entities";
+import { AgpaPhoto, AgpaCategory } from "../entities";
 
 
 // // PALMARES -----------------------------------------------------------------------------------------------------------------------------------------
@@ -199,7 +199,6 @@ import { AgpaPhoto } from "../entities";
  *
  * @return les infos pour construire le menu principal des archives
  */
-
 export async function buildArchiveSummary(): Promise<any>
 {
     const archivesSummary = [];
@@ -210,7 +209,7 @@ export async function buildArchiveSummary(): Promise<any>
     const photos = new Map<Number, AgpaPhoto[]>();
     let sql = `SELECT p.*, a.award, a."userId" from agpa_photo p
         INNER JOIN agpa_award a ON p.id = a."photoId"
-        order by p.year desc, p."categoryId" ASC, a.award ASC`;
+        ORDER BY p.year DESC, p."categoryId" ASC, a.award ASC`;
     // On récupère les données
     let result = await repo.query(sql);
     for (const row of result)
@@ -230,7 +229,7 @@ export async function buildArchiveSummary(): Promise<any>
         FROM agpa_award a 
         INNER JOIN "user" u ON u.id = a."userId" 
         WHERE "categoryId"=-1 
-        order by "year" desc, a."award" ASC `;
+        ORDER BY "year" DESC, a."award" ASC `;
     result = await repo.query(sql);
     for (const row of result)
     {
@@ -257,6 +256,9 @@ export async function buildArchiveSummary(): Promise<any>
 
     return archivesSummary;
 }
+
+
+
 
 
 // const maxYear = new Date().getFullYear();

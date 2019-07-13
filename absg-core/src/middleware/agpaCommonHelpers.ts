@@ -74,29 +74,6 @@ export async function initAGPAContext(date: Date): Promise<AgpaContext>
 }
 
 
-
-// export function convertCatIdToCssId(caId)
-// {
-//     let result = caId;
-    
-//     switch(caId)
-//     {
-//         case -3:
-//             result = 'x3';
-//             break;
-//         case -2:
-//             result = 'x2';
-//             break;
-//         case -1:
-//             result = 'x1';
-//             break;
-//     }
-    
-//     return result;
-// }
-
-
-
 /**
  * shuffleArray
  * Mélange les éléments d'un tableau. Attention, le tableau d'entré est mélangé
@@ -123,7 +100,6 @@ function shuffleArray(array: any[]) {
  * @param year, l'année de l'édition
  * @return ctx le contexte mis à jour avec le tableau récapitulatif des photos de l'edition des AGPA (triées par catégories)
  */
-
 export function sufflePhotos(photos)
 {
     const newPhotos = [];
@@ -151,6 +127,15 @@ export function sufflePhotos(photos)
 
 
 
+/**
+ * Trouve l'année de la dernière édition publiable dans les archives en fonction de la 
+ * date courante.
+ * @return l'année de la dernière édition
+ */
+export function findMaxArchiveEdition(): number {
+    // TODO
+    return 2018;
+}
 
 
 
@@ -161,6 +146,27 @@ export function sufflePhotos(photos)
 
 
 
+
+
+// export function convertCatIdToCssId(caId)
+// {
+//     let result = caId;
+    
+//     switch(caId)
+//     {
+//         case -3:
+//             result = 'x3';
+//             break;
+//         case -2:
+//             result = 'x2';
+//             break;
+//         case -1:
+//             result = 'x1';
+//             break;
+//     }
+    
+//     return result;
+// }
 
 
 
