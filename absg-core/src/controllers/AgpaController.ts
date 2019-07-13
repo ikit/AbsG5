@@ -15,12 +15,16 @@ export class AgpaController {
 
     @Get('/archives')
     archives() {
-        return agpaService.archivesSummary();
+        return agpaService.getArchiveSummary();
     }
 
     @Get('/archives/:year')
-    getYear(@Param("year") year: number) {
-        return agpaService.archiveEditionSummary(year);
+    getEdition(@Param("year") year: number) {
+        return agpaService.getArchiveEdition(year);
+    }
+    @Get('/archives/:year/:catId')
+    getCategory(@Param("year") year: number, @Param("catId") catId: number) {
+        return agpaService.getArchiveCategory(year, catId);
     }
 
     @Get('/archives/:year/files')

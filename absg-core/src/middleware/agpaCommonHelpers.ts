@@ -8,6 +8,7 @@ import { AgpaPhase } from "./model/AgpaPhase";
 export const agpaCtx = new AgpaContext();
 
 
+
 /**
  * initPhotosData
  * Crée le "contexte" pour une édition des agpa, c'est à dire l'ensemble des données concernant l'édition
@@ -15,62 +16,9 @@ export const agpaCtx = new AgpaContext();
  * @param date, la date à prendre en compte pour l'édition
  * @return le "contexte"
  */
-export async function initAGPAContext(date: Date): Promise<AgpaContext>
+export async function initAGPAContext(date: Date)
 {
-    if (!agpaCtx.shallBeReset(date)) return agpaCtx;
-
-    // On intiitalise le contexte en fonction de la date
-    await agpaCtx.reset(date);
-
-    // On récupère les photos et met à jour le contexte 
-    const repo = getRepository(AgpaPhoto);
-    let sql = `SELECT p.*, U.username, a.award, a."categoryId" as "awardCategoryId"
-        FROM agpa_photo p 
-            INNER JOIN "user" u ON U.id = p."userId" 
-            LEFT JOIN agpa_award a ON a."photoId" = p.id 
-        WHERE p.year=${agpaCtx.editionYear}
-        ORDER BY p."categoryId" ASC, p.gscore DESC, p.number ASC`;
-
-    // On récupère les données
-    const result = await repo.query(sql);
-    for (const row of result)
-    {
-        // On vérifie que la photo n'est pas déjà enregistré (peux arriver si la photo à plusieurs award (Agpa bronze + meilleur titre par exemple)
-        if (!agpaCtx.photos.has(row.id))
-        {
-            // On augmente le nombre de photo inscrite dans la catégorie concernée
-            agpaCtx.categories.get(row.categoryId).photos.push(row.id);
-            agpaCtx.categories.get(row.categoryId).nbrPhotos++;
-            agpaCtx.totalPhotos++;
-            
-            // On ajoute l'autheur si il ne l'a pas déjà été
-            if (!agpaCtx.authors.has(row.userId)) {
-                agpaCtx.authors.set(row.userId, row.username);
-                agpaCtx.totalAuthors++;
-            }
-            
-            // On reformate les infos des awards (en liste car une photos peut en avoir plusieurs)
-            let awards = new Map<number, string>();
-            if (row.award != null)
-            {
-                awards.set(row.awardCategoryId, row.award);
-            }
-            
-            // On stocke les infos de la photo
-            const photo = new AgpaPhoto();
-            photo.fromJSON(row);
-            photo.awards = awards;
-
-            agpaCtx.photos.set(photo.id, photo);
-        }
-        else
-        {
-            // on ajoute l'award 
-            agpaCtx.photos.get(row.id).awards.set(row.awardCategoryId, row.award);
-        }
-    }
-
-    return agpaCtx;
+    return agpaCtx.checkForReset();
 }
 
 
@@ -78,7 +26,7 @@ export async function initAGPAContext(date: Date): Promise<AgpaContext>
  * shuffleArray
  * Mélange les éléments d'un tableau. Attention, le tableau d'entré est mélangé
  * @param {Array} array, le tableau à mélanger
- */
+ 
 function shuffleArray(array: any[]) {
     let j, tmp;
     for (let i = array.length - 1; i > 0; i--) {
@@ -88,7 +36,7 @@ function shuffleArray(array: any[]) {
         array[j] = tmp;
     }
 }
-
+*/
 
 /**
  * sufflePhotos
@@ -96,10 +44,8 @@ function shuffleArray(array: any[]) {
  * et met à jour en même temps ce tableau avec les numéros générés
  *
  * @param photos,  les photos de l'éditions, triés par catégories.
- * @param user, les informations relatives à l'utilisateur.
- * @param year, l'année de l'édition
  * @return ctx le contexte mis à jour avec le tableau récapitulatif des photos de l'edition des AGPA (triées par catégories)
- */
+
 export function sufflePhotos(photos)
 {
     const newPhotos = [];
@@ -123,18 +69,80 @@ export function sufflePhotos(photos)
     }
     return sql;
 }
+*/
 
 
 
 
 /**
- * Trouve l'année de la dernière édition publiable dans les archives en fonction de la 
- * date courante.
+ * Calcule l'année de l'édition en fonction de la date courante
+ * @return l'année de l'édition en cours
+ */
+export function getCurrentEdition(): number {
+    // Une édition commence au 1er octobre pour se terminer fin décembre
+    // Mais en fonction du calendrier, peut déborder sur janvier/février de l'année suivante
+    // Donc si on est avant octobre, il s'agit de l'édition précédente, sinon il s'agit de l'année courante :)
+    const date = new Date();
+    let editionYear = date.getFullYear();
+    if (date.getMonth() < 9) {
+        editionYear--;
+    }
+    return editionYear;
+}
+
+/**
+ * Calcule la phase de l'édition en cours
+ * @return la phase de l'édition en cours
+ */
+export function getCurrentPhase(): number {
+    agpaCtx.checkForReset();
+    return agpaCtx.phase;
+}
+
+/**
+ * Calcule les phases pour l'édition courante
+ * @return la liste des phases
+ */
+export function getPhasesBoundaries(): AgpaPhase[] {
+    // Les durées des phases par défaut sont :
+    //   1 : enregistrement des oeuvre        [ du 1er octobre au 15 décembre ] => 76 jours
+    //   2 : vérification des photos          [ du 15 au 17 décembre ] => 2 jours
+    //   3 : votes                            [ du 17 au 21 décembre ] => 4 jours
+    //   4 : calculs et préparation cérémonie [ du 21 au 24 décembre ] => 3 jours
+    //   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ] 
+    // Mais pour l'année en cours, on récupère les durées via la DB car on peut les modifier
+    // pour s'adapter au contraintes des agendas des participants
+    const currentYear = new Date().getFullYear();
+    const phases = [];
+    let startDate =  new Date(getCurrentEdition(), 9, 1, 0, 0, 0);
+    const phasesDayDurations = [76,2,4,3, null];
+    
+    // TODO: récupérer les valeurs en bases de données
+
+    for (let idx=0; idx < phasesDayDurations.length; idx++) {
+        const p = new AgpaPhase();
+        p.id = idx + 1;
+        p.startDate = new Date(startDate);
+        if (phasesDayDurations[idx]) {
+            startDate = addDays(startDate, phasesDayDurations[idx]);
+            p.endDate = new Date(startDate);
+        } else {
+            p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
+        }
+        phases.push(p);
+        
+    }
+    return phases;
+}
+
+/**
+ * Calcule l'année de la dernière édition publiable dans les archives
+ * Tiens compte de la phase de l'édition courante.
  * @return l'année de la dernière édition
  */
-export function findMaxArchiveEdition(): number {
-    // TODO
-    return 2018;
+export function getMaxArchiveEdition(): number {
+    const now = new Date();
+    return  getCurrentPhase() < 5 ? getCurrentEdition() -1 : getCurrentEdition();
 }
 
 

@@ -1,8 +1,8 @@
 import { getConnection, getRepository, Equal } from "typeorm";
 import { format, addDays } from "date-fns";
 import { AgpaPhoto, AgpaAward, AgpaAwardType, AgpaCategory, AgpaVote } from "../entities";
-import { initAGPAContext, findMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
-import { buildArchiveSummary } from "../middleware/agpaArchiveHelper";
+import { initAGPAContext, getMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
+import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
 
 
 
@@ -24,18 +24,27 @@ class AgpaService {
     /**
      * Retourne les informations sur les anciennes éditions
      */
-    public archivesSummary() {
-        return buildArchiveSummary();
+    public getArchiveSummary() {
+        return archiveSummary();
     }
 
     /**
      * 
      * @param year Retourne les informations sur une ancienne édition
      */
-    public archiveEditionSummary(year: number) {
+    public getArchiveEdition(year: number) {
 
-        if (year >= 2006 && year <= findMaxArchiveEdition()) {
-            return initAGPAContext(new Date(year, 11, 30));
+        if (year >= 2006 && year <= getMaxArchiveEdition()) {
+            return archiveEdition(year);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public getArchiveCategory(year: number, catId: number) {
+        if (year >= 2006 && year <= getMaxArchiveEdition()) {
+            return archiveCategory(year, catId);
         }
         else {
             return null;

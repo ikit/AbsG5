@@ -199,7 +199,7 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
  *
  * @return les infos pour construire le menu principal des archives
  */
-export async function buildArchiveSummary(): Promise<any>
+export async function archiveSummary(): Promise<any>
 {
     const archivesSummary = [];
     // On récupère les photos et met à jour le contexte 
@@ -261,6 +261,46 @@ export async function buildArchiveSummary(): Promise<any>
 
 
 
+export async function archiveEdition(year: number) {
+    return {};
+}
+
+
+export async function archiveCategory(year: number, catId: number) {
+    const category = {
+        totalPhotos: 0,
+        totalUsers: 0,
+        photos: []
+    };
+    // On récupère les photos et met à jour le contexte 
+    const users = [];
+    const repo = getRepository(AgpaPhoto);
+
+    // On récupère les photos pour chaque éditions
+    let sql = `SELECT p.*, a.award, u.username 
+        FROM agpa_photo p
+        LEFT JOIN agpa_award a ON p.id = a."photoId"
+        INNER JOIN "user" u ON u.id = p."userId" 
+        WHERE p.year=${year} AND p."categoryId"=${catId}
+        ORDER BY p.ranking ASC`;
+    // On récupère les données
+    let result = await repo.query(sql);
+    for (const row of result)
+    {
+        const p = new AgpaPhoto();
+        p.fromJSON(row);
+        category.photos.push(p);
+        category.totalPhotos += 1;
+
+        if (!(p.user.id in users)) {
+            category.totalUsers += 1;
+            users.push(p.user.id);
+        }
+    }
+    
+
+    return category;
+}
 // const maxYear = new Date().getFullYear();
 
 // if ($year >= 2006 && $year < $maxYear)

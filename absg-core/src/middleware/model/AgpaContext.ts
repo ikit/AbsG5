@@ -1,7 +1,8 @@
 import { AgpaCategory, AgpaPhoto, User } from "../../entities";
 import { getRepository } from "typeorm";
 import { AgpaPhase } from "./AgpaPhase";
-import { addDays } from "date-fns";
+import { addDays, differenceInHours } from "date-fns";
+import { getPhasesBoundaries, getCurrentEdition, getCurrentPhase, agpaCtx } from "../agpaCommonHelpers";
 
 export class AgpaContext {
     categories: Map<number, AgpaCategory>;  // catId => category
@@ -18,23 +19,22 @@ export class AgpaContext {
 
 
     /**
-     * Indique en fonction d'une date donnée, si les infos du contexte doivent être rafraichit ou non
+     * Vérifie en fonction de la date courante si les infos du contexte doivent être rafraichient
      * 
-     * @param date 
      */
-    shallBeReset(date: Date) {
-        const currentYear = new Date(Date.now()).getFullYear();
-        const year = date.getFullYear();
+    async checkForReset(): Promise<AgpaContext> {
+        const currentYear = new Date().getFullYear();
 
-        // Si pas encore init, il le faut
-        if (!this.lastUpdateRefDate) return true;
-        // Si dernier update ne correspond à l'année voulu, il le faut
-        if (year != this.lastUpdateRefDate.getFullYear()) return true;
-        // Pour les année passé, pas besoin de rafraichir le contexte à chaque fois... 
-        if (year < currentYear) return !this.lastUpdateRefDate;
+        // Si pas encore init ou bien dernier reset à plus de 24h: il faut rafraichir le contexte
+        let needToRefresh = !this.lastUpdateRefDate || (differenceInHours(currentYear, this.lastUpdateRefDate) >= 24);
 
-        // Pour l'année en cours (si phase < 5), on raffraichi tout le temps car les données peuvent changer à tout moment.
-        return true;
+        // On recalcul le contexte
+
+        if (needToRefresh) {
+            return this.reset(new Date());
+        }
+
+        return agpaCtx;
     }
 
 
@@ -42,8 +42,8 @@ export class AgpaContext {
      * 
      * @param date 
      */
-    async reset(date: Date) : Promise<void> {
-        const currentYear = new Date(Date.now()).getFullYear();
+    async reset(date: Date) : Promise<AgpaContext> {
+        console.log("reset AGPA contexte");
         this.categories = new Map<number, AgpaCategory>();
         this.photos = new Map<number, AgpaPhoto>();
         this.authors = new Map<number, string>();
@@ -51,58 +51,24 @@ export class AgpaContext {
         this.totalAuthors = 0;
         this.lastUpdateRefDate = date;
 
-        // On calcul l'édition en fonction de la date
-        // Une édition commence au 1er octobre pour se terminer fin décembre
-        // Mais en fonction du calendrier, peut déborder sur janvier/février de l'année suivante
-        // Aussi pour calculer l'édition: si on est avant octobre, il s'agit de l'édition précédente
-        // Sinon il s'agit de l'année courante :)
-        this.editionYear = date.getFullYear();
-        if (date.getMonth() < 9) {
-            this.editionYear--;
-        }
+        // On récupère les dates butoires des différentes phases
+        this.editionYear = getCurrentEdition();
+        this.phases = getPhasesBoundaries();
 
-        // Les durées des phases par défaut sont :
-        //   1 : enregistrement des oeuvre        [ du 1er octobre au 15 décembre ] => 76 jours
-        //   2 : vérification des photos          [ du 15 au 17 décembre ] => 2 jourss
-        //   3 : votes                            [ du 17 au 21 décembre ] => 4 jours
-        //   4 : calculs et préparation cérémonie [ du 21 au 24 décembre ] => 3 jours
-        //   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ] 
-        // Mais pour l'année en cours, on récupère les durées via la DB car on peut les modifier
-        // pour s'adapter au contraintes des agendas des participants
-        this.phases = [];
-        let startDate =  new Date(this.editionYear, 9, 1, 0, 0, 0);
-        const phasesDayDurations = [76,2,4,3, null];
-        if (this.editionYear < currentYear ) {
-            // TODO: for current year, phases durations may be changed to fit users calendars}
-            // retrieve it from db
-        }
-
-        for (let idx=0; idx < phasesDayDurations.length; idx++) {
-            const p = new AgpaPhase();
-            p.id = idx + 1;
-            p.startDate = new Date(startDate);
-            if (phasesDayDurations[idx]) {
-                startDate = addDays(startDate, phasesDayDurations[idx]);
-                p.endDate = new Date(startDate);
-            } else {
-                p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
-            }
-            this.phases.push(p);
-            
-            // On sélectionne la phase en fonction de la date fourni
+        // On en déduis la phase actuelle pour l'édition en cours
+        for (const p of this.phases) {
             if (date > p.startDate) {
                 this.phase = p.id;
             }
         }
 
-        
-        // Reset categories informations
+        // Reset les infos des catégories
         const repo = getRepository(AgpaCategory);
         let sql = `SELECT c.*, v.title as "sTitle", v.description as "sDescription"
             FROM agpa_category c
             LEFT JOIN agpa_category_variation v ON c.id = v.id AND v.year=${this.editionYear}
             ORDER BY c.order ASC`;
-        const result = await repo.query(sql);
+        let result = await repo.query(sql);
 
         for(const row of result)
         {
@@ -113,5 +79,53 @@ export class AgpaContext {
             cat.authors = [];
             this.categories.set(cat.id, cat);
         }
+
+        // On récupère les photos
+        sql = `SELECT p.*, U.username, a.award, a."categoryId" as "awardCategoryId"
+            FROM agpa_photo p 
+                INNER JOIN "user" u ON U.id = p."userId" 
+                LEFT JOIN agpa_award a ON a."photoId" = p.id 
+            WHERE p.year=${this.editionYear}
+            ORDER BY p."categoryId" ASC, p.gscore DESC, p.number ASC`;
+
+        // On récupère les données
+        result = await repo.query(sql);
+        for (const row of result)
+        {
+            // On vérifie que la photo n'est pas déjà enregistré (peux arriver si la photo à plusieurs award (Agpa bronze + meilleur titre par exemple)
+            if (!this.photos.has(row.id))
+            {
+                // On augmente le nombre de photo inscrite dans la catégorie concernée
+                this.categories.get(row.categoryId).photos.push(row.id);
+                this.categories.get(row.categoryId).nbrPhotos++;
+                this.totalPhotos++;
+                
+                // On ajoute l'autheur si il ne l'a pas déjà été
+                if (!this.authors.has(row.userId)) {
+                    this.authors.set(row.userId, row.username);
+                    this.totalAuthors++;
+                }
+                
+                // On reformate les infos des awards (en liste car une photos peut en avoir plusieurs)
+                let awards = new Map<number, string>();
+                if (row.award != null)
+                {
+                    awards.set(row.awardCategoryId, row.award);
+                }
+                
+                // On stocke les infos de la photo
+                const photo = new AgpaPhoto();
+                photo.fromJSON(row);
+                photo.awards = awards;
+
+                this.photos.set(photo.id, photo);
+            }
+            else
+            {
+                // on ajoute l'award 
+                this.photos.get(row.id).awards.set(row.awardCategoryId, row.award);
+            }
+        }
+        return this;
     }
 }

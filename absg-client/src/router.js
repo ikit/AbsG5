@@ -55,8 +55,21 @@ export default new Router({
         },
         {
             path: '/agpa',
-            name: 'agpa',
             component: () => import('./views/Agpa.vue'),
+            children: [
+                {
+                    path: '',
+                    component: () => import('./views/Agpa/Edition.vue'),
+                },
+                {
+                    path: 'archives/:year',
+                    component: () => import('./views/Agpa/ArchiveEdition.vue'),
+                },
+                {
+                    path: 'archives/:year/:catId',
+                    component: () => import('./views/Agpa/ArchiveCategory.vue'),
+                }
+            ]
         },
     ]
 });

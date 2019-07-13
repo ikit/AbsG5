@@ -1,6 +1,6 @@
 <template>
 <div>
-    <h2>Edition {{ current.editionYear }}</h2>
+    <h2>Archive Edition {{ current.editionYear }}</h2>
 
     <v-container fluid v-if="current">
         <v-layout row wrap>
@@ -19,8 +19,8 @@
                     </v-card-title>
 
                     <v-card-actions>
-                        <router-link :to="`/agpa/archives/${current.editionYear}/${cat.id}`" tag="button">
-                            <v-btn flat color="accent">Voir les photos</v-btn>
+                        <router-link :to="{name: '/archives/{{current.editionYear}}/{{cat.id}}'}">
+                            <v-btn flat color="accent" >Voir les photos</v-btn>
                         </router-link>
                     </v-card-actions>
                 </v-card>
@@ -34,6 +34,7 @@
 <script>
 
 export default {
+    name: 'Phase5',
     data: () => ({
     }),
     props: ['current'],
@@ -67,6 +68,7 @@ export default {
             this.resetDialog();
         }
     }
+
 };
 </script>
 
