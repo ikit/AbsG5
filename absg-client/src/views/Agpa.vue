@@ -22,7 +22,7 @@ export default {
             section: 2
         },
     }),
-
+    props: ['darkMode'],
     methods: {
     }
 };

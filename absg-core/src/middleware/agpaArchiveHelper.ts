@@ -207,7 +207,7 @@ export async function archiveSummary(): Promise<any>
 
     // On récupère les photos pour chaque éditions
     const photos = new Map<Number, AgpaPhoto[]>();
-    let sql = `SELECT p.*, a.award, a."userId" from agpa_photo p
+    let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", a."userId" from agpa_photo p
         INNER JOIN agpa_award a ON p.id = a."photoId"
         ORDER BY p.year DESC, p."categoryId" ASC, a.award ASC`;
     // On récupère les données
@@ -270,14 +270,15 @@ export async function archiveCategory(year: number, catId: number) {
     const category = {
         totalPhotos: 0,
         totalUsers: 0,
-        photos: []
+        photos: null
     };
     // On récupère les photos et met à jour le contexte 
     const users = [];
+    const photos = new Map<Number, AgpaPhoto>();
     const repo = getRepository(AgpaPhoto);
 
     // On récupère les photos pour chaque éditions
-    let sql = `SELECT p.*, a.award, u.username 
+    let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
         FROM agpa_photo p
         LEFT JOIN agpa_award a ON p.id = a."photoId"
         INNER JOIN "user" u ON u.id = p."userId" 
@@ -289,16 +290,21 @@ export async function archiveCategory(year: number, catId: number) {
     {
         const p = new AgpaPhoto();
         p.fromJSON(row);
-        category.photos.push(p);
-        category.totalPhotos += 1;
+
+        if (photos.has(p.id)) {
+            photos.get(p.id).awards.set(row.awardCategory, row.award);
+        } else {
+            photos.set(p.id, p);
+        }
 
         if (!(p.user.id in users)) {
             category.totalUsers += 1;
             users.push(p.user.id);
         }
     }
+    category.photos = Array.from(photos.values());
+    category.totalPhotos = category.photos.length;
     
-
     return category;
 }
 // const maxYear = new Date().getFullYear();

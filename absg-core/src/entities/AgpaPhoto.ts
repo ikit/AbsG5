@@ -85,8 +85,8 @@ export class AgpaPhoto {
         }
 
         this.awards = new Map<number, string>();
-        if (json.award && this.category) {
-            this.awards.set(this.category.id, json.award);
+        if (json.award && json.awardCategory) {
+            this.awards.set(json.awardCategory, json.award);
         }
     }
 }
