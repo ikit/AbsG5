@@ -51,7 +51,8 @@ INSERT INTO public.person(firstname, firstname2, lastname, surname, sex, phone, 
 (NULL, NULL, 'Guyomard', 'Papy Guyomard', 'male'::person_sex_enum, NULL, NULL),
 ('Guillaume', NULL, 'Boulerand', 'Jambon', 'male'::person_sex_enum, NULL, NULL),
 ('Armel', 'Frédéric Philippe', 'Thiriet', NULL, 'male'::person_sex_enum, NULL, NULL),
-('Siméon', 'Tahiry', 'Gueudelot', NULL, 'male'::person_sex_enum, NULL, NULL);
+('Siméon', 'Tahiry', 'Gueudelot', NULL, 'male'::person_sex_enum, NULL, NULL),
+('Sacha', '', 'Thiriet', NULL, 'male'::person_sex_enum, NULL, NULL);
 
 
 INSERT INTO public."user"(id, "personId", username, "usernameClean", "passwordHash") VALUES
@@ -91,4 +92,6 @@ INSERT INTO public."user"(id, "personId", username, "usernameClean", "passwordHa
 (35, 35, 'Louison', 'louison', '0b9c2625dc21ef05f6ad4ddf47c5f203837aa32c'),
 (36, 47, 'Camille', 'camille', '0b9c2625dc21ef05f6ad4ddf47c5f203837aa32c'),
 (37, 52, 'Guillaume', 'guillaume', '0b9c2625dc21ef05f6ad4ddf47c5f203837aa32c'),
-(38, 53, 'Armel', 'armel', '0b9c2625dc21ef05f6ad4ddf47c5f203837aa32c');
+(38, 53, 'Armel', 'armel', '0b9c2625dc21ef05f6ad4ddf47c5f203837aa32c'),
+(39, 54, 'Siméon', 'simeon', '0b9c2625dc21ef05f6ad4ddf47c5f203837aa32c'),
+(40, 55, 'Sacha', 'sacha', '0b9c2625dc21ef05f6ad4ddf47c5f203837aa32c');

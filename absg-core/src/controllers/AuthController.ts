@@ -1,13 +1,12 @@
 import { getRepository, Equal } from "typeorm";
 import { JsonController, Post, Body, BadRequestError, Delete, CurrentUser, Get } from "routing-controllers";
 import { User } from "../entities";
-import { AuthService } from "../services/AuthService";
+import { authService } from "../services";
 
 @JsonController('/auth')
 export class AuthController {
 
     private userRepo = getRepository(User);
-    private authService = new AuthService();
 
     @Post('/login')
     async login(@Body() payload) {
@@ -29,13 +28,13 @@ export class AuthController {
 
         // On vérifie le mot de passe envoyé
         try {
-            const isPasswordCorrect = await this.authService.checkPassword(payload.passwordHash, user.passwordHash);
+            const isPasswordCorrect = await authService.checkPassword(payload.passwordHash, user.passwordHash);
             if (!isPasswordCorrect) {
                 throw new BadRequestError(`Wrong username or password.`);
             }
 
             // On génère puis stocke un token
-            user.token = this.authService.createToken(user);
+            user.token = authService.createToken(user);
             this.userRepo.save({
                 id: user.id,
                 token: user.token

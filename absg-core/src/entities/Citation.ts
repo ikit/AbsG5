@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 import { Person } from "./Person";
 
@@ -7,14 +7,14 @@ export class Citation {
     @PrimaryGeneratedColumn({ comment: 'id' })
     id: number;
     
-    @OneToOne(type => User)
+    @ManyToOne(type => User)
     @JoinColumn()
     poster: User;
     
     @Column({ comment: 'La citation', type: 'text' })
     citation: string;
 
-    @OneToOne(type => Person)
+    @ManyToOne(type => Person)
     @JoinColumn()
     author: Person;
 }

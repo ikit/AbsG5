@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { User } from '../entities';
 
-export class AuthService {
+class AuthService {
 
     private SECRET = 'EyVgkGdxM58b>A6df&vrb+X4<Sk,Z[UJ';
     private EXPIRES_IN = 60 * 60;
@@ -66,3 +66,4 @@ export class AuthService {
     }
 
 }
+export const authService = new AuthService();

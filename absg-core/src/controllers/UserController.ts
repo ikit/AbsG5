@@ -1,13 +1,16 @@
 import { getRepository, Equal } from "typeorm";
-import { JsonController, Post, Body, BadRequestError } from "routing-controllers";
-import { AuthService } from "../services/AuthService";
+import { JsonController, Post, Body, BadRequestError, Get } from "routing-controllers";
 import { User } from "../entities";
+
+
+import { authService, citationService, immtService } from "../services";
+import { success } from "../middleware/jsonHelper";
 
 @JsonController('/users')
 export class UserController {
 
     private userRepo = getRepository(User);
-    private authService = new AuthService();
+    
 
     @Post('/')
     async save(@Body() payload: User) {
@@ -27,13 +30,37 @@ export class UserController {
 
         try {
             // On chiffre le mot de passe
-            payload.passwordHash = await this.authService.hashPassword(payload.passwordHash);
+            payload.passwordHash = await authService.hashPassword(payload.passwordHash);
             
             // On stock le nouvel utilisateur en base
             return this.userRepo.save(payload);
         } catch (err) {
             throw new Error(`An error occurred when saving the user.`);
         }
+    }
+
+
+    /**
+     * Récupère l'ensemble des informations de la page d'accueil:
+     *  - Une citation aléatoire
+     *  - La dernière image du moment
+     *  - Les événements du mois en cours
+     *  - L'historique des passages de la journée
+     *  - Les dernières notifications non lues 
+     */
+    @Get('/welcom')
+    async welcom() {
+        console.log("welcome !")
+        const result = {
+            immt: await immtService.last(),
+            citation: await citationService.random(),
+            events: [],
+            passag: [],
+            notifications: [],
+            user: {}
+        }
+
+        return success(result);
     }
 
 }

@@ -1,6 +1,7 @@
 import { getRepository } from "typeorm";
 import { JsonController, Param, Body, Get, Post, Delete, NotFoundError } from "routing-controllers";
 import { Citation } from "../entities";
+import { citationService } from "../services";
 
 @JsonController('/citations')
 export class CitationController {
@@ -8,8 +9,8 @@ export class CitationController {
     private citationsRepo = getRepository(Citation);
 
     @Get('')
-    all() {
-        return this.citationsRepo.find();
+    async random() {
+        return await citationService.random();
     }
 
     @Get('/:id')

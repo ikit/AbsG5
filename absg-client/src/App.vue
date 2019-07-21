@@ -58,7 +58,11 @@
                 </v-tooltip>
             </span>
         </v-toolbar-title>
-        <v-spacer></v-spacer>
+        <v-spacer>
+            <div v-if="citation" style="text-align:center; margin: 0 100px">
+                <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; " v-html="citation.citation"></span>
+            </div>
+        </v-spacer>
         <v-badge color="accent" overlap>
             <span slot="badge">8</span>
             <v-btn icon
@@ -69,7 +73,8 @@
         <v-menu offset-y bottom left>
             <v-btn color="primary" dark depressed slot="activator">
                 Bébé Ma'anne
-                <v-icon right>fas fa-user-circle</v-icon>
+                <!-- <v-icon right>fas fa-user-circle</v-icon> -->
+                <img src="/img/avatars/009.png" style="height: 40px; margin-left: 15px" />
             </v-btn>
             <v-list>
             <v-list-tile>
@@ -103,7 +108,7 @@
                     <div class="menuItem" v-if="!item.children" :key="item.text">
                         <router-link :to="item.route">
                             <v-icon color="inherit">{{ item.icon }}</v-icon><br/>
-                            <span>{{ item.text }}</span>
+                            <span style="display: inline-block; line-height: 1.1em;">{{ item.text }}</span>
                         </router-link>
                     </div>
                 </template>
@@ -174,6 +179,9 @@
 </template>
 
 <script>
+import Vue from 'vue';
+import Vuex from 'vuex';
+import store from './store';
 import ClientOAuth2 from 'client-oauth2';
 
 
@@ -191,6 +199,7 @@ console.log(githubAuth);
 
 export default {
     name: 'App',
+    store,
     data: () => ({
     dialog: false,
     darkMode: false,
@@ -223,6 +232,14 @@ export default {
     }),
     props: {
     source: String
+    },
+    computed: {
+        citation () {
+          return this.$store.state.citation;
+        },
+        user () {
+          return this.$store.state.user;
+        }
     }
 };
 </script>

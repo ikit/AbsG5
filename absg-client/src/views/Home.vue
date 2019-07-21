@@ -1,14 +1,107 @@
 <template>
     <div class="home" v-cloak>
-        <div class="citation"><b>Alain :&nbsp;</b> {{citation.citation}} </div>
         <v-container fluid grid-list-xl>
             <v-layout row wrap>
-                <v-flex sm12 md6 lg4>
+                <v-flex stretch>
+                    <v-card style="min-width: 500px;">
+                        <v-card-title style="border-bottom: 1px solid rgba(0,0,0, 0.1)"> <h1>Agenda</h1>
+                            <div style="position: absolute; right: 15px">
+                                <v-btn fab small color="accent"
+                                    @click="$refs.calendar.prev()">
+                                    <v-icon>fas fa-angle-left</v-icon>
+                                </v-btn>
+                                <v-btn fab small color="accent"
+                                    @click="$refs.calendar.next()">
+                                    <v-icon>fas fa-angle-right</v-icon>
+                                </v-btn>
+                                <v-menu offset-y :close-on-content-click="false">
+                                    <v-btn fab small
+                                        color="accent"
+                                        slot="activator">
+                                        <v-icon>fas fa-th-list</v-icon>
+                                    </v-btn>
+                                    <v-list>
+                                        <v-list-tile
+                                            v-for="(filter, index) in filters"
+                                            :key="index">
+                                            <v-list-tile-action>
+                                                <v-checkbox v-model="filter.selected"></v-checkbox>
+                                            </v-list-tile-action>
+                                            <v-list-tile-title>{{ filter.text }}</v-list-tile-title>
+                                        </v-list-tile>
+                                    </v-list>
+                                </v-menu>
+                            </div>
+
+                        </v-card-title>
+                        <v-sheet style="height:426px;">
+                            <v-calendar
+                                ref="calendar"
+                                :type="type"
+                                :now="today"
+                                v-model="date"
+                                color="primary">
+                                <template
+                                    slot="day"
+                                    slot-scope="{ date }">
+                                    <template v-for="event in eventsMap[date]">
+                                    <v-menu
+                                        :key="event.title"
+                                        v-model="event.open"
+                                        full-width
+                                        offset-x>
+                                        <div
+                                            v-if="!event.time"
+                                            slot="activator"
+                                            v-ripple
+                                            class="my-event"
+                                            v-html="event.title">
+                                        </div>
+                                        <v-card
+                                            color="grey lighten-4"
+                                            min-width="350px"
+                                            flat>
+                                            <v-toolbar
+                                                color="primary"
+                                                dark>
+                                                <v-toolbar-title v-html="event.title"></v-toolbar-title>
+                                                <v-spacer></v-spacer>
+                                                <v-btn icon>
+                                                    <v-icon>fas fa-edit</v-icon>
+                                                </v-btn>
+                                            </v-toolbar>
+                                            <v-card-title primary-title>
+                                                <span v-html="event.details"></span>
+                                            </v-card-title>
+                                            <v-card-actions>
+                                                <v-btn flat color="secondary">Fermer</v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-menu>
+                                    </template>
+                                </template>
+                            </v-calendar>
+                        </v-sheet>
+                    </v-card>
+                </v-flex>
+
+                <v-flex shrink>
+                    <div class="immt" v-if="immt">
+                        <div>
+                            <div>
+                                <img :src="immt.src"/>
+                            </div>
+                        </div>
+                        <p>{{ immt.title }}</p>
+                    </div>
+                </v-flex>
+            </v-layout>
+            <v-layout row wrap>
+
+                <v-flex>
                     <v-card>
                         <v-card-title>
                             <h1>Passa G
-
-
                             <v-btn flat
                                 style="position: absolute; right: 15px; top: 15px;"
                                 @click.stop="">
@@ -45,54 +138,7 @@
                         </v-list>
                     </v-card>
                 </v-flex>
-                <v-flex sm12 md6 lg8>
-                    <v-card >
-                        <silentbox-single src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" description="Bonne année 2019 !">
-                            <v-img src="http://absolumentg.fr/assets/img/immt/2019_037.jpg" height="500px"></v-img>
-                        </silentbox-single>
 
-                        <v-card-title primary-title>
-                        <p style="text-align:center;">Bonne année 2019 !</p>
-                        </v-card-title>
-                    </v-card>
-                </v-flex>
-            </v-layout>
-            <v-layout row wrap>
-                <v-flex sm12 md4>
-                    <v-card class="statBox">
-                        <div class="statIcon">
-                            <v-icon left>fas fa-user</v-icon>
-                        </div>
-                        <div class="statValue">
-                            <span style="font-size: 2em; font-weight: bold;">15</span> visites/jours
-                            <p class="details"><b>max :</b> 28 le 15/12/2016</p>
-                        </div>
-                    </v-card>
-                </v-flex>
-
-                <v-flex sm12 md4>
-                    <v-card class="statBox">
-                        <div class="statIcon">
-                            <v-icon left>fas fa-users</v-icon>
-                        </div>
-                        <div class="statValue">
-                            <span style="font-size: 2em; font-weight: bold;">15</span> visites par jours
-                            max : 28 le 15/12/2016
-                        </div>
-                    </v-card>
-                </v-flex>
-
-                <v-flex sm12 md4>
-                    <v-card class="statBox">
-                        <div class="statIcon">
-                            <v-icon left>fas fa-database</v-icon>
-                        </div>
-                        <div class="statValue">
-                            <span style="font-size: 2em; font-weight: bold;">15</span> visites par jours
-                            max : 28 le 15/12/2016
-                        </div>
-                    </v-card>
-                </v-flex>
             </v-layout>
         </v-container>
 
@@ -102,15 +148,85 @@
 
 <script>
 import Vue from 'vue';
+import Vuex from 'vuex';
+import store from '../store';
+import axios from 'axios';
 import VueSilentbox from 'vue-silentbox';
+import { parseAxiosResponse } from '../middleware/CommonHelper';
+
 Vue.use(VueSilentbox);
 
 export default {
+    store,
     data: () => ({
-        citation: {
-            author: 'Alain',
-            citation: '"C\'est dans la baignoire qu\'on se douche !"',
-        },
+        menu: false,
+        today: new Date().toISOString().substr(0, 10),
+        date: new Date().toISOString().substr(0, 10),
+        type: 'month',
+        typeOptions: [
+            { text: 'Journée', value: 'day' },
+            { text: 'Semaine', value: 'week' },
+            { text: 'Mois', value: 'month' }
+        ],
+        events: [
+            {
+                title: 'Vacation',
+                details: 'Going to the beach!',
+                date: '2019-03-10',
+                open: false,
+          time: '09:00',
+          duration: 45
+            },
+            {
+                title: 'Vacation',
+                details: 'Going to the beach!',
+                date: '2018-12-31',
+                open: false
+            },
+            {
+                title: 'Vacation',
+                details: 'Going to the beach!',
+                date: '2019-01-01',
+                open: false
+            },
+            {
+                title: 'Meeting',
+                details: 'Spending time on how we do not have enough time',
+                date: '2019-01-07',
+                open: false
+            },
+            {
+                title: '30th Birthday',
+                details: 'Celebrate responsibly',
+                date: '2019-01-03',
+                open: false
+            },
+            {
+                title: 'New Year',
+                details: 'Eat chocolate until you pass out',
+                date: '2019-01-01',
+                open: false
+            },
+            {
+                title: 'Conference',
+                details: 'Mute myself the whole time and wonder why I am on this call',
+                date: '2019-01-21',
+                open: false
+            },
+            {
+                title: 'Hackathon',
+                details: 'Code like there is no tommorrow',
+                date: '2019-02-01',
+                open: false
+            }
+        ],
+        filters: [
+            { text: 'Naissances', value: 'birth', selected: true },
+            { text: 'Fêtes nationales', value: 'firstname', selected: true },
+            { text: 'Gueudelot', value: 'firsname2', selected: true },
+            { text: 'Guibert', value: 'age', selected: true },
+            { text: 'Guyomard', value: 'home', selected: true },
+        ],
         selected: [2],
         passage: [
         {
@@ -193,7 +309,46 @@ export default {
                 }
             }
         }
-    })
+    }),
+    mounted() {
+        this.getWelcomData();
+    },
+    watch: {
+        menu (val) {
+            val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));
+        }
+    },
+    methods: {
+        getWelcomData() {
+            axios.get(`/api/users/welcom`).then(response => {
+                const data = parseAxiosResponse(response);
+                if (data) {
+                    console.log(data);
+                    this.isLoading = false;
+                    store.commit('updateUser', data.user);
+                    store.commit('updateCitation', data.citation);
+                    store.commit('updateImmt', data.immt);
+                }
+            });
+        },
+        open (event) {
+            alert(event.title);
+        },
+        save (date) {
+            this.$refs.menu.save(date);
+        }
+    },
+    computed: {
+        // convert the list of events into a map of lists keyed by date
+        eventsMap () {
+            const map = {};
+            this.events.forEach(e => (map[e.date] = map[e.date] || []).push(e));
+            return map;
+        },
+        immt () {
+          return this.$store.state.immt;
+        }
+    }
 };
 </script>
 
@@ -201,6 +356,38 @@ export default {
 
 <style lang="scss" scoped>
 @import '../assets/global.scss';
+
+.immt {
+    div {
+        max-width: 700px;
+        height: 450px;
+        margin: auto;
+        display: table;
+
+        div {
+            max-width: 700px;
+            height: 450px;
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+
+            img {
+                max-width: 700px;
+                max-height: 450px;
+                background: white;
+                padding: 1px;
+                box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+            }
+        }
+    }
+    p {
+        text-align: center;
+        margin-top: 15px;
+        opacity: 0.5;
+    }
+}
+
+
 h1 {
     margin-block-start: 0.67em;
     margin-block-end: 0.67em;
@@ -229,6 +416,7 @@ h1 {
     justify-content: center;
     align-items: center;
 }
+
 .statBox {
     height: 100px;
 

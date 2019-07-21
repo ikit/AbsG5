@@ -7,10 +7,21 @@ import * as morgan from 'morgan';
 import rfs from 'rotating-file-stream';
 import { Init } from './init';
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
+import { agpaService, citationService, immtService } from "./services";
 
 const ormconfig = require(`../ormconfig.${process.env.NODE_ENV}.json`);
 
+console.log('---');
 createConnections(ormconfig).then(() => {
+
+    console.log('ORM connection created');
+
+    // Une fois la connection créé, on peut initialialiser les services
+    agpaService.initService();
+    citationService.initService();
+    immtService.initService();
+    console.log('AbsG services initialized');
+
 
     // create express app
     const app = createExpressServer({
@@ -38,5 +49,7 @@ createConnections(ormconfig).then(() => {
     if (process.env.NODE_ENV === 'development') {
         new Init().initData();
     }
+    
+    console.log('---');
     
 }).catch(error => console.log(error));

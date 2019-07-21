@@ -12,12 +12,18 @@ import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/a
 
 class AgpaService {
 
-    private photosRepo = getRepository(AgpaPhoto);
+    private photosRepo = null;
+
+
+    public initService() {
+        this.photosRepo = getRepository(AgpaPhoto);
+    }
 
     /**
      * Retourne les informations sur l'édition en cours (AgpaContext)
      */
     public welcom() {
+
         return initAGPAContext(new Date());
     }
     

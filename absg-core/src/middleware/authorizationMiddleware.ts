@@ -1,9 +1,8 @@
 import { Action } from "routing-controllers";
 import { getRepository, Equal } from "typeorm";
 import { User } from "../entities";
-import { AuthService } from "../services/AuthService";
+import { authService } from "../services";
 
-const authService = new AuthService();
 
 /**
  * Middleware permettant d'autoriser l'accès à l'utilisateur

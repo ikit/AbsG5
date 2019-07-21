@@ -11,18 +11,7 @@
 
         <div v-if="current">
             <h2>Catégorie {{ category }} {{ year }}</h2>
-
-            <v-gallery :images="photosGalery" :dark="true" :caption="true">
-                <a v-for="img in photosGalery"
-                    :key="img.idx"
-                    :data-image="img.url"
-                    :title="img.title">
-                    <div class="bgbox">
-                        <img :src="img.url">
-                    </div>
-                    <div class="img-title" v-html="img.title"></div>
-                </a>
-            </v-gallery>
+        <button type="button" @click="showLitebox">Show Litebox</button>
 
             <v-container fluid v-if="current">
                 <v-layout row wrap>
@@ -32,6 +21,9 @@
                                 <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
                                     <img class="thumb" :src="`http://absolumentg.fr/assets/img/agpa/${year}/mini/vignette_${photo.filename}`"/>
                                 </div>
+                            </div>
+                            <div style="">
+
                             </div>
                             <v-card style="margin-bottom: 50px">
                                 <div style="text-align: center">
@@ -45,17 +37,32 @@
             </v-container>
         </div>
 
+        <div  v-if="liteboxOn" style="position: fixed; z-index:20000 top: 0; left: 0; right:0; bottom: 0; background: rgba(0,0,0,0.5)">
+            <vue-litebox
+                :items="photosGalery"
+                @close="hideLitebox">
+                <!-- <a v-for="img in photosGalery"
+                        :key="img.idx"
+                        :data-image="img.url"
+                        :title="img.title">
+                        <div class="bgbox">
+                            <img :src="img.url">
+                        </div>
+                        <div class="img-title" v-html="img.title"></div>
+                    </a> -->
+            </vue-litebox>
+        </div>
     </section>
 </template>
 
 
 <script>
 import axios from 'axios';
-import vGallery from 'v-gallery';
+import VueLitebox from 'vue-litebox';
 
 export default {
     components: {
-        vGallery,
+        VueLitebox,
     },
     data: () => ({
         isLoading: true,
@@ -64,6 +71,7 @@ export default {
         year: 0,
         category: null,
         photosGalery: [],
+        liteboxOn: false
     }),
     props: ['darkMode'],
     mounted () {
@@ -80,8 +88,7 @@ export default {
                 let idx = 0;
                 for (let photo of this.current.photos) {
                     this.photosGalery.push({
-                        thumb: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
-                        url: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
+                        src: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
                         title: photo.title,
                         idx: idx
                     });
@@ -89,6 +96,14 @@ export default {
                 }
             }
         });
+    },
+    methods: {
+        showLitebox() {
+            this.liteboxOn = true;
+        },
+        hideLitebox() {
+            this.liteboxOn = false;
+        }
     }
 };
 </script>
@@ -109,6 +124,7 @@ h2 {
 }
 h2:hover {
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+
 }
 
 .thumb {
