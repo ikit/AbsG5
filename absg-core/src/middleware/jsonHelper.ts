@@ -13,8 +13,12 @@ export function success(payload: any): any
 /**
  * Formate la réponse de l'api en cas de
  * @param msg 
- * @param details 
+ * @param ex 
  */
-export function error(msg: string, details: string): any {
-    return { success: false, msg: msg, details: details };
+export function issue(msg: string, ex: Error): any {
+    if (ex) {
+        return { success: false, msg: msg, details: `${ex.name}: ${ex.message}`, stack: ex.stack };
+    }
+    
+    return { success: false, msg: msg };
 }

@@ -1,5 +1,9 @@
 
-
+/**
+ * Analyse la réponse retourné par axios, afin de traiter les cas d'erreur
+ * et retourne la réponse du server quand tout se passe bien; null sinon
+ * @param {any} response
+ */
 export function parseAxiosResponse(response) {
 
     if (response.status !== 200) {
@@ -19,3 +23,17 @@ export function parseAxiosResponse(response) {
     return response.data
 }
 
+/**
+ * Analyse les informations fourni et retourne l'url de l'image à utiliser pour l'avatar, ainsi
+ * qu'un label à utiliser comme nom (qui correspond à l'information la plus pertinente parmis
+ * le nom, le prénom et le surnom de la personne)
+ * @param {any} peopleData
+ */
+export function getPeopleAvatar(peopleData) {
+    const idAsStr = `${peopleData.id}`;
+    return {
+        id: peopleData.id,
+        url: `./img/avatars/${idAsStr.padStart(3, '0')}.png`,
+        label: peopleData.surname ? peopleData.surname : peopleData.firstname
+    };
+}

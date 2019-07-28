@@ -114,7 +114,9 @@
                 </template>
             </v-list>
         </div>
-        <router-view class="view" style="margin-left: 85px"></router-view>
+        <div class="mainContent">
+            <router-view></router-view>
+        </div>
     </v-content>
 
 
@@ -302,6 +304,12 @@ export default {
 }
 .menuItem:hover {
     background: rgba(255,255,255, 0.2);
+}
+
+
+.mainContent {
+    position: relative;
+    margin-left: 85px;
 }
 .theme--light.v-icon {
     color: rgba(0,0,0,0.54);

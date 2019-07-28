@@ -13,7 +13,7 @@ export default new Vuex.Store({
         notifications: [],
         photosGallery: [],
         photosGalleryIndex: 0,
-
+        todayLabel: new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
 
     },
     mutations: {

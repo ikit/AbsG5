@@ -4,7 +4,7 @@
             <v-layout row wrap>
                 <v-flex stretch>
                     <v-card style="min-width: 500px;">
-                        <v-card-title style="border-bottom: 1px solid rgba(0,0,0, 0.1)"> <h1>Agenda</h1>
+                        <v-card-title style="border-bottom: 1px solid rgba(0,0,0, 0.1)"> <h1>{{ todayLabel }}</h1>
                             <div style="position: absolute; right: 15px">
                                 <v-btn fab small color="accent"
                                     @click="$refs.calendar.prev()">
@@ -111,14 +111,13 @@
                             </h1>
                         </v-card-title>
 
-                        <v-list class="passage">
+                        <v-list class="passageRow">
                         <template v-for="(item, i1) in passage">
                             <v-list-tile
                                 :key="item.title"
                                 ripple>
 
-                                <div style="position: absolute; right: 15px; color: #aaa;" v-if="item.date">{{ item.date }}</div>
-                                <div style="width: 50px;">{{ item.time }}</div>
+                                <div class="date">{{ item.time }}</div>
                                 <template v-for="(user, i2) in item.passage">
                                     <v-tooltip :key="i2" bottom>
                                         <template v-slot:activator="{ on }">
@@ -347,6 +346,9 @@ export default {
         },
         immt () {
           return this.$store.state.immt;
+        },
+        todayLabel() {
+            return this.$store.state.todayLabel;
         }
     }
 };
@@ -360,6 +362,7 @@ export default {
 .immt {
     div {
         max-width: 700px;
+        min-width: 500px;
         height: 450px;
         margin: auto;
         display: table;
@@ -389,6 +392,7 @@ export default {
 
 
 h1 {
+    text-transform: capitalize;
     margin-block-start: 0.67em;
     margin-block-end: 0.67em;
     margin-inline-start: 0px;
@@ -402,10 +406,30 @@ h1 {
     font-weight: bold;
     margin: 10px 0;
 }
-.passage {
-    height: 495px;
-    overflow: hidden;
+
+
+.passageCol {
+    div {
+        
+        .date {
+            width: 40px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+
+        }
+    }
 }
+.passageRow {
+    div {
+        display: inline-block;
+
+        .date {
+            width: 50px;
+        }
+    }
+}
+
 .citation {
     text-align: center;
     font-size: 1.5em;
@@ -415,33 +439,6 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.statBox {
-    height: 100px;
-
-    .statIcon {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-
-        .v-icon {
-            font-size: 4em;
-        }
-    }
-
-    .statValue {
-        position: absolute;
-        top: 0;
-        left: 100px;
-        right: 15px;
-        bottom: 0;
-
-        .details {
-            color: #aaa;
-            font-size: 0.9em;
-        }
-    }
 }
 
 </style>

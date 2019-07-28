@@ -1,28 +1,31 @@
 <template>
-<div class="home" style="margin-top: 58px;">
+<div>
+    <img src="../assets/images/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-20px; left: 20px;"/>
     <h1>Les citations cultes</h1>
     <v-card style="margin: 14px;">
-        <img src="../assets/images/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-85px; left: 20px;"/>
         <v-form v-model="citationEditor.isValid">
             <v-container>
             <v-layout>
-                <v-flex sm12 md3>
+                <v-flex>
                 <v-text-field
-                    v-model="query"
+                    v-model="filter.request"
                     label="Rechercher">
                 </v-text-field>
                 </v-flex>
 
-                <v-flex sm12 md3>
+                <v-flex>
                 <v-select
-                    :items="authors"
+                    v-model="filter.authorId"
+                    :items="authorsList"
+                    item-text="label"
+                    item-value="id"
                     label="Sélectionner un auteur">
                 </v-select>
                 </v-flex>
 
-                <v-flex sm12 md3></v-flex>
+                <v-flex></v-flex>
 
-                <v-flex sm12 md3 style="text-align: right;">
+                <v-flex style="text-align: right;">
                     <v-btn
                         color="accent"
                         style="height: 80%"
@@ -35,15 +38,17 @@
             </v-container>
         </v-form>
     </v-card>
+
     <v-card style="margin: 14px;">
     <v-list>
         <template v-for="(item, index) in citations">
             <v-list-tile :key="index" avatar>
                 <v-list-tile-avatar>
-                    <img :src="item.authorAvatar" :alt="item.authorName">
+                    <img :src="item.author.url"/>
                 </v-list-tile-avatar>
                 <v-list-tile-content>
-                    <v-list-tile-title v-html="item.citation"></v-list-tile-title>
+                    <!-- <b>{{ item.author.label}}</b> -->
+                    <span v-html="item.citation"></span>
                 </v-list-tile-content>
             </v-list-tile>
         </template>
@@ -100,8 +105,22 @@
 
 
 <script>
+import axios from 'axios';
+import { parseAxiosResponse, getPeopleAvatar } from '../middleware/CommonHelper';
+
 export default {
     data: () => ({
+        isLoading: false,
+        authors: null,
+        authorsList: [],
+        total: 0,
+        citations: [],
+        filter: {
+            request: "",
+            authorId: null,
+            pageIndex: 0,
+            pageSize: 20,
+        },
         citationEditor: {
             open: false,
             citationId: null,
@@ -109,28 +128,32 @@ export default {
             author: null,
             isValid: true,
         },
-        query: '',
-        authors: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie'],
-        citations: [
-        {
-            authorAvatar: `./img/avatars/005.png`,
-            authorId: 5,
-            authorName: 'Flo',
-            citation: '"C\'est toujours les meilleurs qui s\'en aillent !"',
-        },
-        {
-            authorAvatar: `./img/avatars/012.png`,
-            authorId: 12,
-            authorName: 'Annie',
-            citation: '"Bon, allez ! Ce soir, on regarde un Bermuda." <span class="grey--text text--lighten-1">(un Burma)</span>',
-        },
-        {
-            authorAvatar: `./img/avatars/013.png`,
-            authorId: 13,
-            authorName: 'Poupette',
-            citation: '"Où l\'est, mes grolles ?" <span class="grey--text text--lighten-1">(à deux ans)</span>',
-        }],
     }),
+    mounted () {
+        if (!this.authors) {
+            // Il faut initialiser la vue
+            this.isLoading = true;
+            axios.get(`/api/citations/init`).then(response => {
+                const data = parseAxiosResponse(response);
+                this.authorsList = [];
+                this.authors = {};
+                for (const a of data.authors) {
+                    const aData = getPeopleAvatar(a);
+                    this.authorsList.push(aData);
+                    this.authors[aData.id] = aData;
+                }
+                this.citations = data.citations.map(i => ({
+                    id: i.id,
+                    citation: i.citation,
+                    author: this.authors[i.authorId]
+                }));
+                this.total = data.total;
+
+                this.isLoading = false;
+                console.log(this);
+            });
+        }
+    },
     methods: {
         resetDialog (open = false) {
             this.citationEditor.open = open;
@@ -168,6 +191,6 @@ h1 {
     text-shadow: 0 1px #aaa;
     font-size: 40px;
     font-family: "Comfortaa", sans-serif;
-    margin: 20px 0 60px 0;
+    margin: 30px 0 60px 0;
 }
 </style>
