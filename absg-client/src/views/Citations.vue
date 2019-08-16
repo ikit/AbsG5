@@ -1,49 +1,16 @@
 <template>
 <div>
-    <img src="../assets/images/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-20px; left: 20px;"/>
+    <img 
+        v-if="$vuetify.breakpoint.mdAndUp"
+        src="../assets/images/citation-new.png"
+        style="width: 206px; height: 120px; position: absolute; top:-20px; left: 20px;"/>
     <h1>Les citations cultes</h1>
-    <v-card style="margin: 14px;">
-        <v-form v-model="citationEditor.isValid">
-            <v-container>
-            <v-layout>
-                <v-flex>
-                <v-text-field
-                    v-model="filter.request"
-                    label="Rechercher">
-                </v-text-field>
-                </v-flex>
 
-                <v-flex>
-                <v-select
-                    v-model="filter.authorId"
-                    :items="authorsList"
-                    item-text="label"
-                    item-value="id"
-                    label="Sélectionner un auteur">
-                </v-select>
-                </v-flex>
-
-                <v-flex></v-flex>
-
-                <v-flex style="text-align: right;">
-                    <v-btn
-                        color="accent"
-                        style="height: 80%"
-                        @click.stop="resetDialog(true)">
-                        <v-icon left>fas fa-plus</v-icon>Nouvelle citation
-                    </v-btn>
-                </v-flex>
-
-            </v-layout>
-            </v-container>
-        </v-form>
-    </v-card>
-
-    <v-card style="margin: 14px;">
-        <v-container  fluid  grid-list-md>
+    <div>
+        <v-container fluid  grid-list-md>
             <v-data-iterator
                 :items="citations"
-                :items-per-page="itemsPerPage"
+                :items-per-page="filter.pageSize"
                 :page="filter.pageIndex"
                 :search="filter.request"
                 hide-default-footer>
@@ -52,137 +19,111 @@
                     <v-toolbar class="mb-1">
                         <v-text-field
                             v-model="filter.request"
-                            clearable
-                            flat
-                            solo-inverted
-                            hide-details
-                            prepend-inner-icon="search"
-                            label="Rechercher">
+                            prepend-inner-icon="fa-search"
+                            label="Rechercher"
+                            style="margin-top: 25px;">
                         </v-text-field>
 
                         <template v-if="$vuetify.breakpoint.mdAndUp">
                             <v-spacer></v-spacer>
                             <v-select
+                                v-model="filter.authorId"
+                                :items="authorsList"
+                                item-text="label"
+                                item-value="id"
+                                prepend-inner-icon="fa-user"
+                                label="Filtrer par auteur"
+                            style="margin-top: 25px;">
+                            </v-select>
+                            <!-- <v-select
                                 v-model="sortBy"
                                 flat
-                                solo-inverted
                                 hide-details
-                                :items="keys"
-                                prepend-inner-icon="user"
+                                :items="authors"
+                                prepend-inner-icon="fa-user"
                                 label="Filtrer par auteur">
-                            </v-select>
+                            </v-select> -->
                         </template>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="accent"
+                            @click.stop="resetDialog(true)">
+                            <v-icon left>fas fa-plus</v-icon>
+                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
+                        </v-btn>
                     </v-toolbar>
                 </template>
 
-            <template v-slot:default="props">
-                <v-layout wrap>
-                <v-flex
-                    v-for="item in props.items"
-                    :key="item.name"
-                    xs12
-                    sm6
-                    md4
-                    lg3>
-                    <v-card>
-                    <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
 
-                    <v-divider></v-divider>
-
-                    <v-list dense>
-                        <v-list-item
-                        v-for="(index, key) in filteredKeys"
-                        :key="index"
-                        :color="sortBy === key ? `blue lighten-4` : `white`"
-                        >
-                        <v-list-item-content>{{ key }}:</v-list-item-content>
-                        <v-list-item-content class="align-end">{{ item[key.toLowerCase()] }}</v-list-item-content>
-                        </v-list-item>
-                    </v-list>
+                <template v-slot:default="props">
+                    <v-card style="margin-top: 15px">
+                        <v-list dense>
+                        <template v-for="item in citations">
+                            <v-list-item :key="item.id">
+                                <v-list-item-avatar>
+                                    <img :src="item.author.url"/>
+                                </v-list-item-avatar>
+                                <v-list-item-content>
+                                    <!-- <b>{{ item.author.label}}</b> -->
+                                    <div class="citation" v-html="item.citation"></div>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </template>
+                        </v-list>
                     </v-card>
-                </v-flex>
-                </v-layout>
-            </template>
+                </template>
 
-            <template v-slot:footer>
-                <v-layout mt-2 wrap align-center justify-center>
-                <span class="grey--text">Items per page</span>
-                <v-menu offset-y>
-                    <template v-slot:activator="{ on }">
-                    <v-btn
-                        dark
-                        text
-                        color="primary"
-                        class="ml-2"
-                        v-on="on"
-                    >
-                        {{ itemsPerPage }}
-                        <v-icon>keyboard_arrow_down</v-icon>
-                    </v-btn>
-                    </template>
-                    <v-list>
-                    <v-list-item
-                        v-for="(number, index) in itemsPerPageArray"
-                        :key="index"
-                        @click="updateItemsPerPage(number)"
-                    >
-                        <v-list-item-title>{{ number }}</v-list-item-title>
-                    </v-list-item>
-                    </v-list>
-                </v-menu>
+                <template v-slot:footer>
+                    <v-row class="mt-2" style="margin: 0 5px" align="center" justify="center">
+                        <span class="grey--text">Citations par page</span>
+                        <v-menu offset-y>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    text
+                                    color="primary"
+                                    class="ml-2"
+                                    v-on="on">
+                                        {{ filter.pageSize }}
+                                    <v-icon>fa-angle-down</v-icon>
+                                </v-btn>
+                            </template>
+                                <v-list>
+                                <v-list-item
+                                    v-for="(number, index) in [10, 20, 50]"
+                                    :key="index"
+                                    @click="updateCitationsPerPage(number)">
+                                    <v-list-item-title>{{ number }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
 
-                <v-spacer></v-spacer>
+                        <v-spacer></v-spacer>
 
-                <span
-                    class="mr-4
-                    grey--text"
-                >
-                    Page {{ page }} of {{ numberOfPages }}
-                </span>
-                <v-btn
-                    fab
-                    dark
-                    color="blue darken-3"
-                    class="mr-1"
-                    @click="formerPage"
-                >
-                    <v-icon>keyboard_arrow_left</v-icon>
-                </v-btn>
-                <v-btn
-                    fab
-                    dark
-                    color="blue darken-3"
-                    class="ml-1"
-                    @click="nextPage"
-                >
-                    <v-icon>keyboard_arrow_right</v-icon>
-                </v-btn>
-                </v-layout>
-            </template>
+                        <span class="mr-4 grey--text" >
+                            Page {{ filter.pageIndex +1}} / {{ totalPages }}
+                        </span>
+                        <v-btn
+                            fab small
+                            dark
+                            color="accent"
+                            class="mr-1"
+                            @click="formerPage">
+                            <v-icon>fa-chevron-left</v-icon>
+                        </v-btn>
+                        <v-btn
+                            fab small
+                            dark
+                            color="accent"
+                            class="ml-1"
+                            @click="nextPage"
+                        >
+                            <v-icon>fa-chevron-right</v-icon>
+                        </v-btn>
+                    </v-row>
+                </template>
             </v-data-iterator>
         </v-container>
-
-
-
-
-
-
-
-
-    <v-list>
-        <template v-for="(item, index) in citations">
-            <v-list-item :key="index" avatar>
-                <v-list-item-avatar>
-                    <img :src="item.author.url"/>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                    <!-- <b>{{ item.author.label}}</b> -->
-                    <span v-html="item.citation"></span>
-                </v-list-item-content>
-            </v-list-item>
-        </template>
-        </v-list>
-    </v-card>
+    </div>
 
 
     <v-dialog v-model="citationEditor.open" width="800px">
@@ -223,7 +164,7 @@
         </v-container>
         <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
+        <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
         <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
         </v-card-actions>
     </v-card>
@@ -242,7 +183,8 @@ export default {
         isLoading: false,
         authors: null,
         authorsList: [],
-        total: 0,
+        totalCitations: 0,
+        totalPages: 0,
         citations: [],
         filter: {
             request: "",
@@ -298,6 +240,15 @@ export default {
                 citation: this.citationEditor.citation,
             });
             this.resetDialog();
+        },
+        formerPage() {
+            console.log("page précédente");
+        },
+        nextPage() {
+            console.log("page suivante");
+        },
+        updateCitationsPerPage(count) {
+            console.log("updateCitationsPerPage");
         }
     }
 };
@@ -321,5 +272,9 @@ h1 {
     font-size: 40px;
     font-family: "Comfortaa", sans-serif;
     margin: 30px 0 60px 0;
+}
+
+.citation >>> .note  {
+    color: #999!important;
 }
 </style>
