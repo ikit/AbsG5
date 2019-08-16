@@ -19,8 +19,8 @@
                     </v-card-title>
 
                     <v-card-actions>
-                        <router-link :to="{name: '/archives/{{current.editionYear}}/{{cat.id}}'}">
-                            <v-btn flat color="accent" >Voir les photos</v-btn>
+                        <router-link :to="{name: '/archives/' + current.editionYear + '/' + cat.id}">
+                            <v-btn text color="accent" >Voir les photos</v-btn>
                         </router-link>
                     </v-card-actions>
                 </v-card>

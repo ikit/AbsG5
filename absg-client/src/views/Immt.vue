@@ -65,7 +65,7 @@
         </v-container>
         <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
+        <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
         <v-btn color="accent" @click="saveImmt()">Enregistrer</v-btn>
         </v-card-actions>
     </v-card>

@@ -85,9 +85,9 @@
             </v-layout>
             </v-container>
             <v-card-actions>
-            <v-btn flat color="primary">Supprimer toutes les notifications</v-btn>
+            <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
             <v-spacer></v-spacer>
-            <v-btn flat @click="dialog=false">Fermer</v-btn>
+            <v-btn text @click="dialog=false">Fermer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

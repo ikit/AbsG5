@@ -43,7 +43,7 @@
         <v-container  fluid  grid-list-md>
             <v-data-iterator
                 :items="citations"
-                :items-per-page.sync="itemsPerPage"
+                :items-per-page="itemsPerPage"
                 :page="filter.pageIndex"
                 :search="filter.request"
                 hide-default-footer>
@@ -91,7 +91,7 @@
 
                     <v-list dense>
                         <v-list-item
-                        v-for="(key, index) in filteredKeys"
+                        v-for="(index, key) in filteredKeys"
                         :key="index"
                         :color="sortBy === key ? `blue lighten-4` : `white`"
                         >
@@ -171,15 +171,15 @@
 
     <v-list>
         <template v-for="(item, index) in citations">
-            <v-list-tile :key="index" avatar>
-                <v-list-tile-avatar>
+            <v-list-item :key="index" avatar>
+                <v-list-item-avatar>
                     <img :src="item.author.url"/>
-                </v-list-tile-avatar>
-                <v-list-tile-content>
+                </v-list-item-avatar>
+                <v-list-item-content>
                     <!-- <b>{{ item.author.label}}</b> -->
                     <span v-html="item.citation"></span>
-                </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-content>
+            </v-list-item>
         </template>
         </v-list>
     </v-card>
@@ -223,7 +223,7 @@
         </v-container>
         <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
+        <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
         <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
         </v-card-actions>
     </v-card>

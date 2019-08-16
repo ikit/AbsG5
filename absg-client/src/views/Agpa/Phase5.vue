@@ -20,7 +20,7 @@
 
                     <v-card-actions>
                         <router-link :to="`/agpa/archives/${current.editionYear}/${cat.id}`" tag="button">
-                            <v-btn flat color="accent">Voir les photos</v-btn>
+                            <v-btn text color="accent">Voir les photos</v-btn>
                         </router-link>
                     </v-card-actions>
                 </v-card>

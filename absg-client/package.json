@@ -1,6 +1,6 @@
 {
   "name": "absg5",
-  "version": "0.1.0",
+  "version": "5.0.0",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
@@ -12,20 +12,22 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
     "axios": "^0.19.0",
+    "babel-polyfill": "^6.26.0",
     "client-oauth2": "^4.2.5",
     "register-service-worker": "^1.6.2",
     "roboto-fontface": "*",
-    "vue": "^2.6.7",
+    "vue": "^2.6.10",
     "vue-affix": "^0.5.2",
     "vue-litebox": "^1.0.2",
-    "vue-router": "^3.0.7",
+    "vue-router": "^2.0.0",
     "vue-silentbox": "^0.1.9",
     "vue2-leaflet": "^1.2.3",
-    "vuetify": "^1.5.16",
+    "vuetify": "^2.0.7",
     "vuex": "^3.1.1",
     "webdav": "^2.9.1"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.5.5",
     "@vue/cli-plugin-babel": "^3.9.2",
     "@vue/cli-plugin-e2e-cypress": "^3.9.0",
     "@vue/cli-plugin-pwa": "^3.9.0",
@@ -34,12 +36,12 @@
     "@vue/test-utils": "^1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^24.8.0",
-    "node-sass": "^4.12.0",
-    "sass-loader": "^7.1.0",
+    "sass": "^1.22.9",
+    "sass-loader": "^7.2.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
-    "vue-cli-plugin-vuetify": "^0.4.6",
-    "vue-template-compiler": "^2.6.7",
+    "vue-cli-plugin-vuetify": "^0.6.3",
+    "vue-template-compiler": "^2.6.10",
     "vuetify-loader": "^1.2.2"
   }
 }

@@ -18,20 +18,20 @@
 
                 <v-flex sm12 md3 style="text-align: right;">
                     <v-menu offset-y :close-on-content-click="false" style="margin-top: 10px;">
-                        <v-btn flat
+                        <v-btn text
                             color="primary"
                             slot="activator">
                             <v-icon left>fas fa-th-list</v-icon>Colonnes
                         </v-btn>
                         <v-list>
-                            <v-list-tile
+                            <v-list-item
                                 v-for="(column, index) in columns"
                                 :key="index">
-                                <v-list-tile-action>
+                                <v-list-item-action>
                                     <v-checkbox v-model="column.selected" :disabled="column.disabled"></v-checkbox>
-                                </v-list-tile-action>
-                                <v-list-tile-title>{{ column.text }}</v-list-tile-title>
-                            </v-list-tile>
+                                </v-list-item-action>
+                                <v-list-item-title>{{ column.text }}</v-list-item-title>
+                            </v-list-item>
                         </v-list>
                     </v-menu>
                 </v-flex>
@@ -122,7 +122,7 @@
         </v-container>
         <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
+        <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
         <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
         </v-card-actions>
     </v-card>

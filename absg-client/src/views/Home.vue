@@ -15,20 +15,21 @@
                                     <v-icon>fas fa-angle-right</v-icon>
                                 </v-btn>
                                 <v-menu offset-y :close-on-content-click="false">
-                                    <v-btn fab small
-                                        color="accent"
-                                        slot="activator">
-                                        <v-icon>fas fa-th-list</v-icon>
-                                    </v-btn>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn fab small color="accent" v-bind="attrs" v-on="on">
+                                            <v-icon>fas fa-th-list</v-icon>
+                                        </v-btn>
+                                    </template>
+            
                                     <v-list>
-                                        <v-list-tile
+                                        <v-list-item
                                             v-for="(filter, index) in filters"
                                             :key="index">
-                                            <v-list-tile-action>
+                                            <v-list-item-action>
                                                 <v-checkbox v-model="filter.selected"></v-checkbox>
-                                            </v-list-tile-action>
-                                            <v-list-tile-title>{{ filter.text }}</v-list-tile-title>
-                                        </v-list-tile>
+                                            </v-list-item-action>
+                                            <v-list-item-title>{{ filter.text }}</v-list-item-title>
+                                        </v-list-item>
                                     </v-list>
                                 </v-menu>
                             </div>
@@ -74,7 +75,7 @@
                                                 <span v-html="event.details"></span>
                                             </v-card-title>
                                             <v-card-actions>
-                                                <v-btn flat color="secondary">Fermer</v-btn>
+                                                <v-btn text color="secondary">Fermer</v-btn>
                                             </v-card-actions>
                                         </v-card>
                                     </v-menu>
@@ -102,7 +103,7 @@
                     <v-card>
                         <v-card-title>
                             <h1>Passa G
-                            <v-btn flat
+                            <v-btn text
                                 style="position: absolute; right: 15px; top: 15px;"
                                 @click.stop="">
                                 <v-icon left>far fa-clock</v-icon>historique
@@ -113,7 +114,7 @@
 
                         <v-list class="passageRow">
                         <template v-for="(item, i1) in passage">
-                            <v-list-tile
+                            <v-list-item
                                 :key="item.title"
                                 ripple>
 
@@ -129,7 +130,7 @@
 
                                 </template>
 
-                            </v-list-tile>
+                            </v-list-item>
                             <v-divider
                                 v-if="i1 + 1 < passage.length"
                                 :key="i1"></v-divider>

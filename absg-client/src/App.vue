@@ -14,35 +14,35 @@
             :key="item.text"
             :prepend-icon="item.model ? item.icon : item['icon-alt']"
             append-icon="">
-            <v-list-tile slot="activator">
-                <v-list-tile-content>
-                    <v-list-tile-title>{{ item.text }}</v-list-tile-title>
-                </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile v-for="(child, i) in item.children" :key="i" :to="child.route">
-                <v-list-tile-action v-if="child.icon">
+            <v-list-item slot="activator">
+                <v-list-item-content>
+                    <v-list-item-title>{{ item.text }}</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+            <v-list-item v-for="(child, i) in item.children" :key="i" :to="child.route">
+                <v-list-item-action v-if="child.icon">
                     <v-icon>{{ child.icon }}</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                    <v-list-tile-title>{{ child.text }}</v-list-tile-title>
-                </v-list-tile-content>
-            </v-list-tile>
+                </v-list-item-action>
+                <v-list-item-content>
+                    <v-list-item-title>{{ child.text }}</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
         </v-list-group>
-        <v-list-tile v-else :key="item.text" :to="item.route" active-class="accent--text">
-            <v-list-tile-action>
+        <v-list-item v-else :key="item.text" :to="item.route" active-class="accent--text">
+            <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-            <v-list-tile-title>
+            </v-list-item-action>
+            <v-list-item-content>
+            <v-list-item-title>
                 {{ item.text }}
-            </v-list-tile-title>
-            </v-list-tile-content>
-        </v-list-tile>
+            </v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
         </template>
     </v-list>
     </v-navigation-drawer> -->
 
-    <v-toolbar
+    <v-app-bar
         color="primary"
         dark
         app
@@ -53,9 +53,12 @@
             <span class="hidden-sm-and-down">
                 <router-link to="/"><span class="absg">Absolument <span>G</span></span></router-link>
                 <v-tooltip bottom>
-                    <span slot="activator"></span>
+                    <template v-slot:activator="{ on }">
+                        <v-icon color="primary" dark v-on="on">home</v-icon>
+                    </template>
                     <span>Revenir à l'accueil</span>
                 </v-tooltip>
+
             </span>
         </v-toolbar-title>
         <v-spacer>
@@ -71,35 +74,38 @@
             </v-btn>
         </v-badge>
         <v-menu offset-y bottom left>
-            <v-btn color="primary" dark depressed slot="activator">
-                Bébé Ma'anne
-                <!-- <v-icon right>fas fa-user-circle</v-icon> -->
-                <img src="/img/avatars/009.png" style="height: 40px; margin-left: 15px" />
-            </v-btn>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn depressed color="primary" v-bind="attrs" v-on="on">
+                    Bébé Ma'anne
+                    <!-- <v-icon right>fas fa-user-circle</v-icon> -->
+                    <img src="/img/avatars/009.png" style="height: 40px; margin-left: 15px" />
+                </v-btn>
+            </template>
+            
             <v-list>
-            <v-list-tile>
-                <v-list-tile-title :key="0">
-                    <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations
-                </v-list-tile-title>
-            </v-list-tile>
-            <v-list-tile>
-                <v-list-tile-title :key="1">
-                    <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-chart-bar</v-icon>Mes statistiques
-                </v-list-tile-title>
-            </v-list-tile>
-            <v-list-tile>
-                <v-list-tile-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-tile-title>
-            </v-list-tile>
-            <v-list-tile>
-                <v-switch label="Mode nuit" v-model="darkMode"></v-switch>
-            </v-list-tile>
-            <v-divider></v-divider>
-            <v-list-tile>
-                <v-list-tile-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Déconnexion</v-list-tile-title>
-            </v-list-tile>
+                <v-list-item>
+                    <v-list-item-title :key="0">
+                        <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations
+                    </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title :key="1">
+                        <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-chart-bar</v-icon>Mes statistiques
+                    </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-switch label="Mode nuit" v-model="darkMode"></v-switch>
+                </v-list-item>
+                <v-divider></v-divider>
+                <v-list-item>
+                    <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Déconnexion</v-list-item-title>
+                </v-list-item>
             </v-list>
         </v-menu>
-    </v-toolbar>
+    </v-app-bar>
 
     <v-content id="bgcontent">
         <div class="menu">
@@ -171,9 +177,9 @@
         </v-layout>
         </v-container>
         <v-card-actions>
-        <v-btn flat color="primary">Supprimer toutes les notifications</v-btn>
+        <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
         <v-spacer></v-spacer>
-        <v-btn flat @click="dialog=false">Fermer</v-btn>
+        <v-btn text @click="dialog=false">Fermer</v-btn>
         </v-card-actions>
     </v-card>
     </v-dialog>

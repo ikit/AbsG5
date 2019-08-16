@@ -6,7 +6,7 @@
       "@types/node": "^8.10.38",
       "jest": "^24.1.0",
       "ts-node": "3.3.0",
-      "ts-node-dev": "^1.0.0-pre.31",
+      "ts-node-dev": "^1.0.0-pre.41",
       "typescript": "2.5.2"
    },
    "dependencies": {

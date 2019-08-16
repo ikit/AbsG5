@@ -17,23 +17,23 @@
                     <v-list two-line style="background: none;">
                         <template v-for="(item, index) in tbz.lastActivities">
 
-                            <v-list-tile
+                            <v-list-item
                                 :key="item.title"
                                 avatar
                                 @click="">
-                            <v-list-tile-avatar>
+                            <v-list-item-avatar>
                                 <img :src="item.user.avatar">
-                            </v-list-tile-avatar>
+                            </v-list-item-avatar>
 
-                            <v-list-tile-content>
-                                <v-list-tile-title>{{ item.title }}
+                            <v-list-item-content>
+                                <v-list-item-title>{{ item.title }}
                                     <span v-if="item.notifications > 0" class="notif"> {{ item.notifications }}</span>
-                                </v-list-tile-title>
-                                <v-list-tile-sub-title>
+                                </v-list-item-title>
+                                <v-list-item-sub-title>
                                     <span :class="item.user.rootFamilly">{{ item.user.username }}</span> <span class="date"> le {{ item.date }}:</span> {{ item.message }}
-                                </v-list-tile-sub-title>
-                            </v-list-tile-content>
-                            </v-list-tile>
+                                </v-list-item-sub-title>
+                            </v-list-item-content>
+                            </v-list-item>
                             <v-divider v-if="index != 2" :key="index" inset="true"></v-divider>
                         </template>
                     </v-list>
@@ -52,23 +52,23 @@
                     <v-list two-line style="background: none;">
                         <template v-for="(item, index) in blabla.lastActivities">
 
-                            <v-list-tile
+                            <v-list-item
                                 :key="item.title"
                                 avatar
                                 @click="">
-                            <v-list-tile-avatar>
+                            <v-list-item-avatar>
                                 <img :src="item.user.avatar">
-                            </v-list-tile-avatar>
+                            </v-list-item-avatar>
 
-                            <v-list-tile-content>
-                                <v-list-tile-title>{{ item.title }}
+                            <v-list-item-content>
+                                <v-list-item-title>{{ item.title }}
                                     <span v-if="item.notifications > 0" class="notif"> {{ item.notifications }}</span>
-                                </v-list-tile-title>
-                                <v-list-tile-sub-title>
+                                </v-list-item-title>
+                                <v-list-item-sub-title>
                                     <span :class="item.user.rootFamilly">{{ item.user.username }}</span> <span class="date"> le {{ item.date }}:</span> {{ item.message }}
-                                </v-list-tile-sub-title>
-                            </v-list-tile-content>
-                            </v-list-tile>
+                                </v-list-item-sub-title>
+                            </v-list-item-content>
+                            </v-list-item>
                             <v-divider v-if="index != 2" :key="index" inset="true"></v-divider>
                         </template>
                     </v-list>
@@ -166,9 +166,9 @@
             </v-layout>
             </v-container>
             <v-card-actions>
-            <v-btn flat color="primary">Supprimer toutes les notifications</v-btn>
+            <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
             <v-spacer></v-spacer>
-            <v-btn flat @click="dialog=false">Fermer</v-btn>
+            <v-btn text @click="dialog=false">Fermer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
