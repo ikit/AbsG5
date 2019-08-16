@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 
-export enum LogType {
+export enum LogSeverity {
     panic,
     alert,
     critical,
@@ -19,15 +19,15 @@ export class Log {
     @PrimaryGeneratedColumn({ comment: 'id' })
     id: number;
     
-    @OneToOne(type => User)
+    @ManyToOne(type => User)
     @JoinColumn()
     user: User;
     
     @Column({ comment: 'Date d\'émission du log' })
     datetime: Date;
     
-    @Column({ comment: 'Type du log respectant la RFC Syslog' })
-    type: LogType;
+    @Column({ comment: 'Sévérité du log respectant la RFC Syslog', default: 6 })
+    severity: LogSeverity;
     
     @Column({ comment: 'Identifiant du module à l\'origine du log' })
     module: string;

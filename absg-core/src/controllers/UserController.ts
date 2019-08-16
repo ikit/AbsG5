@@ -56,7 +56,7 @@ export class UserController {
             citation: await citationService.random(),
             events: [],
             passag: [],
-            notifications: [],
+            logs: [],
             user: {}
         }
 

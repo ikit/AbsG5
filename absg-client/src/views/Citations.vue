@@ -40,6 +40,135 @@
     </v-card>
 
     <v-card style="margin: 14px;">
+        <v-container  fluid  grid-list-md>
+            <v-data-iterator
+                :items="citations"
+                :items-per-page.sync="itemsPerPage"
+                :page="filter.pageIndex"
+                :search="filter.request"
+                hide-default-footer>
+
+                <template v-slot:header>
+                    <v-toolbar class="mb-1">
+                        <v-text-field
+                            v-model="filter.request"
+                            clearable
+                            flat
+                            solo-inverted
+                            hide-details
+                            prepend-inner-icon="search"
+                            label="Rechercher">
+                        </v-text-field>
+
+                        <template v-if="$vuetify.breakpoint.mdAndUp">
+                            <v-spacer></v-spacer>
+                            <v-select
+                                v-model="sortBy"
+                                flat
+                                solo-inverted
+                                hide-details
+                                :items="keys"
+                                prepend-inner-icon="user"
+                                label="Filtrer par auteur">
+                            </v-select>
+                        </template>
+                    </v-toolbar>
+                </template>
+
+            <template v-slot:default="props">
+                <v-layout wrap>
+                <v-flex
+                    v-for="item in props.items"
+                    :key="item.name"
+                    xs12
+                    sm6
+                    md4
+                    lg3>
+                    <v-card>
+                    <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
+
+                    <v-divider></v-divider>
+
+                    <v-list dense>
+                        <v-list-item
+                        v-for="(key, index) in filteredKeys"
+                        :key="index"
+                        :color="sortBy === key ? `blue lighten-4` : `white`"
+                        >
+                        <v-list-item-content>{{ key }}:</v-list-item-content>
+                        <v-list-item-content class="align-end">{{ item[key.toLowerCase()] }}</v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                    </v-card>
+                </v-flex>
+                </v-layout>
+            </template>
+
+            <template v-slot:footer>
+                <v-layout mt-2 wrap align-center justify-center>
+                <span class="grey--text">Items per page</span>
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                    <v-btn
+                        dark
+                        text
+                        color="primary"
+                        class="ml-2"
+                        v-on="on"
+                    >
+                        {{ itemsPerPage }}
+                        <v-icon>keyboard_arrow_down</v-icon>
+                    </v-btn>
+                    </template>
+                    <v-list>
+                    <v-list-item
+                        v-for="(number, index) in itemsPerPageArray"
+                        :key="index"
+                        @click="updateItemsPerPage(number)"
+                    >
+                        <v-list-item-title>{{ number }}</v-list-item-title>
+                    </v-list-item>
+                    </v-list>
+                </v-menu>
+
+                <v-spacer></v-spacer>
+
+                <span
+                    class="mr-4
+                    grey--text"
+                >
+                    Page {{ page }} of {{ numberOfPages }}
+                </span>
+                <v-btn
+                    fab
+                    dark
+                    color="blue darken-3"
+                    class="mr-1"
+                    @click="formerPage"
+                >
+                    <v-icon>keyboard_arrow_left</v-icon>
+                </v-btn>
+                <v-btn
+                    fab
+                    dark
+                    color="blue darken-3"
+                    class="ml-1"
+                    @click="nextPage"
+                >
+                    <v-icon>keyboard_arrow_right</v-icon>
+                </v-btn>
+                </v-layout>
+            </template>
+            </v-data-iterator>
+        </v-container>
+
+
+
+
+
+
+
+
     <v-list>
         <template v-for="(item, index) in citations">
             <v-list-tile :key="index" avatar>
