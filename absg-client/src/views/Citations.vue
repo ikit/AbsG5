@@ -1,6 +1,6 @@
 <template>
 <div>
-    <img 
+    <img
         v-if="$vuetify.breakpoint.mdAndUp"
         src="../assets/images/citation-new.png"
         style="width: 206px; height: 120px; position: absolute; top:-20px; left: 20px;"/>
@@ -64,7 +64,7 @@
                                     <img :src="item.author.url"/>
                                 </v-list-item-avatar>
                                 <v-list-item-content>
-                                    <!-- <b>{{ item.author.label}}</b> -->
+                                    <b class="author">{{ item.author.label}}</b>
                                     <div class="citation" v-html="item.citation"></div>
                                 </v-list-item-content>
                             </v-list-item>
@@ -75,7 +75,7 @@
 
                 <template v-slot:footer>
                     <v-row class="mt-2" style="margin: 0 5px" align="center" justify="center">
-                        <span class="grey--text">Citations par page</span>
+                        <span class="grey--text">{{ totalCitations }} citations. Citations par page</span>
                         <v-menu offset-y>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -218,7 +218,7 @@ export default {
                     citation: i.citation,
                     author: this.authors[i.authorId]
                 }));
-                this.total = data.total;
+                this.totalCitations = data.total;
 
                 this.isLoading = false;
                 console.log(this);
@@ -274,7 +274,7 @@ h1 {
     margin: 30px 0 60px 0;
 }
 
-.citation >>> .note  {
+.citation ::v-deep .note  {
     color: #999!important;
 }
 </style>

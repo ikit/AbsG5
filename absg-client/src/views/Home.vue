@@ -20,7 +20,7 @@
                                             <v-icon>fas fa-th-list</v-icon>
                                         </v-btn>
                                     </template>
-            
+
                                     <v-list>
                                         <v-list-item
                                             v-for="(filter, index) in filters"
@@ -126,14 +126,9 @@
                                         </template>
                                         <span>{{ user.username }}</span>
                                     </v-tooltip>
-
-
                                 </template>
 
                             </v-list-item>
-                            <v-divider
-                                v-if="i1 + 1 < passage.length"
-                                :key="i1"></v-divider>
                         </template>
                         </v-list>
                     </v-card>
@@ -411,22 +406,27 @@ h1 {
 
 .passageCol {
     div {
-        
         .date {
             width: 40px;
             height: 20px;
             line-height: 20px;
             text-align: center;
-
         }
     }
 }
 .passageRow {
+    display: table-row;
     div {
-        display: inline-block;
+        display: table-cell;
+        width: 50px;
+        vertical-align: top;
 
         .date {
             width: 50px;
+            width: 40px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
         }
     }
 }
