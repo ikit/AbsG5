@@ -1,141 +1,78 @@
 <template>
-<div class="home" style="margin-top: 58px;">
+<div>
+    <img
+        v-if="$vuetify.breakpoint.mdAndUp"
+        src="../assets/images/immt-new.png"
+        style="width: 206px; height: 120px; position: absolute; top: -20px; left: 10px;"/>
     <h1>L'agenda de la famille</h1>
-    <v-card style="margin: 14px;">
-        <img src="../assets/images/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-85px; left: 20px;"/>
-        <v-form v-model="citationEditor.isValid">
-            <v-container>
-            <v-layout>
-                <v-flex sm12 md6>
-                <v-text-field
-                    v-model="query"
-                    label="Rechercher">
-                </v-text-field>
-                </v-flex>
 
+    <v-tabs centered>
+        <v-tab> <v-icon>fas fa-address-book</v-icon> &nbsp; Répertoire</v-tab>
+        <v-tab> <v-icon>fas fa-user-circle</v-icon> &nbsp; Trombinoscope</v-tab>
+        <v-tab> <v-icon>fas fa-map-marked-alt</v-icon> &nbsp; Lieux</v-tab>
+        <v-tab> <v-icon>fas fa-calendar-alt</v-icon> &nbsp; Calendrier</v-tab>
+        <v-tab> <v-icon>fas fa-sitemap</v-icon> &nbsp; Généalogie</v-tab>
 
-                <v-flex sm12 md3></v-flex>
-
-                <v-flex sm12 md3 style="text-align: right;">
-                    <v-menu offset-y :close-on-content-click="false" style="margin-top: 10px;">
-                        <v-btn text
-                            color="primary"
-                            slot="activator">
-                            <v-icon left>fas fa-th-list</v-icon>Colonnes
-                        </v-btn>
-                        <v-list>
-                            <v-list-item
-                                v-for="(column, index) in columns"
-                                :key="index">
-                                <v-list-item-action>
-                                    <v-checkbox v-model="column.selected" :disabled="column.disabled"></v-checkbox>
-                                </v-list-item-action>
-                                <v-list-item-title>{{ column.text }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                </v-flex>
-
-                <v-flex sm12 md3 style="text-align: right;">
-                    <v-btn
-                        style="margin-top: 15px;"
-                        color="accent"
-                        @click.stop="resetDialog(true)">
-                        <v-icon left>fas fa-plus</v-icon>Nouvelle entrée
-                    </v-btn>
-                </v-flex>
-
-            </v-layout>
-            </v-container>
-        </v-form>
-    </v-card>
-    <v-card style="margin: 14px;">
-        <v-data-table
-        :headers="columns"
-        :items="entries"
-        :loading="true"
-        class="elevation-1">
-            <v-progress-linear slot="progress" color="accent" indeterminate></v-progress-linear>
-            <template slot="items" slot-scope="props">
-                <td>{{ props.item.lastname }}</td>
-                <td class="text-xs-right">{{ props.item.firstname }}</td>
-                <td class="text-xs-right">{{ props.item.firstname2 }}</td>
-                <td class="text-xs-right">{{ props.item.age }}</td>
-                <td class="text-xs-right">{{ props.item.home }}</td>
-                <td class="text-xs-right">{{ props.item.job }}</td>
-                <td class="text-xs-right">{{ props.item.phone }}</td>
-                <td class="text-xs-right">{{ props.item.email }}</td>
-                <td class="text-xs-right">{{ props.item.root }}</td>
-                <td class="justify-center layout px-0">
-                    <v-icon
-                        small
-                        class="mr-2"
-                        @click="editItem(props.item)">
-                        fas fa-edit
-                    </v-icon>
-                    <v-icon
-                        small
-                        @click="deleteItem(props.item)">
-                        fas fa-trash
-                    </v-icon>
-                </td>
-            </template>
-        </v-data-table>
-    </v-card>
-
-
-    <v-dialog v-model="citationEditor.open" width="80%">
-    <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
-        Nouvelle entrée
-        </v-card-title>
-        <v-container grid-list-sm class="pa-4">
-        <v-layout row wrap>
-            <v-flex xs12>
-                <v-text-field
-                    prepend-icon="fas fa-user"
-                    placeholder="Autheur de la citation"
-                    v-model="citationEditor.author">
-                </v-text-field>
-            </v-flex>
-            <v-flex xs12>
-                <v-text-field
-                    prepend-icon="fas fa-quote-left"
-                    placeholder="La citation"
-                    v-model="citationEditor.citation">
-                </v-text-field>
-            </v-flex>
-            <v-flex xs12>
-                <v-card>
-                    <div style="position: relative;">
-
-                        <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
-                        <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                            N'oubliez pas de mettre les guillemets doubles autour de la citation.
-                            Si vous ajoutez des précisions à la citation, merci de les mettre entre double parenthèses: "La citation" ((ma précision)).
-                        </p>
-                    </div>
+        <v-tab-item>
+            <v-card  flat  tile >
+                <v-card style="margin: 14px;">
+                    <v-data-table
+                        :headers="personsHeaders"
+                        :items="persons"
+                        :loading="isLoading"
+                        :footer-props="{
+                            showFirstLastPage: false,
+                            prevIcon: 'fas fa-chevron-left',
+                            nextIcon: 'fas fa-chevron-right'
+                        }"
+                        class="elevation-1">
+                    <template v-slot:item.firstname="{ item }">
+                        <v-chip :color="red" dark>{{ item.firstname }}</v-chip>
+                    </template>
+                    </v-data-table>
                 </v-card>
+            </v-card>
+        </v-tab-item>
+        <v-tab-item>
+            <v-card  flat  tile >
+                <v-card-text>coucou 2</v-card-text>
+            </v-card>
+        </v-tab-item>
+        <v-tab-item>
+            <v-card  flat  tile >
+                <v-card-text>coucou 3</v-card-text>
+            </v-card>
+        </v-tab-item>
+        <v-tab-item>
+            <vo-basic :data="genealogData"></vo-basic>
+        </v-tab-item>
+    </v-tabs>
 
-            </v-flex>
-        </v-layout>
-        </v-container>
-        <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-        <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
-        </v-card-actions>
-    </v-card>
-    </v-dialog>
+
+
+
+
+
+
+
+
+
 </div>
 </template>
 
 
 
 <script>
+import axios from 'axios';
+import { parseAxiosResponse, getPeopleAvatar } from '../middleware/CommonHelper';
+import { VoBasic } from 'vue-orgchart';
+
 export default  {
+    components: {
+        VoBasic
+    },
     data: () => ({
-        citationEditor: {
+        personEditor: {
             open: false,
             citationId: null,
             citation: null,
@@ -143,125 +80,74 @@ export default  {
             isValid: true,
         },
         query: "",
-        entries: [
+        personsHeaders: [
             {
-                photo: 'http://absolumentg.fr/assets/img/avatars/005.png',
-                lastname: 'Gueudelot',
-                firstname: 'Annie',
-                firstname2: 'Audette Andrée',
-                age: '72 ans ( Née le 4 / 5 / 1946 )',
-                home: 'Villons',
-                job: null,
-                phone: '',
-                email: 'annie@absg.fr',
-                root: 'gueudelot',
+                text: 'Nom', value: 'lastname', align: 'left'
             },
             {
-                photo: 'http://absolumentg.fr/assets/img/avatars/005.png',
-                lastname: 'Gueudelot',
-                firstname: 'Annie',
-                firstname2: 'Audette Andrée',
-                age: '72 ans ( Née le 4 / 5 / 1946 )',
-                home: 'Villons',
-                job: null,
-                phone: '',
-                email: 'annie@absg.fr',
-                root: 'gueudelot',
+                text: 'Prénom', value: 'firstname', align: 'left'
             },
             {
-                photo: 'http://absolumentg.fr/assets/img/avatars/005.png',
-                lastname: 'Gueudelot',
-                firstname: 'Annie',
-                firstname2: 'Audette Andrée',
-                age: '72 ans ( Née le 4 / 5 / 1946 )',
-                home: 'Villons',
-                job: null,
-                phone: '',
-                email: 'annie@absg.fr',
-                root: 'gueudelot',
+                text: 'Prénoms secondaires', align: 'left', value: 'firsname2'
             },
             {
-                photo: 'http://absolumentg.fr/assets/img/avatars/005.png',
-                lastname: 'Gueudelot',
-                firstname: 'Annie',
-                firstname2: 'Audette Andrée',
-                age: '72 ans ( Née le 4 / 5 / 1946 )',
-                home: 'Villons',
-                job: null,
-                phone: '',
-                email: 'annie@absg.fr',
-                root: 'gueudelot',
+                text: 'Surnom', value: 'surname', align: 'left'
             },
             {
-                photo: 'http://absolumentg.fr/assets/img/avatars/005.png',
-                lastname: 'Gueudelot',
-                firstname: 'Annie',
-                firstname2: 'Audette Andrée',
-                age: '72 ans ( Née le 4 / 5 / 1946 )',
-                home: 'Villons',
-                job: null,
-                phone: '',
-                email: 'annie@absg.fr',
-                root: 'gueudelot',
+                text: 'Naissance', value: 'dateOfBirth', align: 'left'
             },
             {
-                photo: 'http://absolumentg.fr/assets/img/avatars/005.png',
-                lastname: 'Gueudelot',
-                firstname: 'Annie',
-                firstname2: 'Audette Andrée',
-                age: '72 ans ( Née le 4 / 5 / 1946 )',
-                home: 'Villons',
-                job: null,
-                phone: '',
-                email: 'annie@absg.fr',
-                root: 'gueudelot',
-            },],
-        columns: [
-            {
-                text: 'Nom', value: 'lastname', align: 'left', selected: true, disabled: true,
+                text: 'Emploi', value: 'job', align: 'left'
             },
             {
-                text: 'Prénom', value: 'firstname', align: 'left', selected: true, disabled: true,
+                text: 'Phone', value: 'phone', align: 'left'
             },
             {
-                text: 'Prénoms secondaires', align: 'left', value: 'firsname2', selected: true, disabled: false,
+                text: 'Email', value: 'email', align: 'left'
             },
             {
-                text: 'Age', value: 'age', align: 'left', selected: true, disabled: false,
-            },
-            {
-                text: 'Adresse', value: 'home', align: 'left', selected: true, disabled: false,
-            },
-            {
-                text: 'Emploi', value: 'job', align: 'left', selected: false, disabled: false,
-            },
-            {
-                text: 'Phone', value: 'phone', align: 'left', selected: true, disabled: false,
-            },
-            {
-                text: 'Email', value: 'email', align: 'left', selected: true, disabled: false,
-            },
-            {
-                text: 'Maison mère', value: 'root', selected: false, enabled: false, align: 'left',
+                text: 'Maison mère', value: 'root', align: 'left',
             },
             { text: 'Actions', value: 'name', sortable: false }
-        ]
+        ],
+        isLoading: false,
+        persons: [],
+        places: [],
+        totalPersons: 0,
+        totalPlaces: 0,
+        events: [],
+        totalEvents: 0,
+        genealogData: {
+            name: 'JavaScript',
+            children: [
+                { name: 'Angular' },
+                {
+                    name: 'React',
+                    children: [{ name: 'Preact' }]
+                },
+                {
+                    name: 'Vue',
+                    children: [{ name: 'Moon' }]
+                }
+            ]
+        }
     }),
+    mounted() {
+        // Il faut initialiser la vue
+        this.isLoading = true;
+        axios.get(`/api/agenda/init`).then(response => {
+            const data = parseAxiosResponse(response);
+            this.persons = data.persons;
+            this.totalPersons = data.totalPersons;
+            this.isLoading = false;
+        });
+    },
     methods: {
-        resetDialog (open = false) {
-            this.citationEditor.open = open;
-            this.citationEditor.citationId = null;
-            this.citationEditor.citation = null;
-            this.citationEditor.author = null;
+        editPerson (person) {
+            console.log("editPerson", person);
         },
-        saveCitation: function () {
-            this.citations.push({
-                authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
-                authorId: 16,
-                authorName: this.citationEditor.author,
-                citation: this.citationEditor.citation,
-            });
-            this.resetDialog();
+        deletePerson (person) {
+            console.log("deletePerson", person);
         }
     }
 };
@@ -284,6 +170,6 @@ h1 {
     text-shadow: 0 1px #aaa;
     font-size: 40px;
     font-family: "Comfortaa", sans-serif;
-    margin: 20px 0 60px 0;
+    margin: 30px 0 60px 0;
 }
 </style>

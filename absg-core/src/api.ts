@@ -7,7 +7,7 @@ import * as morgan from 'morgan';
 import rfs from 'rotating-file-stream';
 import { Init } from './init';
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
-import { agpaService, citationService, immtService } from "./services";
+import { agpaService, citationService, immtService, agendaService } from "./services";
 
 const ormconfig = require(`../ormconfig.${process.env.NODE_ENV}.json`);
 
@@ -20,6 +20,7 @@ createConnections(ormconfig).then(() => {
     agpaService.initService();
     citationService.initService();
     immtService.initService();
+    agendaService.initService();
     console.log('AbsG services initialized');
 
 
