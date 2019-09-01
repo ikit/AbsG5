@@ -1,41 +1,15 @@
 <template>
     <div style="width: 100%; height: 100%; position: relative">
 
-        <l-map
-            v-if="showMap"
-            :zoom="zoom"
-            :center="center"
-            :options="mapOptions"
-            style="height: 80%"
-            @update:center="centerUpdate"
-            @update:zoom="zoomUpdate"
-            >
-            <l-tile-layer :url="url" :attribution="attribution" />
-            <l-marker :lat-lng="withPopup">
-                <l-popup>
-                <div @click="innerClick">
-                    I am a popup
-                    <p v-show="showParagraph">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-                        sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-                        Donec finibus semper metus id malesuada.
-                    </p>
-                </div>
-                </l-popup>
-            </l-marker>
-            <l-marker :lat-lng="withTooltip">
-                <l-tooltip :options="{ permanent: true, interactive: true }">
-                <div @click="innerClick">
-                    I am a tooltip
-                    <p v-show="showParagraph">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-                        sed pretium nisl, ut sagittis sapien. Sed vel sollicitudin nisi.
-                        Donec finibus semper metus id malesuada.
-                    </p>
-                </div>
-                </l-tooltip>
-            </l-marker>
-        </l-map>
+
+        <div id="map-wrap" style="height: 100vh">
+            <l-map :zoom="zoom" :center="center">
+                <l-tile-layer :url="url"></l-tile-layer>
+                <l-marker :lat-lng="center"></l-marker>
+            </l-map>
+        </div>
+
+
         <div style="position: absolute; top: 0; left: 0; z-index: 2000; text-align: center">
             <v-btn color="accent" fab small dark>
                 <v-icon>far fa-clock</v-icon>
@@ -57,8 +31,18 @@
 </template>
 
 <script>
-import { latLng } from "leaflet";
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from "vue2-leaflet";
+import Vue from 'vue';
+import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet';
+import { Icon, latLng } from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+// this part resolve an issue where the markers would not appear
+delete Icon.Default.prototype._getIconUrl;
+Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+});
+
 export default {
     name: "Example",
     components: {
@@ -70,28 +54,22 @@ export default {
     },
     data() {
         return {
-        zoom: 13,
-        center: latLng(47.41322, -1.219482),
-        url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
-        attribution:
-            '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        withPopup: latLng(47.41322, -1.219482),
-        withTooltip: latLng(47.41422, -1.250482),
-        currentZoom: 11.5,
-        currentCenter: latLng(47.41322, -1.219482),
-        showParagraph: false,
-        mapOptions: {
-            zoomSnap: 0.5
-        },
-        showMap: true
+            zoom: 13,
+            center: latLng(47.41322, -1.219482),
+            url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
+            currentCenter: latLng(47.41322, -1.219482),
+            showParagraph: false,
+            mapOptions: {
+                zoomSnap: 0.5
+            },
         };
     },
     methods: {
         zoomUpdate(zoom) {
-        this.currentZoom = zoom;
+        this.zoom = zoom;
         },
         centerUpdate(center) {
-        this.currentCenter = center;
+        this.zoom = center;
         },
         showLongText() {
         this.showParagraph = !this.showParagraph;

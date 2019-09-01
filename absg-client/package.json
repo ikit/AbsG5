@@ -15,6 +15,7 @@
     "axios": "^0.19.0",
     "babel-polyfill": "^6.26.0",
     "client-oauth2": "^4.2.5",
+    "leaflet": "^1.5.1",
     "register-service-worker": "^1.6.2",
     "roboto-fontface": "*",
     "vue": "^2.6.10",
@@ -23,7 +24,7 @@
     "vue-orgchart": "^1.1.7",
     "vue-router": "^2.0.0",
     "vue-silentbox": "^0.1.9",
-    "vue2-leaflet": "^1.2.3",
+    "vue2-leaflet": "^2.2.1",
     "vuetify": "^2.0.7",
     "vuex": "^3.1.1",
     "webdav": "^2.9.1"
