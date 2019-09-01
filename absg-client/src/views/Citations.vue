@@ -127,47 +127,47 @@
 
 
     <v-dialog v-model="citationEditor.open" width="800px">
-    <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
-        Nouvelle citation
-        </v-card-title>
-        <v-container grid-list-sm class="pa-4">
-        <v-layout row wrap>
-            <v-flex xs12>
-                <v-text-field
-                    prepend-icon="fas fa-user"
-                    placeholder="Autheur de la citation"
-                    v-model="citationEditor.author">
-                </v-text-field>
-            </v-flex>
-            <v-flex xs12>
-                <v-text-field
-                    prepend-icon="fas fa-quote-left"
-                    placeholder="La citation"
-                    v-model="citationEditor.citation">
-                </v-text-field>
-            </v-flex>
-            <v-flex xs12>
-                <v-card>
-                    <div style="position: relative;">
+        <v-card>
+            <v-card-title class="grey lighten-4 py-4 title">
+            Nouvelle citation
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+            <v-layout row wrap>
+                <v-flex xs12>
+                    <v-text-field
+                        prepend-icon="fas fa-user"
+                        placeholder="Autheur de la citation"
+                        v-model="citationEditor.author">
+                    </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                    <v-text-field
+                        prepend-icon="fas fa-quote-left"
+                        placeholder="La citation"
+                        v-model="citationEditor.citation">
+                    </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                    <v-card>
+                        <div style="position: relative;">
 
-                        <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
-                        <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                            N'oubliez pas de mettre les guillemets doubles autour de la citation.
-                            Si vous ajoutez des précisions à la citation, merci de les mettre entre double parenthèses: "La citation" ((ma précision)).
-                        </p>
-                    </div>
-                </v-card>
+                            <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
+                            <p style="margin-left: 50px; padding: 10px; font-style: italic">
+                                N'oubliez pas de mettre les guillemets doubles autour de la citation.
+                                Si vous ajoutez des précisions à la citation, merci de les mettre entre double parenthèses: "La citation" ((ma précision)).
+                            </p>
+                        </div>
+                    </v-card>
 
-            </v-flex>
-        </v-layout>
-        </v-container>
-        <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
-        <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
-        </v-card-actions>
-    </v-card>
+                </v-flex>
+            </v-layout>
+            </v-container>
+            <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
+            <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
+            </v-card-actions>
+        </v-card>
     </v-dialog>
 </div>
 </template>

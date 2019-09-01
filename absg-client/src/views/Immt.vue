@@ -1,74 +1,135 @@
 <template>
-<div class="home" style="margin-top: 50px;">
+<div>
+    <img
+        v-if="$vuetify.breakpoint.mdAndUp"
+        src="../assets/images/immt-new.png"
+        style="width: 206px; height: 120px; position: absolute; top: -20px; left: 10px;"/>
     <h1>Les images du moment</h1>
-    <v-card style="margin: 14px;">
-        <img src="../assets/images/immt-new.png" style="width: 206px; height: 120px; position: absolute; top:-85px; left: 20px;"/>
-        <v-form v-model="immtEditor.isValid">
-            <v-container>
-            <v-layout>
-                <v-flex sm12 md3>
-                <v-text-field
-                    v-model="query"
-                    label="Rechercher">
-                </v-text-field>
-                </v-flex>
 
-                <v-flex sm12 md3>
-                <v-select
-                    :items="posters"
-                    label="Sélectionner un posteur">
-                </v-select>
-                </v-flex>
 
-                <v-flex sm12 md3></v-flex>
+    <div>
+        <v-container fluid  grid-list-md>
+            <v-data-iterator
+                :items="immts"
+                :items-per-page="filter.pageSize"
+                :page="filter.pageIndex"
+                :search="filter.request"
+                hide-default-footer>
 
-                <v-flex sm12 md3 style="text-align: right;">
-                    <v-btn
-                        color="accent"
-                        style="height: 80%"
-                        @click.stop="resetDialog(true)">
-                        <v-icon left>fas fa-plus</v-icon>Nouvelle image
-                    </v-btn>
-                </v-flex>
-            </v-layout>
-            </v-container>
-        </v-form>
-    </v-card>
-    <v-card style="margin: 14px;">
-        <v-subheader>2019</v-subheader>
-        <v-container fluid grid-list-sm>
-        <v-layout row wrap>
-            <v-flex v-for="i in 15" :key="i" xs2>
-            <img :src="`https://randomuser.me/api/portraits/men/${i + 20}.jpg`" class="image" alt="lorem" width="100%" height="100%">
-            </v-flex>
-        </v-layout>
+                <template v-slot:header>
+                    <v-toolbar class="mb-1">
+                        <v-text-field
+                            v-model="filter.request"
+                            prepend-inner-icon="fa-search"
+                            label="Rechercher"
+                            style="margin-top: 25px;">
+                        </v-text-field>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="accent"
+                            @click.stop="resetDialog(true)">
+                            <v-icon left>fas fa-plus</v-icon>
+                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
+                        </v-btn>
+                    </v-toolbar>
+                </template>
+
+
+                <template v-slot:default="props">
+                    <v-card style="margin-top: 15px">
+                        <v-container fluid>
+                            <v-layout row wrap>
+                                <v-flex v-for="immt in immts" :key="immt.id" style="min-width: 200px; width: 15%; margin: 15px">
+                                    <div>
+                                        <div style="width: 200px; height: 200px; margin: auto;">
+                                            <div style="width: 200px; height: 200px; display: table-cell; text-align: center; vertical-align: middle;">
+                                                <img class="thumb" :src="`http://absolumentg.fr/assets/img/immt/mini/${immt.id}.jpg`"/>
+                                            </div>
+                                        </div>
+                                        <div style="">
+                                        </div>
+                                        <v-card style="margin-bottom: 50px">
+                                            <div style="text-align: center">
+                                                {{ immt.title }}
+                                            </div>
+                                            <div style="text-align: center; font-size: 0.8em; opacity: 0.7">
+                                                {{ immt.poster.name }} le {{ immt.date }} </div>
+                                        </v-card>
+                                    </div>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                    </v-card>
+                </template>
+
+                <template v-slot:footer>
+                    <v-row class="mt-2" style="margin: 0 5px" align="center" justify="center">
+                        <span class="grey--text">{{ totalImmts }} images. Immt par page</span>
+                        <v-menu offset-y>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    text
+                                    color="primary"
+                                    class="ml-2"
+                                    v-on="on">
+                                        {{ filter.pageSize }}
+                                    <v-icon>fa-angle-down</v-icon>
+                                </v-btn>
+                            </template>
+                                <v-list>
+                                <v-list-item
+                                    v-for="(number, index) in [10, 20, 50]"
+                                    :key="index"
+                                    @click="updateImmtsPerPage(number)">
+                                    <v-list-item-title>{{ number }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+
+                        <v-spacer></v-spacer>
+
+                        <span class="mr-4 grey--text" >
+                            Page {{ filter.pageIndex +1}} / {{ totalPages }}
+                        </span>
+                        <v-btn
+                            fab small
+                            dark
+                            color="accent"
+                            class="mr-1"
+                            @click="formerPage">
+                            <v-icon>fa-chevron-left</v-icon>
+                        </v-btn>
+                        <v-btn
+                            fab small
+                            dark
+                            color="accent"
+                            class="ml-1"
+                            @click="nextPage"
+                        >
+                            <v-icon>fa-chevron-right</v-icon>
+                        </v-btn>
+                    </v-row>
+                </template>
+            </v-data-iterator>
         </v-container>
-        <v-subheader>2018</v-subheader>
-        <v-container fluid grid-list-sm>
-        <v-layout row wrap>
-            <v-flex v-for="i in 27" :key="i" xs2>
-            <img :src="`https://randomuser.me/api/portraits/women/${i + 5}.jpg`" class="image" alt="lorem" width="100%" height="100%">
-            </v-flex>
-        </v-layout>
-        </v-container>
-        <v-footer class="mt-5"></v-footer>
-    </v-card>
+    </div>
+
 
     <v-dialog v-model="immtEditor.open" width="800px">
-    <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
-        Nouvelle image du moment
-        </v-card-title>
-        <v-container grid-list-sm class="pa-4">
-            <ImageUpload v-model='immtEditor.image'/>
-            <v-text-field label="Donnez un titre à l'image" v-model='immtEditor.title' prepend-icon='fas fa-feather-alt'></v-text-field>
-        </v-container>
-        <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-        <v-btn color="accent" @click="saveImmt()">Enregistrer</v-btn>
-        </v-card-actions>
-    </v-card>
+        <v-card>
+            <v-card-title class="grey lighten-4 py-4 title">
+            Nouvelle image du moment
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+                <ImageUpload v-model='immtEditor.image'/>
+                <v-text-field label="Donnez un titre à l'image" v-model='immtEditor.title' prepend-icon='fas fa-feather-alt'></v-text-field>
+            </v-container>
+            <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
+            <v-btn color="accent" @click="saveImmt()">Enregistrer</v-btn>
+            </v-card-actions>
+        </v-card>
     </v-dialog>
 </div>
 </template>
@@ -76,34 +137,75 @@
 
 
 <script>
-
-//Vue.component('my-component-name', {});
+import axios from 'axios';
+import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../middleware/CommonHelper';
 import ImageUpload from '../components/ImageUpload.vue';
 
-
-export default  {
+export default {
     components: {
         ImageUpload
     },
     data: () => ({
+        isLoading: false,
+        totalImmts: 0,
+        totalPages: 0,
+        immts: [],
+        filter: {
+            request: "",
+            authorId: null,
+            pageIndex: 0,
+            pageSize: 20,
+        },
         immtEditor: {
             open: false,
             image: null,
             title: null,
             isValid: true,
         },
-        query: "",
-        posters: ['Olivier', 'Jocelyne', 'Denis', 'Alain', 'Annie']
     }),
+    mounted () {
+        if (!this.authors) {
+            // Il faut initialiser la vue
+            this.isLoading = true;
+            axios.get(`/api/immt/init`).then(response => {
+                const data = parseAxiosResponse(response);
+                this.immts = data.immts.map(i => ({
+                    id: `${i.year}_${padNumber(i.day, 3)}`,
+                    poster: { name:  i.posterName, id: i.userId},
+                    title: i.title,
+                    date: new Date().toLocaleDateString()
+                }));
+                this.totalImmts = data.total;
+
+                this.isLoading = false;
+                console.log(this);
+            });
+        }
+    },
     methods: {
-        resetDialog(open = false) {
+        resetDialog (open = false) {
             this.immtEditor.open = open;
-            this.immtEditor.image = null;
-            this.immtEditor.title = null;
+            this.immtEditor.citationId = null;
+            this.immtEditor.citation = null;
+            this.immtEditor.author = null;
         },
-        saveImmt: function() {
-            // TODO
+        saveImmt: function () {
+            this.citations.push({
+                authorAvatar: `./img/avatars/016.png`,
+                authorId: 16,
+                authorName: this.immtEditor.author,
+                citation: this.immtEditor.citation,
+            });
             this.resetDialog();
+        },
+        formerPage() {
+            console.log("page précédente");
+        },
+        nextPage() {
+            console.log("page suivante");
+        },
+        updateImmtsPerPage(count) {
+            console.log("updateImmtsPerPage");
         }
     }
 }
@@ -126,6 +228,11 @@ h1 {
     text-shadow: 0 1px #aaa;
     font-size: 40px;
     font-family: "Comfortaa", sans-serif;
-    margin: 20px 0 60px 0;
+    margin: 30px 0 60px 0;
+}
+.thumb {
+    background: white;
+    padding: 1px;
+    box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
 }
 </style>

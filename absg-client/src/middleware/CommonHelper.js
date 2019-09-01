@@ -37,3 +37,9 @@ export function getPeopleAvatar(peopleData) {
         label: peopleData.surname ? peopleData.surname : peopleData.firstname
     };
 }
+
+
+export function padNumber(value, size) {
+    value = value.toString();
+    return value.length >= size ? value :  new Array(size - value.length + 1).join('0') + value;
+}
