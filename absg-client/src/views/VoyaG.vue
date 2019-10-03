@@ -35,12 +35,13 @@ import Vue from 'vue';
 import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet';
 import { Icon, latLng } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+
 // this part resolve an issue where the markers would not appear
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
 export default {
@@ -66,16 +67,16 @@ export default {
     },
     methods: {
         zoomUpdate(zoom) {
-        this.zoom = zoom;
+            this.zoom = zoom;
         },
         centerUpdate(center) {
-        this.zoom = center;
+            this.zoom = center;
         },
         showLongText() {
-        this.showParagraph = !this.showParagraph;
+            this.showParagraph = !this.showParagraph;
         },
         innerClick() {
-        alert("Click!");
+            alert("Click!");
         }
     }
 };
