@@ -62,12 +62,32 @@ export default new Router({
                     component: () => import('./views/Agpa/Edition.vue'),
                 },
                 {
+                    path: 'rules',
+                    component: () => import('./views/Agpa/Rules.vue'),
+                },
+                {
+                    path: 'archives',
+                    component: () => import('./views/Agpa/ArchiveEdition.vue'),
+                },
+                {
                     path: 'archives/:year',
                     component: () => import('./views/Agpa/ArchiveEdition.vue'),
                 },
                 {
                     path: 'archives/:year/:catId',
                     component: () => import('./views/Agpa/ArchiveCategory.vue'),
+                },
+                {
+                    path: 'palmares',
+                    component: () => import('./views/Agpa/Palmares.vue'),
+                },
+                {
+                    path: 'stats',
+                    component: () => import('./views/Agpa/Stats.vue'),
+                },
+                {
+                    path: 'ceremony',
+                    component: () => import('./views/Agpa/Ceremony.vue'),
                 }
             ]
         },

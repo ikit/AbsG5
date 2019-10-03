@@ -1,6 +1,8 @@
 <template>
     <div class="reglement">
-        <h1>Règlement des AGPA - Version de 2016</h1>
+
+        <v-card class="version" >Règlement officiel des AGPA – Edition 2016 – Version du 28 décembre 2016</v-card>
+
         <a name="chap1"></a>
         <h2><span class="number">I.</span> Présentation des AGPA</h2>
         <p>Ouvert à tous les membres du forum Absolument G, le concours des Absolument G Photos Awards (AGPA) récompense les meilleures photos parmi celles proposées par les participants pour six catégories.</p>
@@ -54,7 +56,7 @@
         <p>Pour pouvoir être prise en compte, chaque photo doit remplir les conditions suivantes :
         <ul>
             <li>Peser moins de 5 Mo et ne pas avoir une largeur ou une hauteur qui dépassent les 5 000 pixels;</li>
-            <li>Avoir été prise par le candidat entre le 9 décembre <?php echo $prev_year; ?> et le 14 décembre 2013. Les photos prises au retardateur sont admises, si le candidat a préparé l’appareil et cadré la photo lui-même ;</li>
+            <li>Avoir été prise par le candidat entre le 9 décembre {{prev_year}} et le 14 décembre 2013. Les photos prises au retardateur sont admises, si le candidat a préparé l’appareil et cadré la photo lui-même ;</li>
             <li>Ne pas être un photo-montage, sauf pour la catégorie &laquo; Autre regard &raquo; où ils sont autorisés.</li>
         </ul></p>
 
@@ -75,7 +77,7 @@
 
         <p>Lors de l’enregistrement des photos, il est demandé au candidat d’attribuer un titre à chacune de ses œuvres. Le titre donné est visible lors de l'évaluation des jurés, ils pourront donc en tenir compte s' ils le souhaitent.</p>
 
-        <p>La date limite d’enregistrement des photos est fixée au <?php echo $p1_end_date; ?> décembre 2013 à 23h59. Avant cette date, le candidat peut :
+        <p>La date limite d’enregistrement des photos est fixée au {{p1_end_date}} décembre 2013 à 23h59. Avant cette date, le candidat peut :
         <ul>
             <li>Envoyer et nommer de nouvelles photos (dans la limite de deux par catégorie) ;</li>
             <li>Supprimer, remplacer ou renommer les photos déjà envoyées.</li>
@@ -84,7 +86,7 @@
 
         <a name="chap3"></a>
         <h2><span class="number">III.</span> Visualisions et vérification des photos proposées</h2>
-        <p>Du <?php echo $p2_start_date; ?> décembre 2013 (0h00) au <?php echo $p2_end_date; ?> décembre 2013 (23h59), les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
+        <p>Du {{ p2_start_date }} décembre 2013 (0h00) au {{ p2_end_date }} décembre 2013 (23h59), les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
 
         <p>Pendant cette période, les membres du forum peuvent :
         <ul>
@@ -92,7 +94,7 @@
             <li>Contacter l’organisation pour signaler une erreur ou une photo ne correspondant pas aux critères définis.</li>
         </ul></p>
 
-        <p>Si une photo est jugée non conforme aux critères définis, le candidat concerné sera prévenu et aura la possibilité de remplacer son œuvre jusqu’au <?php echo $p2_end_date; ?> décembre 2013 23h59. S’il ne le fait pas, la photo en cause pourra être supprimée par l’organisation. </p>
+        <p>Si une photo est jugée non conforme aux critères définis, le candidat concerné sera prévenu et aura la possibilité de remplacer son œuvre jusqu’au {{ p2_end_date }} décembre 2013 23h59. S’il ne le fait pas, la photo en cause pourra être supprimée par l’organisation. </p>
 
         <p>Il n’est pas possible de voter pendant la phase de vérification.</p>
 
@@ -101,7 +103,7 @@
         <h2><span class="number">IV.</span> Votes</h2>
         <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants peuvent voter, cependant seuls les votes des jurés ayant 10 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
 
-        <p>La phase de vote s’étend du <?php echo $p3_start_date; ?> décembre 2013 (0h00) jusqu'au <?php echo $p3_end_date; ?> décembre 2013 (23h59). </p>
+        <p>La phase de vote s’étend du {{ p3_start_date }} décembre 2013 (0h00) jusqu'au {{ p3_end_date }} décembre 2013 (23h59). </p>
 
         <p>Pendant cette période, les membres du forum peuvent :
         <ul>
@@ -194,16 +196,14 @@
         <p>Dans certains cas bien précis, les AGPA d’or peuvent se transformer en AGPA de diamant : <ul>
             <li>AGPA de diamant de la meilleure photo de sa catégorie attribué à la première photo si : <ul>
                 <li>La photo totalise 50 000 points ou plus;</li>
-                <li><b>ET</b> la note de la photo est strictement supérieure au double de la note de la deuxième meilleure photo de la catégorie.</li>
-            </ul>
+                <li><b>ET</b> la note de la photo est strictement supérieure au double de la note de la deuxième meilleure photo de la catégorie.</li></ul></li>
             <li>AGPA de diamant de la meilleure photo toutes catégories attribué à la meilleure photo si : <ul>
-                <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés moins un).</li>
-            </ul>
+                <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés moins un).</li></ul></li>
             <li>AGPA de diamant du meilleur photographe attribué au premier photographe si :<ul>
                 <li>Il est l’auteur des trois meilleures photos et ses quatre meilleures photos totalisent 100 000 points ou plus ;</li>
-                <li><b>OU</b> il totalise 33 points ou plus au palmarès de l’édition actuelle (avant transformation de l’AGPA d’or du meilleur photographe en AGPA de diamant).</li>
+                <li><b>OU</b> il totalise 33 points ou plus au palmarès de l’édition actuelle (avant transformation de l’AGPA d’or du meilleur photographe en AGPA de diamant).</li></ul></li>
             </ul>
-        </ul></p>
+        </p>
 
         <br/>
         <a name="chap5.3"></a>
@@ -218,7 +218,7 @@
         </tbody></table>
         </p>
 
-        <p class="version">Règlement officiel des AGPA – Edition 2016 – Version du 28 décembre 2016</p>
+        <v-card class="version" >Règlement officiel des AGPA – Edition 2016 – Version du 28 décembre 2016</v-card>
         <div class="clear">&nbsp;</div>
     </div>
 </template>
@@ -231,27 +231,12 @@ export default  {
 
     }),
     methods: {
-        resetDialog (open = false) {
-            this.citationEditor.open = open;
-            this.citationEditor.citationId = null;
-            this.citationEditor.citation = null;
-            this.citationEditor.author = null;
-        },
-        saveCitation: function () {
-            this.citations.push({
-                authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
-                authorId: 16,
-                authorName: this.citationEditor.author,
-                citation: this.citationEditor.citation,
-            });
-            this.resetDialog();
-        }
     }
 };
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/global.scss';
+@import '../../assets/global.scss';
 
 h1 {
     display: block;
@@ -268,5 +253,33 @@ h1 {
     font-size: 40px;
     font-family: "Comfortaa", sans-serif;
     margin: 20px 0 60px 0;
+}
+
+.reglement {
+    font-family: "Tangerine", serif;
+    max-width: 800px;
+    font-size: 30px;
+    margin: auto;
+
+    .version {
+        font-family: 'Courier New', Courier, monospace!important;
+        margin: 50px 0;
+        padding: 10px;
+        font-size: 15px;
+    }
+
+    li {
+        list-style-image: url('../../assets/images/theme/agpa/puce.png');
+    }
+
+    .number {
+        font-family: 'Times New Roman', Times, serif!important;
+        font-style: italic;
+        font-weight: 100;
+    }
+
+    td {
+        text-align: center;
+    }
 }
 </style>

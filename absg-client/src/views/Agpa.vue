@@ -1,15 +1,25 @@
 <template>
 <div class="agpa" >
-    <div class="agpa-menu">
-        <v-btn color="accent"><v-icon left>fas fa-home</v-icon> Accueil</v-btn>
-        <v-btn><v-icon left>fas fa-scroll</v-icon> Réglement</v-btn>
-        <v-btn><v-icon left>fas fa-archive</v-icon> Archives</v-btn>
-        <v-btn><v-icon left>fas fa-trophy</v-icon> Palmarès</v-btn>
-        <v-btn><v-icon left>fas fa-chart-bar</v-icon>Statistiques</v-btn>
-        <v-btn><v-icon left>fas fa-tv</v-icon>Cérémonies</v-btn>
-    </div>
-    <h1 style="margin-top: 100px; position: relative;">Absolument G Photos Awards</h1>
+
+    <img
+        v-if="$vuetify.breakpoint.mdAndUp"
+        src="../assets/images/immt-new.png"
+        style="width: 206px; height: 120px; position: absolute; top: -20px; left: 10px;"/>
+    <h1>Absolument G Photos Awards</h1>
+
+
+
+    <v-tabs centered>
+        <v-tab :to="{path:'/agpa/'}"> <v-icon>fas fa-star</v-icon> &nbsp; Edition 2019</v-tab>
+        <v-tab :to="{path:'/agpa/rules'}"> <v-icon>fas fa-scroll</v-icon> &nbsp; Réglement</v-tab>
+        <v-tab :to="{path:'/agpa/archives'}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
+        <v-tab :to="{path:'/agpa/palmares'}"> <v-icon>fas fa-trophy</v-icon> &nbsp; Palmarès</v-tab>
+        <v-tab :to="{path:'/agpa/stats'}"> <v-icon>fas fa-chart-bar</v-icon> &nbsp; Statistiques</v-tab>
+        <v-tab :to="{path:'/agpa/ceremony'}"> <v-icon>fas fa-tv</v-icon> &nbsp; Cérémonies</v-tab>
+    </v-tabs>
+
     <router-view></router-view>
+
 </div>
 </template>
 

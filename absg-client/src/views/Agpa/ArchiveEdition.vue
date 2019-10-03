@@ -1,5 +1,9 @@
 <template>
 <div>
+
+
+
+
     <h2>Archive Edition {{ current.editionYear }}</h2>
 
     <v-container fluid v-if="current">
@@ -32,13 +36,25 @@
 
 
 <script>
+import axios from 'axios';
 
 export default {
     name: 'Phase5',
     data: () => ({
     }),
     props: ['current'],
+    mounted () {
+        console.log('salut', this.$route.params);
+        this.year = this.$route.params.year ? this.$route.params.year : '';
+        axios.get(`/api/agpa/archives/${this.year}`).then(response => {
+            console.log(response);
+            this.current = response.status === 200 ? response.data : null;
+            this.error = response.status !== 200 ? response : null;
+            this.isLoading = false;
+        });
+    },
     methods: {
+
 
         getCategoryPhoto (cat) {
             let url = '';
@@ -51,22 +67,6 @@ export default {
             }
             return url;
         },
-
-        resetDialog (open = false) {
-            this.citationEditor.open = open;
-            this.citationEditor.citationId = null;
-            this.citationEditor.citation = null;
-            this.citationEditor.author = null;
-        },
-        saveCitation: function () {
-            this.citations.push({
-                authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
-                authorId: 16,
-                authorName: this.citationEditor.author,
-                citation: this.citationEditor.citation,
-            });
-            this.resetDialog();
-        }
     }
 
 };
