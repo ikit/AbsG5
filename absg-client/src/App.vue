@@ -1,47 +1,5 @@
 <template>
 <v-app id="inspire" :dark="darkMode">
-    <!-- <v-navigation-drawer
-        fixed
-        :clipped="$vuetify.breakpoint.smAndUp"
-        app
-        v-model="drawer"
-        style="z-index: 2100">
-    <v-list dense>
-        <template v-for="item in items">
-        <v-list-group
-            v-if="item.children"
-            v-model="item.model"
-            :key="item.text"
-            :prepend-icon="item.model ? item.icon : item['icon-alt']"
-            append-icon="">
-            <v-list-item slot="activator">
-                <v-list-item-content>
-                    <v-list-item-title>{{ item.text }}</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
-            <v-list-item v-for="(child, i) in item.children" :key="i" :to="child.route">
-                <v-list-item-action v-if="child.icon">
-                    <v-icon>{{ child.icon }}</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                    <v-list-item-title>{{ child.text }}</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
-        </v-list-group>
-        <v-list-item v-else :key="item.text" :to="item.route" active-class="accent--text">
-            <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-            <v-list-item-title>
-                {{ item.text }}
-            </v-list-item-title>
-            </v-list-item-content>
-        </v-list-item>
-        </template>
-    </v-list>
-    </v-navigation-drawer> -->
-
     <v-app-bar
         color="primary"
         dark
@@ -81,7 +39,7 @@
                     <img src="/img/avatars/009.png" style="height: 40px; margin-left: 15px" />
                 </v-btn>
             </template>
-            
+
             <v-list>
                 <v-list-item>
                     <v-list-item-title :key="0">
@@ -120,8 +78,28 @@
                 </template>
             </v-list>
         </div>
-        <div class="mainContent">
+        <div class="mainContent" >
             <router-view></router-view>
+            <div class="gallery" @click="liteboxClose()" :v-if="photosGalleryDisplayed">
+                <div style="position: relative; padding: 50px; height: 100%;">
+                    <div class="galleryControl">
+                        <div class="count">
+                            {{ photosGalleryIndex + 1 }} / {{ photosGallery.length }}
+                        </div>
+
+                        <button type="button" class="button" @click="liteboxPrev(); return false;"><i class="fas fa-chevron-left"></i></button>
+                        <button type="button" class="button" @click="liteboxPlayPause(); return false;"><i class="fas fa-play"></i></button>
+                        <button type="button" class="button" @click="liteboxNext(); return false;"><i class="fas fa-chevron-right"></i></button>
+
+                        <button type="button" class="close" @click="liteboxClose(); return false;"><i class="fas fa-times"></i> Fermer</button>
+                    </div>
+
+                    <img :src="photoDisplayed.url" @click="liteboxAuto()"/>
+                    <div style="text-align: center">
+                        {{photoDisplayed.title}}
+                    </div>
+                </div>
+            </div>
         </div>
     </v-content>
 
@@ -212,6 +190,7 @@ export default {
     dialog: false,
     darkMode: false,
     drawer: null,
+    photosGalleryDisplayed: true,
     items: [
         { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
         { icon: 'fas fa-image', text: 'Images du moment', route: '/immt' },
@@ -220,34 +199,61 @@ export default {
         { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
         { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
         { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
-        // {
-        // icon: 'fas fa-chevron-up',
-        // 'icon-alt': 'fas fa-chevron-down',
-        // text: 'Avancé',
-        // model: false,
-        // children: [
-        //     { icon: 'fas fa-cloud', text: 'Cloud', route: '/cloud' },
-        //     { icon: 'far fa-calendar-alt', text: 'Calendrier', route: '/calendrier' },
-        //     { icon: 'fas fa-flask', text: 'Labo', route: '/lab' },
-        //     { icon: 'fas fa-search', text: 'Rechercher', route: '/recherche' },
-        //     { icon: 'fas fa-wrench', text: 'Paramètres', route: '/parametres' },
-        //     { icon: 'fas fa-chart-bar', text: 'Statistiques', route: '/stats' },
-        //     { icon: 'fas fa-tools', text: 'Administration', route: '/zaffa' },
-        //     { icon: 'fas fa-question', text: 'Aide', route: '/aide' },
-        // ]
-        // },
     ]
     }),
     props: {
-    source: String
+        source: String
+    },
+    methods: {
+
+        hideLitebox() {
+            console.log('hideLitebox');
+            return store.photosGalleryDisplayed;
+            store.commit('hideImageGalery');
+            return store.photosGalleryDisplayed;
+        },
+        liteboxClose() {
+            this.photosGalleryDisplayed = false;
+            store.commit('setImageGalleryVisible', false);
+        },
+        liteboxPrev() {
+
+        },
+        liteboxPlayPause() {
+
+        },
+        liteboxNext() {
+
+        },
+        liteboxAuto() {
+
+        }
     },
     computed: {
         citation () {
-          return this.$store.state.citation;
+            return this.$store.state.citation;
         },
         user () {
-          return this.$store.state.user;
-        }
+            return this.$store.state.user;
+        },
+        photosGallery () {
+            return this.$store.state.photosGallery;
+        },
+        photosGalleryIndex() {
+            return this.$store.state.photosGalleryIndex;
+        },
+        photoDisplayed () {
+            return {
+                url: 'http://absolumentg.fr/assets/img/agpa/2018/mini/1544998619.jpg',
+                title: 'D&#039;un mill&eacute;naire &agrave; l&#039;autre',
+            }
+
+            // if (this.$store.state.photosGalleryIndex >= 0 && this.$store.state.photosGalleryIndex < this.$store.state.photosGallery.length) {
+            //     return this.$store.state.photosGallery[this.$store.state.photosGalleryIndex];
+            // }
+            // return 'http://localhost:8080/img/immt-new.png';
+        },
+
     }
 };
 </script>
@@ -321,4 +327,79 @@ export default {
     color: rgba(0,0,0,0.54);
 }
 
+
+.gallery {
+    position: fixed;
+    z-index:20000;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom: 0;
+    background: rgba(0,0,0,0.95);
+    text-align: center;
+    color: #aaa;
+
+    .galleryControl {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        text-align: center;
+        line-height: 50px;
+
+        .count {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            line-height: 50px;
+        }
+
+        .button {
+            width: 30px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .close {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            line-height: 50px;
+            font-size: 1.2em;
+        }
+    }
+
+    img {
+        background: #fff!important;
+        padding: 1px!important;
+        border: 1px solid #000!important;
+        max-height: 100%;
+        max-width: 100%;
+    }
+}
+
+
+
+.vlb-arrows {
+    position: absolute!important;
+    top: 10px!important;
+}
+.vlb-close-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+
+.vlb-caption-count {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+.vlb-caption-title {
+    font-size: 1.5em;
+    color: #fff;
+
+}
 </style>

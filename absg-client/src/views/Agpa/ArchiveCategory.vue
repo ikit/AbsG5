@@ -36,34 +36,16 @@
                 </v-layout>
             </v-container>
         </div>
-
-        <div  v-if="liteboxOn" style="position: fixed; z-index:20000 top: 0; left: 0; right:0; bottom: 0; background: rgba(0,0,0,0.5)">
-            <vue-litebox
-                :items="photosGalery"
-                @close="hideLitebox">
-                <!-- <a v-for="img in photosGalery"
-                        :key="img.idx"
-                        :data-image="img.url"
-                        :title="img.title">
-                        <div class="bgbox">
-                            <img :src="img.url">
-                        </div>
-                        <div class="img-title" v-html="img.title"></div>
-                    </a> -->
-            </vue-litebox>
-        </div>
     </section>
 </template>
 
 
 <script>
 import axios from 'axios';
-import VueLitebox from 'vue-litebox';
+import store from '../../store';
 
 export default {
-    components: {
-        VueLitebox,
-    },
+    store,
     data: () => ({
         isLoading: true,
         current: null,
@@ -90,19 +72,19 @@ export default {
                     this.photosGalery.push({
                         src: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
                         title: photo.title,
-                        idx: idx
                     });
                     idx++;
                 }
+                store.commit('resetImageGallery', this.photosGalery);
             }
         });
     },
     methods: {
         showLitebox() {
-            this.liteboxOn = true;
+            store.commit('displayImageGallery');
         },
         hideLitebox() {
-            this.liteboxOn = false;
+            store.commit('hideImageGallery');
         }
     }
 };
