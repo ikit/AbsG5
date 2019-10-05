@@ -27,7 +27,7 @@
                         }"
                         class="elevation-1">
                     <template v-slot:item.firstname="{ item }">
-                        <v-chip :color="red" dark>{{ item.firstname }}</v-chip>
+                        <v-chip dark>{{ item.firstname }}</v-chip>
                     </template>
                     </v-data-table>
                 </v-card>

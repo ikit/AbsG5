@@ -41,10 +41,11 @@ import axios from 'axios';
 export default {
     name: 'Phase5',
     data: () => ({
+        current: null,
+        isLoading: true,
+        error: null
     }),
-    props: ['current'],
     mounted () {
-        console.log('salut', this.$route.params);
         this.year = this.$route.params.year ? this.$route.params.year : '';
         axios.get(`/api/agpa/archives/${this.year}`).then(response => {
             console.log(response);

@@ -225,11 +225,11 @@ export async function archiveSummary(): Promise<any>
     
     // On récupère les meilleurs photographes
     const authors = new Map<Number, any[]>();
-    sql = `SELECT a.year, a."categoryId", a."userId", u.username, a.award 
+    sql = `SELECT a.year, a."userId" as id, u.username as firstname, a.award 
         FROM agpa_award a 
         INNER JOIN "user" u ON u.id = a."userId" 
         WHERE "categoryId"=-1 
-        ORDER BY "year" DESC, a."award" ASC `;
+        ORDER BY "year" DESC, a."award" DESC `;
     result = await repo.query(sql);
     for (const row of result)
     {

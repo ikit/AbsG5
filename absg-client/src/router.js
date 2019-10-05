@@ -67,7 +67,7 @@ export default new Router({
                 },
                 {
                     path: 'archives',
-                    component: () => import('./views/Agpa/ArchiveEdition.vue'),
+                    component: () => import('./views/Agpa/ArchivesSummary.vue'),
                 },
                 {
                     path: 'archives/:year',
