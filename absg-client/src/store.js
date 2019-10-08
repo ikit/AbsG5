@@ -29,20 +29,45 @@ export default new Vuex.Store({
             let day = `${immt.day}`;
             immt.src = `http://absolumentg.fr/assets/img/immt/${immt.year}_${day.padStart(3,'0')}.jpg`;
             state.immt = immt;
+            state.photosGallery = [{
+                url: immt.src,
+                title: immt.title
+            }];
+            state.photosGalleryIndex = 0;
         },
-        resetImageGallery(state, galery) {
+
+        photosGalleryReset(state, galery) {
             state.photosGallery = galery;
             state.photosGalleryIndex = 0;
         },
-        displayImageGallery(state) {
+        photosGalleryDisplay(state) {
             state.photosGalleryDisplayed = true;
         },
-        setImageGalleryVisible(state, visible) {
-            console.log('setImageGalleryVisible', visible)
-            state.photosGalleryDisplayed = visible;
-        }
+        photosGalleryHide(state) {
+            state.photosGalleryDisplayed = false;
+        },
+        photosGalleryNext(state) {
+            if (state.photosGallery.length > 1) {
+                state.photosGalleryIndex++;
+                state.photosGalleryIndex %= state.photosGallery.length;
+            }
+        },
+        photosGalleryPrev(state) {
+            if (state.photosGallery.length > 1) {
+                state.photosGalleryIndex--;
+                state.photosGalleryIndex %= state.photosGallery.length;
+                if (state.photosGalleryIndex < 0) {
+                    state.photosGalleryIndex = state.photosGallery.length - 1;
+                }
+            }
+        },
+        photosGallerySetIndex(state, index) {
+            state.photosGalleryIndex = index;
+        },
     },
-    actions: {
-
+        actions: {
+            photosGalleryNext(context) {
+                state.photosGalleryIndex = 0;
+            }
     }
 });

@@ -11,15 +11,16 @@
 
         <div v-if="current">
             <h2>Catégorie {{ category }} {{ year }}</h2>
-        <button type="button" @click="showLitebox">Show Litebox</button>
 
             <v-container fluid v-if="current">
                 <v-layout row wrap>
-                    <v-flex v-for="photo in current.photos" :key="photo.id" style="min-width: 250px; width: 15%; margin: 15px">
+                    <v-flex v-for="(photo, index) in current.photos" :key="photo.id" style="min-width: 250px; width: 15%; margin: 15px">
                         <div>
                             <div style="width: 250px; height: 250px; margin: auto;">
                                 <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                    <img class="thumb" :src="`http://absolumentg.fr/assets/img/agpa/${year}/mini/vignette_${photo.filename}`"/>
+                                    <img class="thumb"
+                                        :src="`http://absolumentg.fr/assets/img/agpa/${year}/mini/vignette_${photo.filename}`"
+                                        @click="photosGalleryDisplay(index)"/>
                                 </div>
                             </div>
                             <div style="">
@@ -70,22 +71,23 @@ export default {
                 let idx = 0;
                 for (let photo of this.current.photos) {
                     this.photosGalery.push({
-                        src: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
+                        url: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
                         title: photo.title,
                     });
                     idx++;
                 }
-                store.commit('resetImageGallery', this.photosGalery);
+                store.commit('photosGalleryReset', this.photosGalery);
             }
         });
     },
     methods: {
-        showLitebox() {
-            store.commit('displayImageGallery');
+        photosGalleryDisplay(index) {
+            store.commit('photosGallerySetIndex', index);
+            store.commit('photosGalleryDisplay');
         },
-        hideLitebox() {
-            store.commit('hideImageGallery');
-        }
+        photosGalleryHide() {
+            store.commit('photosGalleryHide');
+        },
     }
 };
 </script>

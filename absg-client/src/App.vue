@@ -80,21 +80,29 @@
         </div>
         <div class="mainContent" >
             <router-view></router-view>
-            <div class="gallery" @click="liteboxClose()" :v-if="photosGalleryDisplayed">
-                <div style="position: relative; padding: 50px; height: 100%;">
+            <div class="gallery" v-if="photosGalleryDisplayed">
+                <div style="position: relative; padding: 50px; height: 100%;" @click="photosGalleryAuto()">
                     <div class="galleryControl">
-                        <div class="count">
+                        <div class="count" v-if="photosGallery.length > 1">
                             {{ photosGalleryIndex + 1 }} / {{ photosGallery.length }}
                         </div>
 
-                        <button type="button" class="button" @click="liteboxPrev(); return false;"><i class="fas fa-chevron-left"></i></button>
-                        <button type="button" class="button" @click="liteboxPlayPause(); return false;"><i class="fas fa-play"></i></button>
-                        <button type="button" class="button" @click="liteboxNext(); return false;"><i class="fas fa-chevron-right"></i></button>
+                        <button v-if="photosGallery.length > 1" type="button" class="button"
+                            @click.stop="photosGalleryPrev()"
+                            @keyup.left.stop="photosGalleryPrev()"><i class="fas fa-chevron-left"></i></button>
+                        <button v-if="photosGallery.length > 1" type="button" class="button"
+                            @click.stop="photosGalleryPlayPause()"
+                            @keyup.space.stop="photosGalleryPlayPause()"><i class="fas fa-play"></i></button>
+                        <button v-if="photosGallery.length > 1" type="button" class="button"
+                            @click.stop="photosGalleryNext()"
+                            @keyup.right.stop="photosGalleryNext()"><i class="fas fa-chevron-right"></i></button>
 
-                        <button type="button" class="close" @click="liteboxClose(); return false;"><i class="fas fa-times"></i> Fermer</button>
+                        <button type="button" class="close"
+                            @click.stop="photosGalleryHide()"
+                            @keyup.esc.stop="photosGalleryHide()"><i class="fas fa-times"></i> Fermer</button>
                     </div>
 
-                    <img :src="photoDisplayed.url" @click="liteboxAuto()"/>
+                    <img :src="photoDisplayed.url"/>
                     <div style="text-align: center">
                         {{photoDisplayed.title}}
                     </div>
@@ -190,7 +198,6 @@ export default {
     dialog: false,
     darkMode: false,
     drawer: null,
-    photosGalleryDisplayed: true,
     items: [
         { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
         { icon: 'fas fa-image', text: 'Images du moment', route: '/immt' },
@@ -206,27 +213,20 @@ export default {
     },
     methods: {
 
-        hideLitebox() {
-            console.log('hideLitebox');
-            return store.photosGalleryDisplayed;
-            store.commit('hideImageGalery');
-            return store.photosGalleryDisplayed;
+        photosGalleryHide() {
+            store.commit('photosGalleryHide');
         },
-        liteboxClose() {
-            this.photosGalleryDisplayed = false;
-            store.commit('setImageGalleryVisible', false);
+        photosGalleryPrev() {
+            store.commit('photosGalleryPrev');
         },
-        liteboxPrev() {
-
+        photosGalleryNext() {
+            store.commit('photosGalleryNext');
         },
-        liteboxPlayPause() {
-
+        photosGalleryPlayPause() {
+            console.log('photosGalleryPlayPause');
         },
-        liteboxNext() {
-
-        },
-        liteboxAuto() {
-
+        photosGalleryAuto() {
+            console.log('photosGalleryAuto');
         }
     },
     computed: {
@@ -236,6 +236,9 @@ export default {
         user () {
             return this.$store.state.user;
         },
+        photosGalleryDisplayed() {
+            return this.$store.state.photosGalleryDisplayed;
+        },
         photosGallery () {
             return this.$store.state.photosGallery;
         },
@@ -243,15 +246,10 @@ export default {
             return this.$store.state.photosGalleryIndex;
         },
         photoDisplayed () {
-            return {
-                url: 'http://absolumentg.fr/assets/img/agpa/2018/mini/1544998619.jpg',
-                title: 'D&#039;un mill&eacute;naire &agrave; l&#039;autre',
+            if (this.$store.state.photosGalleryIndex >= 0 && this.$store.state.photosGalleryIndex < this.$store.state.photosGallery.length) {
+                return this.$store.state.photosGallery[this.$store.state.photosGalleryIndex];
             }
-
-            // if (this.$store.state.photosGalleryIndex >= 0 && this.$store.state.photosGalleryIndex < this.$store.state.photosGallery.length) {
-            //     return this.$store.state.photosGallery[this.$store.state.photosGalleryIndex];
-            // }
-            // return 'http://localhost:8080/img/immt-new.png';
+            return 'http://localhost:8080/img/immt-new.png';
         },
 
     }
