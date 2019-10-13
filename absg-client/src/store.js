@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
 
 Vue.use(Vuex);
 
@@ -14,8 +15,8 @@ export default new Vuex.Store({
         photosGallery: [],
         photosGalleryIndex: 0,
         photosGalleryDisplayed: false,
-        todayLabel: new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-
+        todayLabel: new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+        agpaMeta: null,
     },
     mutations: {
         updateUser(state, user) {
@@ -64,6 +65,13 @@ export default new Vuex.Store({
         photosGallerySetIndex(state, index) {
             state.photosGalleryIndex = index;
         },
+        initAGPA(state) {
+            if (!state.agpaMeta) {
+                axios.get(`/api/agpa/metadata`).then(response => {
+                    state.agpaMeta = response.status === 200 ? response.data : null;
+                });
+            }
+        }
     },
         actions: {
             photosGalleryNext(context) {

@@ -26,12 +26,19 @@
 
 
 <script>
+import store from '../store';
+
 export default {
+    store,
     data: () => ({
         nav: {
             section: 2
         },
     }),
+    mounted() {
+        // A l'init des AGPA, on récupère si besoin les méta donnée des AGPA
+        store.commit('initAGPA');
+    },
     props: ['darkMode'],
     methods: {
     }

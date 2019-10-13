@@ -7,6 +7,22 @@ import { AgpaPhase } from "./model/AgpaPhase";
 
 export const agpaCtx = new AgpaContext();
 
+/**
+ * Calcule l'année de l'édition en fonction de la date courante
+ * @return l'année de l'édition en cours
+ */
+export function getCurrentEdition(): number {
+    // Une édition commence au 1er octobre pour se terminer fin décembre
+    // Mais en fonction du calendrier, peut déborder sur janvier/février de l'année suivante
+    // Donc si on est avant octobre, il s'agit de l'édition précédente, sinon il s'agit de l'année courante :)
+    const date = new Date();
+    let editionYear = date.getFullYear();
+    if (date.getMonth() < 9) {
+        editionYear--;
+    }
+    return editionYear;
+}
+
 
 
 /**
@@ -21,6 +37,62 @@ export async function initAGPAContext(date: Date)
     return agpaCtx.checkForReset();
 }
 
+
+/**
+ * showRules
+ * Affiche le réglement en ligne. L'essentiel du réglement est écrit directement dans le template chargé... 
+ * Cette fonction s'occupe essentiellement de calculer les dates afin que le réglement colle avec l'édition courante.
+ *
+ * @return 
+ */
+export async function getMetaData()
+{
+    const repo = getRepository(AgpaPhoto);
+    const currentYear = getCurrentEdition();
+
+    let data = {
+        currentYear: currentYear,
+        maxYear: currentYear - 1,
+        minYear: 2006,
+        catBefore2012: [1, 2, 3, 4, 5, 6, -2, -1],
+        catSince2012: [1, 2, 7, 3, 4, 5, 8, 6 ,-2, -3, -1],
+        boudaries: getPhasesBoundaries(),
+        categories: {},
+    }
+
+    // On récupère les données des catégories
+    let sql = `SELECT id, title, description, color FROM agpa_category`;
+    let result = await repo.query(sql);
+    for (const row of result)
+    {
+        data.categories[row.id] = row;
+    }
+	
+    // On récupère les données des catégories spéciales
+    sql = `SELECT id, year, title, description FROM agpa_category_variation WHERE year > 0`;
+    result = await repo.query(sql);
+    const cat8 = data.categories[8];
+    cat8.variants = {};
+    for (const row of result)
+    {
+        cat8.variants[row.year] = { title:row.title,  description:row.description };
+    }
+
+    // On récupère les meilleures photos de chaque éditions
+    for (let i in data.categories) { data.categories[i].photos = []; }
+    sql = `SELECT p.id, p.year, p.title, p.filename, p."categoryId"
+        FROM public.agpa_photo p INNER JOIN agpa_award a ON p.id=a."photoId" WHERE a."categoryId" = -2 ORDER BY p.year ASC`;
+    result = await repo.query(sql);
+    for (const row of result)
+    {
+        console.log(row);
+        console.log(data.categories[row.categoryId]);
+        data.categories[row.categoryId].photos.push(row);
+    }
+
+
+    return data;
+}
 
 /**
  * shuffleArray
@@ -74,21 +146,7 @@ export function sufflePhotos(photos)
 
 
 
-/**
- * Calcule l'année de l'édition en fonction de la date courante
- * @return l'année de l'édition en cours
- */
-export function getCurrentEdition(): number {
-    // Une édition commence au 1er octobre pour se terminer fin décembre
-    // Mais en fonction du calendrier, peut déborder sur janvier/février de l'année suivante
-    // Donc si on est avant octobre, il s'agit de l'édition précédente, sinon il s'agit de l'année courante :)
-    const date = new Date();
-    let editionYear = date.getFullYear();
-    if (date.getMonth() < 9) {
-        editionYear--;
-    }
-    return editionYear;
-}
+
 
 /**
  * Calcule la phase de l'édition en cours
@@ -109,7 +167,7 @@ export function getPhasesBoundaries(): AgpaPhase[] {
     //   2 : vérification des photos          [ du 15 au 17 décembre ] => 2 jours
     //   3 : votes                            [ du 17 au 21 décembre ] => 4 jours
     //   4 : calculs et préparation cérémonie [ du 21 au 24 décembre ] => 3 jours
-    //   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ] 
+    //   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ]
     // Mais pour l'année en cours, on récupère les durées via la DB car on peut les modifier
     // pour s'adapter au contraintes des agendas des participants
     const currentYear = new Date().getFullYear();
@@ -130,7 +188,6 @@ export function getPhasesBoundaries(): AgpaPhase[] {
             p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
         }
         phases.push(p);
-        
     }
     return phases;
 }
@@ -179,39 +236,3 @@ export function getMaxArchiveEdition(): number {
 
 
 
-// /**
-//  * showRules
-//  * Affiche le réglement en ligne. L'essentiel du réglement est écrit directement dans le template chargé... 
-//  * Cette fonction s'occupe essentiellement de calculer les dates afin que le réglement colle avec l'édition courante.
-//  *
-//  * @param ctx, le contexte avec toutes les infos nécessaire.
-//  * @param user, les informations relatives à l'utilisateur.
-//  * @param year, l'année de l'édition
-//  * @return ctx, le contexte mis à jour avec les dates de l'année courante
-//  */
-// export function showRules(ctx, user, year)
-// {    
-//     const days = ['lundi ', 'mardi ', 'mercredi ', 'jeudi ', 'vendredi ', 'samedi ', 'dimanche '];
-//     let info = {
-//         p1End: new Date(year, 11, ctx.phasesBoundaries[0]1][1],ctx.phasesBoundaries[1][0]-1, year); // moins 1 car (" on inclus" la journée ds le texte du réglement")
-//         p2Start: new Date(year, 11, ctx.phasesBoundaries[1][1],ctx.phasesBoundaries[1][0], year);
-//         p2End: new Date(year, 11, ctx.phasesBoundaries[2][1],ctx.phasesBoundaries[2][0]-1, year);
-//         p3Start: new Date(year, 11, ctx.phasesBoundaries[2][1],ctx.phasesBoundaries[2][0], year);
-//         p3End: new Date(year, 11, ctx.phasesBoundaries[3][1],ctx.phasesBoundaries[3][0], year);
-//     }
-    
-    
-    
-    
-//     // on met à jour le contexte avec les nouvelles infos
-//     $ctx['prev_year']     = $year -1;
-//     $ctx['p1_end_date']   = $days[date('N',$phase1End)-1].date('j',$phase1End);
-//     $ctx['p2_start_date'] = $days[date('N',$phase2Start)-1].date('j',$phase2Start);
-//     $ctx['p2_end_date']   = $days[date('N',$phase2End)-1].date('j',$phase2End);
-//     $ctx['p3_start_date'] = $days[date('N',$phase3Start)-1].date('j',$phase3Start);
-//     $ctx['p3_end_date']   = $days[date('N',$phase3End)-1].date('j',$phase3End);
-    
-    
-
-//     return $ctx;
-// }
