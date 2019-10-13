@@ -53,7 +53,6 @@
                 </v-menu>
 
             </v-card>
-            <h2> </h2>
 
             <v-container fluid v-if="current">
                 <v-layout row wrap>
@@ -164,7 +163,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../assets/global.scss';
+@import '../../themes/global.scss';
 
 #content {
     text-align: center;

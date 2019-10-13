@@ -53,7 +53,6 @@ export default {
     }),
     mounted () {
         axios.get(`/api/agpa/archives`).then(response => {
-            console.log(response);
             this.summary = response.status === 200 ? response.data : null;
             this.error = response.status !== 200 ? response : null;
             this.isLoading = false;
@@ -76,7 +75,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../assets/global.scss';
+@import '../../themes/global.scss';
 
 h3 {
     font-family: 'Tangerine', serif;

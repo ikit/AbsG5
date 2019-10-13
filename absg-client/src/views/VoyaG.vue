@@ -10,22 +10,47 @@
         </div>
 
 
-        <div style="position: absolute; top: 0; left: 0; z-index: 2000; text-align: center">
-            <v-btn color="accent" fab small dark>
-                <v-icon>far fa-clock</v-icon>
-            </v-btn>
-            <v-btn color="primary" fab small dark>
-                <v-icon>fas fa-map-pin</v-icon>
-            </v-btn>
-            <v-btn color="primary" fab small dark>
-                <v-icon>fas fa-search</v-icon>
-            </v-btn>
-            <v-btn color="primary" fab small dark>
-                <v-icon>fas fa-layer-group</v-icon>
-            </v-btn>
-            <v-btn color="primary" fab small dark>
-                <v-icon>fas fa-crosshairs</v-icon>
-            </v-btn>
+        <div style="position: absolute; top: 10px; left: 50px; z-index: 2000; text-align: center">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn color="accent" fab small dark v-on="on" style="margin-right: 10px">
+                        <v-icon>far fa-clock</v-icon>
+                    </v-btn>
+                </template>
+                <span>Naviguer dans le temps</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn color="primary" fab small dark v-on="on" style="margin-right: 10px">
+                        <v-icon>fas fa-layer-group</v-icon>
+                    </v-btn>
+                </template>
+                <span>Masquer/Afficher des informations</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn color="primary" fab small dark v-on="on" style="margin-right: 10px">
+                        <v-icon>fas fa-search</v-icon>
+                    </v-btn>
+                </template>
+                <span>Rechercher sur la carte</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn color="primary" fab small dark v-on="on" style="margin-right: 10px">
+                        <v-icon>fas fa-map-pin</v-icon>
+                    </v-btn>
+                </template>
+                <span>Ajouter des données</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn color="primary" fab small dark v-on="on" style="margin-right: 10px">
+                        <v-icon>fas fa-crosshairs</v-icon>
+                    </v-btn>
+                </template>
+                <span>Recentrer sur ma position</span>
+            </v-tooltip>
         </div>
     </div>
 </template>

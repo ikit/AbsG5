@@ -1,6 +1,11 @@
 <template>
-<div class="home" style="margin-top: 58px;">
+<div class="home">
+    <img
+        v-if="$vuetify.breakpoint.mdAndUp"
+        src="../assets/images/forum-new.png"
+        style="height: 120px; position: absolute; left: 10px;"/>
     <h1>Les discussions</h1>
+
     <v-container fluid grid-list-xl>
         <v-layout row wrap>
             <v-flex xs12>
@@ -289,24 +294,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/global.scss';
-
-h1 {
-    display: block;
-    font-size: 2em;
-    margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-    text-align: center;
-    color: $primary;
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
-    font-size: 40px;
-    font-family: "Comfortaa", sans-serif;
-    margin: 20px 0 20px 0;
-}
+@import '../themes/global.scss';
 
 .box {
     //margin: 14px;
@@ -317,12 +305,12 @@ h1 {
 .tbz {
     background-image: url('../assets/images/tbz.png');
 }
-.blabla {
-    background-image: url('../assets/images/forum-new.png');
-}
-.archives {
-    background-image: url('../assets/images/forum-archives.png');
-}
+// .blabla {
+//     background-image: url('../assets/images/forum-new.png');
+// }
+// .archives {
+//     background-image: url('../assets/images/forum-archives.png');
+// }
 
 h2 {
     display: inline-block;

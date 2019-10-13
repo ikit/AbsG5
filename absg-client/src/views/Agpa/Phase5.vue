@@ -72,7 +72,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../assets/global.scss';
+@import '../../themes/global.scss';
 
 h2 {
     font-family: 'Tangerine', serif;

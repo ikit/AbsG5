@@ -258,7 +258,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import './assets/global.scss';
+@import './themes/global.scss';
 .absg {
     font-size: 1.5em;
     line-height: 1.5em;

@@ -84,7 +84,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../assets/global.scss';
+@import '../../themes/global.scss';
 
 #content {
     text-align: center;

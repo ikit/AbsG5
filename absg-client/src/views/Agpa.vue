@@ -46,7 +46,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/global.scss';
+@import '../themes/global.scss';
 
 .agpa-menu {
     position: fixed;

@@ -3,14 +3,14 @@
     <img
         v-if="$vuetify.breakpoint.mdAndUp"
         src="../assets/images/immt-new.png"
-        style="width: 206px; height: 120px; position: absolute; top: -20px; left: 10px;"/>
+        style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
     <h1>L'agenda de la famille</h1>
 
     <v-tabs centered>
         <v-tab> <v-icon>fas fa-address-book</v-icon> &nbsp; Répertoire</v-tab>
-        <v-tab> <v-icon>fas fa-user-circle</v-icon> &nbsp; Trombinoscope</v-tab>
         <v-tab> <v-icon>fas fa-map-marked-alt</v-icon> &nbsp; Lieux</v-tab>
         <v-tab> <v-icon>fas fa-calendar-alt</v-icon> &nbsp; Calendrier</v-tab>
+        <v-tab> <v-icon>fas fa-user-circle</v-icon> &nbsp; Trombinoscope</v-tab>
         <v-tab> <v-icon>fas fa-sitemap</v-icon> &nbsp; Généalogie</v-tab>
 
         <v-tab-item>
@@ -35,12 +35,17 @@
         </v-tab-item>
         <v-tab-item>
             <v-card  flat  tile >
-                <v-card-text>coucou 2</v-card-text>
+                <v-card-text>annuaire des lieux G</v-card-text>
             </v-card>
         </v-tab-item>
         <v-tab-item>
             <v-card  flat  tile >
-                <v-card-text>coucou 3</v-card-text>
+                <v-card-text>Calendrier partagé</v-card-text>
+            </v-card>
+        </v-tab-item>
+        <v-tab-item>
+            <v-card  flat  tile >
+                <v-card-text>Trombinoscope</v-card-text>
             </v-card>
         </v-tab-item>
         <v-tab-item>
@@ -118,16 +123,26 @@ export default  {
         events: [],
         totalEvents: 0,
         genealogData: {
-            name: 'JavaScript',
+            name: 'LETOT Raymond',
             children: [
-                { name: 'Angular' },
                 {
-                    name: 'React',
-                    children: [{ name: 'Preact' }]
+                    name: 'GUEUDELOT Annie',
+                    children: [
+                        { name: 'Sébastien' },
+                        { name: 'Emmanuel' },
+                        { name: 'Olivier' }]
                 },
                 {
-                    name: 'Vue',
-                    children: [{ name: 'Moon' }]
+                    name: 'GUYOMARD Jocelyne',
+                    children: [
+                        { name: 'Julien' },
+                        { name: 'Fanny' },
+                        { name: 'Frédéric' },
+                        { name: 'Marion' }]
+                },
+                {
+                    name: 'GUIBERT Sylviane',
+                    children: [{ name: 'Thomas' }]
                 }
             ]
         }
@@ -154,22 +169,6 @@ export default  {
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/global.scss';
+@import '../themes/global.scss';
 
-h1 {
-    display: block;
-    font-size: 2em;
-    margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-    text-align: center;
-    color: $primary;
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
-    font-size: 40px;
-    font-family: "Comfortaa", sans-serif;
-    margin: 30px 0 60px 0;
-}
 </style>

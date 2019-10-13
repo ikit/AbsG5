@@ -3,7 +3,7 @@
     <img
         v-if="$vuetify.breakpoint.mdAndUp"
         src="../assets/images/citation-new.png"
-        style="width: 206px; height: 120px; position: absolute; top:-20px; left: 20px;"/>
+        style="width: 206px; height: 120px; position: absolute; left: 20px;"/>
     <h1>Les citations cultes</h1>
 
     <div>
@@ -255,24 +255,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/global.scss';
-
-h1 {
-    display: block;
-    font-size: 2em;
-    margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-    text-align: center;
-    color: $primary;
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
-    font-size: 40px;
-    font-family: "Comfortaa", sans-serif;
-    margin: 30px 0 60px 0;
-}
+@import '../themes/global.scss';
 
 .citation ::v-deep .note  {
     color: #999!important;

@@ -1,0 +1,68 @@
+
+.gold {
+    position: relative;
+    width: 150px;
+    text-align: center;
+    padding: .61538462em 1em;
+    vertical-align: middle;
+    color: #FFF;
+    border: 1px solid #07c;
+    border-radius: 2px;
+    background-color: #0095ff;
+    box-shadow: inset 0 1px 0 #66bfff;
+}
+.shiny {
+    overflow: hidden;
+}
+
+.shiny::after {
+    content: '';
+    display: block;
+    width: 70%;
+    background: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.2)50%, rgba(255, 255, 255, 0.7)100%); /* Safari 5.1-6.0 */
+    background: -o-linear-gradient(0deg, rgba(255, 255, 255, 0.2)50%, rgba(255, 255, 255, 0.7)100%); /* Opera 11.1-12.0 */
+    background: -moz-linear-gradient(0deg, rgba(255, 255, 255, 0.2)50%, rgba(255, 255, 255, 0.7)100%); /* Firefox 3.6-15 */
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.2)50%, rgba(255, 255, 255, 0.7)100%); /* Standard syntax */
+
+    left: -100%;
+    top: 0;
+    height: 100%;
+    position: absolute;
+    transition: none;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    -ms-transition: none;
+    -ms-transform: skewX(-20deg); /* IE 9 */
+    -webkit-transform: skewX(-20deg); /* Safari */
+    transform: skewX(-20deg);
+}
+
+.shiny:hover::after {
+    left: 150%;
+    transition: all 1s;
+    -webkit-transition: all 1s;
+    -moz-transition: all 1s;
+    -o-transition: all 1s;
+    -ms-transition: all 1s;
+}
+
+
+
+h1 {
+    color: #fff;
+    font-size: 8em;
+    line-height: 120px;
+    font-weight: bold;
+    font-family: 'Tangerine', serif;
+    text-shadow:
+        0 1px 0 #ccc, 0 2px 0 #c9c9c9,
+        0 3px 0 #bbb, 0 4px 0 #b9b9b9,
+        0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1),
+        0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3),
+        0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25),
+        0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15);
+    text-align: center;
+}
+

@@ -72,7 +72,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../assets/global.scss';
+@import '../themes/global.scss';
 h1 {
     margin-block-start: 0.67em;
     margin-block-end: 0.67em;

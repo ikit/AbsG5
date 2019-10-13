@@ -190,7 +190,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/global.scss';
+@import '../themes/global.scss';
 
 h1 {
     display: block;
