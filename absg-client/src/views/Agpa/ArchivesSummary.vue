@@ -1,25 +1,34 @@
 <template>
 <div>
 
-    <v-container fluid v-if="summary">
+    <v-container fluid v-if="summary" style="text-align: center;">
         <v-layout row wrap>
             <v-flex v-for="edition in summary" :key="edition.year" style="min-width: 380px; max-width:800px; width: 40%; margin: 15px">
                 <v-card>
-                    <v-img
-                        :src="getEditionPhoto(edition)"
-                        aspect-ratio="2.75">
-                    </v-img>
+                    <router-link :to="{path: '/agpa/archives/' + edition.year}">
+                        <v-img
+                            :src="getEditionPhoto(edition)"
+                            aspect-ratio="2.75">
+                        </v-img>
+                    </router-link>
 
                     <v-card-title primary-title style="position: relative">
                         <h3 class="headline mb-0">Edition {{ edition.year }} </h3>
                         <div style="position: absolute; top: 0; right: 15px; text-align: right;">
-                            <img v-for="author in edition.authors" :key="author.id" height="50px" :src="getAvatar(author)" :alt="getName(author)" />
+                            <v-tooltip v-for="author in edition.authors" :key="author.id">
+                                <template v-slot:activator="{ on }">
+                                    <img height="40px" :src="getAvatar(author)" :alt="getName(author)" />
+                                </template>
+                                <span>salut</span>
+                            </v-tooltip>
+
+
                         </div>
                     </v-card-title>
 
                     <v-card-actions style="position: relative">
-                        <router-link :to="{path: '/agpa/archives/' + edition.year}">
-                            <v-btn text color="accent" >Voir les photos</v-btn>
+                        <router-link :to="{path: '/agpa/archives/' + edition.year}" style="text-decoration: none">
+                            <v-btn text color="accent">Voir les photos</v-btn>
                         </router-link>
                         <div style="position: absolute; bottom: 20px; right: 15px; text-align: right; font-size: 0.9em;">
                             {{ edition.totalPhotos }} photos
