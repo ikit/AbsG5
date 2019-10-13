@@ -39,11 +39,13 @@
                     <v-card style="margin-top: 15px">
                         <v-container fluid>
                             <v-layout row wrap>
-                                <v-flex v-for="immt in immts" :key="immt.id" style="min-width: 200px; width: 15%; margin: 15px">
+                                <v-flex v-for="(immt, index) in immts" :key="immt.id" style="min-width: 200px; width: 15%; margin: 15px">
                                     <div>
                                         <div style="width: 200px; height: 200px; margin: auto;">
                                             <div style="width: 200px; height: 200px; display: table-cell; text-align: center; vertical-align: middle;">
-                                                <img class="thumb" :src="`http://absolumentg.fr/assets/img/immt/mini/${immt.id}.jpg`"/>
+                                                <img class="thumb"
+                                                    :src="immt.thumb"
+                                                    @click="photosGalleryDisplay(index)"/>
                                             </div>
                                         </div>
                                         <div style="">
@@ -53,7 +55,7 @@
                                                 {{ immt.title }}
                                             </div>
                                             <div style="text-align: center; font-size: 0.8em; opacity: 0.7">
-                                                {{ immt.poster.name }} le {{ immt.date }} </div>
+                                                {{ immt.username }} le {{ immt.date }} </div>
                                         </v-card>
                                     </div>
                                 </v-flex>
@@ -140,11 +142,13 @@
 import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../middleware/CommonHelper';
 import ImageUpload from '../components/ImageUpload.vue';
+import store from '../store';
 
 export default {
     components: {
         ImageUpload
     },
+    store,
     data: () => ({
         isLoading: false,
         totalImmts: 0,
@@ -169,20 +173,27 @@ export default {
             this.isLoading = true;
             axios.get(`/api/immt/init`).then(response => {
                 const data = parseAxiosResponse(response);
-                this.immts = data.immts.map(i => ({
-                    id: `${i.year}_${padNumber(i.day, 3)}`,
-                    poster: { name:  i.posterName, id: i.userId},
-                    title: i.title,
-                    date: new Date().toLocaleDateString()
-                }));
+                this.immts = data.immts.map(i => {
+                    const id = `${i.year}_${padNumber(i.day, 3)}`
+                    return {
+                        id,
+                        username: i.posterName,
+                        title: i.title,
+                        date: new Date().toLocaleDateString(),
+                        url: `http://absolumentg.fr/assets/img/immt/${id}.jpg`,
+                        thumb: `http://absolumentg.fr/assets/img/immt/mini/${id}.jpg`,
+                    }
+                });
                 this.totalImmts = data.total;
-
                 this.isLoading = false;
-                console.log(this);
+                store.commit('photosGalleryReset', this.immts);
             });
         }
     },
     methods: {
+        initGallery() {
+            store.commit('photosGalleryReset', this.immts);
+        },
         resetDialog (open = false) {
             this.immtEditor.open = open;
             this.immtEditor.citationId = null;
@@ -206,7 +217,11 @@ export default {
         },
         updateImmtsPerPage(count) {
             console.log("updateImmtsPerPage");
-        }
+        },
+        photosGalleryDisplay(index) {
+            store.commit('photosGallerySetIndex', index);
+            store.commit('photosGalleryDisplay');
+        },
     }
 }
 </script>
@@ -234,5 +249,6 @@ h1 {
     background: white;
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+    cursor: pointer;
 }
 </style>
