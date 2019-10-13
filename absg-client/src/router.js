@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
+import E404 from './views/E404.vue';
 
 Vue.use(Router);
 
@@ -90,6 +91,16 @@ export default new Router({
                     component: () => import('./views/Agpa/Ceremony.vue'),
                 }
             ]
+        },
+
+        // Error management
+        {
+            name: '404',
+            path: '/404',
+            component: E404 },
+        {
+            path: '*',
+            redirect: '/404'
         },
     ]
 });
