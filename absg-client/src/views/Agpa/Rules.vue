@@ -230,8 +230,13 @@ export default  {
     data: () => ({
 
     }),
-    methods: {
-    }
+    mounted () {
+        axios.get(`/api/agpa/rules`).then(response => {
+            this.current = response.status === 200 ? response.data : null;
+            this.error = response.status !== 200 ? response : null;
+            this.isLoading = false;
+        });
+    },
 };
 </script>
 

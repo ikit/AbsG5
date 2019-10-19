@@ -1,4 +1,8 @@
 
+html {
+    background: #000;
+}
+
 .gold {
     position: relative;
     width: 150px;
@@ -66,3 +70,21 @@ h1 {
     text-align: center;
 }
 
+.catHeader {
+    padding-left: 150px;
+    
+}
+.cat1 { 
+    color: #f99; 
+    background-image: url(../../../../assets/theme/agpa/img/c2-mini.png);
+}
+.cat2 { color: #F3DA80; }
+.cat3 { color: #69C841; }
+.cat4 { color: #FFA263; }
+.cat5 { color: #7BB9FF; }
+.cat6 { color: #E292FF; }
+.cat7 { color: #77E0CC; }
+.cat8 { color: #CED99A; }
+.cat-1 { color: #d0d0d0; }
+.cat-2 { color: #d0d0d0; }
+.cat-3 { color: #d0d0d0; }

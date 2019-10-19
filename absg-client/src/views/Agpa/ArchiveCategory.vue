@@ -46,7 +46,7 @@
                 <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextCat(-1)">
                     <v-icon>fas fa-chevron-left</v-icon>
                 </v-btn>
-                {{ this.$store.state.agpaMeta ? this.$store.state.agpaMeta.categories[category].title : '...' }}
+                {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
                 <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextCat(1)">
                     <v-icon>fas fa-chevron-right</v-icon>
                 </v-btn>
@@ -82,6 +82,7 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
+import { mapState } from 'vuex';
 
 export default {
     store,
@@ -93,13 +94,13 @@ export default {
         category: null,
         photosGalery: [],
         liteboxOn: false,
-        archivesMeta: {
-            maxYear: 2018,
-            minYear: 2006,
-            cats1: [1, 2, 3, 4, 5, 6, -2, -1],
-            cats2: [1, 2, 7, 3, 4, 5, 8, 6 ,-3, -2, -1]
-        }
     }),
+    computed: { ...mapState([
+        'agpaMeta',
+        'photosGallery',
+        'photosGalleryIndex',
+        'photosGalleryDisplayed'
+    ])},
     props: ['darkMode'],
     mounted () {
         this.initView();
@@ -120,7 +121,6 @@ export default {
                 this.error = response.status !== 200 ? response : null;
                 this.isLoading = false;
                 // Prepare photo galery
-                console.log(this.current);
                 if (this.current) {
                     let idx = 0;
                     for (let photo of this.current.photos) {
@@ -145,12 +145,12 @@ export default {
         },
         gotoNextYear(step) {
             let nextYear = this.year + step;
-            nextYear = nextYear > this.archivesMeta.maxYear ? this.archivesMeta.minYear : nextYear;
-            nextYear = nextYear < this.archivesMeta.minYear ? this.archivesMeta.maxYear : nextYear;
+            nextYear = nextYear > this.agpaMeta.maxYear ? this.agpaMeta.minYear : nextYear;
+            nextYear = nextYear < this.agpaMeta.minYear ? this.agpaMeta.maxYear : nextYear;
             this.$router.replace({path: `/agpa/archives/${nextYear}/${this.category}`});
         },
         gotoNextCat(step) {
-            const cats = this.year < 2012 ? this.archivesMeta.cats1 : this.archivesMeta.cats2;
+            const cats = this.year < 2012 ? this.agpaMeta.catBefore2012 : this.agpaMeta.catSince2012;
             let catIdx = cats.indexOf(this.category);
             catIdx += step;
             catIdx %= cats.length;

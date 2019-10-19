@@ -78,18 +78,6 @@ export async function getMetaData()
         cat8.variants[row.year] = { title:row.title,  description:row.description };
     }
 
-    // On récupère les meilleures photos de chaque éditions
-    for (let i in data.categories) { data.categories[i].photos = []; }
-    sql = `SELECT p.id, p.year, p.title, p.filename, p."categoryId"
-        FROM public.agpa_photo p INNER JOIN agpa_award a ON p.id=a."photoId" WHERE a."categoryId" = -2 ORDER BY p.year ASC`;
-    result = await repo.query(sql);
-    for (const row of result)
-    {
-        console.log(row);
-        console.log(data.categories[row.categoryId]);
-        data.categories[row.categoryId].photos.push(row);
-    }
-
 
     return data;
 }

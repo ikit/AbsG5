@@ -4,7 +4,7 @@
     <img
         v-if="$vuetify.breakpoint.mdAndUp"
         src="../assets/images/immt-new.png"
-        style="width: 206px; height: 120px; position: absolute; top: -20px; left: 10px;"/>
+        style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
     <h1>Absolument G Photos Awards</h1>
 
 
@@ -59,16 +59,13 @@ export default {
     z-index: 1000;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
 }
+
 h1 {
-    display: block;
     font-size: 5em;
+    line-height: 150px;
     font-weight: bold;
-    text-align: center;
-    color: $primary;
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
-    font-family: "Comfortaa", sans-serif;
-    margin: 20px 0;
     font-family: 'Tangerine', serif;
 }
+
+
 </style>

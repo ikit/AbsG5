@@ -194,18 +194,15 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 
 
 /**
- * archiveSummary
- * Récupère les infos a afficher pour le menu des archives
+ * Récupère les infos de chaque édition à afficher pour le sommaire des archives
  *
- * @return les infos pour construire le menu principal des archives
+ * @return any
  */
 export async function archiveSummary(): Promise<any>
 {
     const archivesSummary = [];
     // On récupère les photos et met à jour le contexte 
     const repo = getRepository(AgpaPhoto);
-
-    // On récupère les meilleures photos (avec agpa) de chaque éditions
 
     // On récupère les meilleures photos de chaque éditions
     const photos = new Map<Number, AgpaPhoto[]>();
@@ -265,29 +262,57 @@ export async function archiveSummary(): Promise<any>
 
 
 /**
- * archiveEdition
- * Récupère les infos a afficher pour le sommaire des archives d'une édition donnée
+ * Récupère les infos d'une édition donnée pour afficher son résumé
  *
- * @return les infos pour construire le menu des archives de l'édition demandée
+ * @return any
  */
 export async function archiveEdition(year: number): Promise<any>
 {
-    // On récupère les photos et met à jour le contexte 
+    // On récupère les photos
     const repo = getRepository(AgpaPhoto);
 
-    // On récupère les meilleures photos (avec AGPA) pour chaque éditions
-    const photos = [];
-    let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", a."userId" from agpa_photo p
-        INNER JOIN agpa_award a ON p.id = a."photoId"
-        WHERE p.year=${year}
-        ORDER BY p.year DESC, p."categoryId" ASC, a.award ASC`;
-    // On récupère les données
+    // Init data
+    let edition = {
+        categories: year < 2012 ? { 
+            '1': { photos: [], mines:[] },
+            '2': { photos: [], mines:[] },
+            '3': { photos: [], mines:[] },
+            '4': { photos: [], mines:[] },
+            '5': { photos: [], mines:[] },
+            '6': { photos: [], mines:[] },
+            '-2': { photos: [], mines:[] },
+            '-1': []} :{ 
+            '1': { photos: [], mines:[] },
+            '2': { photos: [], mines:[] },
+            '3': { photos: [], mines:[] },
+            '4': { photos: [], mines:[] },
+            '5': { photos: [], mines:[] },
+            '6': { photos: [], mines:[] },
+            '7': { photos: [], mines:[] },
+            '8': { photos: [], mines:[] },
+            '-3': { photos: [], mines:[] },
+            '-2': { photos: [], mines:[] },
+            '-1': []},
+        authors: []
+    }
+    
+    // On récupère les photos de chaque catégories
+    let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
+        FROM agpa_photo p
+        INNER JOIN "user" u ON u.id = p."userId" 
+        LEFT JOIN agpa_award a ON p.id = a."photoId"
+        WHERE p.year=${year} AND p."categoryId" > 0
+        ORDER BY p.gscore DESC`;
+    // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
     let result = await repo.query(sql);
     for (const row of result)
     {
         const p = new AgpaPhoto();
         p.fromJSON(row);
-        photos.push(p);
+        edition.categories[p.categoryId].photos.push(p);
+        if (p.user.id == 2) { // TODO: do it with authenticated session user
+            edition.categories[p.categoryId].mines.push(p);
+        }
     }
     
     // On récupère les meilleurs photographes
@@ -302,20 +327,19 @@ export async function archiveEdition(year: number): Promise<any>
     {
         authors.push(row);
     }
+    edition.authors = authors;
 
     // On récupère les données
     sql = `SELECT count(*) AS total FROM agpa_photo WHERE year=${year} GROUP BY year ORDER BY year DESC`;
     result = await repo.query(sql);
-    return {
-        year: year, 
-        totalPhotos: +result[0].total,
-        photos: photos,
-        authors: authors
-    };
+    
+    return edition;
 }
 
 
-
+/**
+ * Récupère les infos d'une catégorie pour afficher ses détails
+ */
 export async function archiveCategory(year: number, catId: number) {
     const category = {
         totalPhotos: 0,
@@ -327,13 +351,15 @@ export async function archiveCategory(year: number, catId: number) {
     const photos = new Map<Number, AgpaPhoto>();
     const repo = getRepository(AgpaPhoto);
 
-    // On récupère les photos pour chaque éditions
+
+
+    // On récupère les photos
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
         FROM agpa_photo p
         LEFT JOIN agpa_award a ON p.id = a."photoId"
         INNER JOIN "user" u ON u.id = p."userId" 
         WHERE p.year=${year} AND p."categoryId"=${catId}
-        ORDER BY p.ranking ASC`;
+        ORDER BY p.gscore DESC`;
     // On récupère les données
     let result = await repo.query(sql);
     for (const row of result)
