@@ -64,11 +64,14 @@
                             <div style="">
 
                             </div>
-                            <v-card class="shiny" style="margin-bottom: 50px" >
-                                <div style="text-align: center">
+                            <v-card class="card shiny" v-bind:class="{
+                                gold: photo.rank == 1,
+                                sylver: photo.rank === 2,
+                                bronze: photo.rank === 3 }" style="margin-bottom: 50px" >
+                                <div>
                                     {{ photo.title }}
                                 </div>
-                                <div> {{ photo.username }} </div>
+                                <div style="position: absolute; bottom: 5px; left: 5px; right: 5px; color: rgba(255,255,255,.8)"> {{ photo.username }} </div>
                             </v-card>
                         </div>
                     </v-flex>
@@ -128,7 +131,8 @@ export default {
                             url: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
                             thumb: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/vignette_${photo.filename}`,
                             title: photo.title,
-                            username: photo.user.username
+                            username: photo.user.username,
+                            rank: idx+1,
                         });
                         idx++;
                     }

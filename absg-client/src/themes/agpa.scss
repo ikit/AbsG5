@@ -3,18 +3,18 @@ html {
     background: #000;
 }
 
-.gold {
-    position: relative;
-    width: 150px;
-    text-align: center;
-    padding: .61538462em 1em;
-    vertical-align: middle;
-    color: #FFF;
-    border: 1px solid #07c;
-    border-radius: 2px;
-    background-color: #0095ff;
-    box-shadow: inset 0 1px 0 #66bfff;
-}
+// .gold {
+//     position: relative;
+//     width: 150px;
+//     text-align: center;
+//     padding: .61538462em 1em;
+//     vertical-align: middle;
+//     color: #FFF;
+//     border: 1px solid #07c;
+//     border-radius: 2px;
+//     background-color: #0095ff;
+//     box-shadow: inset 0 1px 0 #66bfff;
+// }
 .shiny {
     overflow: hidden;
 }
@@ -72,11 +72,11 @@ h1 {
 
 .catHeader {
     padding-left: 150px;
-    
+
 }
-.cat1 { 
-    color: #f99; 
-    background-image: url(../../../../assets/theme/agpa/img/c2-mini.png);
+.cat1 {
+    color: #f99;
+    background-image: url('~/assets/images/theme/agpa/c1-mini.png');
 }
 .cat2 { color: #F3DA80; }
 .cat3 { color: #69C841; }
@@ -88,3 +88,38 @@ h1 {
 .cat-1 { color: #d0d0d0; }
 .cat-2 { color: #d0d0d0; }
 .cat-3 { color: #d0d0d0; }
+
+
+.card {
+    padding: 5px;
+    text-shadow: 0px 2px rgba(0,0,0,.25);
+    height: 100px;
+    width: 270px;
+    margin: auto;
+    display: table;
+    :first-child {
+        display: table-cell;
+        height: 70px;
+        vertical-align: middle;
+        padding-bottom: 30px;
+    }
+}
+
+.gold {
+    background: #ffffff;
+    color: #ffffff;
+    background: linear-gradient(to bottom,  #ffffff 0%,#ecce00 25%,#e29300 90%,#c68b00 100%);
+}
+.sylver {
+    background: #ffffff;
+    color: #ffffff;
+    background: linear-gradient(to bottom,  #ffffff 0%,#d8d8d8 25%,#b7b7b7 90%,#9b9b9b 100%);
+}
+.bronze {
+    background: #ffffff;
+    color: #ffffff;
+    background: linear-gradient(to bottom, #fff 0%,#964c31 10%,#aa3c01 90%,#931b00 100%);
+}
+.nominated {
+
+}
