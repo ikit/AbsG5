@@ -35,7 +35,7 @@
 
             <v-container fluid v-if="current && agpaMeta">
                 <v-layout row wrap v-for="(cat, catIdx) in current.categories" :key="catIdx">
-                    <h2 :class="`cat${catIdx}`">{{ agpaMeta.categories[catIdx].title }}</h2>
+                    <h2 :class="`catHeader cat${catIdx}`">{{ agpaMeta.categories[catIdx].title }}</h2>
 
                 </v-layout>
             </v-container>
