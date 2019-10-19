@@ -15,14 +15,12 @@
                     <v-card-title primary-title style="position: relative">
                         <h3 class="headline mb-0">Edition {{ edition.year }} </h3>
                         <div style="position: absolute; top: 0; right: 15px; text-align: right;">
-                            <v-tooltip v-for="author in edition.authors" :key="author.id">
+                            <v-tooltip bottom v-for="author in edition.authors" :key="author.id">
                                 <template v-slot:activator="{ on }">
-                                    <img height="40px" :src="getAvatar(author)" :alt="getName(author)" />
+                                    <img style="height: 40px; margin-top: 10px;" :src="getAvatar(author)" :alt="getName(author)" v-on="on"/>
                                 </template>
-                                <span>salut</span>
+                                <span>salut {{ getName(author) }}</span>
                             </v-tooltip>
-
-
                         </div>
                     </v-card-title>
 
