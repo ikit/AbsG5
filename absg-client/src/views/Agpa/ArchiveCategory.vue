@@ -11,7 +11,25 @@
 
         <div v-if="current">
             <v-card style="line-height: 75px; margin: 30px 20px; font-family: 'Tangerine', serif; color: orange; font-size: 3em;">
-                Edition
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <router-link :to="{path: '/agpa/archives/' }" style="text-decoration: none;  position: absolute; left: 10px; line-height: 65px;">
+                            <v-icon style="color: orange; vertical-align: middle" v-on="on">fas fa-bars</v-icon>
+                        </router-link>
+                    </template>
+                    <span>Retour au sommaire des archives</span>
+                </v-tooltip>
+
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <router-link :to="{path: '/agpa/archives/' + year }" style="text-decoration: none; color: orange">
+                            <span v-on="on">Edition</span>
+                        </router-link>
+                    </template>
+                    <span>Retour au sommaire de l'édition {{ year }}</span>
+                </v-tooltip>
                 <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextYear(-1)">
                     <v-icon>fas fa-chevron-left</v-icon>
                 </v-btn>
@@ -28,30 +46,10 @@
                 <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextCat(-1)">
                     <v-icon>fas fa-chevron-left</v-icon>
                 </v-btn>
-                {{ category }}
+                {{ this.$store.state.agpaMeta ? this.$store.state.agpaMeta.categories[category].title : '...' }}
                 <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextCat(1)">
                     <v-icon>fas fa-chevron-right</v-icon>
                 </v-btn>
-
-                <v-menu offset-y :close-on-content-click="false">
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn text icon color="orange" style="vertical-align: inherit;" v-bind="attrs" v-on="on">
-                            <v-icon>fas fa-bars</v-icon>
-                        </v-btn>
-                    </template>
-
-                    <v-list>
-                        <v-list-item
-                            v-for="(filter, index) in filters"
-                            :key="index">
-                            <v-list-item-action>
-                                <v-checkbox v-model="filter.selected"></v-checkbox>
-                            </v-list-item-action>
-                            <v-list-item-title>{{ filter.text }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-
             </v-card>
 
             <v-container fluid v-if="current">
@@ -66,7 +64,7 @@
                             <div style="">
 
                             </div>
-                            <v-card style="margin-bottom: 50px">
+                            <v-card class="shiny" style="margin-bottom: 50px" >
                                 <div style="text-align: center">
                                     {{ photo.title }}
                                 </div>
@@ -122,6 +120,7 @@ export default {
                 this.error = response.status !== 200 ? response : null;
                 this.isLoading = false;
                 // Prepare photo galery
+                console.log(this.current);
                 if (this.current) {
                     let idx = 0;
                     for (let photo of this.current.photos) {
@@ -164,6 +163,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
+@import '../../themes/agpa.scss';
 
 #content {
     text-align: center;
