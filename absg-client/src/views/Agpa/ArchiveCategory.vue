@@ -71,7 +71,7 @@
                                 <div>
                                     {{ photo.title }}
                                 </div>
-                                <div style="position: absolute; bottom: 5px; left: 5px; right: 5px; color: rgba(255,255,255,.8)"> {{ photo.username }} </div>
+                                <div style="position: absolute; bottom: 5px; left: 5px; right: 5px; opacity:.5"> {{ photo.username }} </div>
                             </v-card>
                         </div>
                     </v-flex>
@@ -188,5 +188,6 @@ h2:hover {
     background: white;
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+    cursor: pointer;
 }
 </style>

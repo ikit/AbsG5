@@ -4,7 +4,7 @@
             <v-layout row wrap>
                 <v-flex stretch>
                     <v-card style="min-width: 500px;">
-                        <v-card-title style="border-bottom: 1px solid rgba(0,0,0, 0.1)"> <h1>{{ todayLabel }}</h1>
+                        <v-card-title style="border-bottom: 1px solid rgba(0,0,0, 0.1)"> <h2>{{ todayLabel }}</h2>
                             <div style="position: absolute; right: 15px">
                                 <v-btn fab small color="accent"
                                     @click="$refs.calendar.prev()">
@@ -102,14 +102,14 @@
                 <v-flex>
                     <v-card>
                         <v-card-title>
-                            <h1>Passa G
+                            <h2>Passa G
                             <v-btn text
                                 style="position: absolute; right: 15px; top: 15px;"
                                 @click.stop="">
                                 <v-icon left>far fa-clock</v-icon>historique
                             </v-btn>
 
-                            </h1>
+                            </h2>
                         </v-card-title>
 
                         <v-list class="passageRow">
@@ -392,7 +392,7 @@ export default {
 }
 
 
-h1 {
+h2 {
     text-transform: capitalize;
     margin-block-start: 0.67em;
     margin-block-end: 0.67em;
