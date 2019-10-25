@@ -2,7 +2,7 @@
 <div>
     <img
         v-if="$vuetify.breakpoint.mdAndUp"
-        src="../assets/images/immt-new.png"
+        src="/img/immt-new.png"
         style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
     <h1>Les images du moment</h1>
 
@@ -202,7 +202,7 @@ export default {
         },
         saveImmt: function () {
             this.citations.push({
-                authorAvatar: `./img/avatars/016.png`,
+                authorAvatar: `/img/avatars/016.png`,
                 authorId: 16,
                 authorName: this.immtEditor.author,
                 citation: this.immtEditor.citation,

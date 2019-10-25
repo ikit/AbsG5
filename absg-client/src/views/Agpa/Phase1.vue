@@ -70,7 +70,7 @@ h3 {
     display: block;
     width: 200px;
     line-height: 200px;
-    background: transparent url('../../assets/images/theme/agpa/photoSlot.png') 0 0 no-repeat;
+    background: transparent url('/img/agpa/photoSlot.png') 0 0 no-repeat;
 }
 .emptySlot:hover {
     cursor: pointer;

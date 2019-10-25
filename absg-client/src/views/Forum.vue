@@ -178,7 +178,7 @@ export default {
         },
         saveCitation: function () {
             this.citations.push({
-                authorAvatar: `./img/avatars/016.png`,
+                authorAvatar: `/img/avatars/016.png`,
                 authorId: 16,
                 authorName: this.citationEditor.author,
                 citation: this.citationEditor.citation,
@@ -216,13 +216,13 @@ h1 {
     //padding-left: 200px;
 }
 .tbz {
-    background-image: url('../assets/images/tbz.png');
+    background-image: url('/img/tbz.png');
 }
 .blabla {
-    background-image: url('../assets/images/forum-new.png');
+    background-image: url('/img/forum-new.png');
 }
 .archives {
-    background-image: url('../assets/images/forum-archives.png');
+    background-image: url('/img/forum-archives.png');
 }
 
 h2 {

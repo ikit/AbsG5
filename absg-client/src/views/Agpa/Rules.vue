@@ -274,7 +274,7 @@ h1 {
     }
 
     li {
-        list-style-image: url('../../assets/images/theme/agpa/puce.png');
+        list-style-image: url('/img/agpa/puce.png');
     }
 
     .number {

@@ -271,7 +271,7 @@ export default {
 #bgcontent {
     width: 100%;
     height: 100%;
-    // background-image: url('./assets/images/background/r00.png');
+    // background-image: url('/img/background/r00.png');
     // background-position: center;
     // background-size: cover;
     // background-attachment: fixed;

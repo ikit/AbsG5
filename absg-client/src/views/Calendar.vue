@@ -2,7 +2,7 @@
 <div class="home" style="margin-top: 58px;">
     <h1>Le calendrier de la famille</h1>
     <v-card style="margin: 14px">
-        <img src="../assets/images/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-85px; left: 20px;"/>
+        <img src="/img/citation-new.png" style="width: 206px; height: 120px; position: absolute; top:-85px; left: 20px;"/>
         <v-form>
             <v-container>
                 <v-layout>

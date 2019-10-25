@@ -3,7 +3,7 @@
 
     <img
         v-if="$vuetify.breakpoint.mdAndUp"
-        src="../assets/images/immt-new.png"
+        src="/img/immt-new.png"
         style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
     <h1>Absolument G Photos Awards</h1>
 

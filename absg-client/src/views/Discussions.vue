@@ -2,7 +2,7 @@
 <div class="home">
     <img
         v-if="$vuetify.breakpoint.mdAndUp"
-        src="../assets/images/forum-new.png"
+        src="/img/forum-new.png"
         style="height: 120px; position: absolute; left: 10px;"/>
     <h1>Les discussions</h1>
 
@@ -191,7 +191,7 @@ export default {
                 {
                     user: {
                         id: 2,
-                        avatar: `./img/avatars/002.png`,
+                        avatar: `/img/avatars/002.png`,
                         username: 'Olive',
                         rootFamilly: 'gueudelot',
                     },
@@ -203,7 +203,7 @@ export default {
                 {
                     user: {
                         id: 13,
-                        avatar: `./img/avatars/013.png`,
+                        avatar: `/img/avatars/013.png`,
                         username: 'Poupette',
                         rootFamilly: 'guyomard',
                     },
@@ -215,7 +215,7 @@ export default {
                 {
                     user: {
                         id: 15,
-                        avatar: `./img/avatars/015.png`,
+                        avatar: `/img/avatars/015.png`,
                         username: 'Sylve',
                         rootFamilly: 'guibert',
                     },
@@ -233,7 +233,7 @@ export default {
                 {
                     user: {
                         id: 2,
-                        avatar: `./img/avatars/002.png`,
+                        avatar: `/img/avatars/002.png`,
                         username: 'Olive',
                         rootFamilly: 'gueudelot',
                     },
@@ -245,7 +245,7 @@ export default {
                 {
                     user: {
                         id: 13,
-                        avatar: `./img/avatars/013.png`,
+                        avatar: `/img/avatars/013.png`,
                         username: 'Poupette',
                         rootFamilly: 'guyomard',
                     },
@@ -257,7 +257,7 @@ export default {
                 {
                     user: {
                         id: 15,
-                        avatar: `./img/avatars/015.png`,
+                        avatar: `/img/avatars/015.png`,
                         username: 'Sylve',
                         rootFamilly: 'guibert',
                     },
@@ -282,7 +282,7 @@ export default {
         },
         saveCitation: function () {
             this.citations.push({
-                authorAvatar: `./img/avatars/016.png`,
+                authorAvatar: `/img/avatars/016.png`,
                 authorId: 16,
                 authorName: this.citationEditor.author,
                 citation: this.citationEditor.citation,
@@ -303,13 +303,13 @@ export default {
     //padding-left: 200px;
 }
 .tbz {
-    background-image: url('../assets/images/tbz.png');
+    background-image: url('/img/tbz.png');
 }
 // .blabla {
-//     background-image: url('../assets/images/forum-new.png');
+//     background-image: url('/img/forum-new.png');
 // }
 // .archives {
-//     background-image: url('../assets/images/forum-archives.png');
+//     background-image: url('/img/forum-archives.png');
 // }
 
 h2 {

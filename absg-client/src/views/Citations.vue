@@ -2,11 +2,11 @@
 <div>
     <img
         v-if="$vuetify.breakpoint.mdAndUp"
-        src="../assets/images/citation-new.png"
+        src="/img/citation-new.png"
         style="width: 206px; height: 120px; position: absolute; left: 20px;"/>
     <h1>Les citations cultes</h1>
 
-    <div>
+    <div v-if="citations && citations.length > 0">
         <v-container fluid  grid-list-md>
             <v-data-iterator
                 :items="citations"
@@ -125,6 +125,17 @@
         </v-container>
     </div>
 
+    <div v-if="!citations || citations.length == 0"
+        style="text-align:center;">
+        <p style="margin: 70px auto">Aucune citation n'a encore été enregistrée... soyez le premier !</p>
+        <v-btn
+            color="accent"
+            @click.stop="resetDialog(true)">
+            <v-icon left>fas fa-plus</v-icon>
+            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
+        </v-btn>
+    </div>
+
 
     <v-dialog v-model="citationEditor.open" width="800px">
         <v-card>
@@ -153,7 +164,6 @@
 
                             <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
                             <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                                N'oubliez pas de mettre les guillemets doubles autour de la citation.
                                 Si vous ajoutez des précisions à la citation, merci de les mettre entre double parenthèses: "La citation" ((ma précision)).
                             </p>
                         </div>
@@ -234,7 +244,7 @@ export default {
         },
         saveCitation: function () {
             this.citations.push({
-                authorAvatar: `./img/avatars/016.png`,
+                authorAvatar: `/img/avatars/016.png`,
                 authorId: 16,
                 authorName: this.citationEditor.author,
                 citation: this.citationEditor.citation,

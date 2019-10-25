@@ -94,13 +94,13 @@ export default new Router({
         },
 
         // Error management
-        {
-            name: '404',
-            path: '/404',
-            component: E404 },
-        {
-            path: '*',
-            redirect: '/404'
-        },
+        // {
+        //     name: '404',
+        //     path: '/404',
+        //     component: E404 },
+        // {
+        //     path: '*',
+        //     redirect: '/404'
+        // },
     ]
 });
