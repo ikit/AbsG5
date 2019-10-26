@@ -34,30 +34,23 @@
 
 
             <v-container fluid v-if="current && agpaMeta">
-                <v-layout row wrap v-for="(cat, catIdx) in current.categories" :key="catIdx">
+                <v-layout row wrap v-for="(cat, catIdx) in categories" :key="catIdx">
                     <h2 :class="`catHeader cat${catIdx}`">{{ agpaMeta.categories[catIdx].title }}</h2>
 
-                    <v-container fluid v-if="cat.photos">
+                    <v-container fluid v-if="cat">
                         <v-layout row wrap>
-                            <v-flex v-for="idx in [0, 1, 2, 3, 4]" :key="idx" style="min-width: 250px; width: 15%; margin: 15px">
+                            <v-flex v-for="photo in cat" :key="photo.idx" style="min-width: 250px; width: 15%; margin: 15px">
                                 <div>
                                     <div style="width: 250px; height: 250px; margin: auto;">
                                         <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                            <img class="thumb" :src="cat.photos[idx].thumb" @click="photosGalleryDisplay(index)"/>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                        <img class="thumb" :src="photo.thumb" @click="photosGalleryDisplay(photo.idx)"/>
+                                                </template>
+                                                <span>{{ photo.username }} - {{ photo.title }}</span>
+                                            </v-tooltip>
                                         </div>
                                     </div>
-                                    <div style="">
-
-                                    </div>
-                                    <v-card class="card shiny" v-bind:class="{
-                                        gold: cat.photos[idx].ranking == 1,
-                                        sylver: cat.photos[idx].ranking === 2,
-                                        bronze: cat.photos[idx].ranking === 3 }" style="margin-bottom: 50px" >
-                                        <div>
-                                            {{ cat.photos[idx].title }}
-                                        </div>
-                                        <div style="position: absolute; bottom: 5px; left: 5px; right: 5px; opacity:.5"> {{ cat.photos[idx].user.username }} </div>
-                                    </v-card>
                                 </div>
                             </v-flex>
                         </v-layout>
@@ -74,6 +67,7 @@
 import axios from 'axios';
 import store from '../../store';
 import { mapState } from 'vuex';
+import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 
 export default {
     store,
@@ -82,12 +76,12 @@ export default {
         current: null,
         error: null,
         year: 0,
+        photosGalery: [],
+        categories: {}
     }),
     computed: { ...mapState([
         'agpaMeta',
         'photosGallery',
-        'photosGalleryIndex',
-        'photosGalleryDisplayed'
     ])},
     props: ['darkMode'],
     mounted () {
@@ -107,9 +101,37 @@ export default {
             axios.get(`/api/agpa/archives/${this.year}`).then(response => {
                 this.current = response.status === 200 ? response.data : null;
                 this.error = response.status !== 200 ? response : null;
+                // Prepare photo galery
+                if (this.current) {
+                    let idx = 0;
+                    for (let catId in this.current.categories) {
+                        const cat = this.current.categories[catId];
+                        if (catId > 0) {
+                            const photos = [];
+                            let max = 4;
+                            for (let photo of cat.photos) {
+                                const p = agpaPhotoToGalleryPhoto(photo);
+                                p.idx = idx;
+                                photos.push(p);
+                                this.photosGalery.push(p);
+                                idx++;
+                                max--;
+                                if (max === 0) break;
+                            }
+                            this.categories[catId] = photos;
+                        }
+                    }
+                    store.commit('photosGalleryReset', this.photosGalery);
+                }
                 this.isLoading = false;
-                console.log(this.current);
             });
+        },
+        photosGalleryDisplay(index) {
+            store.commit('photosGallerySetIndex', index);
+            store.commit('photosGalleryDisplay');
+        },
+        photosGalleryHide() {
+            store.commit('photosGalleryHide');
         },
         gotoNextYear(step) {
             let nextYear = this.year + step;
@@ -136,6 +158,7 @@ export default {
     background: white;
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+    cursor: pointer;
 }
 
 </style>

@@ -86,6 +86,8 @@
 import axios from 'axios';
 import store from '../../store';
 import { mapState } from 'vuex';
+import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
+
 
 export default {
     store,
@@ -95,14 +97,11 @@ export default {
         error: null,
         year: 0,
         category: null,
-        photosGalery: [],
         liteboxOn: false,
+        photosGalery: []
     }),
     computed: { ...mapState([
-        'agpaMeta',
-        'photosGallery',
-        'photosGalleryIndex',
-        'photosGalleryDisplayed'
+        'agpaMeta'
     ])},
     props: ['darkMode'],
     mounted () {
@@ -117,27 +116,20 @@ export default {
         initView() {
             // Reset photos list
             this.photosGalery = [];
+            this.photosGalleryIndex = 0;
             this.year = Number.parseInt(this.$route.params.year);
             this.category = Number.parseInt(this.$route.params.catId);
             axios.get(`/api/agpa/archives/${this.year}/${this.$route.params.catId}`).then(response => {
                 this.current = response.status === 200 ? response.data : null;
                 this.error = response.status !== 200 ? response : null;
-                this.isLoading = false;
                 // Prepare photo galery
                 if (this.current) {
-                    let idx = 0;
                     for (let photo of this.current.photos) {
-                        this.photosGalery.push({
-                            url: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/${photo.filename}`,
-                            thumb: `http://absolumentg.fr/assets/img/agpa/${this.year}/mini/vignette_${photo.filename}`,
-                            title: photo.title,
-                            username: photo.user.username,
-                            rank: idx+1,
-                        });
-                        idx++;
+                        this.photosGalery.push(agpaPhotoToGalleryPhoto(photo));
                     }
                     store.commit('photosGalleryReset', this.photosGalery);
                 }
+                this.isLoading = false;
             });
         },
         photosGalleryDisplay(index) {

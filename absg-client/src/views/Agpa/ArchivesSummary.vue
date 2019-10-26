@@ -19,7 +19,7 @@
                                 <template v-slot:activator="{ on }">
                                     <img style="height: 40px; margin-top: 10px;" :src="getAvatar(author)" :alt="getName(author)" v-on="on"/>
                                 </template>
-                                <span>salut {{ getName(author) }}</span>
+                                <span>{{ getName(author) }}</span>
                             </v-tooltip>
                         </div>
                     </v-card-title>
