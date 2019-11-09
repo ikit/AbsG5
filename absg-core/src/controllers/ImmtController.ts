@@ -35,7 +35,7 @@ export class ImmtController {
      * @param year l'année de l'immt
      * @param day  le jour dans l'année de l'immt
      */
-    @Get('/:year/:day')
+    @Get('/:year([0-9]{4})/:day([0-9]{1,3})')
     async getById(@Param("year") year: number, @Param("day") day: number) {
         try {
             return success(await immtService.fromId(year, day));
@@ -66,7 +66,7 @@ export class ImmtController {
         }
     }
 
-    @Delete('/:year/:day')
+    @Delete('/:year([0-9]{4})/:day([0-9]{1,3})')
     async remove(@Param("year") year: number, @Param("day") day: number) {
         try {
             return success(await immtService.remove(year, day));

@@ -24,7 +24,7 @@ export class CitationController {
         }
     }
 
-    @Get('/:id')
+    @Get('/:id([0-9]+)')
     async getById(@Param("id") id: number) {
         try {
             return success(await citationService.fromId(id));
@@ -33,7 +33,7 @@ export class CitationController {
         }
     }
 
-    @Get('/author/:id')
+    @Get('/author/:id([0-9]+)')
     async getByAuthor(@Param("id") id: number) {
         try {
             return success(await citationService.fromAuthor(id));

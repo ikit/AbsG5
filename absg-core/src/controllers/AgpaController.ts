@@ -24,22 +24,22 @@ export class AgpaController {
         return agpaService.getArchiveSummary();
     }
 
-    @Get('/archives/:year')
+    @Get('/archives/:year([0-9]{4})')
     getEdition(@Param("year") year: number) {
         return agpaService.getArchiveEdition(year);
     }
-    @Get('/archives/:year/:catId')
+    @Get('/archives/:year([0-9]{4})/:catId([0-9]{1,2})')
     getCategory(@Param("year") year: number, @Param("catId") catId: number) {
         return agpaService.getArchiveCategory(year, catId);
     }
 
-    @Get('/archives/:year/files')
+    @Get('/archives/:year([0-9]{4})/files')
     getArchivesFile(@Param("year") year: number) {
         // TODO
         return "zip download from cloud";
     }
     
-    @Get('/ceremony/:year')
+    @Get('/ceremony/:year([0-9]{4})')
     async getCeremony(@Param("year") year: number) {
         // TODO
         const rawData = await this.photosRepo.query(`SELECT * FROM agpa_photo LIMIT 2`);
@@ -60,7 +60,7 @@ export class AgpaController {
     }
 
 
-    @Delete('/:photoId')
+    @Delete('/:photoId([0-9]+)')
     async remove(@Param("photoId") photoId: number) {
 
         return "this.citationsRepo.remove(citation)";
