@@ -1,12 +1,5 @@
 <template>
 <div>
-    <img
-        v-if="$vuetify.breakpoint.mdAndUp"
-        src="/img/immt-new.png"
-        style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
-    <h1>Les images du moment</h1>
-
-
     <div>
         <v-container fluid  grid-list-md>
             <v-data-iterator
@@ -140,9 +133,9 @@
 
 <script>
 import axios from 'axios';
-import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../middleware/CommonHelper';
-import ImageUpload from '../components/ImageUpload.vue';
-import store from '../store';
+import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
+import ImageUpload from '../../components/ImageUpload.vue';
+import store from '../../store';
 
 export default {
     components: {
@@ -227,7 +220,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../themes/global.scss';
+@import '../../themes/global.scss';
 
 .thumb {
     background: white;

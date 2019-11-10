@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import E404 from './views/E404.vue';
+import Changelog from './views/Changelog.vue';
 
 Vue.use(Router);
 
@@ -28,6 +29,32 @@ export default new Router({
             path: '/photos',
             name: 'photos',
             component: () => import('./views/Photos.vue'),
+            children: [
+                {
+                    path: '',
+                    redirect: '/photos/immt'
+                },
+                {
+                    path: 'immt',
+                    component: () => import('./views/Photos/Immt.vue'),
+                },
+                {
+                    path: 'random',
+                    component: () => import('./views/Photos/Random.vue'),
+                },
+                {
+                    path: 'loose',
+                    component: () => import('./views/Photos/Loose.vue'),
+                },
+                {
+                    path: 'sorting',
+                    component: () => import('./views/Photos/ToSort.vue'),
+                },
+                {
+                    path: 'albums',
+                    component: () => import('./views/Photos/Albums.vue'),
+                }
+            ]
         },
         {
             path: '/cloud',

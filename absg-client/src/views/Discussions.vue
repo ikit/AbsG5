@@ -4,8 +4,27 @@
         v-if="$vuetify.breakpoint.mdAndUp"
         src="/img/forum-new.png"
         style="height: 120px; position: absolute; left: 10px;"/>
-    <h1>Les discussions</h1>
 
+
+
+    <h1 style="position: relative">Les discussions
+        <v-btn
+            style="position: absolute; top: 57px; right: 14px"
+            color="accent"
+            @click.stop="newDiscussion()">
+            <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
+        </v-btn>
+
+    </h1>
+
+    <v-tabs centered>
+
+        <v-tab> <v-icon>fas fa-comment-dots</v-icon> &nbsp; T.B.Z.</v-tab>
+        <v-tab> <v-icon>far fa-comment</v-icon> &nbsp; Lanslevillard</v-tab>
+        <v-tab> <v-icon>far fa-comment</v-icon> &nbsp; Malaucène</v-tab>
+        <v-tab> <v-icon>far fa-comment-dots</v-icon> &nbsp; A.G.P.A.</v-tab>
+        <v-tab> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
+    </v-tabs>
     <v-container fluid grid-list-xl>
         <v-layout row wrap>
             <v-flex xs12>
@@ -24,8 +43,7 @@
 
                             <v-list-item
                                 :key="item.title"
-                                avatar
-                                @click="">
+                                avatar>
                             <v-list-item-avatar>
                                 <img :src="item.user.avatar">
                             </v-list-item-avatar>
@@ -59,8 +77,7 @@
 
                             <v-list-item
                                 :key="item.title"
-                                avatar
-                                @click="">
+                                avatar>
                             <v-list-item-avatar>
                                 <img :src="item.user.avatar">
                             </v-list-item-avatar>
@@ -111,11 +128,6 @@
                     color="accent"
                     @click.stop="resetDialog(true)">
                     <v-icon left>fas fa-archive</v-icon>Voir les archives
-                </v-btn>
-                <v-btn
-                    color="accent"
-                    @click.stop="newDiscussion()">
-                    <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
                 </v-btn>
             </v-flex>
         </v-layout>
