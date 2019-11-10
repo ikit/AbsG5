@@ -16,18 +16,13 @@ export default new Router({
             component: Home,
         },
         {
-            path: '/changelog',
-            name: 'changelog',
-            component: Changelog
-        },
-        {
             path: '/citations',
             name: 'citations',
             component: () => import('./views/Citations.vue'),
         },
+        // Photos
         {
             path: '/photos',
-            name: 'photos',
             component: () => import('./views/Photos.vue'),
             children: [
                 {
@@ -57,11 +52,6 @@ export default new Router({
             ]
         },
         {
-            path: '/cloud',
-            name: 'cloud',
-            component: () => import('./views/Cloud.vue'),
-        },
-        {
             path: '/voyag',
             name: 'voyag',
             component: () => import('./views/VoyaG.vue'),
@@ -83,9 +73,35 @@ export default new Router({
         },
         {
             path: '/agenda',
-            name: 'agenda',
             component: () => import('./views/Agenda.vue'),
+            children: [
+                {
+                    path: '',
+                    redirect: '/agenda/directory'
+                },
+                {
+                    path: 'directory',
+                    component: () => import('./views/Agenda/Directory.vue'),
+                },
+                {
+                    path: 'locations',
+                    component: () => import('./views/Agenda/Locations.vue'),
+                },
+                {
+                    path: 'events',
+                    component: () => import('./views/Agenda/Events.vue'),
+                },
+                {
+                    path: 'trombi',
+                    component: () => import('./views/Agenda/Trombi.vue'),
+                },
+                {
+                    path: 'genealogy',
+                    component: () => import('./views/Agenda/Genealogy.vue'),
+                }
+            ]
         },
+        // AGPA
         {
             path: '/agpa',
             component: () => import('./views/Agpa.vue'),
@@ -123,6 +139,12 @@ export default new Router({
                     component: () => import('./views/Agpa/Ceremony.vue'),
                 }
             ]
+        },
+        // Pages uniques
+        {
+            path: '/changelog',
+            name: 'changelog',
+            component: Changelog
         },
 
         // Error management
