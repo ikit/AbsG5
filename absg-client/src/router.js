@@ -15,14 +15,19 @@ export default new Router({
             component: Home,
         },
         {
+            path: '/changelog',
+            name: 'changelog',
+            component: Changelog
+        },
+        {
             path: '/citations',
             name: 'citations',
             component: () => import('./views/Citations.vue'),
         },
         {
-            path: '/immt',
-            name: 'immt',
-            component: () => import('./views/Immt.vue'),
+            path: '/photos',
+            name: 'photos',
+            component: () => import('./views/Photos.vue'),
         },
         {
             path: '/cloud',
@@ -94,13 +99,14 @@ export default new Router({
         },
 
         // Error management
-        // {
-        //     name: '404',
-        //     path: '/404',
-        //     component: E404 },
-        // {
-        //     path: '*',
-        //     redirect: '/404'
-        // },
+        {
+            path: '/404',
+            name: '404',
+            component: E404
+        },
+        {
+            path: '*',
+            redirect: '/404'
+        },
     ]
 });

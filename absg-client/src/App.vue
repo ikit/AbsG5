@@ -77,6 +77,13 @@
                     </div>
                 </template>
             </v-list>
+
+            <div class="menuItem" style="position: absolute; bottom: 0; border-top: 1px solid rgba(0, 0, 0, 0.2)">
+                <router-link to="/changelog">
+                    <v-icon color="inherit">far fa-question-circle</v-icon><br/>
+                    <span style="display: inline-block; line-height: 0.9em;">v5 apha.5</span>
+                </router-link>
+            </div>
         </div>
         <div class="mainContent" >
             <router-view></router-view>
@@ -176,6 +183,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import store from './store';
+import { mapState } from 'vuex';
 import ClientOAuth2 from 'client-oauth2';
 
 
@@ -200,7 +208,7 @@ export default {
     drawer: null,
     items: [
         { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
-        { icon: 'fas fa-image', text: 'Images du moment', route: '/immt' },
+        { icon: 'fas fa-image', text: 'Photos', route: '/photos' },
         { icon: 'fas fa-comment', text: 'Discussions', route: '/discussions' },
         { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
         { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
@@ -230,6 +238,9 @@ export default {
         }
     },
     computed: {
+        ...mapState([
+            'notifications'
+        ]),
         citation () {
             return this.$store.state.citation;
         },
