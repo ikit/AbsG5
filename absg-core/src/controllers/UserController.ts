@@ -3,7 +3,7 @@ import { JsonController, Post, Body, BadRequestError, Get } from "routing-contro
 import { User } from "../entities";
 
 
-import { authService, citationService, immtService } from "../services";
+import { authService, citationService, immtService, userService } from "../services";
 import { success } from "../middleware/jsonHelper";
 
 @JsonController('/users')
@@ -54,9 +54,9 @@ export class UserController {
         const result = {
             immt: await immtService.last(),
             citation: await citationService.random(),
-            events: [],
+            events: [{}],
             passag: [],
-            logs: [],
+            logs: await userService.checkNotifications(1),
             user: {}
         }
 
