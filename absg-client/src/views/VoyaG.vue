@@ -3,9 +3,20 @@
 
 
         <div id="map-wrap" style="height: 100vh">
-            <l-map :zoom="zoom" :center="center">
+            <l-map ref="theMap" :zoom="zoom" :center="center">
                 <l-tile-layer :url="url"></l-tile-layer>
-                <l-marker :lat-lng="center"></l-marker>
+                <l-marker-cluster>
+                    <l-marker v-for="p in persons" :key="p.id" :lat-lng="p.location">
+                        <l-icon
+                            :icon-size="dynamicSize"
+                            :icon-anchor="dynamicAnchor"
+                            :icon-url="p.avatar.url"
+                        />
+                        <l-popup>
+                            {{ p.avatar.label }}
+                        </l-popup>
+                    </l-marker>
+                </l-marker-cluster>
             </l-map>
         </div>
 
@@ -57,45 +68,66 @@
 
 <script>
 import Vue from 'vue';
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip } from 'vue2-leaflet';
-import { Icon, latLng } from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import axios from 'axios';
+import { parseAxiosResponse, getPeopleAvatar } from '../middleware/CommonHelper';
+import { LMap, LTileLayer, LMarker, LPopup, LTooltip, LIcon } from 'vue2-leaflet';
+import Vue2LeafletMarkerCluster from 'vue2-leaflet-markercluster'
+import { latLng } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
-// this part resolve an issue where the markers would not appear
-delete Icon.Default.prototype._getIconUrl;
-Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png')
-});
 
 export default {
-    name: "Example",
     components: {
         LMap,
         LTileLayer,
         LMarker,
         LPopup,
-        LTooltip
+        LTooltip,
+        LIcon,
+        'l-marker-cluster': Vue2LeafletMarkerCluster
     },
-    data() {
-        return {
-            zoom: 13,
-            center: latLng(47.41322, -1.219482),
-            url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
-            currentCenter: latLng(47.41322, -1.219482),
-            showParagraph: false,
-            mapOptions: {
-                zoomSnap: 0.5
-            },
-        };
+    data: () => ({
+        zoom: 13,
+        center: latLng(47.41322, -1.219482),
+        url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
+        currentCenter: latLng(47.41322, -1.219482),
+        showParagraph: false,
+        mapOptions: {
+            zoomSnap: 0.5
+        },
+        persons: [],
+        iconSize: 64
+    }),
+    mounted () {
+        //console.log(this.$refs.theMap);
+        axios.get(`/api/voyag`).then(response => {
+            const data = parseAxiosResponse(response);
+            this.persons = data;
+            this.persons = data.map(i => ({
+                id: i.id,
+                personId: i.personId,
+                avatar: getPeopleAvatar(i),
+                location: latLng(i.lastLocation[0], i.lastLocation[1])
+            }));
+
+            this.isLoading = false;
+        });
+
+    },
+    computed: {
+        dynamicSize() {
+            return [this.iconSize, this.iconSize * 1.15];
+        },
+        dynamicAnchor() {
+            return [this.iconSize / 2, this.iconSize * 1.15];
+        }
     },
     methods: {
         zoomUpdate(zoom) {
             this.zoom = zoom;
         },
         centerUpdate(center) {
-            this.zoom = center;
+            this.currentCenter = center;
         },
         showLongText() {
             this.showParagraph = !this.showParagraph;
@@ -109,4 +141,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~leaflet.markercluster/dist/MarkerCluster.css";
+@import "~leaflet.markercluster/dist/MarkerCluster.Default.css";
+
 </style>

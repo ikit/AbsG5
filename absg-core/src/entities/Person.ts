@@ -54,4 +54,7 @@ export class Person {
     @OneToMany(type => Website, website => website.id)
     websites: Website[];
 
+    @Column("json", { nullable: true, comment: 'Dernière coordonnée GPS connu pour la personne (VoyaG)' })
+    lastLocation: string;
+
 }

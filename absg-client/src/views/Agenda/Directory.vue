@@ -26,9 +26,6 @@ import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 
 export default  {
-    components: {
-        VoBasic
-    },
     data: () => ({
         personEditor: {
             open: false,

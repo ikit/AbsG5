@@ -15,11 +15,6 @@ export default new Router({
             name: 'home',
             component: Home,
         },
-        {
-            path: '/citations',
-            name: 'citations',
-            component: () => import('./views/Citations.vue'),
-        },
         // Photos
         {
             path: '/photos',
@@ -51,26 +46,43 @@ export default new Router({
                 }
             ]
         },
-        {
-            path: '/voyag',
-            name: 'voyag',
-            component: () => import('./views/VoyaG.vue'),
-        },
+        // Discussions
         {
             path: '/discussions',
-            name: 'discussions',
             component: () => import('./views/Discussions.vue'),
+            children: [
+                {
+                    path: '',
+                    redirect: '/discussions/directory'
+                },
+                {
+                    path: 'directory',
+                    component: () => import('./views/Agenda/Directory.vue'),
+                },
+                {
+                    path: 'locations',
+                    component: () => import('./views/Agenda/Locations.vue'),
+                },
+                {
+                    path: 'events',
+                    component: () => import('./views/Agenda/Events.vue'),
+                },
+                {
+                    path: 'trombi',
+                    component: () => import('./views/Agenda/Trombi.vue'),
+                },
+                {
+                    path: 'genealogy',
+                    component: () => import('./views/Agenda/Genealogy.vue'),
+                }
+            ]
         },
         {
             path: '/discussions/forum/:id',
             name: 'forum',
-            component: () => import('./views/Forum.vue'),
+            component: () => import('./views/Discussions/Forum.vue'),
         },
-        {
-            path: '/calendrier',
-            name: 'calendar',
-            component: () => import('./views/Calendar.vue'),
-        },
+        // Agenda
         {
             path: '/agenda',
             component: () => import('./views/Agenda.vue'),
@@ -141,6 +153,16 @@ export default new Router({
             ]
         },
         // Pages uniques
+        {
+            path: '/citations',
+            name: 'citations',
+            component: () => import('./views/Citations.vue'),
+        },
+        {
+            path: '/voyag',
+            name: 'voyag',
+            component: () => import('./views/VoyaG.vue'),
+        },
         {
             path: '/changelog',
             name: 'changelog',

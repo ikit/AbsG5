@@ -5,3 +5,4 @@ export * from './CitationService';
 export * from './ImmtService';
 export * from './AgendaService';
 export * from './UserService';
+export * from './VoyagService';
