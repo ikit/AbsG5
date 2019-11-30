@@ -81,7 +81,7 @@
             <div class="menuItem" style="position: absolute; bottom: 0; border-top: 1px solid rgba(0, 0, 0, 0.2)">
                 <router-link to="/changelog">
                     <v-icon color="inherit">far fa-question-circle</v-icon><br/>
-                    <span style="display: inline-block; line-height: 0.9em;">v5 apha.5</span>
+                    <span style="display: inline-block; line-height: 0.9em;">v5 apha</span>
                 </router-link>
             </div>
         </div>
@@ -114,6 +114,8 @@
                         {{photoDisplayed.title}}
                     </div>
                 </div>
+            </div>
+            <div class="photoEditor" v-if="photosEditorDisplayed">
             </div>
         </div>
     </v-content>
@@ -203,18 +205,18 @@ export default {
     name: 'App',
     store,
     data: () => ({
-    dialog: false,
-    darkMode: false,
-    drawer: null,
-    items: [
-        { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
-        { icon: 'fas fa-image', text: 'Photos', route: '/photos' },
-        { icon: 'fas fa-comment', text: 'Discussions', route: '/discussions' },
-        { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
-        { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
-        { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
-        { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
-    ]
+        dialog: false,
+        darkMode: false,
+        drawer: null,
+        items: [
+            { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
+            { icon: 'fas fa-image', text: 'Photos', route: '/photos' },
+            { icon: 'fas fa-comment', text: 'Discussions', route: '/discussions' },
+            { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
+            { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
+            { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
+            { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
+        ]
     }),
     props: {
         source: String
@@ -247,6 +249,7 @@ export default {
         user () {
             return this.$store.state.user;
         },
+        // Gallerie photos
         photosGalleryDisplayed() {
             return this.$store.state.photosGalleryDisplayed;
         },
@@ -262,7 +265,10 @@ export default {
             }
             return 'http://localhost:8080/img/immt-new.png';
         },
-
+        // Editeur photos
+        photosEditorDisplayed() {
+            return this.$store.state.photosEditorDisplayed;
+        }
     }
 };
 </script>

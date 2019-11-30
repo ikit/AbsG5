@@ -12,9 +12,12 @@ export default new Vuex.Store({
         currentMonthEvents: [],
         passag: [],
         notifications: [],
+        // Galerie photos
         photosGallery: [],
         photosGalleryIndex: 0,
         photosGalleryDisplayed: false,
+        // Editeur photo
+        photosEditorDisplayed: false,
         todayLabel: new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
         agpaMeta: null,
     },

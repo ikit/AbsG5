@@ -134,6 +134,18 @@ export default {
         },
         innerClick() {
             alert("Click!");
+        },
+        onUpdateMyPosition () {
+            if(navigator.geolocation) {
+                vigator.geolocation.getCurrentPosition(this.showPosition);
+            }else{
+                displayError("La géolocalisation n'est pas supoportée par votre navigateur web.");
+                this.error = "Geolocation is not supported.";
+            }
+        },
+        showPosition:function (position) {
+            this.lat = position.coords.latitude;
+            this.lon = position.coords.longitude;
         }
     }
 };

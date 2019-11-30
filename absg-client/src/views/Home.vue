@@ -113,7 +113,7 @@
                         </v-card-title>
 
                         <v-list class="passageRow">
-                        <template v-for="(item, i1) in passage">
+                        <template v-for="item in passage">
                             <v-list-item
                                 :key="item.title"
                                 ripple>
@@ -135,7 +135,11 @@
                 </v-flex>
 
             </v-layout>
+            <v-layout row wrap>
+                <div id="coke" data-src="/img/cube.jpg" data-depth-src="/img/cube-depth.jpg"></div>
+            </v-layout>
         </v-container>
+
 
     </div>
 </template>
@@ -148,6 +152,7 @@ import store from '../store';
 import axios from 'axios';
 import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
+import * as image3D from '3d-image';
 
 Vue.use(VueSilentbox);
 
@@ -307,6 +312,9 @@ export default {
     }),
     mounted() {
         this.getWelcomData();
+        var coke = document.getElementById("coke");
+        console.log(image3D)
+        //image3D.process(coke);
     },
     watch: {
         menu (val) {

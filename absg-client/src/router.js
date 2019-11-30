@@ -53,11 +53,11 @@ export default new Router({
             children: [
                 {
                     path: '',
-                    redirect: '/discussions/directory'
+                    redirect: '/discussions/tbz'
                 },
                 {
-                    path: 'directory',
-                    component: () => import('./views/Agenda/Directory.vue'),
+                    path: 'tbz',
+                    component: () => import('./views/Discussions/Tbz.vue'),
                 },
                 {
                     path: 'locations',
