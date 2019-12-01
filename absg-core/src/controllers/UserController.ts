@@ -3,7 +3,7 @@ import { JsonController, Post, Body, BadRequestError, Get } from "routing-contro
 import { User } from "../entities";
 
 
-import { authService, citationService, immtService, userService } from "../services";
+import { authService, citationService, eventService, immtService, userService } from "../services";
 import { success } from "../middleware/jsonHelper";
 
 @JsonController('/users')
@@ -51,10 +51,11 @@ export class UserController {
     @Get('/welcom')
     async welcom() {
         console.log("welcome !")
+        const current = new Date();
         const result = {
             immt: await immtService.last(),
             citation: await citationService.random(),
-            events: [{}],
+            events: await eventService.getForMonth(current.getFullYear(), current.getMonth()),
             passag: [],
             logs: await userService.checkNotifications(1),
             user: {}

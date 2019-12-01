@@ -18,7 +18,6 @@ export default new Vuex.Store({
         photosGalleryDisplayed: false,
         // Editeur photo
         photosEditorDisplayed: false,
-        todayLabel: new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
         agpaMeta: null,
     },
     mutations: {
