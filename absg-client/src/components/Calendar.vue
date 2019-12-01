@@ -24,13 +24,10 @@
                     <v-list>
                         <v-list-item-group>
                         <v-list-item v-for="(filter, index) in filters" :key="index">
-                            <template v-slot:default="{ active, toggle }">
+                            <template >
                                 <v-list-item-action>
-                                <v-checkbox
-                                    v-model="filter.selected"
-                                    color="primary"
-                                    @click="toggle"
-                                ></v-checkbox>
+                                <v-checkbox v-model="filter.selected"
+                                    ></v-checkbox>
                                 </v-list-item-action>
 
                                 <v-list-item-content>
@@ -163,8 +160,7 @@ export default {
     },
     methods: {
         loadMonthEvents() {
-            //let url = `/api/event`;
-            if (!this.start) return // url =;
+            if (!this.start) return
             axios.get( `/api/event/${this.start.year}/${this.start.month-1}`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
