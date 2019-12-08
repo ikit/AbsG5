@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Param, Body, Get, Post, Delete, NotFoundError } from "routing-controllers";
+import { JsonController, Param, Body, Get, Post, Delete, NotFoundError, Authorized } from "routing-controllers";
 import { Immt } from "../entities";
 
 import { immtService } from "../services";
@@ -13,6 +13,7 @@ export class ImmtController {
     /**
      * Renvoie la dernière image du moment en date
      */
+    @Authorized()
     @Get('')
     async last() {
         return await immtService.last();
@@ -21,6 +22,7 @@ export class ImmtController {
     /**
      * Récupère les infos pour initialiser l'écran des Immt
      */
+    @Authorized()
     @Get('/init')
     async initData() {
         try {
@@ -35,6 +37,7 @@ export class ImmtController {
      * @param year l'année de l'immt
      * @param day  le jour dans l'année de l'immt
      */
+    @Authorized()
     @Get('/:year([0-9]{4})/:day([0-9]{1,3})')
     async getById(@Param("year") year: number, @Param("day") day: number) {
         try {
@@ -48,6 +51,7 @@ export class ImmtController {
      * Récupère les immt en fonction des données de filtrage fournis
      * @param filteringData 
      */
+    @Authorized()
     @Post('/')
     async get(@Body() filteringData: any) {
         try {
@@ -57,6 +61,7 @@ export class ImmtController {
         }
     }
 
+    @Authorized()
     @Post('/')
     async save(@Body() citation: Immt) {
         try {
@@ -66,6 +71,7 @@ export class ImmtController {
         }
     }
 
+    @Authorized()
     @Delete('/:year([0-9]{4})/:day([0-9]{1,3})')
     async remove(@Param("year") year: number, @Param("day") day: number) {
         try {

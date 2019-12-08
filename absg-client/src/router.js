@@ -3,10 +3,11 @@ import Router from 'vue-router';
 import Home from './views/Home.vue';
 import E404 from './views/E404.vue';
 import Changelog from './views/Changelog.vue';
+import Login from './views/Login.vue'
 
 Vue.use(Router);
 
-export default new Router({
+export const router = new Router({
     mode: 'history',
     base: process.env.BASE_URL,
     routes: [
@@ -154,6 +155,11 @@ export default new Router({
         },
         // Pages uniques
         {
+            path: '/login',
+            name: 'login',
+            component: Login,
+        },
+        {
             path: '/citations',
             name: 'citations',
             component: () => import('./views/Citations.vue'),
@@ -181,3 +187,20 @@ export default new Router({
         },
     ]
 });
+
+router.beforeEach((to, from, next) => {
+    // redirect to login page if not logged in and trying to access a restricted page
+    console.log("beforeEach")
+    const publicPages = ['/login'];
+    const authRequired = !publicPages.includes(to.path);
+    const loggedIn = localStorage.getItem('user');
+
+    console.log("localStorage", localStorage);
+    console.log("authRequired", authRequired);
+    console.log("loggedIn", loggedIn);
+    if (authRequired && !loggedIn) {
+      return next('/login');
+    }
+
+    next();
+  })

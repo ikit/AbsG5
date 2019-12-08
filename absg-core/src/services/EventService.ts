@@ -22,7 +22,6 @@ class EventService {
             AND ("startMonth" IS NULL OR "startMonth" <= ${month})
             AND ("endMonth" IS NULL OR "endMonth" >= ${month})`;
         let result = await this.repo.query(q);
-        console.log(q)
         return result.map(e => this.formatDateFromDatabase(e));
     }
 

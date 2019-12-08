@@ -1,5 +1,5 @@
 import { getRepository, Equal } from "typeorm";
-import { JsonController, Post, Body, BadRequestError, Get } from "routing-controllers";
+import { JsonController, Post, Body, BadRequestError, Get, Authorized } from "routing-controllers";
 import { User } from "../entities";
 
 
@@ -16,6 +16,7 @@ export class VoyagController {
      * Récupère les données initiales de la section voyaG:
      *  - Dernière position en date pour chaque utilisateur actif
      */
+    @Authorized()
     @Get('/')
     async welcom() {
         const result = await voyagService.getInitData();

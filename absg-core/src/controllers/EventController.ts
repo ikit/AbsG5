@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Param, Body, Get, Post, Delete, NotFoundError } from "routing-controllers";
+import { JsonController, Param, Body, Get, Post, Delete, NotFoundError, Authorized } from "routing-controllers";
 import { EventG } from "../entities";
 
 import { eventService } from "../services";
@@ -13,6 +13,7 @@ export class EventController {
     /**
      * Renvoie les événements pour le mois en cours
      */
+    @Authorized()
     @Get('')
     async current() {
         const current = new Date();
@@ -22,6 +23,7 @@ export class EventController {
     /**
      * Renvoie les événements pour le mois demandé
      */
+    @Authorized()
     @Get('/:year([0-9]{4})/:month([0-9]{1,2})')
     async getMonth(@Param("year") year: number, @Param("month") month: number) {
         const result = await eventService.getForMonth(year, month);

@@ -1,4 +1,4 @@
-import { JsonController, Param, Body, Get, Post, Delete, NotFoundError } from "routing-controllers";
+import { JsonController, Param, Body, Get, Post, Delete, NotFoundError, Authorized } from "routing-controllers";
 import { Citation } from "../entities";
 import { citationService } from "../services";
 import { success, issue } from "../middleware/jsonHelper";
@@ -6,6 +6,7 @@ import { success, issue } from "../middleware/jsonHelper";
 @JsonController('/citations')
 export class CitationController {
 
+    @Authorized()
     @Get('')
     async getRandom() {
         try {
@@ -15,6 +16,7 @@ export class CitationController {
         }
     }
 
+    @Authorized()
     @Get('/init')
     async initData() {
         try {
@@ -24,6 +26,7 @@ export class CitationController {
         }
     }
 
+    @Authorized()
     @Get('/:id([0-9]+)')
     async getById(@Param("id") id: number) {
         try {
@@ -33,6 +36,7 @@ export class CitationController {
         }
     }
 
+    @Authorized()
     @Get('/author/:id([0-9]+)')
     async getByAuthor(@Param("id") id: number) {
         try {
@@ -42,6 +46,7 @@ export class CitationController {
         }
     }
 
+    @Authorized()
     @Post('/')
     async get(@Body() filteringData: any) {
         try {
@@ -51,6 +56,7 @@ export class CitationController {
         }
     }
 
+    @Authorized()
     @Post('/')
     async save(@Body() citation: Citation) {
         try {
@@ -60,6 +66,7 @@ export class CitationController {
         }
     }
 
+    @Authorized()
     @Delete('/:id')
     async remove(@Param("id") id: number) {
         try {

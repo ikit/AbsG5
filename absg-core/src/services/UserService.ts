@@ -9,7 +9,11 @@ class UserService {
 
     public initService() {
         this.usersRepo = getRepository(User);
+
+        
     }
+
+
 
     /**
      * Retourne les infos nécessaire à l'initialisation de l'écran "citation" du site
@@ -43,6 +47,13 @@ class UserService {
             }
         ]
     }
+
+
+
+    /**
+     * 
+     */
+    
 }
 
 export const userService = new UserService();
