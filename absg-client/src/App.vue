@@ -24,19 +24,19 @@
                 <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; " v-html="citation.citation"></span>
             </div>
         </v-spacer>
-        <v-badge color="accent" overlap>
+        <v-badge color="accent" style="margin-right: 15px" overlap v-if="user">
             <span slot="badge">8</span>
             <v-btn icon
                 @click.stop="dialog = !dialog">
                 <v-icon>fas fa-bell</v-icon>
             </v-btn>
         </v-badge>
-        <v-menu offset-y bottom left>
+        <v-menu offset-y bottom left v-if="user">
             <template v-slot:activator="{ on, attrs }">
                 <v-btn depressed color="primary" v-bind="attrs" v-on="on">
-                    Bébé Ma'anne
+                    {{ user.username }}
                     <!-- <v-icon right>fas fa-user-circle</v-icon> -->
-                    <img src="/img/avatars/009.png" style="height: 40px; margin-left: 15px" />
+                    <img :src="user.avatarUrl" style="height: 40px; margin-left: 15px" />
                 </v-btn>
             </template>
 
@@ -66,7 +66,7 @@
     </v-app-bar>
 
     <v-content id="bgcontent">
-        <div class="menu">
+        <div class="menu" v-if="user">
             <v-list style="background: none">
                 <template v-for="item in items">
                     <div class="menuItem" v-if="!item.roles || checkUserRolesMatch(item.roles)" :key="item.text">
@@ -216,6 +216,7 @@ export default {
         },
         photosGalleryHide() {
             store.commit('photosGalleryHide');
+            console.log("couc", this.user);
         },
         photosGalleryPrev() {
             store.commit('photosGalleryPrev');
@@ -232,14 +233,10 @@ export default {
     },
     computed: {
         ...mapState([
+            'citation',
+            'user',
             'notifications'
         ]),
-        citation () {
-            return this.$store.state.citation;
-        },
-        user () {
-            return this.$store.state.user;
-        },
         // Gallerie photos
         photosGalleryDisplayed() {
             return this.$store.state.photosGalleryDisplayed;

@@ -1,17 +1,3 @@
-/**
- * Retourne le header à utiliser pour authentifier les requêtes avec l'API
- */
-export function authHeader() {
-    //
-    let user = JSON.parse(localStorage.getItem('user'));
-
-    if (user && user.token) {
-        return { 'Authorization': 'Bearer ' + user.token };
-    } else {
-        return {};
-    }
-}
-
 
 /**
  * Analyse la réponse retourné par axios, afin de traiter les cas d'erreur
@@ -19,6 +5,9 @@ export function authHeader() {
  * @param {any} response
  */
 export function parseAxiosResponse(response) {
+    if (!response) {
+        return null;
+    }
 
     console.log('parseAxiosResponse', response);
     if (response.status !== 200) {

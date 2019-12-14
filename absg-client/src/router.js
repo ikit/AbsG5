@@ -191,30 +191,45 @@ export const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-    // redirect to login page if not logged in and trying to access a restricted page
-    console.log("beforeEach")
+    // Si la page nécessite une authent ou non
     const publicPages = ['/login'];
     const authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('user');
 
-    console.log("localStorage", localStorage);
-    console.log("authRequired", authRequired);
-    console.log("loggedIn", loggedIn);
-    if (authRequired && !loggedIn) {
+    // Les infos de l'utilisateur authentifié
+    let user = localStorage.getItem('user');
+    if (user) {
+        user = JSON.parse(user);
+    }
+
+    // Si accés restreint et pas d'authent, on redirige vers la page de login
+    if (authRequired && !user) {
       return next('/login');
+    }
+
+    // On s'assure que le header d'authent est correctement paramétré
+    if (user && !axios.defaults.headers.common['Authorization']) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+        store.commit('login', user);
     }
 
     next();
   })
 
 
+// On intercepte les requêtes qui échouent, pour rediriger en conséquence
 axios.interceptors.response.use(function (response) {
     return response
 }, function (error) {
-    console.log("axios.interceptors", error.response)
     if (error.response.status === 401) {
         store.dispatch('logout');
-        router.push('/login');
+        return router.push('/login');
     }
+    if (error.response.status === 500) {
+        console.log("TODO: 500", error.response);
+        return router.push('/404');
+    }
+    // Pour tout le reste on redirige vers 404
+    console.log("TODO: NOT MANAGED ERROR", error.response)
+    router.push('/404');
     return Promise.reject(error)
 })

@@ -1,24 +1,28 @@
 <template>
-    <form  v-on:submit="login" method="post">
-        <div>
-            <label>Identifiant:</label>
-            <v-text-field
-                prepend-icon="fas fa-user"
-                placeholder="Login"
-                v-model="username">
-            </v-text-field>
-        </div>
-        <div>
-            <v-text-field
-                prepend-icon="fas fa-lock"
-                placeholder="Mot de passe"
-                v-model="password">
-            </v-text-field>
-        </div>
-        <div>
-            <v-btn color="accent" @click="login()">Se connecter</v-btn>
-        </div>
-    </form>
+    <v-card style="width: 400px; padding:50px; margin: auto; margin-top: 100px">
+        <form  v-on:submit="login" method="post" >
+            <div>
+                <v-text-field
+                    prepend-icon="fas fa-user"
+                    label="Identifiant"
+                    :outlined="true"
+                    v-model="username">
+                </v-text-field>
+            </div>
+            <div>
+                <v-text-field
+                    prepend-icon="fas fa-lock"
+                    label="Mot de passe"
+                    :outlined="true"
+                    type="password"
+                    v-model="password">
+                </v-text-field>
+            </div>
+            <div style="text-align: center">
+                <v-btn color="accent" @click="login()">Se connecter</v-btn>
+            </div>
+        </form>
+    </v-card>
 </template>
 
 
@@ -26,18 +30,17 @@
 <script>
 import Vue from 'vue';
 import axios from 'axios';
+import store from '../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../middleware/CommonHelper';
 
 export default {
     name: "Login",
     data: () => ({
-        username: "Olive",
+        username: "",
         password: ""
     }),
     methods: {
         login: function () {
-
-            localStorage.setItem("toto", "coucou");
 
         let data = {
             username: this.username,
@@ -48,7 +51,7 @@ export default {
                 const user = parseAxiosResponse(response);
                 if (user && user.token) {
                     // On sauvegarde les infos sur l'utilisateurs dans le store
-                    // TODO
+                    store.commit('login', user);
                     // On sauvegarde localement le token de session dans le navigateur
                     localStorage.setItem('user', JSON.stringify(user));
                     // On indique à axios que désormais chaque requête faites à l'API devra transmettre le token de session dans le header
