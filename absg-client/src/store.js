@@ -76,6 +76,12 @@ export default new Vuex.Store({
         }
     },
         actions: {
+            login(data) {
+                console.log("TODO: STORE LOGIN")
+            },
+            logout() {
+                console.log("TODO: STORE LOGOUT")
+            },
             photosGalleryNext(context) {
                 state.photosGalleryIndex = 0;
             }

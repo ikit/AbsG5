@@ -23,7 +23,7 @@ export class User {
     token: string;
 
     @Column("json", { comment: 'users authorisations', nullable: true })
-    acl: any;
+    roles: any;
 
     @Column("json", { comment: 'use to compute notifications for the user', nullable: true })
     lastActivity: any;

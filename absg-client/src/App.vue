@@ -69,7 +69,7 @@
         <div class="menu">
             <v-list style="background: none">
                 <template v-for="item in items">
-                    <div class="menuItem" v-if="!item.children" :key="item.text">
+                    <div class="menuItem" v-if="!item.roles || checkUserRolesMatch(item.roles)" :key="item.text">
                         <router-link :to="item.route">
                             <v-icon color="inherit">{{ item.icon }}</v-icon><br/>
                             <span style="display: inline-block; line-height: 1.1em;">{{ item.text }}</span>
@@ -202,13 +202,18 @@ export default {
             { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
             { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
             { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
+            { icon: 'fas fa-cog', text: 'Admin', route: '/admin', roles: ["admin"]  },
         ]
     }),
     props: {
         source: String
     },
     methods: {
-
+        checkUserRolesMatch(roles) {
+            let result = true;
+            console.log("checkUserRolesMatch", roles);
+            return result;
+        },
         photosGalleryHide() {
             store.commit('photosGalleryHide');
         },

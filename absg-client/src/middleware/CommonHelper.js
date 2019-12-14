@@ -20,6 +20,7 @@ export function authHeader() {
  */
 export function parseAxiosResponse(response) {
 
+    console.log('parseAxiosResponse', response);
     if (response.status !== 200) {
         // http error
         console.log('NETWORK ERROR', response);

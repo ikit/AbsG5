@@ -232,6 +232,9 @@ export default {
 
                 this.isLoading = false;
                 console.log(this);
+            }).catch( err => {
+                console.log("ERR", JSON.stringify(err));
+                return this.$router.replace({path: `/login`});
             });
         }
     },

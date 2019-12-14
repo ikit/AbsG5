@@ -3,7 +3,9 @@ import Router from 'vue-router';
 import Home from './views/Home.vue';
 import E404 from './views/E404.vue';
 import Changelog from './views/Changelog.vue';
-import Login from './views/Login.vue'
+import Login from './views/Login.vue';
+import axios from 'axios';
+import store from './store';
 
 Vue.use(Router);
 
@@ -204,3 +206,15 @@ router.beforeEach((to, from, next) => {
 
     next();
   })
+
+
+axios.interceptors.response.use(function (response) {
+    return response
+}, function (error) {
+    console.log("axios.interceptors", error.response)
+    if (error.response.status === 401) {
+        store.dispatch('logout');
+        router.push('/login');
+    }
+    return Promise.reject(error)
+})

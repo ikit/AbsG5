@@ -1,12 +1,12 @@
 import "reflect-metadata";
 import { createConnections } from "typeorm";
 import { createExpressServer } from "routing-controllers";
-import * as path from 'path';
 import * as bodyParser from "body-parser";
-import * as morgan from 'morgan';
 import rfs from 'rotating-file-stream';
 import { Init } from './init';
+import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
+
 import { agpaService, citationService, immtService, agendaService, voyagService, eventService } from "./services";
 
 const ormconfig = require(`../ormconfig.${process.env.NODE_ENV}.json`);
@@ -34,14 +34,10 @@ createConnections(ormconfig).then(() => {
         currentUserChecker
     });
 
-    app.use(bodyParser.json());
-
-    // prepare logs
-    const accessLogStream = rfs('access.log', {
-        interval: '1d', 
-        path: path.join(__dirname, 'logs')
-    });
-    app.use(morgan('combined', { stream: accessLogStream }));
+    app.use(bodyParser.json()); // parse request as JSON
+    app.use(accessLogHandler()); // access logs
+    app.use(errorLogHandler()); // error logs
+    
         
     // start express server
     app.listen(5000);
@@ -55,4 +51,9 @@ createConnections(ormconfig).then(() => {
     
     console.log('---');
     
-}).catch(error => console.log(error));
+  })
+  .catch(error => {
+    console.error(error);
+    logger.error(error);
+  });
+

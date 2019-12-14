@@ -71,6 +71,7 @@ export async function localAuthorizationChecker(action: Action, roles: string[])
  * @returns boolean true is the user is authorized
  */
 export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
+    console.log("jwtAuthorizationChecker")
     // on récupère le header authorization
     const authorization: string = action.request.headers['authorization'];
     if (!authorization) {
