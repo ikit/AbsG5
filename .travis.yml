@@ -19,9 +19,15 @@ cache:
 install:
   - cd absg-core
   - npm install
+  - cd ../absg-client
+  - npm install
+  - cd ..
 
 script:
-  - npm build
+  - cd absg-core
+  - npm run build
+  - cd ../absg-client
+  - npm run build
 #  - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
 
 
