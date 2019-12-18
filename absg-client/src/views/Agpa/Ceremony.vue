@@ -7,16 +7,18 @@
                     <h2>2018</h2>
                 </section>
 
-                <section v-for="(slide, cidx) in slides" :key="cidx">
+                <section v-for="(slide, cidx) in slides" :key="cidx" style="width:100%; height:100%">
                     <div v-if="slide.type === 'category'">
                         <h3>Categorie {{ slide.id }}</h3>
-                        <img :src="`/img/agpa/cupesMaxi/c${slide.id}.jpg`" class="catIllustration"/>
+                        <img :src="`/img/agpa/cupesMaxi/c${slide.id}.png`" class="catIllustration"/>
                     </div>
                     <div v-if="slide.type === 'photo'">
-                        <div style="position: relative; padding: 50px; height: 70vh;">
-                            <img :src="slide.url"/>
-                            <div style="text-align: center">
+                        <div style="position: absolute; top:0; left:0; right:0; bottom:0">
+                            <v-img class="photo" :src="slide.url" :contain="true" aspect-ratio="1"></v-img>
+                            <div class="photoInfo">
                                 {{slide.title}}
+                                <img src="http://absolumentg.fr/assets/img/avatars/012.png" class="authorAvatar"/>
+                                <img src="http://absolumentg.fr/assets/theme/agpa/img/cupes/c2-bronze.png" class="award"/>
                             </div>
                         </div>
                     </div>
@@ -71,7 +73,7 @@ export default {
                 }
                 this.isLoading = false;
 
-                Reveal.initialize();
+                Reveal.initialize({transition: "fade"});
                 Reveal.addEventListener("slidechanged", () => console.log("Progress: ", Reveal.getProgress() * 100, "%"));
             });
         },
@@ -98,7 +100,8 @@ export default {
     left:0;
     right: 0;
     bottom: 0;
-    background: #000;
+    background-color: #000;
+    background-image: url('/img/agpa/ceremony-background.jpg');
     z-index: 10000;
     color: #d0d0d0;
 
@@ -134,16 +137,11 @@ export default {
         text-shadow: 0 -1px white;
     }
 
-    img {
-        background: #fff;
-        padding: 1px;
-        border: 1px solid #000;
-        max-height: 100%;
-        max-width: 100%;
+    section {
+        padding: 0
     }
 
-
-    .catIllustration {
+    img.catIllustration {
         display: absolute;
         height: 50vh;
         margin: auto;
@@ -152,6 +150,46 @@ export default {
         background: none;
         padding: 0;
     }
+
+    .photo {
+        // background: #fff;
+        // padding: 1px;
+        // border: 1px solid #000;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 100px;
+        filter:  drop-shadow(0 0 10px #000)
+    }
+
+    .photoInfo {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        padding: 0 100px;
+        font-size: 40px;
+        vertical-align: middle;
+
+
+        .authorAvatar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+        }
+
+        .award {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+        }
+    }
+
+
 
 }
 
