@@ -2,6 +2,7 @@
 <div class="ceremony">
         <div class="reveal">
             <div class="slides">
+
                 <section>
                     <h1>Absolument G Photos Awards</h1>
                     <h2>2018</h2>
@@ -26,8 +27,15 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="slide.type === 'awardWaiting'">
-                        <p>Délibération</p>
+                    <div v-if="slide.type === 'awardWaiting'" style="width:100%; height:100%">
+                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[0]" :contain="true" aspect-ratio="1"></v-img></div>
+                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[1]" :contain="true" aspect-ratio="1"></v-img></div>
+                        </div>
+                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[2]" :contain="true" aspect-ratio="1"></v-img></div>
+                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[3]" :contain="true" aspect-ratio="1"></v-img></div>
+                        </div>
                     </div>
                     <div v-if="slide.type === 'photoAward'">
                         <div style="position: absolute; top:0; left:0; right:0; bottom:0">
@@ -146,20 +154,20 @@ export default {
                             data: data.stats.totalAuthors.map(e => +e.total)
                         }
                     ]
-                    console.log(" >  ",  this.stats)
                     // Photos categories simples
                     for(let catId in data.categories) {
                         if (catId > 0) {
                             const cat = data.categories[catId];
                             this.slides.push({ type: "category", id: catId, title: cat.title});
-                            const nominated = cat.nominated.map(photo => ({
+                            let nominated = cat.nominated.map(photo => ({
                                 url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
                                 username: photo.user.username,
                                 avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.user.id, 3)}.png`,
                             }));
-                            this.slides = this.slides.concat(nominated.map(photo => { photo.type = "photo"; return photo; }));
-                            this.slides.push({ type:"awardWaiting"});
+                            nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
+                            this.slides = this.slides.concat(nominated);
+                            this.slides.push({ type:"awardWaiting", photos: nominated.map(e => e.url)});
                             const awards = cat.nominated.map(photo => ({
                                 url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
@@ -267,6 +275,13 @@ export default {
         left: 0;
         right: 0;
         bottom: 100px;
+        filter:  drop-shadow(0 0 10px #000)
+    }
+    .photoDeliberating {
+        flex-grow: 1;
+        max-height: 95%;
+        max-width: 95%;
+        margin: 10px;
         filter:  drop-shadow(0 0 10px #000)
     }
 
