@@ -78,7 +78,6 @@ export async function getMetaData()
         cat8.variants[row.year] = { title:row.title,  description:row.description };
     }
 
-
     return data;
 }
 

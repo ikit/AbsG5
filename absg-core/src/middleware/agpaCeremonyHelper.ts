@@ -1,4 +1,100 @@
+import { getRepository } from "typeorm";
+import { AgpaPhoto, AgpaCategory } from "../entities";
+import { getMetaData } from "./agpaCommonHelpers";
 
+/**
+ * Récupère les informations pour présenter la cérémony des AGPA en ligne
+ * @param year 
+ */
+export async function ceremonyData(year: number) {
+    // On récupère les photos
+    const repo = getRepository(AgpaPhoto);
+    const meta = await getMetaData();
+
+    // Init data
+    let edition = {
+        stats: { totalPhotos: 0, totalAuthors: 0 }, 
+        categories: year < 2012 ? { 
+            '1': { nominated: [] },
+            '2': { nominated: [] },
+            '3': { nominated: [] },
+            '4': { nominated: [] },
+            '5': { nominated: [] },
+            '6': { nominated: [] },
+            '-2': { nominated: [] },
+            '-1': { nominated: []}} : { 
+            '1': { nominated: [] },
+            '2': { nominated: [] },
+            '3': { nominated: [] },
+            '4': { nominated: [] },
+            '5': { nominated: [] },
+            '6': { nominated: [] },
+            '7': { nominated: [] },
+            '8': { nominated: [] },
+            '-3': { nominated: [] },
+            '-2': { nominated: [] },
+            '-1': { nominated: [] }},
+        authors: []
+    }
+    for (let catId in edition.categories) {
+        edition.categories[catId].title = meta.categories[catId].title;
+    }
+
+    
+    // On récupère les photos de chaque catégories
+    let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
+        FROM agpa_photo p
+        INNER JOIN "user" u ON u.id = p."userId" 
+        LEFT JOIN agpa_award a ON p.id = a."photoId"
+        WHERE p.year=${year} AND p."categoryId" > 0
+        ORDER BY p."categoryId" ASC, p.gscore DESC`;
+    // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
+    let result = await repo.query(sql);
+    let currentCatId = 0, currentCount = 0;
+    for (const row of result)
+    {
+        const p = new AgpaPhoto();
+        p.fromJSON(row);
+        if (p.categoryId !== currentCatId) {
+            currentCatId = p.categoryId;
+            currentCount = 0;
+        }
+
+        if ( currentCount < 4 && p.awards.has(p.categoryId)) {
+            edition.categories[p.categoryId].nominated.push(p);3
+            currentCount += 1;
+        }
+    }
+    
+    // On récupère les meilleurs photographes
+    const authors = [];
+    sql = `SELECT a."userId" as id, u.username as firstname, a.award 
+        FROM agpa_award a 
+        INNER JOIN "user" u ON u.id = a."userId" 
+        WHERE "categoryId"=-1 AND year=${year}
+        ORDER BY "year" DESC, a."award" DESC `;
+    result = await repo.query(sql);
+    for (const row of result)
+    {
+        authors.push(row);
+    }
+    edition.categories[-1].nominated = authors;
+    
+    sql = `SELECT a."userId" as id, u.username as firstname 
+        FROM agpa_award a 
+        INNER JOIN "user" u ON u.id = a."userId" 
+        WHERE "categoryId"=-1 AND year=${year}
+        ORDER BY "year" DESC, a."award" DESC `;
+    result = await repo.query(sql);
+
+    // On récupère les données
+    sql = `SELECT year, COUNT(DISTINCT(id)) AS total FROM agpa_photo GROUP BY year ORDER BY year DESC`;
+    edition.stats.totalPhotos = await repo.query(sql);
+    sql = `SELECT year, COUNT(DISTINCT('userId')) AS total FROM agpa_photo GROUP BY year ORDER BY year DESC`;
+    edition.stats.totalAuthors = await repo.query(sql);
+    
+    return edition;
+}
 
 
 // /**

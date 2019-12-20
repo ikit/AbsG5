@@ -7,9 +7,13 @@
                     <h2>2018</h2>
                 </section>
 
+                <section>
+                    <p>Statistiques</p>
+                </section>
+
                 <section v-for="(slide, cidx) in slides" :key="cidx" style="width:100%; height:100%">
                     <div v-if="slide.type === 'category'">
-                        <h3>Categorie {{ slide.id }}</h3>
+                        <h3>{{ slide.title }}</h3>
                         <img :src="`/img/agpa/cupesMaxi/c${slide.id}.png`" class="catIllustration"/>
                     </div>
                     <div v-if="slide.type === 'photo'">
@@ -17,8 +21,20 @@
                             <v-img class="photo" :src="slide.url" :contain="true" aspect-ratio="1"></v-img>
                             <div class="photoInfo">
                                 {{slide.title}}
-                                <img src="http://absolumentg.fr/assets/img/avatars/012.png" class="authorAvatar"/>
-                                <img src="http://absolumentg.fr/assets/theme/agpa/img/cupes/c2-bronze.png" class="award"/>
+                                <img :src="slide.avatar" class="authorAvatar"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="slide.type === 'awardWaiting'">
+                        <p>Délibération</p>
+                    </div>
+                    <div v-if="slide.type === 'photoAward'">
+                        <div style="position: absolute; top:0; left:0; right:0; bottom:0">
+                            <v-img class="photo" :src="slide.url" :contain="true" aspect-ratio="1"></v-img>
+                            <div class="photoInfo">
+                                {{slide.title}}
+                                <img :src="slide.avatar" class="authorAvatar"/>
+                                <img :src="slide.award" class="award"/>
                             </div>
                         </div>
                     </div>
@@ -32,6 +48,7 @@
 <script>
 import axios from 'axios';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
+import { padNumber } from '../../middleware/CommonHelper';
 import * as Reveal from 'reveal';
 
 export default {
@@ -39,7 +56,8 @@ export default {
     data: () => ({
         revealProgress: 0,
         year: 2018,
-        slides: []
+        slides: [],
+        stats: {}
     }),
     mounted() {
         this.initView();
@@ -50,21 +68,38 @@ export default {
             this.photosGalery = [];
             this.photosGalleryIndex = 0;
             this.year = 2018; // Number.parseInt(this.$route.params.year);
-            axios.get(`/api/agpa/archives/${this.year}`).then(response => {
+            axios.get(`/api/agpa/ceremony/${this.year}`).then(response => {
                 const data = response.status === 200 ? response.data : null;
                 this.error = response.status !== 200 ? response : null;
-                // Prepare photo galery
+
+
+
+
                 console.log("ready ", data)
                 if (data) {
                     for(let catId in data.categories) {
-                        const cat = data.categories[catId];
-                        this.slides.push({ type: "category", id: catId});
                         if (catId > 0) {
-                            for (let photo of cat.photos) {
-                                let slide = agpaPhotoToGalleryPhoto(photo);
-                                slide.type = "photo";
-                                this.slides.push(slide);
-                            }
+                            const cat = data.categories[catId];
+                            this.slides.push({ type: "category", id: catId, title: cat.title});
+                            const nominated = cat.nominated.map(photo => ({
+                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                title: photo.title,
+                                username: photo.user.username,
+                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.user.id, 3)}.png`,
+                            }));
+                            this.slides = this.slides.concat(nominated.map(photo => { photo.type = "photo"; return photo; }));
+                            this.slides.push({ type:"awardWaiting"});
+                            const awards = cat.nominated.map(photo => ({
+                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                title: photo.title,
+                                username: photo.user.username,
+                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.user.id, 3)}.png`,
+                                award: `/img/agpa/cupes/c${catId}-${photo.awards[catId]}.png`,
+
+                            }));
+                            awards.pop();
+                            awards.reverse();
+                            this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
                         }
                     }
                     console.log(" >  ", this.slides)
@@ -73,7 +108,7 @@ export default {
                 }
                 this.isLoading = false;
 
-                Reveal.initialize({transition: "fade"});
+                Reveal.initialize({transition: "fade", progress: false, controls: false });
                 Reveal.addEventListener("slidechanged", () => console.log("Progress: ", Reveal.getProgress() * 100, "%"));
             });
         },
@@ -171,7 +206,12 @@ export default {
         height: 100px;
         padding: 0 100px;
         font-size: 40px;
-        vertical-align: middle;
+        line-height: 1em;
+
+        // Alignement vertical du text
+        display: flex; // contexte sur le parent
+        flex-direction: column; // direction d'affichage verticale
+        justify-content: center; // alignement vertical
 
 
         .authorAvatar {

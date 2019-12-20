@@ -3,6 +3,7 @@ import { format, addDays } from "date-fns";
 import { AgpaPhoto, AgpaAward, AgpaAwardType, AgpaCategory, AgpaVote } from "../entities";
 import { initAGPAContext, getMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
+import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 
 
 
@@ -51,6 +52,15 @@ class AgpaService {
     public getArchiveCategory(year: number, catId: number) {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
             return archiveCategory(year, catId);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public getCeremonyData(year: number) {
+        if (year >= 2006 && year <= getMaxArchiveEdition()) {
+            return ceremonyData(year);
         }
         else {
             return null;

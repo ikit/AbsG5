@@ -45,12 +45,10 @@ export class AgpaController {
         return "zip download from cloud";
     }
     
-    @Authorized()
+    
     @Get('/ceremony/:year([0-9]{4})')
     async getCeremony(@Param("year") year: number) {
-        // TODO
-        const rawData = await this.photosRepo.query(`SELECT * FROM agpa_photo LIMIT 2`);
-        return { categories: [], photos: rawData, awards: [], stats: {} };
+        return agpaService.getCeremonyData(year);
     }
     
 

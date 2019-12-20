@@ -1,7 +1,6 @@
 import { getRepository } from "typeorm";
 import { AgpaPhoto, AgpaCategory } from "../entities";
 
-
 // // PALMARES -----------------------------------------------------------------------------------------------------------------------------------------
 
 
