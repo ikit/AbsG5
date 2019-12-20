@@ -43,49 +43,31 @@ export async function ceremonyData(year: number) {
     
     // On récupère les photos de chaque catégories
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
-        FROM agpa_photo p
+        FROM agpa_award a
+        LEFT JOIN agpa_photo p ON p.id = a."photoId"
         INNER JOIN "user" u ON u.id = p."userId" 
-        LEFT JOIN agpa_award a ON p.id = a."photoId"
-        WHERE p.year=${year} AND p."categoryId" > 0
-        ORDER BY p."categoryId" ASC, p.gscore DESC`;
+        WHERE a.year=${year} 
+        ORDER BY a."categoryId" ASC, p.gscore DESC`;
     // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
     let result = await repo.query(sql);
-    let currentCatId = 0, currentCount = 0;
-    for (const row of result)
+    for (const p of result)
     {
-        const p = new AgpaPhoto();
-        p.fromJSON(row);
-        if (p.categoryId !== currentCatId) {
-            currentCatId = p.categoryId;
-            currentCount = 0;
-        }
-
-        if ( currentCount < 4 && p.awards.has(p.categoryId)) {
-            edition.categories[p.categoryId].nominated.push(p);3
-            currentCount += 1;
-        }
+        edition.categories[p.awardCategory].nominated.push(p);
     }
     
     // On récupère les meilleurs photographes
-    const authors = [];
-    sql = `SELECT a."userId" as id, u.username as firstname, a.award 
+    sql = `SELECT a."userId", u.username, a.award
         FROM agpa_award a 
         INNER JOIN "user" u ON u.id = a."userId" 
         WHERE "categoryId"=-1 AND year=${year}
         ORDER BY "year" DESC, a."award" DESC `;
-    result = await repo.query(sql);
-    for (const row of result)
-    {
-        authors.push(row);
-    }
-    edition.categories[-1].nominated = authors;
+    edition.categories[-1].nominated = await repo.query(sql);;
     
-    sql = `SELECT a."userId" as id, u.username as firstname 
-        FROM agpa_award a 
-        INNER JOIN "user" u ON u.id = a."userId" 
-        WHERE "categoryId"=-1 AND year=${year}
-        ORDER BY "year" DESC, a."award" DESC `;
-    result = await repo.query(sql);
+    sql = `SELECT DISTINCT(p."userId"), u.username
+        FROM agpa_photo p 
+        INNER JOIN "user" u ON u.id = p."userId" 
+        WHERE p.year=${year}`;
+    edition.authors = await repo.query(sql);
 
     // On récupère les données
     sql = `SELECT year, COUNT(DISTINCT(id)) AS total FROM agpa_photo GROUP BY year ORDER BY year ASC`;

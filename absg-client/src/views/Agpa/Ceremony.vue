@@ -134,10 +134,6 @@ export default {
                 const data = response.status === 200 ? response.data : null;
                 this.error = response.status !== 200 ? response : null;
 
-
-
-
-                console.log("ready ", data)
                 if (data) {
                     // Participations
                     this.stats.diag1.series = [
@@ -156,7 +152,7 @@ export default {
                     ]
                     // Photos categories simples
                     for(let catId in data.categories) {
-                        if (catId > 0) {
+                        if (catId != -1) {
                             const cat = data.categories[catId];
                             this.slides.push({ type: "category", id: catId, title: cat.title});
                             let nominated = cat.nominated.map(photo => ({
@@ -179,6 +175,11 @@ export default {
                             awards.pop();
                             awards.reverse();
                             this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
+                        }
+                        else if (catId === -1) {
+                            this.slides.push({ type: "category", id: catId, title: cat.title});
+                            this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
+                            this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
                         }
                     }
                     console.log(" >  ", this.slides)
