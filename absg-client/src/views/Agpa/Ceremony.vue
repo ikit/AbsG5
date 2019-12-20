@@ -8,7 +8,8 @@
                 </section>
 
                 <section>
-                    <p>Statistiques</p>
+                    <h3>Participation</h3>
+                    <highcharts :options="stats.diag1"></highcharts>
                 </section>
 
                 <section v-for="(slide, cidx) in slides" :key="cidx" style="width:100%; height:100%">
@@ -39,6 +40,15 @@
                         </div>
                     </div>
                 </section>
+
+                <section>
+                    <h1>Merci !</h1>
+                </section>
+
+                <section>
+                    <button type="button" class="button">Quitter la cérémonie</button>
+                </section>
+
             </div>
     </div>
 </div>
@@ -49,15 +59,59 @@
 import axios from 'axios';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
+import {Chart} from 'highcharts-vue'
 import * as Reveal from 'reveal';
 
 export default {
     name: 'Ceremony',
+    components: {
+        highcharts: Chart
+    },
     data: () => ({
         revealProgress: 0,
         year: 2018,
         slides: [],
-        stats: {}
+        stats: {
+            diag1: {
+                chart: {
+                    styledMode: true
+                },
+                xAxis: [{
+                    categories: [],
+                    crosshair: true
+                }],
+                yAxis: [
+                    {
+                        title: {
+                            text: 'Photos',
+                        },
+                        labels: {
+                            format: '{value}',
+                        }
+                    },
+                    {
+                        opposite: true,
+                        title: {
+                            text: 'Participants',
+                        },
+                        labels: {
+                            format: '{value}',
+                        }
+                    }],
+                tooltip: {
+                    shared: true
+                },
+                series: [],
+                plotOptions: {
+                    series: {
+                        label: {
+                            connectorAllowed: false
+                        },
+                        pointStart: 2006
+                    }
+                }
+            }
+        }
     }),
     mounted() {
         this.initView();
@@ -77,6 +131,23 @@ export default {
 
                 console.log("ready ", data)
                 if (data) {
+                    // Participations
+                    this.stats.diag1.series = [
+                        {
+                            name: 'Photos',
+                            type: 'column',
+                            yAxis: 0,
+                            data: data.stats.totalPhotos.map(e => +e.total)
+                        },
+                        {
+                            name: 'Participants',
+                            type: 'spline',
+                            yAxis: 1,
+                            data: data.stats.totalAuthors.map(e => +e.total)
+                        }
+                    ]
+                    console.log(" >  ",  this.stats)
+                    // Photos categories simples
                     for(let catId in data.categories) {
                         if (catId > 0) {
                             const cat = data.categories[catId];
@@ -125,6 +196,7 @@ export default {
 </script>
 
 <style src='reveal/css/reveal.css'></style>
+<style src='../../themes/agpa-highchart-theme.css'></style>
 
 <style lang="scss" scoped>
 @import '../../themes/global.scss';

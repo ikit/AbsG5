@@ -88,9 +88,9 @@ export async function ceremonyData(year: number) {
     result = await repo.query(sql);
 
     // On récupère les données
-    sql = `SELECT year, COUNT(DISTINCT(id)) AS total FROM agpa_photo GROUP BY year ORDER BY year DESC`;
+    sql = `SELECT year, COUNT(DISTINCT(id)) AS total FROM agpa_photo GROUP BY year ORDER BY year ASC`;
     edition.stats.totalPhotos = await repo.query(sql);
-    sql = `SELECT year, COUNT(DISTINCT('userId')) AS total FROM agpa_photo GROUP BY year ORDER BY year DESC`;
+    sql = `SELECT year, COUNT(DISTINCT("userId")) AS total FROM agpa_photo GROUP BY year ORDER BY year ASC`;
     edition.stats.totalAuthors = await repo.query(sql);
     
     return edition;
