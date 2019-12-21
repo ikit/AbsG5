@@ -2,11 +2,10 @@ import "reflect-metadata";
 import { createConnections } from "typeorm";
 import { createExpressServer } from "routing-controllers";
 import * as bodyParser from "body-parser";
-import { Init } from "./init";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
-import * as ormconfig from "../ormconfig";
 import { agpaService, citationService, immtService, agendaService, voyagService, eventService } from "./services";
+import * as ormconfig from "../ormconfig";
 
 console.log("---");
 createConnections(ormconfig)
@@ -25,7 +24,7 @@ createConnections(ormconfig)
         // create express app
         const app = createExpressServer({
             routePrefix: "/api",
-            controllers: [__dirname + "/controllers/*.ts"],
+            controllers: [__dirname + "/controllers/*.ts", __dirname + "/controllers/*.js"],
             authorizationChecker: jwtAuthorizationChecker,
             currentUserChecker
         });
@@ -38,11 +37,6 @@ createConnections(ormconfig)
         app.listen(5000);
 
         console.info("Server has started on port 5000.");
-
-        // init DB data on dev
-        if (process.env.NODE_ENV === "development") {
-            new Init().initData();
-        }
 
         console.log("---");
     })

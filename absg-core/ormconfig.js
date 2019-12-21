@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const rootDir = process.env.NODE_ENV === "development" ? "src" : "build";
 
 module.exports = [
@@ -11,9 +13,9 @@ module.exports = [
         database: "absg",
         synchronize: true,
         logging: false,
-        entities: [`${rootDir}/entities/**/*.js`],
-        migrations: [`${rootDir}/migration/**/*.js`],
-        subscribers: [`${rootDir}/subscriber/**/*.js`],
+        entities: [`${rootDir}/entities/**/*.{ts,js}`],
+        migrations: [`${rootDir}/migration/**/*.{ts,js}`],
+        subscribers: [`${rootDir}/subscriber/**/*.{ts,js}`],
         cli: {
             entitiesDir: `${rootDir}/entities`,
             migrationsDir: `${rootDir}/migration`,
