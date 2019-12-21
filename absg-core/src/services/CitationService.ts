@@ -3,10 +3,7 @@ import { format } from "date-fns";
 import { Citation } from "../entities";
 import { NotFoundError } from "routing-controllers";
 
-
-
 class CitationService {
-
     private citationsRepo = null;
 
     public initService() {
@@ -20,7 +17,7 @@ class CitationService {
         const result = {
             citations: [],
             authors: [],
-            total: 0,
+            total: 0
         };
 
         // On récupère la liste des 20 dernière citations
@@ -42,7 +39,8 @@ class CitationService {
      * Renvoie une citation au hasard
      */
     public async random() {
-        const result = await this.citationsRepo.query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
+        const result = await this.citationsRepo
+            .query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
             FROM citation c 
             LEFT JOIN "user" u ON c."posterId"=u.id
             LEFT JOIN person p ON c."authorId"=p.id
@@ -50,7 +48,7 @@ class CitationService {
 
         return result[0];
     }
-    
+
     /**
      * Renvoie les citations en fonction des informations de filtrage et de pagination
      */
@@ -68,12 +66,13 @@ class CitationService {
 
         return result;
     }
-    
+
     /**
      * Renvoie une citation à partir de son identifiant
      */
     public async fromId(citationId: number) {
-        const result = await this.citationsRepo.query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
+        const result = await this.citationsRepo
+            .query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
             FROM citation c 
             LEFT JOIN "user" u ON c."posterId"=u.id
             LEFT JOIN person p ON c."authorId"=p.id
@@ -86,7 +85,8 @@ class CitationService {
      * Renvoie toutes les citation en fonction de l'autheur
      */
     public async fromAuthor(authorId: number) {
-        const result = await this.citationsRepo.query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
+        const result = await this.citationsRepo
+            .query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
             FROM citation c 
             LEFT JOIN "user" u ON c."posterId"=u.id
             LEFT JOIN person p ON c."authorId"=p.id
@@ -107,19 +107,18 @@ class CitationService {
 
     /**
      * Supprime une citation
-     * Une citation ne peut être supprimé que par un admin, 
+     * Une citation ne peut être supprimé que par un admin,
      * ou bien par le poster si il s'agit de la dernière citation ajouté
      */
     public async remove(id: number) {
         // TODO: retrieve user info to check permission to delete
 
-        let citation = await this.citationsRepo.findOne(id);
+        const citation = await this.citationsRepo.findOne(id);
         if (!citation) {
             throw new NotFoundError(`Citations was not found.`);
         }
         return this.citationsRepo.remove(citation);
     }
-
 }
 
 export const citationService = new CitationService();

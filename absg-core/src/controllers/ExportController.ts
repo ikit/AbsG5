@@ -1,7 +1,7 @@
 import { JsonController, Post, Body, Res } from "routing-controllers";
 import { getRepository, Equal, FindManyOptions, getConnection } from "typeorm";
 import { addDays } from "date-fns";
-import * as Excel from 'exceljs';
+import * as Excel from "exceljs";
 
 export interface ExcelSheet {
     name: string;
@@ -9,7 +9,7 @@ export interface ExcelSheet {
     rows: any[];
 }
 
-@JsonController('/exports')
+@JsonController("/exports")
 export class ExportController {
     /*
     private vehicleRepo = getRepository(Vehicle);
@@ -337,28 +337,30 @@ export class ExportController {
             title: c.comment,
             locked: c.isPrimary
         }));
-        const entities = await getRepository(entityName).find({ order: { id: 'ASC' } });
+        const entities = await getRepository(entityName).find({ order: { id: "ASC" } });
 
-        const sheets: ExcelSheet[] = [{
-            name: entityName,
-            headers,
-            rows: entities.map(row => headers.map(h => row[h.field]))
-        }];
-        
+        const sheets: ExcelSheet[] = [
+            {
+                name: entityName,
+                headers,
+                rows: entities.map(row => headers.map(h => row[h.field]))
+            }
+        ];
+
         return await this.exportAsExcel(sheets, entityName, response);
     }
 
     /**
      * Créé le fichier Excel et insère les données dans les feuilles
-     * @param sheets 
+     * @param sheets
      * @param name nom du fichier
      */
     async exportAsExcel(sheets: ExcelSheet[], name: string, response) {
         const wb = new Excel.Workbook();
-        
-        sheets.forEach((sheet) => {
+
+        sheets.forEach(sheet => {
             const ws = wb.addWorksheet(sheet.name);
-            
+
             // headers
             ws.columns = sheet.headers.map(header => ({
                 header: header.title || header.field,
@@ -366,7 +368,7 @@ export class ExportController {
                 style: {
                     font: {
                         color: {
-                            argb: header.locked ? 'FFD41010' : 'FF000000'
+                            argb: header.locked ? "FFD41010" : "FF000000"
                         }
                     }
                 }
@@ -377,12 +379,11 @@ export class ExportController {
         });
 
         const filename = `export_${name}_${new Date().toISOString()}.xls`;
-        const filetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        const filetype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         const data = await wb.xlsx.writeBuffer();
-        response.setHeader('Content-Type', filetype);
+        response.setHeader("Content-Type", filetype);
         response.setHeader("Content-Disposition", "attachment; filename=" + filename);
         return response.send(data);
     }
-
 }

@@ -1,21 +1,36 @@
 import { getConnection, getRepository } from "typeorm";
-import { Citation, Immt, User, Parameter, Person, Place, EventG, Forum, Discussion, Message, AgpaAward, AgpaCategory, AgpaCategoryVariation, AgpaPhoto, AgpaVote } from "./entities";
-import * as D from './data/data';
+import {
+    Citation,
+    Immt,
+    User,
+    Parameter,
+    Person,
+    Place,
+    EventG,
+    Forum,
+    Discussion,
+    Message,
+    AgpaAward,
+    AgpaCategory,
+    AgpaCategoryVariation,
+    AgpaPhoto,
+    AgpaVote
+} from "./entities";
+import * as D from "./data/data";
 
 export class Init {
-
-    async initData(reset = false, initFakeData=false) {
+    async initData(reset = false, initFakeData = false) {
         if (reset || initFakeData) {
-            console.info('Clear all data...');
+            console.info("Clear all data...");
             await this.clearAll();
         }
         if (initFakeData) {
-            console.info('Init fake data...');
+            console.info("Init fake data...");
             await this.initAbsg();
             await this.initForum();
             await this.initAgpa();
         }
-        console.info('Init done.');
+        console.info("Init done.");
     }
 
     async clearAll() {
@@ -26,16 +41,15 @@ export class Init {
             await repository.query(`ALTER SEQUENCE ${entity.tableName}_id_seq RESTART WITH 1;`);
         }
     }
-    
+
     async insert(entity, items: any[]) {
         const data = [];
-        for (let item of items) {
+        for (const item of items) {
             const dataItem = await getRepository(entity).save(item);
             data.push(dataItem);
         }
         return data;
     }
-
 
     async initAbsg() {
         await this.insert(Parameter, D.PARAMETERS);
@@ -45,7 +59,7 @@ export class Init {
         await this.insert(Place, D.PLACES);
         await this.insert(Person, D.PERSONS);
         await this.insert(User, D.USERS);
-        
+
         // Agenda, citations et immt
         await this.insert(EventG, D.EVENTGS);
         await this.insert(Citation, D.CITATIONS);
@@ -66,9 +80,6 @@ export class Init {
     }
 
     randomItem(arr: any[], nullable = true) {
-        return (nullable && Math.random() < 0.5)
-        ? null 
-        : arr[Math.floor(Math.random() * arr.length)];
+        return nullable && Math.random() < 0.5 ? null : arr[Math.floor(Math.random() * arr.length)];
     }
-
 }

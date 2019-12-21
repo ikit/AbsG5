@@ -76,6 +76,7 @@ export default {
         highcharts: Chart
     },
     data: () => ({
+       isLoading: false,
         revealProgress: 0,
         year: 2018,
         slides: [],
@@ -133,7 +134,6 @@ export default {
             axios.get(`/api/agpa/ceremony/${this.year}`).then(response => {
                 const data = response.status === 200 ? response.data : null;
                 this.error = response.status !== 200 ? response : null;
-
                 if (data) {
                     // Participations
                     this.stats.diag1.series = [
@@ -152,14 +152,14 @@ export default {
                     ]
                     // Photos categories simples
                     for(let catId in data.categories) {
+                        const cat = data.categories[catId];
                         if (catId != -1) {
-                            const cat = data.categories[catId];
                             this.slides.push({ type: "category", id: catId, title: cat.title});
                             let nominated = cat.nominated.map(photo => ({
                                 url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
-                                username: photo.user.username,
-                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.user.id, 3)}.png`,
+                                username: photo.username,
+                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
                             }));
                             nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
                             this.slides = this.slides.concat(nominated);
@@ -167,29 +167,26 @@ export default {
                             const awards = cat.nominated.map(photo => ({
                                 url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
-                                username: photo.user.username,
-                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.user.id, 3)}.png`,
-                                award: `/img/agpa/cupes/c${catId}-${photo.awards[catId]}.png`,
+                                username: photo.username,
+                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
 
                             }));
                             awards.pop();
                             awards.reverse();
                             this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
                         }
-                        else if (catId === -1) {
+                        else if (catId == -1) {
                             this.slides.push({ type: "category", id: catId, title: cat.title});
                             this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
                             this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
                         }
                     }
-                    console.log(" >  ", this.slides)
 
                     // store.commit('photosGalleryReset', this.photosGalery);
                 }
                 this.isLoading = false;
-
                 Reveal.initialize({transition: "fade", progress: false, controls: false });
-                Reveal.addEventListener("slidechanged", () => console.log("Progress: ", Reveal.getProgress() * 100, "%"));
             });
         },
 

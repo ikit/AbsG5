@@ -4,73 +4,68 @@ import { AgpaPhoto, AgpaAward } from "../entities";
 import { agpaService } from "../services/AgpaService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
 
-@JsonController('/agpa')
+@JsonController("/agpa")
 export class AgpaController {
-
     private photosRepo = getRepository(AgpaPhoto);
 
     @Authorized()
-    @Get('')
+    @Get("")
     welcome() {
         return agpaService.welcom();
     }
 
     @Authorized()
-    @Get('/metaData')
+    @Get("/metaData")
     getMeta() {
         return getMetaData();
     }
 
     @Authorized()
-    @Get('/archives')
+    @Get("/archives")
     archives() {
         return agpaService.getArchiveSummary();
     }
 
     @Authorized()
-    @Get('/archives/:year([0-9]{4})')
+    @Get("/archives/:year([0-9]{4})")
     getEdition(@Param("year") year: number) {
         return agpaService.getArchiveEdition(year);
     }
     @Authorized()
-    @Get('/archives/:year([0-9]{4})/:catId([0-9]{1,2})')
+    @Get("/archives/:year([0-9]{4})/:catId([0-9]{1,2})")
     getCategory(@Param("year") year: number, @Param("catId") catId: number) {
         return agpaService.getArchiveCategory(year, catId);
     }
 
     @Authorized()
-    @Get('/archives/:year([0-9]{4})/files')
+    @Get("/archives/:year([0-9]{4})/files")
     getArchivesFile(@Param("year") year: number) {
         // TODO
         return "zip download from cloud";
     }
-    
-    
-    @Get('/ceremony/:year([0-9]{4})')
+
+    @Get("/ceremony/:year([0-9]{4})")
     async getCeremony(@Param("year") year: number) {
         return agpaService.getCeremonyData(year);
     }
-    
 
     @Authorized()
-    @Get('/stats')
+    @Get("/stats")
     getStats() {
         // TODO
-        return { };
+        return {};
     }
 
     @Authorized()
-    @Get('/palmares')
+    @Get("/palmares")
     getPalmares() {
         // TODO
-        return { };
+        return {};
     }
 
-
     @Authorized()
-    @Delete('/:photoId([0-9]+)')
+    @Delete("/:photoId([0-9]+)")
     async remove(@Param("photoId") photoId: number) {
-
         return "this.citationsRepo.remove(citation)";
     }
 }

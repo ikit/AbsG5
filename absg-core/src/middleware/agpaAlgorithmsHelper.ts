@@ -1,4 +1,3 @@
-
 // /**
 //  * checkVotes
 //  * vérifie l'intégrité des votes : cohérance aux niveaux des différents identifiants, des années,
@@ -15,18 +14,16 @@
 //         $CI = get_instance();
 //         $votesAccepted = array();
 
-
 //         // ----------------------------------------------------------------------------
 //         // Récupérer votes, avec les données des photos associées
 //         $sql = "SELECT v.*, p.category_id as 'p_category_id', p.user_id as 'p_user_id', p.year as 'p_year', p.title, a.birthday FROM agpa_votes v, agpa_photos p, absg_users u, agenda_people a WHERE v.`year`={$ctx['current_phase_year']} AND p.photo_id = v.photo_id AND p.error is NULL and v.user_id = u.user_id AND u.people_id = a.people_id ORDER BY p.category_id ASC, v.user_id ASC, v.score ASC";
-                    
+
 //         $datas = array();
 //         $result = $CI->db->query($sql)->result();
-//         foreach ($result as $row) 
+//         foreach ($result as $row)
 //         {
 //             $datas[$row->p_category_id][$row->user_id][] = $row;
 //         }
-
 
 //         // Analyse des votes...
 //         foreach($datas as $categoryId => $category)
@@ -47,7 +44,7 @@
 //                 $childError = false;
 
 //                 $content = array();
-                
+
 //                 // Pour chacun des votes de l'utilisateur :
 //                 foreach($votes as $vote)
 //                 {
@@ -55,7 +52,6 @@
 //                     $content_tr = array();
 //                     $content_tr['photo_id'] = $vote->photo_id;
 //                     $content_tr['photo_title'] = $vote->title;
-
 
 //                 // Vérification note du vote compris entre 1 et 2 (on accepte les vote zéro utilisé pour le meilleur titre)
 //                     if ($vote->score < 0 || $vote->score > 2)
@@ -94,12 +90,12 @@
 // 					}
 
 //                     $content[] = $content_tr;
-//                 }       
-                
+//                 }
+
 //                 // une fois qu'on a analysé tout les vote d'un utilisateur pour une catégorie, on décide si on en tient compte ou pas.
-//                 $error = (!$authorError && !$categoryError && !$yearError && !$votesNumberError && !$voteError && $votesScore >= $minVotePhoto && $votesScore <= $maxVotePhoto && !$childError) ? false : true; 
+//                 $error = (!$authorError && !$categoryError && !$yearError && !$votesNumberError && !$voteError && $votesScore >= $minVotePhoto && $votesScore <= $maxVotePhoto && !$childError) ? false : true;
 //                 $error_msg = "";
-                
+
 //                 if ($error)
 //                 {
 //                     if ($votesScore < $minVotePhoto ) $error_msg .= ' - Manque des vote(s) [pas assez de points attribués : '.$votesScore.'/'.$maxVotePhoto.']<br/>';
@@ -121,7 +117,6 @@
 //                         );
 //                     }
 //                 }
-                
 
 //                 // Affichage si demandé
 //                 if ($display)
@@ -143,17 +138,16 @@
 //                             'photo_year' => $content_row['year_from_photo']);
 //                     }
 //                 }
-//             }            
+//             }
 //         }
 
 //         return $votesAccepted;
 //     }
 // }
 
-
 // /**
 //  * computeNotes
-//  * à partir du tableau de votes qu'on lui fournis, calcul les notes de chaques photos suivant 
+//  * à partir du tableau de votes qu'on lui fournis, calcul les notes de chaques photos suivant
 //  * l'algorithme du réglement 2008 des AGPA
 //  * @param $ctx [array], le contexte des agpa
 //  * @param $votes, le tableau des votes (doit eêtre généré par la fonction checkVotes)
@@ -176,7 +170,7 @@
 //         $categories = array();
 //         $result = $CI->db->query($sql)->result();
 
-//         foreach ($result as $row) 
+//         foreach ($result as $row)
 //         {
 //             $photos[$row->photo_id] = $row;
 //             if ($photos[$row->photo_id]->g_score != 0) $NEED_TO_UPDATE_SQL = false;
@@ -194,7 +188,6 @@
 //                 ++$categories[$row->category_id]['photosNumber'];
 //             }
 //         }
-
 
 //         // 1- Décompte des votes (passe 1 -> calcul note simple)
 //         foreach($votes as $idCat => $category)
@@ -230,14 +223,13 @@
 //         }
 
 //         // On crée le tableau des photos sélectionnées pour le meilleur titre
-//         foreach ($photos as $id => $photo) 
+//         foreach ($photos as $id => $photo)
 //         {
 //             if ($photo->scoreTitle > 0)
 //             {
 //                 $categories[-3]['photos'][] = &$photos[$id];
 //             }
 //         }
-
 
 //         // 2- Décompte des votes (passe 2 -> calcul note G)
 //         $scoreCoefficient = 9990.00999001 ; //10000000 / 1001;
@@ -259,7 +251,6 @@
 //             $categories[$photos[$idPhoto]->category_id]['photos'][] = $photos[$idPhoto];
 //         }
 
-
 //         // 3- On trie les photos par ordre decroissant de note globale
 //         function compareScorePhotos($a, $b)
 //         {
@@ -278,7 +269,7 @@
 //         {
 //             $categoryId = -1313213;
 //             $userId = 0;
-            
+
 //             foreach($photos as $photoId => $photo)
 //             {
 //                 if ($photo->category_id != $categoryId)
@@ -309,7 +300,7 @@
 //                 );
 //             }
 
-//             foreach ($categories[-3]['photos'] as $photoId => $photo) 
+//             foreach ($categories[-3]['photos'] as $photoId => $photo)
 //             {
 //                 $ctx['computeStep'][-3]['photos'][] = $photo;
 //             }
@@ -320,7 +311,6 @@
 //     }
 // }
 
-
 // /**
 //  * evalNote
 //  * récupère les photos d'une année, et effectue le trie pour toutes les catégories afin d'attribuer les AGPA -> création palmares
@@ -329,7 +319,7 @@
 //  * @param &$categories, les photos triées par catégories obtenue lors de l'appel à la méthode computeNote
 //  * @param $display, boolean, true : affichage dans le template du resultat
 //  *
-//  * @return array[mixed], par catégorie, les 4 meilleurs photos avec des 
+//  * @return array[mixed], par catégorie, les 4 meilleurs photos avec des
 //  *                       indications sur le type d'AGPA et les cas d'ex-aequo
 //  */
 // if ( ! function_exists('evalNote'))
@@ -348,21 +338,20 @@
 //         {
 //             if ($idCat < 0 ) continue;
 //             foreach($category['photos'] as $i => $photo)
-//             {	
+//             {
 // 				// On rempli le taleau des photos de chaque auteur
 // 				if ($idCat > 0)
 // 				{
 // 					$photosPerPhotographes[$photo->user_id][] = $categories[$idCat]['photos'][$i];
 //                 }
-				
+
 //                 // On donne une référence au tableau principale ds chaque photos (utile plus tard (cf 3- ) lors du tri automatique des photos)
 //                 $categories[$idCat]['photos'][$i]->refRoot = &$categories;
 // 				$categories[-2]['photos'][] = $categories[$idCat]['photos'][$i];
 
-
 //             }
 //         }
-		
+
 //         function compare($a, $b)
 //         {
 //             // on trie dans l'ordre décroissant
@@ -399,7 +388,7 @@
 //             $photographeDatas['sumScores'] = $sumScores;
 //             $photographeDatas['votesNumber'] = $nbrVotes;
 //             $photographeDatas['photosNumber'] = $nbrPhotos;
-				
+
 //             // on sauvegarde
 //             foreach($photographeDatas as $k => $row)
 //             {
@@ -407,14 +396,14 @@
 //                 $categories[-1][$photoIdgraphe][$k] = $row;
 //             }
 //         }
-        
+
 //         // 2.2 - Calcul des palmares des editions précédentes
 //         $sql = 'SELECT * FROM agpa_awards WHERE year < '.$ctx['current_phase_year'].' ORDER BY author_id ASC, year ASC';
 //         $datas = array(); // contenaire temporaire
 //         $actualUser = 0;
 
 //         $result = $CI->db->query($sql)->result();
-//         foreach ($result as $row) 
+//         foreach ($result as $row)
 //         {
 //             if ($actualUser != $row->author_id)
 //             {
@@ -424,7 +413,7 @@
 
 //             $datas[$actualUser] += getPalmaresPoint($row->category_id, $row->award);
 //         }
-        
+
 //         // on garde le palmares des années précédentes dans le contenaires principale $categories
 //         foreach($datas as $photoIdgraphe => $score)
 //         {
@@ -461,15 +450,15 @@
 //             // Si exaequo, avantage à la photo appartenant à la categorie la plus importante (en nombre de photo)
 //             $res = $a->refRoot[$a->category_id]['photosNumber'] - $b->refRoot[$b->category_id]['photosNumber'];
 //             if ( $res != 0) return $res;
-			
+
 //             // Si exaequo, avantage à la photo de l'édition la plus récente
 //             $res = $a->year - $b->year;
 //             if ( $res != 0) return $res;
-            
+
 //             // Si exaequo, avantage au photographe ayant le moins bon palamarès cumulé sur l'ensemble des éditions précédentes
 //             $res = $AGPA_CTX['members'][$a->user_id]->PreviousWinners - $AGPA_CTX['members'][$b->user_id]->PreviousWinners;
 //             if ( $res != 0) return $res;
-            
+
 //             // Si toujours exaequos, on tire au sort
 //             $res = rand(0,1);
 //             if ( $res == 0) return -1;
@@ -489,7 +478,7 @@
 //             // Si exaequo, avantage au photographe dont la plus mauvaise photo a la meilleur note
 //             $res = $a['lower'] - $b['lower'];
 //             if ( $res != 0) return $res;
-            
+
 //             // Si exaequo, avantage au photograhe ayant le meilleur palmarès sur l'édition en cours
 //             // TODO : PAS FAIT !!!!!!
 //             $res = $a['ActualWinners'] - $b['ActualWinners'];
@@ -520,16 +509,15 @@
 //             if ( $res == 0) return -1;
 //             return 1;
 //         }
-     
 
-//         // 3.1- Déroulement du trie 
+//         // 3.1- Déroulement du trie
 //         // 3.1.1- pour les catégories simples
 //         foreach($categories as $idCat => $cat)
 //         {
 //             if ($idCat > 0 || $idCat == -2)
 //             usort($categories[$idCat]['photos'], "sortPhotos"); // NE SURTOUT PAS UTILISER $cat qui est une copie et non une ref !!!
 //         }
-        
+
 //         // 3.1.2- Trie de la catégorie -3 : meilleur titre
 //         usort($categories[-3]['photos'], "sortTitles");
 
@@ -560,15 +548,14 @@
 //             $categories[-1][$photoIdgraphe]['IdPhotographe'] = $photoIdgraphe; // on duplique l'id car avec le trie, la clés va changer
 //         }
 
-
 //         // On s'assure que tout les participants sont créés même si ils n'ont rien récolé
-//         foreach ($ctx['members'] as $id => $memberData) 
+//         foreach ($ctx['members'] as $id => $memberData)
 //         {
 //             if (isset($categories[-1][$id]))
 //             {
-//                 if (!isset($categories[-1][$id]['IdPhotographe'])) 
+//                 if (!isset($categories[-1][$id]['IdPhotographe']))
 //                     $categories[-1][$id]['IdPhotographe'] = $id;
-//                 if (!isset($categories[-1][$id]['sum8'])) 
+//                 if (!isset($categories[-1][$id]['sum8']))
 //                 {
 //                     $categories[-1][$id]['sum8'] = 0;
 //                     $categories[-1][$id]['sum4'] = 0;
@@ -581,10 +568,8 @@
 //             }
 //         }
 
-
 //         // 3.2.3- Trie de la catégorie -1 : meilleur photographe
 //         usort($categories[-1], "sortPhotographes");
-
 
 //         // 3.2.5- On attribue les récompenses aux photographes
 //         deliverAwardsPasse2($categories);
@@ -626,7 +611,7 @@
 //                 }
 //                 // Meilleurs titre
 //                 elseif ($categoryId == -3)
-//                 {           
+//                 {
 //                     foreach($category['photos'] as $positionInLeaderboard => $photo)
 //                     {
 //                         $ctx['computeStep'][$categoryId]['photos'][] = array(
@@ -639,7 +624,7 @@
 //                 }
 //                 // Meilleurs photographes
 //                 elseif ($categoryId == -1)
-//                 {           
+//                 {
 //                     foreach($category as $position => $data)
 //                     {
 //                         $ctx['computeStep'][$categoryId]['photos'][] = array(
@@ -656,11 +641,9 @@
 //             }
 //         }
 
-
 //         return $categories;
 //     }
 // }
-
 
 // /**
 // * deliverAwardsPasse1
@@ -736,7 +719,6 @@
 //     }
 // }
 
-
 // /**
 // * deliverAwardsPasse2
 // * Première passe pour l'attribution des AGPA (or, argent, bronze)
@@ -752,7 +734,6 @@
 //         $categories[-1][2]['award'] = 'bronze';
 //     }
 // }
-
 
 // /**
 //  * getPalmaresPoint
@@ -780,7 +761,6 @@
 //     }
 // }
 
-
 // /**
 //  * deliverAwards
 //  * récupère les données retournées par la méthode evalNote(year, $categorie)
@@ -789,7 +769,7 @@
 //  * @param &$categories, les photos triées par catégories obtenue lors de l'appel à la méthode evalNote(year, $categorie)
 //  * @param $display, boolean, true : affichage dans le template du resultat
 //  *
-//  * @return array[mixed], par catégorie, les 4 meilleurs photos avec des 
+//  * @return array[mixed], par catégorie, les 4 meilleurs photos avec des
 //  *                       indications sur le type d'AGPA et les cas d'ex-aequo
 //  */
 // if ( ! function_exists('deliverAwards'))
@@ -834,7 +814,6 @@
 //             foreach ($categories as $categoryId => $category)
 //             {
 
-
 //                 if ($categoryId > 0)
 //                 {
 //                     $ctx['computeStep'][$categoryId] =  array(
@@ -866,7 +845,7 @@
 //                 }
 //                 // Meilleurs titres
 //                 elseif ($categoryId == -3)
-//                 {           
+//                 {
 //                     foreach($category['photos'] as $positionInLeaderboard => $photo)
 //                     {
 //                         $ctx['computeStep'][$categoryId]['photos'][] = array(
@@ -877,7 +856,6 @@
 
 //                     }
 
-
 //                 }
 //             }
 
@@ -885,7 +863,6 @@
 //         return $categories;
 //     }
 // }
-
 
 // /**
 //  * checkDiamant
@@ -907,11 +884,10 @@
 //         {
 //             // Catégorie simple (1 à 8)
 //             case 0 :
-//             if ( $a->g_score > 50000 and 
+//             if ( $a->g_score > 50000 and
 //                  $a->g_score > 2 * $b->g_score)
 //             $result = true;
 //             break;
-
 
 //             // Hors catégorie : meilleure titre
 //             case -3 :
@@ -921,7 +897,7 @@
 
 //             // Hors catégorie : meilleure photo
 //             case -2 :
-//             if ( $a->g_score > 50000 and 
+//             if ( $a->g_score > 50000 and
 //                  $a->g_score > 2 * $b->g_score and
 //                  $a->vote == $a->refRoot[$a->category_id]->judgesNumber-1)
 //             $result = true;
@@ -931,7 +907,7 @@
 //             case -1 :
 // 			/*
 //             // Si ses 4 meilleurs photos > 100 000 et si auteur des 3 meilleurs photos
-//             if ( $a['sum4'] > 100000 and 
+//             if ( $a['sum4'] > 100000 and
 //                  $a->refRoot[-2]['photos'][0]['user_id'] == $a['IdPhotographe'] and
 //                  $a->refRoot[-2]['photos'][1]['user_id'] == $a['IdPhotographe'] and
 //                  $a->refRoot[-2]['photos'][2]['user_id'] == $a['IdPhotographe']
@@ -948,7 +924,6 @@
 //         return $result;
 //     }
 // }
-
 
 // /**
 //  * closeEdition
@@ -977,15 +952,15 @@
 //                 $CI->db->query($sql);
 //             }
 //         }
-        
+
 //     // 2- Enregistrer les données palmares
 //         $sql = 'INSERT INTO agpa_awards (`year`,`category_id`,`author_id`,`award`,`photo_id`) VALUES';
-        
+
 //         foreach ($categories as $idCat => $category)
 //         {
 //             $max = ($idCat != -1)? min(sizeof($category['photos']), 4) : min(sizeof($category),4);
 //             $previousAward = '';
-            
+
 //             for($i=0; $i<$max;  $i++)
 //             {
 //                 if ($idCat == -1)
@@ -1018,12 +993,11 @@
 //         }
 //         // On supprime la dernière virgule en trop
 //         $sql = substr($sql,0,strlen($sql)-1);
-            
-//         // Précaution, avant d'enregistrer, on supprime tout le palmares de l'année 
+
+//         // Précaution, avant d'enregistrer, on supprime tout le palmares de l'année
 //         $CI->db->query('DELETE FROM agpa_awards WHERE year='.$ctx['current_phase_year']);
 
 //         // On enregistre
 //         $CI->db->query($sql);
 //     }
 // }
-

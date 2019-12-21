@@ -5,16 +5,8 @@ import { initAGPAContext, getMaxArchiveEdition } from "../middleware/agpaCommonH
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 
-
-
-
-
-
-
 class AgpaService {
-
     private photosRepo = null;
-
 
     public initService() {
         this.photosRepo = getRepository(AgpaPhoto);
@@ -24,10 +16,9 @@ class AgpaService {
      * Retourne les informations sur l'édition en cours (AgpaContext)
      */
     public welcom() {
-
         return initAGPAContext(new Date());
     }
-    
+
     /**
      * Retourne les informations sur les anciennes éditions
      */
@@ -36,15 +27,13 @@ class AgpaService {
     }
 
     /**
-     * 
+     *
      * @param year Retourne les informations sur une ancienne édition
      */
     public getArchiveEdition(year: number) {
-
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
             return archiveEdition(year);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -52,8 +41,7 @@ class AgpaService {
     public getArchiveCategory(year: number, catId: number) {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
             return archiveCategory(year, catId);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -61,13 +49,10 @@ class AgpaService {
     public getCeremonyData(year: number) {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
             return ceremonyData(year);
-        }
-        else {
+        } else {
             return null;
         }
     }
 }
 
-
 export const agpaService = new AgpaService();
-

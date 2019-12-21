@@ -4,7 +4,7 @@ import { getMetaData } from "./agpaCommonHelpers";
 
 /**
  * Récupère les informations pour présenter la cérémony des AGPA en ligne
- * @param year 
+ * @param year
  */
 export async function ceremonyData(year: number) {
     // On récupère les photos
@@ -12,35 +12,39 @@ export async function ceremonyData(year: number) {
     const meta = await getMetaData();
 
     // Init data
-    let edition = {
-        stats: { totalPhotos: 0, totalAuthors: 0 }, 
-        categories: year < 2012 ? { 
-            '1': { nominated: [] },
-            '2': { nominated: [] },
-            '3': { nominated: [] },
-            '4': { nominated: [] },
-            '5': { nominated: [] },
-            '6': { nominated: [] },
-            '-2': { nominated: [] },
-            '-1': { nominated: []}} : { 
-            '1': { nominated: [] },
-            '2': { nominated: [] },
-            '3': { nominated: [] },
-            '4': { nominated: [] },
-            '5': { nominated: [] },
-            '6': { nominated: [] },
-            '7': { nominated: [] },
-            '8': { nominated: [] },
-            '-3': { nominated: [] },
-            '-2': { nominated: [] },
-            '-1': { nominated: [] }},
+    const edition = {
+        stats: { totalPhotos: 0, totalAuthors: 0 },
+        categories:
+            year < 2012
+                ? {
+                      "1": { nominated: [] },
+                      "2": { nominated: [] },
+                      "3": { nominated: [] },
+                      "4": { nominated: [] },
+                      "5": { nominated: [] },
+                      "6": { nominated: [] },
+                      "-2": { nominated: [] },
+                      "-1": { nominated: [] }
+                  }
+                : {
+                      "1": { nominated: [] },
+                      "2": { nominated: [] },
+                      "3": { nominated: [] },
+                      "4": { nominated: [] },
+                      "5": { nominated: [] },
+                      "6": { nominated: [] },
+                      "7": { nominated: [] },
+                      "8": { nominated: [] },
+                      "-3": { nominated: [] },
+                      "-2": { nominated: [] },
+                      "-1": { nominated: [] }
+                  },
         authors: []
-    }
-    for (let catId in edition.categories) {
+    };
+    for (const catId in edition.categories) {
         edition.categories[catId].title = meta.categories[catId].title;
     }
 
-    
     // On récupère les photos de chaque catégories
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
         FROM agpa_award a
@@ -49,20 +53,19 @@ export async function ceremonyData(year: number) {
         WHERE a.year=${year} 
         ORDER BY a."categoryId" ASC, p.gscore DESC`;
     // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
-    let result = await repo.query(sql);
-    for (const p of result)
-    {
+    const result = await repo.query(sql);
+    for (const p of result) {
         edition.categories[p.awardCategory].nominated.push(p);
     }
-    
+
     // On récupère les meilleurs photographes
     sql = `SELECT a."userId", u.username, a.award
         FROM agpa_award a 
         INNER JOIN "user" u ON u.id = a."userId" 
         WHERE "categoryId"=-1 AND year=${year}
         ORDER BY "year" DESC, a."award" DESC `;
-    edition.categories[-1].nominated = await repo.query(sql);;
-    
+    edition.categories[-1].nominated = await repo.query(sql);
+
     sql = `SELECT DISTINCT(p."userId"), u.username
         FROM agpa_photo p 
         INNER JOIN "user" u ON u.id = p."userId" 
@@ -74,10 +77,9 @@ export async function ceremonyData(year: number) {
     edition.stats.totalPhotos = await repo.query(sql);
     sql = `SELECT year, COUNT(DISTINCT("userId")) AS total FROM agpa_photo GROUP BY year ORDER BY year ASC`;
     edition.stats.totalAuthors = await repo.query(sql);
-    
+
     return edition;
 }
-
 
 // /**
 // * ceremonyOnline
@@ -92,7 +94,7 @@ export async function ceremonyData(year: number) {
 //     {
 // 		$CI = get_instance();
 // 		$data = array();
-		
+
 // 		// On récupère les données
 // 		$sql  = "SELECT a.year, a.award, a.photo_id, a.category_id, p.title, p.filename, p.ranking,  u.user_id, u.username, up.rootfamilly ";
 // 		$sql .= "FROM agpa_awards a ";
@@ -100,43 +102,35 @@ export async function ceremonyData(year: number) {
 // 		$sql .= "INNER JOIN absg_users u ON a.author_id=u.user_id ";
 // 		$sql .= "INNER JOIN agenda_people up ON u.people_id=up.people_id ";
 // 		$sql .= "LEFT JOIN agpa_photos p ON a.photo_id = p.photo_id ";
-        
+
 //         // On détermine la date limite
 // 		$maxYear = date("Y");
 // 		if ($ctx['current_phase'] <= 4) $maxYear--;
-	    
-//         // On affiche le palmarès de quelle année ?    
+
+//         // On affiche le palmarès de quelle année ?
 // 		if ($year <= 0 || $year > $maxYear)
 // 		{
 // 			$year = $maxYear;
 // 		}
 // 		$sql .= "WHERE a.year=$maxYear AND a.category_id=$category ";
 // 		$sql .= "ORDER BY  p.ranking ASC";
-	
+
 // 		// On récupère les données de l'édition terminée
 //         $data = $CI->db->query($sql)->result();
 
-		
 // 		return $data;
 // 	}
-	
+
 // }
-
-
-
-
-
-
-
 
 // /**
 //  * analyseHC1
 //  * Effectue l'analyse necessaire pour afficher le resume du Hors Categorie (-1)
 //  * En profite pour retourner le nombre de participant
 //  *
-//  * @param $infos,   [array] les donnees de la categorie HC1 (meilleur photographe) 
+//  * @param $infos,   [array] les donnees de la categorie HC1 (meilleur photographe)
 //  *                  a analyser
-//  * 
+//  *
 //  */
 // if ( ! function_exists('analyseHC1'))
 // {
@@ -145,13 +139,13 @@ export async function ceremonyData(year: number) {
 //         global $template, $AGPA_MEMBERS, $AGPA_CATEGORIES, $AGPA_PHOTOS;
 
 //         // Get Avatar of the winner
-//         $avatar = ''; 
+//         $avatar = '';
 //         $avatar_type = $AGPA_MEMBERS[$infos['author']]['user_avatar_type'];
 //         if ( $avatar_type == 3 )
 //             $avatar = "{$phpbb_root_path}images/avatars/gallery/".$AGPA_MEMBERS[$infos['author']]['user_avatar'];
 //         else
 //             $avatar = "{$phpbb_root_path}images/avatars/upload/".$AGPA_MEMBERS[$infos['author']]['user_avatar'];
-        
+
 //         // Compter le nombre de photos du photographes et les points récoltés
 //         $photosScore = 0;
 //         $photosNumber = 0;
@@ -175,13 +169,12 @@ export async function ceremonyData(year: number) {
 //     }
 // }
 
-
 // /**
 //  * analyseHC2
 //  * Effectue l'analyse necessaire pour afficher le resume du Hors Categorie (-2)
 //  * En profite pour retourner le nombre de photos postees
 //  *
-//  * @param $infos,   [array] les donnees de la categorie HC1 (meilleur photographe) 
+//  * @param $infos,   [array] les donnees de la categorie HC1 (meilleur photographe)
 //  *                  a analyser
 //  */
 // if ( ! function_exists('analyseHC2'))
@@ -212,13 +205,12 @@ export async function ceremonyData(year: number) {
 //     }
 // }
 
-
 // /**
 //  * analyseSC
 //  * Effectue l'analyse necessaire pour afficher le resume d'une Categorie simple (1 a 6 par exemple)
 //  *
 //  * @param $infos      [array]   les infos sur la photos nominées
-//  * 
+//  *
 //  * @return -
 //  */
 // if ( ! function_exists('analyseSC'))
@@ -226,7 +218,7 @@ export async function ceremonyData(year: number) {
 //     function analyseSC( $infos )
 //     {
 //         global $template, $AGPA_MEMBERS, $AGPA_CATEGORIES, $AGPA_PHOTOS;
-        
+
 //         $photo = $AGPA_PHOTOS[$infos['category']][$infos['photo']];
 //         $place = array('diamant' => 1, 'or' => 1, 'argent' => 2, 'bronze' => 3);
 //         // contruction du template !
@@ -245,9 +237,3 @@ export async function ceremonyData(year: number) {
 //         );
 //     }
 // }
-
-
-
-
-
-

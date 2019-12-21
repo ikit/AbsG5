@@ -10,37 +10,32 @@ export enum LogSeverity {
     notice,
     info,
     debug
-};
-
+}
 
 @Entity()
 export class Log {
-
-    @PrimaryGeneratedColumn({ comment: 'id' })
+    @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
-    
+
     @ManyToOne(type => User)
     @JoinColumn()
     user: User;
-    
-    @Column({ comment: 'Date d\'émission du log' })
+
+    @Column({ comment: "Date d'émission du log" })
     datetime: Date;
-    
-    @Column({ comment: 'Sévérité du log respectant la RFC Syslog', default: 6 })
+
+    @Column({ comment: "Sévérité du log respectant la RFC Syslog", default: 6 })
     severity: LogSeverity;
-    
-    @Column({ comment: 'Identifiant du module à l\'origine du log' })
+
+    @Column({ comment: "Identifiant du module à l'origine du log" })
     module: string;
 
-    @Column({ comment: 'Id / Code Error code si nécessaire', nullable: true })
+    @Column({ comment: "Id / Code Error code si nécessaire", nullable: true })
     messageId: string;
-    
-    @Column({ comment: 'Message du log' })
+
+    @Column({ comment: "Message du log" })
     message: string;
-    
-    @Column("json", { comment: 'Méta-donnée attachée au log', nullable: true })
+
+    @Column("json", { comment: "Méta-donnée attachée au log", nullable: true })
     data: any;
-
-
-
 }

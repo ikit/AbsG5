@@ -3,9 +3,9 @@ import { getConnection, QueryRunner, getRepository } from "typeorm";
 //import * as Excel from 'exceljs';
 //import * as csv from 'csvtojson';
 
-@JsonController('/imports')
+@JsonController("/imports")
 export class ImportController {
-/*
+    /*
     @Post('/')
     async import(@UploadedFile("file") file: any) {
         if (!file) {
@@ -324,7 +324,6 @@ export class ImportController {
     }
 */
 
-
     /**
      * Permet d'importer les données dans les tables simples (sans relations)
      * @param data les données à importer
@@ -333,7 +332,13 @@ export class ImportController {
      * @param entityName le nom de l'entité correspondant aux données
      * @param entityClass le constructeur de l'entité
      */
-    async defaultImport(data: any[] = [], queryRunner: QueryRunner, messages: any[] = [], entityName: string, entityClass: Function) {
+    async defaultImport(
+        data: any[] = [],
+        queryRunner: QueryRunner,
+        messages: any[] = [],
+        entityName: string,
+        entityClass: Function
+    ) {
         const metadata = getConnection().getMetadata(entityName);
         const headers = metadata.columns.map(c => ({
             field: c.propertyName,
@@ -342,7 +347,7 @@ export class ImportController {
         }));
 
         let i = 0;
-        for (let row of data) {
+        for (const row of data) {
             if (i > 0) {
                 const entityId = row[0];
                 let entity;

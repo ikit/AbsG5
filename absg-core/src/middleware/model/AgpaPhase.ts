@@ -1,6 +1,5 @@
 import { registerSchema } from "class-validator";
 
-
 export class AgpaPhase {
     id: number;
     startDate: Date;
@@ -13,5 +12,3 @@ export class AgpaPhase {
         return result;
     }
 }
-
-

@@ -4,14 +4,14 @@ import { Person } from "./Person";
 
 @Entity()
 export class Citation {
-    @PrimaryGeneratedColumn({ comment: 'id' })
+    @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
-    
+
     @ManyToOne(type => User)
     @JoinColumn()
     poster: User;
-    
-    @Column({ comment: 'La citation', type: 'text' })
+
+    @Column({ comment: "La citation", type: "text" })
     citation: string;
 
     @ManyToOne(type => Person)

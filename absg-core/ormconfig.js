@@ -1,3 +1,5 @@
+const rootDir = process.env.NODE_ENV === "development" ? "src" : "build";
+
 module.exports = [
     {
         name: "default",
@@ -9,15 +11,13 @@ module.exports = [
         database: "absg",
         synchronize: true,
         logging: false,
-        entities: ["build/entities/**/*.js"],
-        migrations: ["build/migration/**/*.js"],
-        subscribers: ["build/subscriber/**/*.js"],
+        entities: [`${rootDir}/entities/**/*.js`],
+        migrations: [`${rootDir}/migration/**/*.js`],
+        subscribers: [`${rootDir}/subscriber/**/*.js`],
         cli: {
-        entitiesDir: "build/entities",
-        migrationsDir: "build/migration",
-        subscribersDir: "build/subscriber"
-        },
-        pgDump: "C:/Program Files/PostgreSQL/11/bin/pg_dump"
+            entitiesDir: `${rootDir}/entities`,
+            migrationsDir: `${rootDir}/migration`,
+            subscribersDir: `${rootDir}/subscriber`
+        }
     }
 ];
-  
