@@ -1,50 +1,63 @@
 {
-   "name": "absg-core",
-   "version": "0.0.1",
-   "description": "Core of the Absolument G application.",
-   "devDependencies": {
-      "@types/node": "^8.10.38",
-      "@typescript-eslint/eslint-plugin": "^2.12.0",
-      "@typescript-eslint/parser": "^2.12.0",
-      "eslint": "^6.8.0",
-      "eslint-config-prettier": "^6.7.0",
-      "eslint-plugin-prettier": "^3.1.2",
-      "husky": "^3.1.0",
-      "jest": "^24.1.0",
-      "lint-staged": "^9.5.0",
-      "prettier": "^1.19.1",
-      "ts-node": "3.3.0",
-      "ts-node-dev": "^1.0.0-pre.41"
-   },
-   "dependencies": {
-      "bcrypt": "^3.0.2",
-      "body-parser": "^1.18.1",
-      "cross-env": "^5.2.0",
-      "csvtojson": "^2.0.8",
-      "date-fns": "^1.30.1",
-      "exceljs": "^1.7.0",
-      "express": "^4.16.4",
-      "jsonwebtoken": "^8.4.0",
-      "morgan": "^1.9.1",
-      "multer": "^1.4.1",
-      "node-cmd": "^3.0.0",
-      "pg": "^7.7.1",
-      "reflect-metadata": "^0.1.10",
-      "rotating-file-stream": "^1.3.9",
-      "routing-controllers": "^0.7.7",
-      "typeorm": "0.2.9",
-      "typescript": "2.5.2",
-      "winston": "^3.2.1",
-      "winston-daily-rotate-file": "^4.4.0"
-   },
-   "scripts": {
-      "start": "cross-env NODE_ENV=production ts-node src/api.ts",
-      "build": "tsc --build tsconfig.json",
-      "dev": "ts-node-dev src/api.ts",
-      "test": "jest",
-      "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\""
-   },
-   "husky": {
+    "name": "absg-core",
+    "version": "0.0.1",
+    "description": "API principale de l'application Absolument G.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ikit/AbsG5.git"
+    },
+    "apidoc": {
+        "title": "ABSG5 API",
+        "description": "Documentation de l'API"
+    },
+
+    "devDependencies": {
+        "@types/node": "^8.10.38",
+        "apidoc": "^0.19.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.7.0",
+        "eslint-plugin-prettier": "^3.1.2",
+        "husky": "^3.1.0",
+        "jest": "^24.1.0",
+        "lint-staged": "^9.5.0",
+        "prettier": "^1.19.1",
+        "ts-node": "3.3.0",
+        "ts-node-dev": "^1.0.0-pre.41",
+        "typescript": "2.5.2"
+    },
+    "dependencies": {
+        "@typescript-eslint/eslint-plugin": "^2.12.0",
+        "@typescript-eslint/parser": "^2.12.0",
+        "bcrypt": "^3.0.2",
+        "body-parser": "^1.18.1",
+        "cross-env": "^5.2.0",
+        "csvtojson": "^2.0.8",
+        "date-fns": "^1.30.1",
+        "exceljs": "^1.7.0",
+        "express": "^4.16.4",
+        "jsonwebtoken": "^8.4.0",
+        "morgan": "^1.9.1",
+        "multer": "^1.4.1",
+        "node-cmd": "^3.0.0",
+        "pg": "^7.7.1",
+        "reflect-metadata": "^0.1.10",
+        "rotating-file-stream": "^1.3.9",
+        "routing-controllers": "^0.7.7",
+        "typeorm": "0.2.9",
+        "winston": "^3.2.1",
+        "winston-daily-rotate-file": "^4.4.0"
+    },
+    "scripts": {
+        "start": "cross-env NODE_ENV=production ts-node src/api.ts",
+        "build": "tsc",
+        "dev": "ts-node-dev src/api.ts",
+        "test": "jest",
+        "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\"",
+        "doc:apidoc": "./node_modules/.bin/apidoc -i src/controllers/ -o apidoc/",
+        "doc": "npm run doc:apidoc"
+
+    },
+    "husky": {
         "hooks": {
         "pre-commit": "lint-staged"
         }
