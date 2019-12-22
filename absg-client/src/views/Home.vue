@@ -185,7 +185,6 @@ export default {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
-                    store.commit('updateUser', data.user);
                     store.commit('updateCitation', data.citation);
                     store.commit('updateImmt', data.immt);
                 }
