@@ -1,7 +1,7 @@
 <template>
     <div class="reglement">
 
-        <v-card class="version" >Règlement officiel des AGPA – Edition 2016 – Version du 28 décembre 2016</v-card>
+        <v-card class="version" >Règlement officiel des AGPA – Edition 2020 – Version du 28 décembre 2019</v-card>
 
         <a name="chap1"></a>
         <h2><span class="number">I.</span> Présentation des AGPA</h2>
@@ -9,9 +9,9 @@
 
         <p>Liste et description des catégories retenues :
         <ul>
-            <li><b>Portrait :</b> Photos mettant en évidence un personnage unique;</li>
-            <li><b>Groupe et événement :</b> Photos de groupes avec au minimum deux individus sur la photo;</li>
-            <li><b>Enfants :</b> Photos mettant en évidence un enfant de moins de quinze ans au moment de la prise de vue;</li>
+            <li><b>Portrait :</b> Photos mettant en évidence un personnage unique de plus de quinze ans au moment de la prise de vue;</li>
+            <li><b>Groupe et événement :</b> Toutes photos avec au moins un personnage (enfants comme adulte) sont acceptés dans cette catégorie;</li>
+            <li><b>Enfant :</b> Photos mettant en évidence un enfant de moins de quinze ans au moment de la prise de vue;</li>
             <li><b>Nature :</b> Photos mettant en évidence un sujet principal floristique, faunistique ou naturel;</li>
             <li><b>Grand angle :</b> Tous types de paysages et panoramas;</li>
             <li><b>Manus Hominum :</b> Photos dont le sujet principal est marqué par l'empreinte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme ...);</li>
@@ -19,7 +19,7 @@
             <li><b>Autre regard :</b> Photos humoristiques, artistiques, décalées ou retouchées, ainsi que toutes celles n’entrant pas dans les autres catégories.</li>
         </ul></p>
 
-        <p>Historique et organisation du concours :
+        <p>Historique et organisation du concours :</p>
         <dl>
             <dt>2006</dt>
             <dd><ul>
@@ -38,11 +38,11 @@
             <dd>Modification des catégories historiques, mise en place nouvelle version du site des AGPA (V4) + systeme de vote du meilleur titre intégré</dd>
             <dt>2016</dt>
             <dd>Précision concernant les votes des enfants</dd>
-        </dl></p>
+            <dt>2019</dt>
+            <dd>Précision concernant les catégories Groupe et événement et Enfant</dd>
+        </dl>
 
         <p>Le déroulement de l’édition des AGPA 2013 est détaillé ci-dessous. Les dates et heures indiquées ne sont pas immuables ; elles pourront être modifiées si les circonstances l’exigent (les candidats seront alors prévenus sur le forum Absolument G).</p>
-
-
         <br/>
         <a name="chap2"></a>
         <h2><span class="number">II.</span> Candidature et enregistrement des photos</h2>
@@ -56,7 +56,8 @@
         <p>Pour pouvoir être prise en compte, chaque photo doit remplir les conditions suivantes :
         <ul>
             <li>Peser moins de 5 Mo et ne pas avoir une largeur ou une hauteur qui dépassent les 5 000 pixels;</li>
-            <li>Avoir été prise par le candidat entre le 9 décembre {{prev_year}} et le 14 décembre 2013. Les photos prises au retardateur sont admises, si le candidat a préparé l’appareil et cadré la photo lui-même ;</li>
+            <li>Avoir été prise par le candidat au cours de l'année. Les photos du mois de décembre de l'année précédente sont acceptées;
+            <li>Les photos prises au retardateur sont admises, si le candidat a préparé l’appareil et cadré la photo lui-même;</li>
             <li>Ne pas être un photo-montage, sauf pour la catégorie &laquo; Autre regard &raquo; où ils sont autorisés.</li>
         </ul></p>
 
@@ -70,14 +71,11 @@
             <li>La correction des yeux rouges ou l’effacement de poussières.</li>
         </ul></p>
 
-
         <a name="chap2.2"></a>
         <h3><span class="number">II.2.</span> Enregistrement des photos</h3>
         <p>L’enregistrement des photos se fait sur Internet, dans la section du site Absolument G consacrée aux AGPA. Seules les photos numériques ou numérisées sont acceptées (les diapositives et photos argentiques doivent être scannées). </p>
-
         <p>Lors de l’enregistrement des photos, il est demandé au candidat d’attribuer un titre à chacune de ses œuvres. Le titre donné est visible lors de l'évaluation des jurés, ils pourront donc en tenir compte s' ils le souhaitent.</p>
-
-        <p>La date limite d’enregistrement des photos est fixée au {{p1_end_date}} décembre 2013 à 23h59. Avant cette date, le candidat peut :
+        <p>La date limite d’enregistrement des photos est fixée au 19 décembre à 23h59. Avant cette date, le candidat peut :
         <ul>
             <li>Envoyer et nommer de nouvelles photos (dans la limite de deux par catégorie) ;</li>
             <li>Supprimer, remplacer ou renommer les photos déjà envoyées.</li>
@@ -86,25 +84,20 @@
 
         <a name="chap3"></a>
         <h2><span class="number">III.</span> Visualisions et vérification des photos proposées</h2>
-        <p>Du {{ p2_start_date }} décembre 2013 (0h00) au {{ p2_end_date }} décembre 2013 (23h59), les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
-
+        <p>La journée du 20 décembre, les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
         <p>Pendant cette période, les membres du forum peuvent :
         <ul>
             <li>Visualiser toutes les photos de tous les candidats ;</li>
             <li>Contacter l’organisation pour signaler une erreur ou une photo ne correspondant pas aux critères définis.</li>
         </ul></p>
-
-        <p>Si une photo est jugée non conforme aux critères définis, le candidat concerné sera prévenu et aura la possibilité de remplacer son œuvre jusqu’au {{ p2_end_date }} décembre 2013 23h59. S’il ne le fait pas, la photo en cause pourra être supprimée par l’organisation. </p>
-
+        <p>Si une photo est jugée non conforme aux critères définis, le candidat concerné sera prévenu et aura la possibilité de remplacer son œuvre. S’il ne le fait pas, la photo en cause sera exclues de la phase de vote et ne pourra pas obtenir de point pour le classement final. </p>
         <p>Il n’est pas possible de voter pendant la phase de vérification.</p>
 
         <br/>
         <a name="chap4"></a>
         <h2><span class="number">IV.</span> Votes</h2>
         <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants peuvent voter, cependant seuls les votes des jurés ayant 10 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
-
-        <p>La phase de vote s’étend du {{ p3_start_date }} décembre 2013 (0h00) jusqu'au {{ p3_end_date }} décembre 2013 (23h59). </p>
-
+        <p>La phase de vote s’étend du 21 décembre (0h00) jusqu'au 23 décembre (23h59). </p>
         <p>Pendant cette période, les membres du forum peuvent :
         <ul>
             <li>Visualiser les photos de tous les candidats</li>
@@ -117,9 +110,7 @@
             <li>Corriger leurs votes</li>
         </ul></p>
         <p>Les candidats doivent attribuer tous leurs points. S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.</p>
-
         <p>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables.</p>
-
         <p>Les candidats ne peuvent pas voter pour leurs propres œuvres et les votes sont anonymes.</p>
 
         <br/>
@@ -127,7 +118,7 @@
         <h2><span class="number">V.</span> Palmarès et récompenses</h2>
         <a name="chap5.1"></a>
         <h3><span class="number">V.1.</span> Généralités</h3>
-        <p>Le palmarès sera dévoilé au public le 24 décembre au soir. En dehors de l’honorifique attribution des AGPA d’or, aucune récompense n’est assurée. Les photos gagnantes seront cependant durablement mises en ligne sur le site Absolument G. </p>
+        <p>Le palmarès sera dévoilé au public lors d'une cérémonie organisé pour l'occasion. En dehors de l’honorifique attribution des AGPA d’or, aucune récompense n’est assurée. Les photos gagnantes seront cependant durablement mises en ligne sur le site Absolument G. </p>
 
         <p>Le total des points gagnés détermine le classement d’une photo dans sa catégorie (la photo gagnante est celle qui a obtenu le plus de points). Les cas particuliers (ex-æquo, comparaisons inter catégories) sont détaillés dans le paragraphe <a href="#chap5.2" class="number" title="Aller au paragraphe V.2">V.2</a>.</p>
 
@@ -228,15 +219,7 @@
 <script>
 export default  {
     data: () => ({
-
     }),
-    mounted () {
-        axios.get(`/api/agpa/rules`).then(response => {
-            this.current = response.status === 200 ? response.data : null;
-            this.error = response.status !== 200 ? response : null;
-            this.isLoading = false;
-        });
-    },
 };
 </script>
 
@@ -261,9 +244,9 @@ h1 {
 }
 
 .reglement {
-    font-family: "Tangerine", serif;
+    // font-family: "Tangerine", serif;
+    // font-size: 30px;
     max-width: 800px;
-    font-size: 30px;
     margin: auto;
 
     .version {
