@@ -186,6 +186,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import store from './store';
 import { mapState } from 'vuex';
+import { checkAutentication } from './middleware/CommonHelper';
 
 export default {
     name: 'App',
@@ -207,6 +208,13 @@ export default {
     }),
     props: {
         source: String
+    },
+    beforeCreate() {
+        const user = checkAutentication(store);
+        console.log(this.$route);
+        if (!user) {
+            return this.$route.router.go('/login');
+        }
     },
     methods: {
         checkUserRolesMatch(roles) {

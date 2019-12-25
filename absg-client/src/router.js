@@ -6,6 +6,7 @@ import Changelog from './views/Changelog.vue';
 import Login from './views/Login.vue';
 import axios from 'axios';
 import store from './store';
+import { checkAutentication } from './middleware/CommonHelper';
 
 Vue.use(Router);
 
@@ -199,21 +200,11 @@ router.beforeEach((to, from, next) => {
     const publicPages = ['/login'];
     const authRequired = !publicPages.includes(to.path);
 
-    // Les infos de l'utilisateur authentifié
-    let user = localStorage.getItem('user');
-    if (user) {
-        user = JSON.parse(user);
-    }
+    const user = checkAutentication(store);
 
     // Si accés restreint et pas d'authent, on redirige vers la page de login
     if (authRequired && !user) {
-      return next('/login');
-    }
-
-    // On s'assure que le header d'authent est correctement paramétré
-    if (user && !axios.defaults.headers.common['Authorization']) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-        store.commit('login', user);
+        return next('/login');
     }
 
     next();

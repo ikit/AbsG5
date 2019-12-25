@@ -47,6 +47,10 @@
                             </div>
                         </div>
                     </div>
+                    <div v-if="slide.type === 'bestAuthorWaiting'" class="allAuthors">
+                        <img v-for="user of slide.users" v-bind:key="user.userId" :src="user.avatar" />
+                    </div>
+
                 </section>
 
                 <section>
@@ -189,8 +193,16 @@ export default {
                         // else
                         if (catId == -1) {
                             this.slides.push({ type: "category", id: catId, title: cat.title});
-                            this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
-                            this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
+                            this.slides.push({ type: "bestAuthorWaiting",
+                                users: data.authors.sort(() => Math.random() - 0.5).map(
+                                    e => ({
+                                        ...e,
+                                        avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(e.userId, 3)}.png`,
+                                    }))}
+                                );
+                            for (const s of data.categories[-1].nominated.reverse()) {
+                                this.slides.push({ type: "bestAuthorAward", ...s});
+                            }
                         }
                     }
 
@@ -321,6 +333,18 @@ export default {
             width: 100px;
         }
     }
+
+    .allAuthors {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        height: 100%;
+
+        img {
+            height: 100px
+        }
+    }
+
 }
 
 .controls {
