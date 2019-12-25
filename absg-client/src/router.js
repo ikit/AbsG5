@@ -151,6 +151,10 @@ export const router = new Router({
                 },
                 {
                     path: 'ceremony',
+                    component: () => import('./views/Agpa/CeremonyMenu.vue'),
+                },
+                {
+                    path: 'ceremony/:year',
                     component: () => import('./views/Agpa/Ceremony.vue'),
                 }
             ]
@@ -186,7 +190,7 @@ export const router = new Router({
         {
             path: '*',
             redirect: '/404'
-        },
+        }
     ]
 });
 

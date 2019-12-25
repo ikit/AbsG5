@@ -51,7 +51,7 @@ export async function ceremonyData(year: number) {
         LEFT JOIN agpa_photo p ON p.id = a."photoId"
         INNER JOIN "user" u ON u.id = p."userId" 
         WHERE a.year=${year} 
-        ORDER BY a."categoryId" ASC, p.gscore DESC`;
+        ORDER BY a."categoryId" ASC, p.ranking ASC`;
     // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
     const result = await repo.query(sql);
     for (const p of result) {

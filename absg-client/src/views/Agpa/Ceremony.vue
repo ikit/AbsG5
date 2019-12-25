@@ -1,11 +1,11 @@
 <template>
-<div class="ceremony">
+<div>
+    <div class="ceremony">
         <div class="reveal">
             <div class="slides">
-
                 <section>
                     <h1>Absolument G Photos Awards</h1>
-                    <h2>2018</h2>
+                    <h2>{{ year }}</h2>
                 </section>
 
                 <section>
@@ -54,11 +54,20 @@
                 </section>
 
                 <section>
-                    <button type="button" class="button">Quitter la cérémonie</button>
+                    <button type="button" class="button" @click="close()">Quitter la cérémonie</button>
                 </section>
 
             </div>
+        </div>
+
+        <div class="controls">
+            <v-btn small color="primary" dark>Début</v-btn>
+            <v-btn small color="primary" dark>Précédante</v-btn>
+            <v-btn small color="primary" dark>Suivante</v-btn>
+            <v-btn small color="primary" dark @click="close()">Quitter</v-btn>
+        </div>
     </div>
+
 </div>
 </template>
 
@@ -76,8 +85,7 @@ export default {
         highcharts: Chart
     },
     data: () => ({
-       isLoading: false,
-        revealProgress: 0,
+        isLoading: false,
         year: 2018,
         slides: [],
         stats: {
@@ -123,17 +131,19 @@ export default {
         }
     }),
     mounted() {
-        this.initView();
+        this.year = Number.parseInt(this.$route.params.year);
+        this.initView()
     },
     methods: {
         initView() {
             // Reset photos list
             this.photosGalery = [];
             this.photosGalleryIndex = 0;
-            this.year = 2018; // Number.parseInt(this.$route.params.year);
+            console.log("PREZ call", this.year)
             axios.get(`/api/agpa/ceremony/${this.year}`).then(response => {
                 const data = response.status === 200 ? response.data : null;
                 this.error = response.status !== 200 ? response : null;
+                console.log("PREZ init", data)
                 if (data) {
                     // Participations
                     this.stats.diag1.series = [
@@ -153,30 +163,31 @@ export default {
                     // Photos categories simples
                     for(let catId in data.categories) {
                         const cat = data.categories[catId];
-                        if (catId != -1) {
-                            this.slides.push({ type: "category", id: catId, title: cat.title});
-                            let nominated = cat.nominated.map(photo => ({
-                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
-                                title: photo.title,
-                                username: photo.username,
-                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
-                            }));
-                            nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
-                            this.slides = this.slides.concat(nominated);
-                            this.slides.push({ type:"awardWaiting", photos: nominated.map(e => e.url)});
-                            const awards = cat.nominated.map(photo => ({
-                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
-                                title: photo.title,
-                                username: photo.username,
-                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
-                                award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
+                        // if (catId != -1) {
+                        //     this.slides.push({ type: "category", id: catId, title: cat.title});
+                        //     let nominated = cat.nominated.map(photo => ({
+                        //         url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                        //         title: photo.title,
+                        //         username: photo.username,
+                        //         avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                        //     }));
+                        //     nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
+                        //     this.slides = this.slides.concat(nominated);
+                        //     this.slides.push({ type:"awardWaiting", photos: nominated.map(e => e.url)});
+                        //     const awards = cat.nominated.map(photo => ({
+                        //         url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                        //         title: photo.title,
+                        //         username: photo.username,
+                        //         avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                        //         award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
 
-                            }));
-                            awards.pop();
-                            awards.reverse();
-                            this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
-                        }
-                        else if (catId == -1) {
+                        //     }));
+                        //     awards.pop();
+                        //     awards.reverse();
+                        //     this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
+                        // }
+                        // else
+                        if (catId == -1) {
                             this.slides.push({ type: "category", id: catId, title: cat.title});
                             this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
                             this.slides.push({ type: "bestAuthorWaiting", users: data.authors.sort(() => Math.random() - 0.5)});
@@ -187,16 +198,13 @@ export default {
                 }
                 this.isLoading = false;
                 Reveal.initialize({transition: "fade", progress: false, controls: false });
+                console.log("PREZ ready", this.slides)
             });
         },
 
-        handleSlideChange(event) {
-
-            this.setBatteryProgress(Reveal.getProgress() * 100);
+        close() {
+            window.close();
         },
-        setBatteryProgress(progress) {
-            console.log(progress);
-        }
     },
 };
 </script>
@@ -256,7 +264,7 @@ export default {
 
     img.catIllustration {
         display: absolute;
-        height: 50vh;
+        height: 60vh;
         margin: auto;
         bottom: 50px;
         border: none;
@@ -313,9 +321,29 @@ export default {
             width: 100px;
         }
     }
-
-
-
 }
+
+.controls {
+    background: rgba(0,0,0,0.8);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    height: 30px;
+    opacity: 0;
+    text-align: center;
+
+    button {
+        color: #fff;
+        margin: 3px 10px;
+        font-family: 'Lucida Sans', Verdana, sans-serif;
+
+    }
+}
+
+.controls:hover {
+    opacity: 1;
+}
+
 
 </style>
