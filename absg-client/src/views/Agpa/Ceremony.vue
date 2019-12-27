@@ -50,7 +50,22 @@
                     <div v-if="slide.type === 'bestAuthorWaiting'" class="allAuthors">
                         <img v-for="user of slide.users" v-bind:key="user.userId" :src="user.avatar" />
                     </div>
-
+                    <div v-if="slide.type === 'bestAuthorAward'" style="width:100%; height:100%">
+                        <img :src="slide.avatar" class="authorAvatar"/>
+                        <h3>{{ slide.username }}</h3>
+                        <img :src="slide.award" class="award"/>
+<!--
+                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                            <div class="photoDeliberating">
+                                <img :src="slide.avatar" class="authorAvatar"/>
+                            </div>
+                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[0]" :contain="true" aspect-ratio="1"></v-img></div>
+                        </div>
+                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[1]" :contain="true" aspect-ratio="1"></v-img></div>
+                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[2]" :contain="true" aspect-ratio="1"></v-img></div>
+                        </div> -->
+                    </div>
                 </section>
 
                 <section>
@@ -60,7 +75,6 @@
                 <section>
                     <button type="button" class="button" @click="close()">Quitter la cérémonie</button>
                 </section>
-
             </div>
         </div>
 
@@ -163,34 +177,12 @@ export default {
                             yAxis: 1,
                             data: data.stats.totalAuthors.map(e => +e.total)
                         }
-                    ]
-                    // Photos categories simples
+                    ];
+
+                    // Categories
                     for(let catId in data.categories) {
                         const cat = data.categories[catId];
-                        // if (catId != -1) {
-                        //     this.slides.push({ type: "category", id: catId, title: cat.title});
-                        //     let nominated = cat.nominated.map(photo => ({
-                        //         url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
-                        //         title: photo.title,
-                        //         username: photo.username,
-                        //         avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
-                        //     }));
-                        //     nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
-                        //     this.slides = this.slides.concat(nominated);
-                        //     this.slides.push({ type:"awardWaiting", photos: nominated.map(e => e.url)});
-                        //     const awards = cat.nominated.map(photo => ({
-                        //         url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
-                        //         title: photo.title,
-                        //         username: photo.username,
-                        //         avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
-                        //         award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
-
-                        //     }));
-                        //     awards.pop();
-                        //     awards.reverse();
-                        //     this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
-                        // }
-                        // else
+                        // Meilleurs photographes
                         if (catId == -1) {
                             this.slides.push({ type: "category", id: catId, title: cat.title});
                             this.slides.push({ type: "bestAuthorWaiting",
@@ -201,12 +193,54 @@ export default {
                                     }))}
                                 );
                             for (const s of data.categories[-1].nominated.reverse()) {
-                                this.slides.push({ type: "bestAuthorAward", ...s});
+                                this.slides.push({
+                                    type: "bestAuthorAward",
+                                    ...s,
+                                    photos:[],
+                                    avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(s.userId, 3)}.png`,
+                                    award: `/img/agpa/cupes/cx1-${s.award}.png`});
                             }
+                        } else
+                        // AGPA d'honneurs
+                        if (catId == -4) {
+                            this.slides.push({ type: "category", id: catId, title: cat.title});
+                            const awards = cat.nominated.map(photo => ({
+                                type: "photoAward",
+                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                title: photo.title,
+                                username: photo.username,
+                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
+
+                            }));
+                            this.slides = this.slides.concat(awards);
+                        }
+                        // Les autres catégories
+                        else {
+
+                            this.slides.push({ type: "category", id: catId, title: cat.title});
+                            let nominated = cat.nominated.map(photo => ({
+                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                title: photo.title,
+                                username: photo.username,
+                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                            }));
+                            nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
+                            this.slides = this.slides.concat(nominated);
+                            this.slides.push({ type:"awardWaiting", photos: nominated.map(e => e.url)});
+                            const awards = cat.nominated.map(photo => ({
+                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                title: photo.title,
+                                username: photo.username,
+                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
+
+                            }));
+                            awards.pop();
+                            awards.reverse();
+                            this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
                         }
                     }
-
-                    // store.commit('photosGalleryReset', this.photosGalery);
                 }
                 this.isLoading = false;
                 Reveal.initialize({transition: "fade", progress: false, controls: false });

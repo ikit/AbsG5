@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { AgpaPhoto, AgpaCategory } from "../entities";
+import { AgpaPhoto } from "../entities";
 import { getMetaData } from "./agpaCommonHelpers";
 
 /**
@@ -35,6 +35,7 @@ export async function ceremonyData(year: number) {
                       "6": { nominated: [] },
                       "7": { nominated: [] },
                       "8": { nominated: [] },
+                      "-4": { nominated: [] },
                       "-3": { nominated: [] },
                       "-2": { nominated: [] },
                       "-1": { nominated: [] }
@@ -51,11 +52,15 @@ export async function ceremonyData(year: number) {
         LEFT JOIN agpa_photo p ON p.id = a."photoId"
         INNER JOIN "user" u ON u.id = p."userId" 
         WHERE a.year=${year} 
-        ORDER BY a."categoryId" ASC, p.ranking ASC`;
+        ORDER BY a."categoryId" ASC, a.award DESC`;
     // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
     const result = await repo.query(sql);
     for (const p of result) {
-        edition.categories[p.awardCategory].nominated.push(p);
+        if (p.award === "honor") {
+            edition.categories[-4].nominated.push(p);
+        } else {
+            edition.categories[p.awardCategory].nominated.push(p);
+        }
     }
 
     // On récupère les meilleurs photographes
@@ -80,48 +85,6 @@ export async function ceremonyData(year: number) {
 
     return edition;
 }
-
-// /**
-// * ceremonyOnline
-// * La cérémonie de remise des AGPA online
-// * @param $ctx [array], le contexte des agpa
-// * @param $category [int], la catégorie en cours
-// * @param $step [int] l'étape courante : 0=Présentation, 1=nominés, 2=Bronze, 3=argent, 4=or/diamant
-// */
-// if ( ! function_exists('ceremonyOnline'))
-// {
-//     function ceremonyOnline(&$ctx, $year, $category, $step)
-//     {
-// 		$CI = get_instance();
-// 		$data = array();
-
-// 		// On récupère les données
-// 		$sql  = "SELECT a.year, a.award, a.photo_id, a.category_id, p.title, p.filename, p.ranking,  u.user_id, u.username, up.rootfamilly ";
-// 		$sql .= "FROM agpa_awards a ";
-// 		$sql .= "INNER JOIN agpa_categories c ON a.category_id=c.category_id ";
-// 		$sql .= "INNER JOIN absg_users u ON a.author_id=u.user_id ";
-// 		$sql .= "INNER JOIN agenda_people up ON u.people_id=up.people_id ";
-// 		$sql .= "LEFT JOIN agpa_photos p ON a.photo_id = p.photo_id ";
-
-//         // On détermine la date limite
-// 		$maxYear = date("Y");
-// 		if ($ctx['current_phase'] <= 4) $maxYear--;
-
-//         // On affiche le palmarès de quelle année ?
-// 		if ($year <= 0 || $year > $maxYear)
-// 		{
-// 			$year = $maxYear;
-// 		}
-// 		$sql .= "WHERE a.year=$maxYear AND a.category_id=$category ";
-// 		$sql .= "ORDER BY  p.ranking ASC";
-
-// 		// On récupère les données de l'édition terminée
-//         $data = $CI->db->query($sql)->result();
-
-// 		return $data;
-// 	}
-
-// }
 
 // /**
 //  * analyseHC1
