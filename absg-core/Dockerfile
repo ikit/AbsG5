@@ -19,9 +19,10 @@ WORKDIR /app
 
 USER node
 
-COPY --chown=node:node --from=build  ./app/build/src ./build
+COPY --chown=node:node --from=build  ./app/build ./build
 COPY --chown=node:node package*.json ormconfig.js ./
 
+RUN node --version
 RUN npm install --production
 
 EXPOSE 5010 5011
