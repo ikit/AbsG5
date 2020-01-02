@@ -1,0 +1,51 @@
+version: '3.5'
+
+networks:
+  AZERTY_TEST_net:
+    name: AZERTY_TEST_net
+
+services:
+  AZERTY_TEST_db:
+    container_name: AZERTY_TEST_db
+    image: postgres
+    restart: always
+    volumes:
+      - /var/c/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=AZERTY_TEST
+      - POSTGRES_DB=AZERTY_TEST
+      - POSTGRES_USER=AZERTY_TEST
+    networks:
+      - AZERTY_TEST_net
+
+  AZERTY_TEST_pgadmin:
+    container_name: AZERTY_TEST_pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    volumes:
+      - /var/AZERTY_TEST/pgadmin:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.com
+      - PGADMIN_DEFAULT_PASSWORD=AZERTY_TEST
+    networks:
+      - AZERTY_TEST_net
+    ports:
+      - "20013:80"
+
+  AZERTY_TEST_cloud:
+    container_name: AZERTY_TEST_cloud
+    image: nextcloud:apache
+    volumes:
+      - /var/AZERTY_TEST/nextcloud:/var/www/html
+    depends_on:
+      - AZERTY_TEST_db
+    environment:
+      - POSTGRES_USER=AZERTY_TEST
+      - POSTGRES_DB=AZERTY_TEST
+      - POSTGRES_PASSWORD=AZERTY_TEST
+      - POSTGRES_HOST=AZERTY_TEST_db
+    networks:
+      - AZERTY_TEST_net
+    ports:
+      - "20011:80"
+      - "20012:443"
