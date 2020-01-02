@@ -3,7 +3,6 @@ import { AgpaCategory } from "./AgpaCategory";
 import { AgpaPhoto } from "./AgpaPhoto";
 import { User } from "./User";
 
-
 export enum AgpaAwardType {
     honor,
     nominated,
@@ -19,7 +18,7 @@ export class AgpaAward {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ comment: 'Année d\'attribution de l\'agpa', width: 4 })
+    @Column({ comment: "Année d'attribution de l'agpa", width: 4 })
     year: number;
 
     @ManyToOne(type => AgpaCategory)
@@ -30,7 +29,10 @@ export class AgpaAward {
     @JoinColumn()
     user: User;
 
-    @Column("enum", { enum: ['honor', 'nominated', 'bronze', 'sylver', 'gold', 'diamond'], comment: `'L\'agpa décerné` })
+    @Column("enum", {
+        enum: ["honor", "nominated", "bronze", "sylver", "gold", "diamond"],
+        comment: `'L\'agpa décerné`
+    })
     award: AgpaAwardType;
 
     @ManyToOne(type => AgpaPhoto)

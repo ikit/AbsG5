@@ -3,87 +3,7 @@
         <v-container fluid grid-list-xl>
             <v-layout row wrap>
                 <v-flex stretch>
-                    <v-card style="min-width: 500px;">
-                        <v-card-title style="border-bottom: 1px solid rgba(0,0,0, 0.1)"> <h2>{{ todayLabel }}</h2>
-                            <div style="position: absolute; right: 15px">
-                                <v-btn fab small color="accent"
-                                    @click="$refs.calendar.prev()">
-                                    <v-icon>fas fa-angle-left</v-icon>
-                                </v-btn>
-                                <v-btn fab small color="accent"
-                                    @click="$refs.calendar.next()">
-                                    <v-icon>fas fa-angle-right</v-icon>
-                                </v-btn>
-                                <v-menu offset-y :close-on-content-click="false">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn fab small color="accent" v-bind="attrs" v-on="on">
-                                            <v-icon>fas fa-th-list</v-icon>
-                                        </v-btn>
-                                    </template>
-
-                                    <v-list>
-                                        <v-list-item
-                                            v-for="(filter, index) in filters"
-                                            :key="index">
-                                            <v-list-item-action>
-                                                <v-checkbox v-model="filter.selected"></v-checkbox>
-                                            </v-list-item-action>
-                                            <v-list-item-title>{{ filter.text }}</v-list-item-title>
-                                        </v-list-item>
-                                    </v-list>
-                                </v-menu>
-                            </div>
-
-                        </v-card-title>
-                        <v-sheet style="height:426px;">
-                            <v-calendar
-                                ref="calendar"
-                                :type="type"
-                                :now="today"
-                                v-model="date"
-                                color="primary">
-                                <template
-                                    slot="day"
-                                    slot-scope="{ date }">
-                                    <template v-for="event in eventsMap[date]">
-                                    <v-menu
-                                        :key="event.title"
-                                        v-model="event.open"
-                                        full-width
-                                        offset-x>
-                                        <div
-                                            v-if="!event.time"
-                                            slot="activator"
-                                            v-ripple
-                                            class="my-event"
-                                            v-html="event.title">
-                                        </div>
-                                        <v-card
-                                            color="grey lighten-4"
-                                            min-width="350px"
-                                            flat>
-                                            <v-toolbar
-                                                color="primary"
-                                                dark>
-                                                <v-toolbar-title v-html="event.title"></v-toolbar-title>
-                                                <v-spacer></v-spacer>
-                                                <v-btn icon>
-                                                    <v-icon>fas fa-edit</v-icon>
-                                                </v-btn>
-                                            </v-toolbar>
-                                            <v-card-title primary-title>
-                                                <span v-html="event.details"></span>
-                                            </v-card-title>
-                                            <v-card-actions>
-                                                <v-btn text color="secondary">Fermer</v-btn>
-                                            </v-card-actions>
-                                        </v-card>
-                                    </v-menu>
-                                    </template>
-                                </template>
-                            </v-calendar>
-                        </v-sheet>
-                    </v-card>
+                    <Calendar></Calendar>
                 </v-flex>
 
                 <v-flex shrink>
@@ -113,7 +33,7 @@
                         </v-card-title>
 
                         <v-list class="passageRow">
-                        <template v-for="(item, i1) in passage">
+                        <template v-for="item in passage">
                             <v-list-item
                                 :key="item.title"
                                 ripple>
@@ -135,7 +55,11 @@
                 </v-flex>
 
             </v-layout>
+            <v-layout row wrap>
+                <div id="coke" data-src="/img/cube.jpg" data-depth-src="/img/cube-depth.jpg"></div>
+            </v-layout>
         </v-container>
+
 
     </div>
 </template>
@@ -148,80 +72,19 @@ import store from '../store';
 import axios from 'axios';
 import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
+import * as image3D from '3d-image';
+import Calendar from '../components/Calendar';
 
 Vue.use(VueSilentbox);
 
 export default {
+    components: {
+        Calendar
+    },
     store,
     data: () => ({
         menu: false,
-        today: new Date().toISOString().substr(0, 10),
-        date: new Date().toISOString().substr(0, 10),
-        type: 'month',
-        typeOptions: [
-            { text: 'Journée', value: 'day' },
-            { text: 'Semaine', value: 'week' },
-            { text: 'Mois', value: 'month' }
-        ],
-        events: [
-            {
-                title: 'Vacation',
-                details: 'Going to the beach!',
-                date: '2019-03-10',
-                open: false,
-          time: '09:00',
-          duration: 45
-            },
-            {
-                title: 'Vacation',
-                details: 'Going to the beach!',
-                date: '2018-12-31',
-                open: false
-            },
-            {
-                title: 'Vacation',
-                details: 'Going to the beach!',
-                date: '2019-01-01',
-                open: false
-            },
-            {
-                title: 'Meeting',
-                details: 'Spending time on how we do not have enough time',
-                date: '2019-01-07',
-                open: false
-            },
-            {
-                title: '30th Birthday',
-                details: 'Celebrate responsibly',
-                date: '2019-01-03',
-                open: false
-            },
-            {
-                title: 'New Year',
-                details: 'Eat chocolate until you pass out',
-                date: '2019-01-01',
-                open: false
-            },
-            {
-                title: 'Conference',
-                details: 'Mute myself the whole time and wonder why I am on this call',
-                date: '2019-01-21',
-                open: false
-            },
-            {
-                title: 'Hackathon',
-                details: 'Code like there is no tommorrow',
-                date: '2019-02-01',
-                open: false
-            }
-        ],
-        filters: [
-            { text: 'Naissances', value: 'birth', selected: true },
-            { text: 'Fêtes nationales', value: 'firstname', selected: true },
-            { text: 'Gueudelot', value: 'firsname2', selected: true },
-            { text: 'Guibert', value: 'age', selected: true },
-            { text: 'Guyomard', value: 'home', selected: true },
-        ],
+
         selected: [2],
         passage: [
         {
@@ -307,6 +170,9 @@ export default {
     }),
     mounted() {
         this.getWelcomData();
+        var coke = document.getElementById("coke");
+        console.log(image3D)
+        //image3D.process(coke);
     },
     watch: {
         menu (val) {
@@ -318,9 +184,7 @@ export default {
             axios.get(`/api/users/welcom`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
-                    console.log(data);
                     this.isLoading = false;
-                    store.commit('updateUser', data.user);
                     store.commit('updateCitation', data.citation);
                     store.commit('updateImmt', data.immt);
                 }
@@ -338,18 +202,47 @@ export default {
         }
     },
     computed: {
-        // convert the list of events into a map of lists keyed by date
-        eventsMap () {
-            const map = {};
-            this.events.forEach(e => (map[e.date] = map[e.date] || []).push(e));
-            return map;
-        },
+        // Méthode pour le store
         immt () {
           return this.$store.state.immt;
         },
-        todayLabel() {
-            return this.$store.state.todayLabel;
-        }
+
+
+        // Méthode pour la calendrier
+        title () {
+            const { start, end } = this
+            if (!start || !end) {
+            return ''
+            }
+
+            const startMonth = this.monthFormatter(start)
+            const endMonth = this.monthFormatter(end)
+            const suffixMonth = startMonth === endMonth ? '' : endMonth
+
+            const startYear = start.year
+            const endYear = end.year
+            const suffixYear = startYear === endYear ? '' : endYear
+
+            const startDay = start.day + this.nth(start.day)
+            const endDay = end.day + this.nth(end.day)
+
+            switch (this.type) {
+            case 'month':
+                return `${startMonth} ${startYear}`
+            case 'week':
+            case '4day':
+                return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
+            case 'day':
+                return `${startMonth} ${startDay} ${startYear}`
+            }
+            return ''
+        },
+        monthFormatter () {
+            return this.$refs.calendar.getFormatter({
+            timeZone: 'UTC', month: 'long',
+            })
+        },
+
     }
 };
 </script>

@@ -1,19 +1,17 @@
 import { getRepository } from "typeorm";
-import { JsonController, Param, Body, Get, Post, Delete, NotFoundError } from "routing-controllers";
+import { JsonController, Param, Body, Get, Post, Delete, NotFoundError, Authorized } from "routing-controllers";
 import { Immt } from "../entities";
 
 import { immtService } from "../services";
 import { success, issue } from "../middleware/jsonHelper";
 
-
-@JsonController('/immt')
+@JsonController("/immt")
 export class ImmtController {
-
-
     /**
      * Renvoie la dernière image du moment en date
      */
-    @Get('')
+    @Authorized()
+    @Get("")
     async last() {
         return await immtService.last();
     }
@@ -21,12 +19,13 @@ export class ImmtController {
     /**
      * Récupère les infos pour initialiser l'écran des Immt
      */
-    @Get('/init')
+    @Authorized()
+    @Get("/init")
     async initData() {
         try {
             return success(await immtService.getInitData());
         } catch (ex) {
-            return issue('Impossible de récupérer les données d\'initialisation de la section immt', ex);
+            return issue("Impossible de récupérer les données d'initialisation de la section immt", ex);
         }
     }
 
@@ -35,7 +34,8 @@ export class ImmtController {
      * @param year l'année de l'immt
      * @param day  le jour dans l'année de l'immt
      */
-    @Get('/:year([0-9]{4})/:day([0-9]{1,3})')
+    @Authorized()
+    @Get("/:year([0-9]{4})/:day([0-9]{1,3})")
     async getById(@Param("year") year: number, @Param("day") day: number) {
         try {
             return success(await immtService.fromId(year, day));
@@ -46,18 +46,20 @@ export class ImmtController {
 
     /**
      * Récupère les immt en fonction des données de filtrage fournis
-     * @param filteringData 
+     * @param filteringData
      */
-    @Post('/')
+    @Authorized()
+    @Post("/")
     async get(@Body() filteringData: any) {
         try {
             return success(await immtService.getImmts(filteringData.pageIndex, filteringData.pageSize));
         } catch (ex) {
-            return issue('Impossible de récupérer les images demandées', ex);
+            return issue("Impossible de récupérer les images demandées", ex);
         }
     }
 
-    @Post('/')
+    @Authorized()
+    @Post("/")
     async save(@Body() citation: Immt) {
         try {
             return success(await immtService.save(citation));
@@ -66,7 +68,8 @@ export class ImmtController {
         }
     }
 
-    @Delete('/:year([0-9]{4})/:day([0-9]{1,3})')
+    @Authorized()
+    @Delete("/:year([0-9]{4})/:day([0-9]{1,3})")
     async remove(@Param("year") year: number, @Param("day") day: number) {
         try {
             return success(await immtService.remove(year, day));

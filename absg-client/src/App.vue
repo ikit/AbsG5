@@ -24,19 +24,19 @@
                 <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; " v-html="citation.citation"></span>
             </div>
         </v-spacer>
-        <v-badge color="accent" overlap>
+        <v-badge color="accent" style="margin-right: 15px" overlap v-if="user">
             <span slot="badge">8</span>
             <v-btn icon
                 @click.stop="dialog = !dialog">
                 <v-icon>fas fa-bell</v-icon>
             </v-btn>
         </v-badge>
-        <v-menu offset-y bottom left>
+        <v-menu offset-y bottom left v-if="user">
             <template v-slot:activator="{ on, attrs }">
                 <v-btn depressed color="primary" v-bind="attrs" v-on="on">
-                    Bébé Ma'anne
+                    {{ user.username }}
                     <!-- <v-icon right>fas fa-user-circle</v-icon> -->
-                    <img src="/img/avatars/009.png" style="height: 40px; margin-left: 15px" />
+                    <img :src="user.avatarUrl" style="height: 40px; margin-left: 15px" />
                 </v-btn>
             </template>
 
@@ -66,10 +66,10 @@
     </v-app-bar>
 
     <v-content id="bgcontent">
-        <div class="menu">
+        <div class="menu" v-if="user">
             <v-list style="background: none">
                 <template v-for="item in items">
-                    <div class="menuItem" v-if="!item.children" :key="item.text">
+                    <div class="menuItem" v-if="!item.roles || checkUserRolesMatch(item.roles)" :key="item.text">
                         <router-link :to="item.route">
                             <v-icon color="inherit">{{ item.icon }}</v-icon><br/>
                             <span style="display: inline-block; line-height: 1.1em;">{{ item.text }}</span>
@@ -81,7 +81,7 @@
             <div class="menuItem" style="position: absolute; bottom: 0; border-top: 1px solid rgba(0, 0, 0, 0.2)">
                 <router-link to="/changelog">
                     <v-icon color="inherit">far fa-question-circle</v-icon><br/>
-                    <span style="display: inline-block; line-height: 0.9em;">v5 apha.5</span>
+                    <span style="display: inline-block; line-height: 0.9em;">v5 apha</span>
                 </router-link>
             </div>
         </div>
@@ -115,66 +115,68 @@
                     </div>
                 </div>
             </div>
+            <div class="photoEditor" v-if="photosEditorDisplayed">
+            </div>
         </div>
     </v-content>
 
 
     <v-dialog v-model="dialog" width="800px">
-    <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
-        Notifications
-        </v-card-title>
-        <v-container grid-list-sm class="pa-4">
-        <v-layout row wrap>
-            <v-flex xs12 align-center justify-space-between>
-            <v-layout align-center>
-                <v-avatar size="40px" class="mr-3">
-                <img
-                    src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
-                    alt="">
-                </v-avatar>
-                <v-text-field placeholder="Name"></v-text-field>
+        <v-card>
+            <v-card-title class="grey lighten-4 py-4 title">
+            Notifications
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+            <v-layout row wrap>
+                <v-flex xs12 align-center justify-space-between>
+                <v-layout align-center>
+                    <v-avatar size="40px" class="mr-3">
+                    <img
+                        src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
+                        alt="">
+                    </v-avatar>
+                    <v-text-field placeholder="Name"></v-text-field>
+                </v-layout>
+                </v-flex>
+                <v-flex xs6>
+                <v-text-field
+                    prepend-icon="business"
+                    placeholder="Company">
+                </v-text-field>
+                </v-flex>
+                <v-flex xs6>
+                <v-text-field
+                    placeholder="Job title">
+                </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                <v-text-field
+                    prepend-icon="mail"
+                    placeholder="Email">
+                </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                <v-text-field
+                    type="tel"
+                    prepend-icon="phone"
+                    placeholder="(000) 000 - 0000"
+                    mask="phone">
+                </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                <v-text-field
+                    prepend-icon="notes"
+                    placeholder="Notes">
+                </v-text-field>
+                </v-flex>
             </v-layout>
-            </v-flex>
-            <v-flex xs6>
-            <v-text-field
-                prepend-icon="business"
-                placeholder="Company">
-            </v-text-field>
-            </v-flex>
-            <v-flex xs6>
-            <v-text-field
-                placeholder="Job title">
-            </v-text-field>
-            </v-flex>
-            <v-flex xs12>
-            <v-text-field
-                prepend-icon="mail"
-                placeholder="Email">
-            </v-text-field>
-            </v-flex>
-            <v-flex xs12>
-            <v-text-field
-                type="tel"
-                prepend-icon="phone"
-                placeholder="(000) 000 - 0000"
-                mask="phone">
-            </v-text-field>
-            </v-flex>
-            <v-flex xs12>
-            <v-text-field
-                prepend-icon="notes"
-                placeholder="Notes">
-            </v-text-field>
-            </v-flex>
-        </v-layout>
-        </v-container>
-        <v-card-actions>
-        <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
-        <v-spacer></v-spacer>
-        <v-btn text @click="dialog=false">Fermer</v-btn>
-        </v-card-actions>
-    </v-card>
+            </v-container>
+            <v-card-actions>
+            <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn text @click="dialog=false">Fermer</v-btn>
+            </v-card-actions>
+        </v-card>
     </v-dialog>
 </v-app>
 </template>
@@ -184,45 +186,45 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import store from './store';
 import { mapState } from 'vuex';
-import ClientOAuth2 from 'client-oauth2';
-
-
-var githubAuth = new ClientOAuth2({
-  clientId: 'abc',
-  clientSecret: '123',
-  accessTokenUri: 'https://github.com/login/oauth/access_token',
-  authorizationUri: 'https://github.com/login/oauth/authorize',
-  redirectUri: 'http://example.com/auth/github/callback',
-  scopes: ['notifications', 'gist']
-});
-
-console.log(githubAuth);
-
+import { checkAutentication } from './middleware/CommonHelper';
 
 export default {
     name: 'App',
     store,
     data: () => ({
-    dialog: false,
-    darkMode: false,
-    drawer: null,
-    items: [
-        { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
-        { icon: 'fas fa-image', text: 'Photos', route: '/photos' },
-        { icon: 'fas fa-comment', text: 'Discussions', route: '/discussions' },
-        { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
-        { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
-        { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
-        { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
-    ]
+        dialog: false,
+        darkMode: false,
+        drawer: null,
+        items: [
+            { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
+            { icon: 'fas fa-image', text: 'Photos', route: '/photos' },
+            { icon: 'fas fa-comment', text: 'Discussions', route: '/discussions' },
+            { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
+            { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
+            { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
+            { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
+            { icon: 'fas fa-cog', text: 'Admin', route: '/admin', roles: ["admin"]  },
+        ]
     }),
     props: {
         source: String
     },
+    beforeCreate() {
+        const user = checkAutentication(store);
+        console.log(this.$route);
+        if (!user) {
+            return this.$route.router.go('/login');
+        }
+    },
     methods: {
-
+        checkUserRolesMatch(roles) {
+            let result = true;
+            console.log("checkUserRolesMatch", roles);
+            return result;
+        },
         photosGalleryHide() {
             store.commit('photosGalleryHide');
+            console.log("couc", this.user);
         },
         photosGalleryPrev() {
             store.commit('photosGalleryPrev');
@@ -239,14 +241,11 @@ export default {
     },
     computed: {
         ...mapState([
+            'citation',
+            'user',
             'notifications'
         ]),
-        citation () {
-            return this.$store.state.citation;
-        },
-        user () {
-            return this.$store.state.user;
-        },
+        // Gallerie photos
         photosGalleryDisplayed() {
             return this.$store.state.photosGalleryDisplayed;
         },
@@ -262,7 +261,10 @@ export default {
             }
             return 'http://localhost:8080/img/immt-new.png';
         },
-
+        // Editeur photos
+        photosEditorDisplayed() {
+            return this.$store.state.photosEditorDisplayed;
+        }
     }
 };
 </script>

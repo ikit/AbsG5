@@ -1,15 +1,14 @@
-import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
-import { User } from '../entities';
+import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
+import { User } from "../entities";
 
 class AuthService {
-
-    private SECRET = 'EyVgkGdxM58b>A6df&vrb+X4<Sk,Z[UJ';
+    private SECRET = "EyVgkGdxM58b>A6df&vrb+X4<Sk,Z[UJ";
     private EXPIRES_IN = 60 * 60;
-    
+
     /**
      * Chiffre un mot de passe
-     * 
+     *
      * @param password le mot de passe en clair
      */
     async hashPassword(password: string) {
@@ -18,7 +17,7 @@ class AuthService {
 
     /**
      * Retourne true si le mot de passe est correct
-     * 
+     *
      * @param cleanPassword le mot de passe en clair
      * @param encryptedPassword le mot de passe chiffré
      */
@@ -28,7 +27,7 @@ class AuthService {
 
     /**
      * Génère un token
-     * 
+     *
      * @param user les données de l'utilisateur
      */
     createToken(user: User): string {
@@ -48,8 +47,8 @@ class AuthService {
 
     /**
      * Vérifie le contenu du token JWT
-     * 
-     * @param token 
+     *
+     * @param token
      */
     checkToken(token: string) {
         return jwt.verify(token, this.SECRET);
@@ -57,13 +56,12 @@ class AuthService {
 
     /**
      * Vérifie que l'utilisateur dispose bien des rôles necessaires
-     * 
-     * @param userRoles 
-     * @param authorizedRoles 
+     *
+     * @param userRoles
+     * @param authorizedRoles
      */
     checkRoles(userRoles: string[], authorizedRoles: string[]) {
         return !authorizedRoles.length || !authorizedRoles.some(role => !userRoles.includes(role));
     }
-
 }
 export const authService = new AuthService();

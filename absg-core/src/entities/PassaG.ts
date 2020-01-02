@@ -3,11 +3,10 @@ import { User } from "./User";
 
 @Entity()
 export class PassaG {
-
-    @PrimaryGeneratedColumn({ comment: 'id' })
+    @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
-    
-    @Column({ comment: 'Date et heure de passage sur le site' })
+
+    @Column({ comment: "Date et heure de passage sur le site" })
     date: Date;
 
     @OneToOne(type => User)
@@ -16,6 +15,4 @@ export class PassaG {
 
     @Column("json", { comment: `Données sur les actions réalisées` })
     data: any;
-
 }
-  

@@ -1,8 +1,7 @@
-import { format, addDays } from "date-fns";
-import { AgpaPhoto, AgpaAward, AgpaAwardType, AgpaCategory, AgpaVote, User } from "../entities";
+import { addDays } from "date-fns";
+import { AgpaPhoto } from "../entities";
 import { AgpaContext } from "./model/AgpaContext";
 import { getRepository } from "typeorm";
-import { stringify } from "querystring";
 import { AgpaPhase } from "./model/AgpaPhase";
 
 export const agpaCtx = new AgpaContext();
@@ -23,7 +22,39 @@ export function getCurrentEdition(): number {
     return editionYear;
 }
 
+/**
+ * Calcule les phases pour l'édition courante
+ * @return la liste des phases
+ */
+export function getPhasesBoundaries(): AgpaPhase[] {
+    // Les durées des phases par défaut sont :
+    //   1 : enregistrement des oeuvre        [ du 1er octobre au 15 décembre ] => 76 jours
+    //   2 : vérification des photos          [ du 15 au 17 décembre ] => 2 jours
+    //   3 : votes                            [ du 17 au 21 décembre ] => 4 jours
+    //   4 : calculs et préparation cérémonie [ du 21 au 24 décembre ] => 3 jours
+    //   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ]
+    // Mais pour l'année en cours, on récupère les durées via la DB car on peut les modifier
+    // pour s'adapter au contraintes des agendas des participants
+    const phases = [];
+    let startDate = new Date(getCurrentEdition(), 9, 1, 0, 0, 0);
+    const phasesDayDurations = [76, 2, 4, 3, null];
 
+    // TODO: récupérer les valeurs en bases de données
+
+    for (let idx = 0; idx < phasesDayDurations.length; idx++) {
+        const p = new AgpaPhase();
+        p.id = idx + 1;
+        p.startDate = new Date(startDate);
+        if (phasesDayDurations[idx]) {
+            startDate = addDays(startDate, phasesDayDurations[idx]);
+            p.endDate = new Date(startDate);
+        } else {
+            p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
+        }
+        phases.push(p);
+    }
+    return phases;
+}
 
 /**
  * initPhotosData
@@ -32,52 +63,46 @@ export function getCurrentEdition(): number {
  * @param date, la date à prendre en compte pour l'édition
  * @return le "contexte"
  */
-export async function initAGPAContext(date: Date)
-{
+export async function initAGPAContext(date: Date) {
     return agpaCtx.checkForReset();
 }
 
-
 /**
  * showRules
- * Affiche le réglement en ligne. L'essentiel du réglement est écrit directement dans le template chargé... 
+ * Affiche le réglement en ligne. L'essentiel du réglement est écrit directement dans le template chargé...
  * Cette fonction s'occupe essentiellement de calculer les dates afin que le réglement colle avec l'édition courante.
  *
- * @return 
+ * @return
  */
-export async function getMetaData()
-{
+export async function getMetaData() {
     const repo = getRepository(AgpaPhoto);
     const currentYear = getCurrentEdition();
 
-    let data = {
+    const data = {
         currentYear: currentYear,
         maxYear: currentYear - 1,
         minYear: 2006,
         catBefore2012: [1, 2, 3, 4, 5, 6, -2, -1],
-        catSince2012: [1, 2, 7, 3, 4, 5, 8, 6 ,-2, -3, -1],
+        catSince2012: [1, 2, 7, 3, 4, 5, 8, 6, -2, -3, -1],
         boudaries: getPhasesBoundaries(),
-        categories: {},
-    }
+        categories: {}
+    };
 
     // On récupère les données des catégories
     let sql = `SELECT id, title, description, color FROM agpa_category`;
     let result = await repo.query(sql);
-    for (const row of result)
-    {
+    for (const row of result) {
         data.categories[row.id] = row;
     }
-	
+
     // On récupère les données des catégories spéciales
     sql = `SELECT id, year, title, description FROM agpa_category_variation WHERE year > 0`;
     result = await repo.query(sql);
     const cat8 = data.categories[8];
     cat8.variants = {};
-    for (const row of result)
-    {
-        cat8.variants[row.year] = { title:row.title,  description:row.description };
+    for (const row of result) {
+        cat8.variants[row.year] = { title: row.title, description: row.description };
     }
-
 
     return data;
 }
@@ -131,11 +156,6 @@ export function sufflePhotos(photos)
 }
 */
 
-
-
-
-
-
 /**
  * Calcule la phase de l'édition en cours
  * @return la phase de l'édition en cours
@@ -146,65 +166,19 @@ export function getCurrentPhase(): number {
 }
 
 /**
- * Calcule les phases pour l'édition courante
- * @return la liste des phases
- */
-export function getPhasesBoundaries(): AgpaPhase[] {
-    // Les durées des phases par défaut sont :
-    //   1 : enregistrement des oeuvre        [ du 1er octobre au 15 décembre ] => 76 jours
-    //   2 : vérification des photos          [ du 15 au 17 décembre ] => 2 jours
-    //   3 : votes                            [ du 17 au 21 décembre ] => 4 jours
-    //   4 : calculs et préparation cérémonie [ du 21 au 24 décembre ] => 3 jours
-    //   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ]
-    // Mais pour l'année en cours, on récupère les durées via la DB car on peut les modifier
-    // pour s'adapter au contraintes des agendas des participants
-    const currentYear = new Date().getFullYear();
-    const phases = [];
-    let startDate =  new Date(getCurrentEdition(), 9, 1, 0, 0, 0);
-    const phasesDayDurations = [76,2,4,3, null];
-    
-    // TODO: récupérer les valeurs en bases de données
-
-    for (let idx=0; idx < phasesDayDurations.length; idx++) {
-        const p = new AgpaPhase();
-        p.id = idx + 1;
-        p.startDate = new Date(startDate);
-        if (phasesDayDurations[idx]) {
-            startDate = addDays(startDate, phasesDayDurations[idx]);
-            p.endDate = new Date(startDate);
-        } else {
-            p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
-        }
-        phases.push(p);
-    }
-    return phases;
-}
-
-/**
  * Calcule l'année de la dernière édition publiable dans les archives
  * Tiens compte de la phase de l'édition courante.
  * @return l'année de la dernière édition
  */
 export function getMaxArchiveEdition(): number {
     const now = new Date();
-    return  getCurrentPhase() < 5 ? getCurrentEdition() -1 : getCurrentEdition();
+    return getCurrentPhase() < 5 ? getCurrentEdition() - 1 : getCurrentEdition();
 }
-
-
-
-
-
-
-
-
-
-
-
 
 // export function convertCatIdToCssId(caId)
 // {
 //     let result = caId;
-    
+
 //     switch(caId)
 //     {
 //         case -3:
@@ -217,10 +191,6 @@ export function getMaxArchiveEdition(): number {
 //             result = 'x1';
 //             break;
 //     }
-    
+
 //     return result;
 // }
-
-
-
-

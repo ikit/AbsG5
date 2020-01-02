@@ -1,57 +1,46 @@
 import "reflect-metadata";
 import { createConnections } from "typeorm";
 import { createExpressServer } from "routing-controllers";
-import * as path from 'path';
 import * as bodyParser from "body-parser";
-import * as morgan from 'morgan';
-import rfs from 'rotating-file-stream';
-import { Init } from './init';
+import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
-import { agpaService, citationService, immtService, agendaService, voyagService } from "./services";
+import { agpaService, citationService, immtService, agendaService, voyagService, eventService } from "./services";
+import * as ormconfig from "../ormconfig";
 
-const ormconfig = require(`../ormconfig.${process.env.NODE_ENV}.json`);
+console.log("---");
+createConnections(ormconfig)
+    .then(() => {
+        console.log("ORM connection created");
 
-console.log('---');
-createConnections(ormconfig).then(() => {
+        // Une fois la connection créé, on peut initialialiser les services
+        agpaService.initService();
+        citationService.initService();
+        immtService.initService();
+        agendaService.initService();
+        voyagService.initService();
+        eventService.initService();
+        console.log("AbsG services initialized");
 
-    console.log('ORM connection created');
+        // create express app
+        const app = createExpressServer({
+            routePrefix: "/api",
+            controllers: [__dirname + "/controllers/*.ts", __dirname + "/controllers/*.js"],
+            authorizationChecker: jwtAuthorizationChecker,
+            currentUserChecker
+        });
 
-    // Une fois la connection créé, on peut initialialiser les services
-    agpaService.initService();
-    citationService.initService();
-    immtService.initService();
-    agendaService.initService();
-    voyagService.initService();
-    console.log('AbsG services initialized');
+        app.use(bodyParser.json()); // parse request as JSON
+        app.use(accessLogHandler()); // access logs
+        app.use(errorLogHandler()); // error logs
 
+        // start express server
+        app.listen(5000);
 
-    // create express app
-    const app = createExpressServer({
-        routePrefix: '/api',
-        controllers: [__dirname + '/controllers/*.ts'],
-        authorizationChecker: jwtAuthorizationChecker,
-        currentUserChecker
+        console.info("Server has started on port 5000.");
+
+        console.log("---");
+    })
+    .catch(error => {
+        console.error(error);
+        logger.error(error);
     });
-
-    app.use(bodyParser.json());
-
-    // prepare logs
-    const accessLogStream = rfs('access.log', {
-        interval: '1d', 
-        path: path.join(__dirname, 'logs')
-    });
-    app.use(morgan('combined', { stream: accessLogStream }));
-        
-    // start express server
-    app.listen(5000);
-    
-    console.info('Server has started on port 5000.');
-
-    // init DB data on dev
-    if (process.env.NODE_ENV === 'development') {
-        new Init().initData();
-    }
-    
-    console.log('---');
-    
-}).catch(error => console.log(error));

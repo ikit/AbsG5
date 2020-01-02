@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne
 import { AgpaCategory } from "./AgpaCategory";
 import { User } from "./User";
 
-
 // liste des véhicules attendus pour la mission
 @Entity()
 export class AgpaPhoto {
@@ -16,35 +15,35 @@ export class AgpaPhoto {
     @ManyToOne(type => AgpaCategory)
     @JoinColumn()
     category: AgpaCategory;
-    
-    @Column({ comment: 'Année de la photo' })
+
+    @Column({ comment: "Année de la photo" })
     year: number;
 
-    @Column({ comment: 'Nom du fichier', length: 20 })
+    @Column({ comment: "Nom du fichier", length: 20 })
     filename: string;
 
-    @Column({ comment: 'Titre de la photo' })
+    @Column({ comment: "Titre de la photo" })
     title: string;
 
-    @Column({ comment: 'Classement de la photo' })
+    @Column({ comment: "Classement de la photo" })
     ranking: number;
 
-    @Column({ comment: 'Numéro de la photo' })
+    @Column({ comment: "Numéro de la photo" })
     number: number;
 
-    @Column({ comment: 'Nombre de votes reçu par la photo' })
+    @Column({ comment: "Nombre de votes reçu par la photo" })
     votes: number;
 
-    @Column({ comment: 'Nombre de votes reçu par le titre la photo' })
+    @Column({ comment: "Nombre de votes reçu par le titre la photo" })
     votesTitle: number;
 
-    @Column({ comment: 'Score obtenu par la photo' })
+    @Column({ comment: "Score obtenu par la photo" })
     score: number;
 
-    @Column({ comment: 'Score homogonéisé obtenu par la photo' })
+    @Column({ comment: "Score homogonéisé obtenu par la photo" })
     gscore: number;
 
-    @Column("json", { comment: 'Erreur disqualifiant la photo', nullable: true })
+    @Column("json", { comment: "Erreur disqualifiant la photo", nullable: true })
     error: any;
 
     // Transient properties
@@ -64,7 +63,6 @@ export class AgpaPhoto {
         this.gscore = json.gscore ? json.gscore : null;
         this.error = json.error ? json.error : null;
 
-        
         if (json.user) {
             const user = new User();
             user.fromJSON(json.user);

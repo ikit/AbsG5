@@ -116,8 +116,8 @@
             Nouvelle image du moment
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
-                <ImageUpload v-model='immtEditor.image'/>
-                <v-text-field label="Donnez un titre à l'image" v-model='immtEditor.title' prepend-icon='fas fa-feather-alt'></v-text-field>
+                <ImageEditor style="height: 300px; position: relative"/>
+                <!-- <v-text-field label="Donnez un titre à l'image" v-model='immtEditor.title' prepend-icon='fas fa-feather-alt'></v-text-field> -->
             </v-container>
             <v-card-actions>
             <v-spacer></v-spacer>
@@ -134,12 +134,12 @@
 <script>
 import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
-import ImageUpload from '../../components/ImageUpload.vue';
+import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
 
 export default {
     components: {
-        ImageUpload
+        ImageEditor
     },
     store,
     data: () => ({

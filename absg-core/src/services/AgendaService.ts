@@ -4,13 +4,11 @@ import { Immt, Person } from "../entities";
 import { NotFoundError } from "routing-controllers";
 
 class AgendaService {
-
     private personsRepo = null;
 
     public initService() {
         this.personsRepo = getRepository(Person);
     }
-
 
     /**
      * Retourne les infos nécessaire à l'initialisation de l'écran "immt" du site
@@ -22,7 +20,7 @@ class AgendaService {
             totalPersons: 0,
             totalPlaces: 0,
             events: [],
-            totalEvents: 0,
+            totalEvents: 0
         };
 
         // On récupère la liste des personnes
@@ -39,7 +37,6 @@ class AgendaService {
 
         return result;
     }
-
 }
 
 export const agendaService = new AgendaService();

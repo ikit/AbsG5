@@ -5,7 +5,7 @@
         <div id="map-wrap" style="height: 100vh">
             <l-map ref="theMap" :zoom="zoom" :center="center">
                 <l-tile-layer :url="url"></l-tile-layer>
-                <l-marker-cluster>
+                <l-marker-cluster ref="markersLayer">
                     <l-marker v-for="p in persons" :key="p.id" :lat-lng="p.location">
                         <l-icon
                             :icon-size="dynamicSize"
@@ -103,7 +103,9 @@ export default {
         axios.get(`/api/voyag`).then(response => {
             const data = parseAxiosResponse(response);
             this.persons = data;
-            this.persons = data.map(i => ({
+            console.log(data);
+            const list = data.filter(e => Array.isArray(e.lastLocation));
+            this.persons = list.map(i => ({
                 id: i.id,
                 personId: i.personId,
                 avatar: getPeopleAvatar(i),
@@ -111,6 +113,10 @@ export default {
             }));
 
             this.isLoading = false;
+            console.log(this.$refs.markersLayer);
+            console.log(this.$refs.theMap);
+            var group = new L.featureGroup(this.persons);
+            this.$refs.theMap.fitBounds(group.getBounds());
         });
 
     },
@@ -134,6 +140,18 @@ export default {
         },
         innerClick() {
             alert("Click!");
+        },
+        onUpdateMyPosition () {
+            if(navigator.geolocation) {
+                vigator.geolocation.getCurrentPosition(this.showPosition);
+            }else{
+                displayError("La géolocalisation n'est pas supoportée par votre navigateur web.");
+                this.error = "Geolocation is not supported.";
+            }
+        },
+        showPosition:function (position) {
+            this.lat = position.coords.latitude;
+            this.lon = position.coords.longitude;
         }
     }
 };

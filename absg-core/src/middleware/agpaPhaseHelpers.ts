@@ -1,4 +1,3 @@
-
 // /**
 //  * actualPhase1
 //  * Gère la phase 1 de l'édition actuelle : Enregistrement / Edition de ses photos
@@ -36,7 +35,7 @@
 
 //                 $ctx['categories'][$k] = $categorie;
 //             }
-            
+
 //             for ($slot = $numPhoto+1; $slot <= 2 ; $slot++)
 //             {
 //                 $categorie->photos[] =  array(
@@ -51,10 +50,9 @@
 //     }
 // }
 
-
 // /**
 //  * actualPhase2Resume
-//  * Résume la phase 2 du concours. Si pas de catégorie d'indiquée, on affiche 
+//  * Résume la phase 2 du concours. Si pas de catégorie d'indiquée, on affiche
 //  * le résumé, ainsi que la liste des photos posant problèmes...
 //  *
 //  * @param $ctx [array], le contexte des agpa
@@ -82,12 +80,9 @@
 //     }
 // }
 
-
-
-
 // /**
 //  * actualPhase3Resume
-//  * Résume la phase 3 du concours. On resumes les categories de l'annee 
+//  * Résume la phase 3 du concours. On resumes les categories de l'annee
 //  * actuelle avec d'affiche pour chacune les 3 votes
 //  *
 //  * @param $ctx [array], le contexte des agpa
@@ -100,8 +95,6 @@
 //     {
 //         $CI = get_instance();
 //         $ctx['photos'][-3] = array();
-        
-
 
 //     // 1- Informations participations par categories
 //         foreach($ctx['categories'] as $cat)
@@ -111,14 +104,14 @@
 //                 $ctx['categories'][$cat->category_id]->star_used = 0;
 //                 $ctx['categories'][$cat->category_id]->star_available = 0;
 //                 $ctx['categories'][$cat->category_id]->star_ok = false;
-                
+
 //                 foreach($ctx['photos'][$cat->category_id] as $p)
 //                 {
 // 		    if ($p->error === null)
 // 		    $ctx['categories'][$cat->category_id]->star_available ++;
 //                 }
 //                 $ctx['categories'][$cat->category_id]->star_available = round($ctx['categories'][$cat->category_id]->star_available / 2, 0);
-                
+
 //             }
 //             if ($cat->category_id == -3)
 //             {
@@ -128,21 +121,21 @@
 //         }
 
 //     // 2- On recupere les votes du membre ainsi que les photos qui y sont liee
-//         $sql = "SELECT p.*, v.score as `user_vote` FROM agpa_votes v, agpa_photos p 
+//         $sql = "SELECT p.*, v.score as `user_vote` FROM agpa_votes v, agpa_photos p
 //             WHERE v.year={$ctx['current_phase_year']}
 //                 AND v.user_id={$user->user_id}
 //                 AND v.photo_id=p.photo_id
 //             ORDER BY category_id ASC, user_vote DESC ";
 //         $votes = array();
 //         $result = $CI->db->query($sql)->result();
-//         foreach ($result as $photo) 
+//         foreach ($result as $photo)
 //         {
 //             // cas général
 //             if ($photo->user_vote > 0)
 //             {
 //                 $ctx['categories'][$photo->category_id]->star_used += $photo->user_vote;
 //                 $ctx['photos'][$photo->category_id][$photo->photo_id]->user_vote = $photo->user_vote;
-//                 if ($ctx['categories'][$photo->category_id]->star_used >= $ctx['categories'][$photo->category_id]->star_available / 2) 
+//                 if ($ctx['categories'][$photo->category_id]->star_used >= $ctx['categories'][$photo->category_id]->star_available / 2)
 //                 {
 //                     $ctx['categories'][$photo->category_id]->star_ok = true;
 //                 }
@@ -153,7 +146,7 @@
 //                 ++$ctx['categories'][-3]->feather;
 //                 $ctx['photos'][-3][] = $photo;
 //                 $ctx['photos'][$photo->category_id][$photo->photo_id]->title_selection = true;
-//                 if ($ctx['categories'][-3]->feather >= ($ctx['max_feather']/2) && $ctx['categories'][-3]->feather <= $ctx['max_feather']) 
+//                 if ($ctx['categories'][-3]->feather >= ($ctx['max_feather']/2) && $ctx['categories'][-3]->feather <= $ctx['max_feather'])
 //                 {
 //                     $ctx['categories'][-3]->feather_ok = true;
 //                 }
@@ -161,7 +154,6 @@
 //         }
 //     }
 // }
-
 
 // /**
 // * actualPhase4DeliberationsEngine
@@ -177,7 +169,7 @@
 //     {
 //     // 1- Récupérer les votes et les vérifier
 //         $votes = checkVotes($ctx, (($checkStep == 1)? true : false));
-        
+
 //         // Est-ce qu'il faut arrêter là ou continuer ?
 //         if ($checkStep == 1) return;
 
@@ -208,8 +200,6 @@
 //     }
 // }
 
-
-
 // /**
 // * actualPhase5Resume
 // * Résumé des récompenses obtenu cette année (seulement les AGPA or/diamant)
@@ -222,7 +212,6 @@
 //     {
 // 		$CI = get_instance();
 //         $ctx['photos'][-3] = array();
-
 
 //     // 1- Informations participations par categories
 //         /*foreach($ctx['categories'] as $cat)
@@ -243,21 +232,21 @@
 //         }*/
 // /*
 //     // 2- On recupere les votes du membre ainsi que les photos qui y sont liées
-//         $sql = "SELECT p.*, v.score as `user_vote` FROM agpa_votes v, agpa_photos p 
+//         $sql = "SELECT p.*, v.score as `user_vote` FROM agpa_votes v, agpa_photos p
 //             WHERE v.year={$ctx['current_phase_year']}
 //                 AND v.user_id={$user->user_id}
 //                 AND v.photo_id=p.photo_id
 //             ORDER BY category_id ASC, user_vote DESC ";
 //         $votes = array();
 //         $result = $CI->db->query($sql)->result();
-//         foreach ($result as $photo) 
+//         foreach ($result as $photo)
 //         {
 //             // cas général
 //             if ($photo->user_vote > 0)
 //             {
 //                 $ctx['categories'][$photo->category_id]->star_used += $photo->user_vote;
 //                 $ctx['photos'][$photo->category_id][$photo->photo_id]->user_vote = $photo->user_vote;
-//                 if ($ctx['categories'][$photo->category_id]->star_used >= $ctx['categories'][$photo->category_id]->star_available / 2) 
+//                 if ($ctx['categories'][$photo->category_id]->star_used >= $ctx['categories'][$photo->category_id]->star_available / 2)
 //                 {
 //                     $ctx['categories'][$photo->category_id]->star_ok = true;
 //                 }
@@ -268,29 +257,29 @@
 //                 ++$ctx['categories'][-3]->feather;
 //                 $ctx['photos'][-3][] = $photo;
 //                 $ctx['photos'][$photo->category_id][$photo->photo_id]->title_selection = true;
-//                 if ($ctx['categories'][-3]->feather >= 4 && $ctx['categories'][-3]->feather <= 8) 
+//                 if ($ctx['categories'][-3]->feather >= 4 && $ctx['categories'][-3]->feather <= 8)
 //                 {
 //                     $ctx['categories'][-3]->feather_ok = true;
 //                 }
 //             }
 //         }
 //         */
-        
+
 // 		return;
-    
+
 //         $CI = get_instance();
 //         // 1- On récupère les données de l'édition terminée
 //         $sql = "SELECT * FROM agpa_awards WHERE year = {$ctx['current_phase_year']}  ORDER BY category ASC, award ASC";
 //         $result = $CI->db->query($sql)->result();
 //         $infosEdition = array();
-//         foreach ($result as $row) 
+//         foreach ($result as $row)
 //         {
 //             $infosEdition[$row->category][$row->award] = $row;
 //         }
-        
+
 //         // 2- On recupere toutes les données sur les photos de cette année la
 //         //$AGPA_PHOTOS = initAGPA($ctx['current_phase_year']);
-        
+
 //         foreach ($infosEdition as $catId => $categoryInformations)
 //         {
 //             if ($catId == -1) // AGPA meilleur photographe
@@ -317,8 +306,7 @@
 //             }
 //             else // categorie normal
 //             {
-                
-                
+
 //                 // afficher les 3 meilleurs photos (ordre avec lequel on appel analyseSC est important)
 //                 if (isset($categoryInformations['diamant']))
 //                 {

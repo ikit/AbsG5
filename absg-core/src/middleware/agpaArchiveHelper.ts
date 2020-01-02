@@ -1,12 +1,7 @@
 import { getRepository } from "typeorm";
 import { AgpaPhoto, AgpaCategory } from "../entities";
 
-
 // // PALMARES -----------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
 
 // /**
 //  * getPalmaresData
@@ -16,9 +11,9 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 //  * @param $filter_user      [dynamic]   si int : user_id (0 = current user)
 //  *					si string : { 'gueudelot', 'guyomard', 'guibert'}
 //  * @param $filter_year	    [dynamic]   si int : year (0 = all)
-//  *                                        
-//  * 
-//  * @return [array] 
+//  *
+//  *
+//  * @return [array]
 //  */
 // if ( ! function_exists('getPalmaresData'))
 // {
@@ -26,10 +21,7 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 //     {
 //         $CI = get_instance();
 // 		$data = array();
-		
-		
 
-		
 // 		// On récupère les données
 // 		$sql  = "SELECT a.year, a.award, a.photo_id, a.category_id, p.title, p.filename, u.user_id, u.username, up.rootfamilly ";
 // 		$sql .= "FROM agpa_awards a ";
@@ -37,7 +29,7 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 // 		$sql .= "INNER JOIN absg_users u ON a.author_id=u.user_id ";
 // 		$sql .= "INNER JOIN agenda_people up ON u.people_id=up.people_id ";
 // 		$sql .= "LEFT JOIN agpa_photos p ON a.photo_id = p.photo_id ";
-		
+
 // 		// On affiche les palmarès de qui ?
 //         if ($filter_user == 'gueudelot' || $filter_user == 'guibert' || $filter_user == 'guyomard')
 //         {
@@ -54,14 +46,12 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 // 			$user_id = ($filter_user > 0) ? $filter_user : $user->user_id;
 // 			$sql .= "WHERE author_id=$user_id ";
 //         }
-        
-        
+
 //         // On détermine la date limite
 // 		$maxYear = date("Y");
 // 		if ($ctx['current_phase'] <= 4) $maxYear--;
-			
-			
-// 			// On affiche le palmarès de quelle année ?    
+
+// 			// On affiche le palmarès de quelle année ?
 // 		if ($filter_year > 0 && $filter_year <= $maxYear)
 // 		{
 // 			$sql .= "AND a.year=$filter_year ";
@@ -73,14 +63,14 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 // 		}
 // 		$sql .= "ORDER BY a.category_id ASC, a.year ASC";
 // 		$result = $CI->db->query($sql)->result();
-			
+
 // 		// On parse les résultats pour construire : le tableau résumé, calculer les scores totaux et partiels, ainsi que le tableau par catégories
 // 		$resume = array();
 // 		foreach ($CI->ctx['categories'] as $cat)
 // 		{
 // 			$resume[$cat->category_id] = array('totalAgpa' => 0, 'totalPoints' => 0);
 // 		}
-		
+
 // 		$totalPoints = 0;
 // 		foreach ($result as $row)
 // 		{
@@ -89,14 +79,14 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 // 				$resume[$row->category_id][$row->award] = array();
 // 			}
 // 			$resume[$row->category_id][$row->award][] = array('year' => $row->year, 'photo_id' => $row->photo_id, 'filename' => $row->filename, 'title' => $row->title, 'user_id' => $row->user_id, 'username' => $row->username, 'avatar' => $CI->layout->asset_avatar_url($row->user_id));
-			
+
 // 			$resume[$row->category_id]['totalPoints'] += getPalmaresPoint($row->category_id, $row->award);
 // 			$totalPoints += getPalmaresPoint($row->category_id, $row->award);
 // 			if ($row->award != 'lice')
 // 			{
-// 				$resume[$row->category_id]['totalAgpa'] ++; 
+// 				$resume[$row->category_id]['totalAgpa'] ++;
 // 			}
-			
+
 // 			if (!isset($data['palmaresUserData']))
 // 			{
 // 				$data['palmaresUserData'] = array();
@@ -107,32 +97,28 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 // 				$data['palmaresUserData']['avatar'] = $CI->layout->asset_avatar_url($row->user_id);
 // 			}
 // 		}
-			
-			
+
 // 		$data['filterYear'] = $filter_year;
 // 		$data['maxYear'] = $maxYear;
 // 		$data['resumeTotal'] = $totalPoints;
 // 		$data['resume'] = $resume;
-        
+
 //         return $data;
 //     }
 // }
-
-
-
 
 // /**
 //  * buildPalmaresMenu
 //  * Construit la requête sql qui permettra de récupérer les infos palmarès a afficher en fonction des filtres
 //  *
 //  * @param $ctx [array], le contexte avec toutes les infos nécessaire.
-//  * @param $feature 	[string]	
+//  * @param $feature 	[string]
 //  * @param $filter_user  [dynamic]	si int : user_id (0 = current user)
 //  *			 		si string : { 'gueudelot', 'guyomard', 'guibert'}
 //  * @param $filter_year	[int]		si int : year (0 = all)
-//  *                                        
-//  * 
-//  * @return [array] 
+//  *
+//  *
+//  * @return [array]
 //  */
 // if ( ! function_exists('buildPalmaresMenu'))
 // {
@@ -150,7 +136,7 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 // 				'yearFilter' => $filter_year
 // 			)
 // 		);
-	
+
 // 		// On construit le menu user
 // 		$members = array();
 // 		foreach($ctx['members'] as $member)
@@ -160,60 +146,49 @@ import { AgpaPhoto, AgpaCategory } from "../entities";
 // 				$members[$member->rootfamilly][$member->user_id] = $member->username;
 // 			}
 // 		}
-		
+
 // 		asort($members['gueudelot']);
 // 		asort($members['guibert']);
 // 		asort($members['guyomard']);
 // 		$menu['userFilter'] = $members;
-		
-		
+
 // 		// On construit les années
 // 		$menu['yearFilter'] = array(0=> 'Global');
-		
+
 // 		// On détermine la date limite
 // 		$maxYear = date("Y");
 // 		if ($ctx['current_phase'] <= 4) $maxYear--;
-		
+
 // 		for($i=$maxYear; $i>= 2006; $i--)
 // 		{
 // 			$menu['yearFilter'][$i] = $i;
 // 		}
-		
+
 // 		return $menu;
 //     }
 // }
 
-
-
-
-
-
 // ARCHIVES -----------------------------------------------------------------------------------------------------------------------------------------
-
-
-
 
 /**
  * Récupère les infos de chaque édition à afficher pour le sommaire des archives
  *
  * @return any
  */
-export async function archiveSummary(): Promise<any>
-{
+export async function archiveSummary(): Promise<any> {
     const archivesSummary = [];
-    // On récupère les photos et met à jour le contexte 
+    // On récupère les photos et met à jour le contexte
     const repo = getRepository(AgpaPhoto);
 
     // On récupère les meilleures photos de chaque éditions
-    const photos = new Map<Number, AgpaPhoto[]>();
+    const photos = new Map<number, AgpaPhoto[]>();
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", a."userId" from agpa_photo p
         INNER JOIN agpa_award a ON p.id = a."photoId"
         WHERE a."categoryId" = -2 
         ORDER BY p.year DESC, p.gscore DESC`;
     // On récupère les données
     let result = await repo.query(sql);
-    for (const row of result)
-    {
+    for (const row of result) {
         const p = new AgpaPhoto();
         p.fromJSON(row);
         if (photos.has(p.year)) {
@@ -222,17 +197,16 @@ export async function archiveSummary(): Promise<any>
             photos.set(p.year, [p]);
         }
     }
-    
+
     // On récupère les meilleurs photographes
-    const authors = new Map<Number, any[]>();
+    const authors = new Map<number, any[]>();
     sql = `SELECT a.year, a."userId" as id, u.username as firstname, a.award 
         FROM agpa_award a 
         INNER JOIN "user" u ON u.id = a."userId" 
         WHERE "categoryId"=-1 
         ORDER BY "year" DESC, a."award" DESC `;
     result = await repo.query(sql);
-    for (const row of result)
-    {
+    for (const row of result) {
         if (authors.has(row.year)) {
             authors.get(row.year).push(row);
         } else {
@@ -243,59 +217,57 @@ export async function archiveSummary(): Promise<any>
     // On récupère les données
     sql = `SELECT year, count(*) AS photos FROM agpa_photo GROUP BY year ORDER BY year DESC`;
     result = await repo.query(sql);
-    for (const row of result)
-    {
+    for (const row of result) {
         archivesSummary.push({
-            year: row.year, 
+            year: row.year,
             totalPhotos: +row.photos,
             photos: photos.has(row.year) ? photos.get(row.year) : [],
             authors: authors.has(row.year) ? authors.get(row.year) : []
         });
     }
-    
 
     return archivesSummary;
 }
-
-
-
-
 
 /**
  * Récupère les infos d'une édition donnée pour afficher son résumé
  *
  * @return any
  */
-export async function archiveEdition(year: number): Promise<any>
-{
+export async function archiveEdition(year: number): Promise<any> {
     // On récupère les photos
     const repo = getRepository(AgpaPhoto);
 
     // Init data
-    let edition = {
-        categories: year < 2012 ? { 
-            '1': { photos: [], mines:[] },
-            '2': { photos: [], mines:[] },
-            '3': { photos: [], mines:[] },
-            '4': { photos: [], mines:[] },
-            '5': { photos: [], mines:[] },
-            '6': { photos: [], mines:[] },
-            '-2': { photos: [], mines:[] },
-            '-1': []} :{ 
-            '1': { photos: [], mines:[] },
-            '2': { photos: [], mines:[] },
-            '3': { photos: [], mines:[] },
-            '4': { photos: [], mines:[] },
-            '5': { photos: [], mines:[] },
-            '6': { photos: [], mines:[] },
-            '7': { photos: [], mines:[] },
-            '8': { photos: [], mines:[] },
-            '-3': { photos: [], mines:[] },
-            '-2': { photos: [], mines:[] },
-            '-1': []},
+    const edition = {
+        categories:
+            year < 2012
+                ? {
+                      "1": { photos: [], mines: [] },
+                      "2": { photos: [], mines: [] },
+                      "3": { photos: [], mines: [] },
+                      "4": { photos: [], mines: [] },
+                      "5": { photos: [], mines: [] },
+                      "6": { photos: [], mines: [] },
+                      "-2": { photos: [], mines: [] },
+                      "-1": []
+                  }
+                : {
+                      "1": { photos: [], mines: [] },
+                      "2": { photos: [], mines: [] },
+                      "3": { photos: [], mines: [] },
+                      "4": { photos: [], mines: [] },
+                      "5": { photos: [], mines: [] },
+                      "6": { photos: [], mines: [] },
+                      "7": { photos: [], mines: [] },
+                      "8": { photos: [], mines: [] },
+                      "-3": { photos: [], mines: [] },
+                      "-2": { photos: [], mines: [] },
+                      "-1": []
+                  },
         authors: []
-    }
-    
+    };
+
     // On récupère les photos de chaque catégories
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
         FROM agpa_photo p
@@ -305,16 +277,16 @@ export async function archiveEdition(year: number): Promise<any>
         ORDER BY p.gscore DESC`;
     // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
     let result = await repo.query(sql);
-    for (const row of result)
-    {
+    for (const row of result) {
         const p = new AgpaPhoto();
         p.fromJSON(row);
         edition.categories[p.categoryId].photos.push(p);
-        if (p.user.id == 2) { // TODO: do it with authenticated session user
+        if (p.user.id == 2) {
+            // TODO: do it with authenticated session user
             edition.categories[p.categoryId].mines.push(p);
         }
     }
-    
+
     // On récupère les meilleurs photographes
     const authors = [];
     sql = `SELECT a."userId" as id, u.username as firstname, a.award 
@@ -323,8 +295,7 @@ export async function archiveEdition(year: number): Promise<any>
         WHERE "categoryId"=-1 AND year=${year}
         ORDER BY "year" DESC, a."award" DESC `;
     result = await repo.query(sql);
-    for (const row of result)
-    {
+    for (const row of result) {
         authors.push(row);
     }
     edition.authors = authors;
@@ -332,10 +303,9 @@ export async function archiveEdition(year: number): Promise<any>
     // On récupère les données
     sql = `SELECT count(*) AS total FROM agpa_photo WHERE year=${year} GROUP BY year ORDER BY year DESC`;
     result = await repo.query(sql);
-    
+
     return edition;
 }
-
 
 /**
  * Récupère les infos d'une catégorie pour afficher ses détails
@@ -346,24 +316,21 @@ export async function archiveCategory(year: number, catId: number) {
         totalUsers: 0,
         photos: null
     };
-    // On récupère les photos et met à jour le contexte 
+    // On récupère les photos et met à jour le contexte
     const users = [];
-    const photos = new Map<Number, AgpaPhoto>();
+    const photos = new Map<number, AgpaPhoto>();
     const repo = getRepository(AgpaPhoto);
 
-
-
     // On récupère les photos
-    let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
+    const sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
         FROM agpa_photo p
         LEFT JOIN agpa_award a ON p.id = a."photoId"
         INNER JOIN "user" u ON u.id = p."userId" 
         WHERE p.year=${year} AND p."categoryId"=${catId}
         ORDER BY p.gscore DESC`;
     // On récupère les données
-    let result = await repo.query(sql);
-    for (const row of result)
-    {
+    const result = await repo.query(sql);
+    for (const row of result) {
         const p = new AgpaPhoto();
         p.fromJSON(row);
 
@@ -380,7 +347,7 @@ export async function archiveCategory(year: number, catId: number) {
     }
     category.photos = Array.from(photos.values());
     category.totalPhotos = category.photos.length;
-    
+
     return category;
 }
 // const maxYear = new Date().getFullYear();
@@ -395,12 +362,11 @@ export async function archiveCategory(year: number, catId: number) {
 
 //         $navbar[2] = array('Edition '.$year, append_sid("{$phpbb_root_path}agpa.$phpEx", "section=archives&amp;year=$year"));
 //         $template->assign_vars(array('SOMMAIRE_ARCHIVES' => false));
-        
-        
+
 //         // Analyser les principaux resultat pour l'annee $annee
 //         $sql = "SELECT * FROM agpa_awards WHERE year = $year  ORDER BY category ASC, award ASC";
 //         $result = $db->sql_query($sql);
-        
+
 //         // save informations about the edition
 //         $infosEdition = array();
 //         while ($row = $db->sql_fetchrow($result))
@@ -408,7 +374,7 @@ export async function archiveCategory(year: number, catId: number) {
 //             $infosEdition[$row['category']][$row['award']] = $row;
 //         }
 //         $db->sql_freeresult($result);
-        
+
 //         // foreach category, fill data template and complete some extra statistics
 //         $usersNumber = 0;
 //         $photosNumber = 0;
@@ -440,7 +406,7 @@ export async function archiveCategory(year: number, catId: number) {
 //             {
 //                 $photosInTheCategory = 0;
 //                 $photosNumber += sizeof($AGPA_PHOTOS[$catId]);
-                
+
 //                 $template->assign_block_vars('categories', array(
 //                         'ID' => $catId,
 //                         'TITLE'       => $ctx['categories'][$catId]['title'],
@@ -448,7 +414,7 @@ export async function archiveCategory(year: number, catId: number) {
 //                         'NBR_PHOTOS'  => $photosNumber,
 //                         'SPECIAL'     => ($catId < 0) ? $catId : false)
 //                     );
-                
+
 //                 // afficher les 3 meilleurs photos (ordre avec lequel on appel analyseSC est important)
 //                 if (isset($categoryInformations['diamant']))
 //                 {
@@ -463,21 +429,20 @@ export async function archiveCategory(year: number, catId: number) {
 //             }
 
 //         }
-        
+
 //         // TODO : récupérer le nombre de participant (requete SQL basique)
-        
+
 //         $template->assign_vars(array(
 //             'EDITION_YEAR'     => $year,
 //             'NBR_PHOTOS'       => $photosNumber,
 //             'NBR_PHOTOGRAPHER' => $usersNumber)
 //         );
 //     }
-//     else 
-//     { 
+//     else
+//     {
 //         // si pas d'annee precise, on considere qu'il s'agit de l'accueil des archives.
 //         displayArchivesSummary(ctx, $page, 10);
 //     }
-
 
 // /**
 //  * buildArchive
@@ -495,8 +460,7 @@ export async function archiveCategory(year: number, catId: number) {
 //         // On détermine la date limite
 //         $maxYear = date("Y");
 //         if ($ctx['current_phase'] <= 4) $maxYear --;
-        
-        
+
 //         // On init les variables de filtre
 //         $filters = $ctx['filters'];
 //         $year = -1;
@@ -504,28 +468,27 @@ export async function archiveCategory(year: number, catId: number) {
 //         $photographe = -1;
 //         $family = -1;
 //         $award = -1;
-        
 
 //         // On récupère les data en fonction des filtres
-// 		$sql = "SELECT p.*, a.rootfamilly, w.award FROM agpa_photos p 
+// 		$sql = "SELECT p.*, a.rootfamilly, w.award FROM agpa_photos p
 // 		INNER JOIN absg_users u ON p.user_id = u.user_id
 // 		INNER JOIN agenda_people a ON a.people_id = u.people_id
 // 		LEFT JOIN agpa_awards w ON w.photo_id = p.photo_id ";
-	
+
 // 		// La condition Where va être conditioné par le premier filtre
 //     if (!isset($filters['f1_type']) || !isset ($filters['f1_value']))
 //     {
 //       $filters['f1_type'] = 'a';
 //       $filters['f1_value'] = $maxYear;
 //     }
-   
+
 // 		switch($filters['f1_type'])
 //     {
 // 			case 'a':
 // 				$year = $filters['f1_value'];
 // 				$year = ($year >= 2006 && $year <= $maxYear) ? $year : $maxYear;
 // 				$sql .= "WHERE p.year = $year ";
-        
+
 // 				break;
 // 			case 'c':
 // 				$category = $filters['f1_value'];
@@ -557,7 +520,7 @@ export async function archiveCategory(year: number, catId: number) {
 //   				$award = $filters['f2_value'];
 //   				$sql .= "ORDER BY p.g_score DESC";
 //   				break;
-          
+
 //   			case 'a':
 //         default:
 //           $filters['f2_type'] = 'a';
@@ -566,32 +529,24 @@ export async function archiveCategory(year: number, catId: number) {
 //   				break;
 //   		}
 //     }
-			
-		
-		
+
 // 		// On récupère les données
 // 		$result = $CI->db->query($sql)->result();
-		
+
 // 		foreach($result as $row)
 //     {
 // 			if (!isset($infosEditions[$row->year][-1]->winners))
 // 			{
 // 			  $infosEditions[$row->year][-1]->winners = array();
 // 			}
-			
+
 //       $infosEditions[$row->year][-1]->winners[] = $row;
 //     }
-		
+
 // 		// l'organisation des données est conditionné par les deux filtres
-		
-		
+
 //   }
 // }
-
-
-
-
-
 
 // /**
 //  * afficher_sommaire_archives
@@ -599,31 +554,29 @@ export async function archiveCategory(year: number, catId: number) {
 //  *
 //  * @param $page,       [int] la page actuellement sélectionnée
 //  * @param $maxPerPage, [int] le nombre d'édition à afficher par page
-//  * 
+//  *
 //  */
 // if ( ! function_exists('displayArchivesSummary'))
 // {
 //     function displayArchivesSummary(&$ctx, $page=0, $maxPerPage=10 )
 //     {
-//         $CI = get_instance(); 
+//         $CI = get_instance();
 // 		    $data = array();
-        
+
 //         // On détermine la date limite
 //         $maxYear = date("Y");
 //         if ($ctx['current_phase'] <= 4) $maxYear --;
-        
-        
-//         // Les années des édition à afficher 
+
+//         // Les années des édition à afficher
 //         $lastEdition = max($maxYear - ($page) * $maxPerPage, 2006);
 //         $oldestEdition = max(2006, $lastEdition - $maxPerPage);
 
 //         // récupérer les données
 //         $sql = "SELECT a.*, p.filename, p.title, p.photo_id FROM agpa_awards a
 //             LEFT JOIN agpa_photos p ON a.photo_id = p.photo_id
-//             WHERE a.year >= $oldestEdition AND a.year <= $lastEdition AND (a.award='diamant' OR a.award='or') 
+//             WHERE a.year >= $oldestEdition AND a.year <= $lastEdition AND (a.award='diamant' OR a.award='or')
 //             ORDER BY a.year DESC, a.category_id ASC, a.award ASC";
 //         $result = $CI->db->query($sql)->result();
-
 
 //         // save informations about the edition
 //         $infosEditions = array();
@@ -633,31 +586,30 @@ export async function archiveCategory(year: number, catId: number) {
 //         }
 
 //         // On récupère les données spécifiques pour les hors cat -1 (meilleure photographe)
-//         $sql = "SELECT * FROM agpa_awards 
-//             WHERE year <= $lastEdition AND year >= $oldestEdition AND award<>'lice' 
+//         $sql = "SELECT * FROM agpa_awards
+//             WHERE year <= $lastEdition AND year >= $oldestEdition AND award<>'lice'
 //             AND category_id = -1 ORDER BY year DESC, category_id ASC";
 //         $result = $CI->db->query($sql)->result();
-        
-        
+
 //         foreach($result as $row)
 //         {
 // 			if (!isset($infosEditions[$row->year][-1]->winners))
 // 			{
 // 				$infosEditions[$row->year][-1]->winners = array();
 // 			}
-			
+
 //             $infosEditions[$row->year][-1]->winners[] = $row;
 //         }
-        
+
 //         // On met en forme les données pour l'affichage
 //         foreach($infosEditions as $year => $edition)
 //         {
 // 			$data[$year] = array();
 // 			$data[$year]['winners'] = array();
-			
+
 // 			foreach($edition[-1]->winners as $winner)
 // 			{
-				
+
 // 				$data[$year]['winners'][orderAccordingToAward($winner->award)] = array(
 // 					'name' => $ctx['members'][$winner->author_id]->username,
 // 					'award' => $winner->award,
@@ -668,7 +620,7 @@ export async function archiveCategory(year: number, catId: number) {
 // 			$data[$year]['bestPhoto_filename'] = $edition[-2]->filename;
 // 			$data[$year]['bestPhoto_title'] = $edition[-2]->title;
 // 			$data[$year]['diaporama'] = array();
-			
+
 // 			foreach($edition as $catId => $catData)
 // 			{
 // 				if ($catId > 0)
@@ -686,7 +638,6 @@ export async function archiveCategory(year: number, catId: number) {
 //         return $data;
 //     }
 
-    
 //     function orderAccordingToAward($award)
 //     {
 // 		switch($award)
@@ -704,12 +655,8 @@ export async function archiveCategory(year: number, catId: number) {
 // 		}
 // 		return 10;
 //     }
-    
-    
+
 // }
-
-
-
 
 // /**
 //  * buildArchiveSQLQuery
@@ -722,31 +669,30 @@ export async function archiveCategory(year: number, catId: number) {
 //  * @param $values,        [array] la valeurs de ces filtres                   [int]  [int]   [int]
 //  * @param $display,       [array] references vers les donnees des membres  {year, author, category, score, number, award}
 //  *                                                                          desc  asc     asc       desc   asc     asc
-//  * 
-//  * @return [string1, string2n string3] 
+//  *
+//  * @return [string1, string2n string3]
 //  *                            string1 => la requete sql correctement construite
-//  *                            string2 => le texte a afficher décrivant les filtres appliquer pour sélectionner les photos 
+//  *                            string2 => le texte a afficher décrivant les filtres appliquer pour sélectionner les photos
 //  */
 // if ( ! function_exists('buildArchiveSQLQuery'))
 // {
 //     function buildArchiveSQLQuery(&$ctx, $filters)
 //     {
-//         $CI = get_instance(); 
+//         $CI = get_instance();
 // 		$data = array();
-            
+
 //         // construction de la requete mysql
 //         $sql = "SELECT p.photo_id, p.year, p.category_id, p.user_id, p.filename, p.title, a.award FROM agpa_photos p LEFT JOIN agpa_awards a ON a.photo_id = p.photo_id ";
-//         //    WHERE a.year >= $oldestEdition AND a.year <= $lastEdition AND (a.award='diamant' OR a.award='or') 
+//         //    WHERE a.year >= $oldestEdition AND a.year <= $lastEdition AND (a.award='diamant' OR a.award='or')
 //         //    ORDER BY a.year DESC, a.category_id ASC, a.award ASC
 //         $result = $CI->db->query($sql)->result();
-        
+
 //         // Selection des bonnes donnees
 //         $first = true;
 //         $titleFilters = '';
 //         $numberOfFilters = sizeof($filters);
 //         $displayFilter = array();
 //         $titleDisplay = '';
-        
 
 //         // filter 1
 //         switch($filters['f1_type'])
@@ -756,14 +702,13 @@ export async function archiveCategory(year: number, catId: number) {
 //                     $maxYear = $ctx['current_year'];
 //     				$year = ($year >= 2006 && $year < $maxYear) ? $year : $maxYear - 1;
 //     				$sql .= "WHERE p.year = $year ";
-            
+
 //                     $titleFilters .= 'Photos de l\'année '. $year;
 //                     $displayFilter[] = 'year';
 //     				break;
 //     			case 'c':
 //     				$category = $filters['f1_value'];
 //     				$sql .= "WHERE p.category_id = $category ";
-
 
 //                     $titleFilters .= 'Photos de la catégorie '.$ctx['categories'][$category]['title'];
 //                     $displayFilter[] = 'category';
@@ -806,7 +751,7 @@ export async function archiveCategory(year: number, catId: number) {
 //       				$sql .= "todo ";
 //                     $displayFilter[] = 'award';
 //       				break;
-              
+
 //       			case 'a':
 //                 default:
 //                     $filters['f2_type'] = 'a';
@@ -816,7 +761,7 @@ export async function archiveCategory(year: number, catId: number) {
 //       				break;
 //       		}
 //         }
-        
+
 //         // Trie et affichage de la requete
 //         $sql_order = '';
 //         $first = true;
@@ -856,17 +801,15 @@ export async function archiveCategory(year: number, catId: number) {
 //                 break;
 //             }
 //         }
-        
+
 //         // Quel que soit les filtres precedant, on termine toujours par ordonner en fonction du score puis du numero attribue a la photo
 //         if (!$first) { $sql_order .= ', '; }
 //         $sql_order .= 'score ASC, number ASC';
-        
-        
+
 //         $sql .= " ORDER BY $sql_order";
 //         return array($sql,$titleFilters) ;
 //     }
 // }
-
 
 // /**
 //  * buildArchiveView
@@ -876,18 +819,17 @@ export async function archiveCategory(year: number, catId: number) {
 //  * @param $values,        [array] la valeurs de ces filtres                   [int]  [int]   [int]
 //  * @param $display,       [array] references vers les donnees des membres  {year, author, category, score, number, award}
 //  *                                                                          desc  asc     asc       desc   asc     asc
-//  * 
+//  *
 //  * @return string,          le nom de la vue
 //  */
 // if ( ! function_exists('buildArchiveView'))
 // {
 //     function buildArchiveView(&$ctx, $filters)
 //     {
-//         $CI = get_instance(); 
+//         $CI = get_instance();
 //         $data = array();
-            
+
 //         $view = '';
-        
 
 //         if (isset($filters['f2_type']) && trim($filters['f2_type']) != '')
 //         {
@@ -907,8 +849,6 @@ export async function archiveCategory(year: number, catId: number) {
 //             $view = 'a';
 //         }
 
-
 //         return $view ;
 //     }
 // }
-

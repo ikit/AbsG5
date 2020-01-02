@@ -1,35 +1,90 @@
 {
-   "name": "absg-core",
-   "version": "0.0.1",
-   "description": "Core of the Absolument G application.",
-   "devDependencies": {
-      "@types/node": "^8.10.38",
-      "jest": "^24.1.0",
-      "ts-node": "3.3.0",
-      "ts-node-dev": "^1.0.0-pre.41",
-      "typescript": "2.5.2"
-   },
-   "dependencies": {
-      "bcrypt": "^3.0.2",
-      "body-parser": "^1.18.1",
-      "cross-env": "^5.2.0",
-      "csvtojson": "^2.0.8",
-      "date-fns": "^1.30.1",
-      "exceljs": "^1.7.0",
-      "express": "^4.16.4",
-      "jsonwebtoken": "^8.4.0",
-      "morgan": "^1.9.1",
-      "multer": "^1.4.1",
-      "node-cmd": "^3.0.0",
-      "pg": "^7.7.1",
-      "reflect-metadata": "^0.1.10",
-      "rotating-file-stream": "^1.3.9",
-      "routing-controllers": "^0.7.7",
-      "typeorm": "0.2.9"
-   },
-   "scripts": {
-      "start": "cross-env NODE_ENV=production ts-node src/api.ts",
-      "dev": "ts-node-dev src/api.ts",
-      "test": "jest"
-   }
+    "name": "absg-core",
+    "version": "0.0.1",
+    "description": "API principale de l'application Absolument G.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ikit/AbsG5.git"
+    },
+    "apidoc": {
+        "title": "ABSG5 API",
+        "description": "Documentation de l'API"
+    },
+    "devDependencies": {
+        "@panz3r/apidoc-postman": "^2.0.1",
+        "@types/node": "^8.0.29",
+        "@types/node-cron": "^2.0.2",
+        "apidoc": "^0.17.7",
+        "bestzip": "^2.1.4",
+        "husky": "^3.0.0",
+        "prettier": "^1.18.2",
+        "ts-node": "3.3.0",
+        "ts-node-dev": "^1.0.0-pre.40",
+        "tslint": "^5.20.0",
+        "typescript": "3.3.3333"
+    },
+    "dependencies": {
+        "@typescript-eslint/eslint-plugin": "^2.12.0",
+        "@typescript-eslint/parser": "^2.12.0",
+        "axios": "^0.19.0",
+        "bcrypt": "^3.0.7",
+        "body-parser": "^1.18.1",
+        "class-validator-jsonschema": "^1.3.0",
+        "cross-env": "^5.2.1",
+        "date-fns": "^1.30.1",
+        "dotenv": "^8.1.0",
+        "eslint": "^6.7.2",
+        "eslint-config-prettier": "^6.7.0",
+        "eslint-plugin-prettier": "^3.1.2",
+        "express": "^4.15.4",
+        "jsonwebtoken": "^8.5.1",
+        "lint-staged": "^9.5.0",
+        "lodash.sortby": "^4.7.0",
+        "md5": "^2.2.1",
+        "morgan": "^1.9.1",
+        "node-cron": "^2.0.3",
+        "node-rfc": "^1.0.0-rc10",
+        "pg": "^7.3.0",
+        "promise-retry": "^1.1.1",
+        "reflect-metadata": "^0.1.10",
+        "rimraf": "^2.6.3",
+        "routing-controllers": "^0.7.7",
+        "routing-controllers-openapi": "^1.7.0",
+        "swagger-ui-express": "^4.1.2",
+        "typedi": "^0.8.0",
+        "typeorm": "0.2.18",
+        "winston": "^3.2.1",
+        "winston-daily-rotate-file": "^3.9.0",
+        "ws": "^7.2.0"
+    },
+    "scripts": {
+        "dev": "npm run start:dev",
+        "start": "cross-env NODE_ENV=production node build/api.js",
+        "start:dev": "cross-env NODE_ENV=development ts-node-dev src/api.ts",
+        "start:prod": "pm2 start ./ecosystem.config.js --env production",
+        "prebuild": "rimraf build",
+        "build": "tsc",
+        "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\"",
+        "doc:apidoc": "./node_modules/.bin/apidoc -i src/controllers/ -o apidoc/",
+        "doc:postman": "./node_modules/.bin/apidoc-postman -i src/controllers/ -o apidoc/",
+        "doc:generate": "npm run doc:postman && npm run doc:apidoc",
+        "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+        "zip": "cd build/ && bestzip ../diallog-api.zip * .env",
+        "package": "npm run build && npm run doc:generate && npm run zip",
+        "release": "npx standard-version"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,ts}": [
+            "npm run lint",
+            "git add"
+        ]
+    },
+    "prettier": {
+        "printWidth": 120
+    }
 }

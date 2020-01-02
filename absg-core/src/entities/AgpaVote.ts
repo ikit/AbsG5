@@ -8,22 +8,22 @@ import { User } from "./User";
 export class AgpaVote {
     @PrimaryGeneratedColumn()
     id: number;
-    
-    @Column({ comment: 'Année de la photo', width: 4 })
+
+    @Column({ comment: "Année de la photo", width: 4 })
     year: number;
-    
+
     @OneToOne(type => AgpaCategory)
     @JoinColumn()
     category: AgpaCategory;
-    
+
     @OneToOne(type => User)
     @JoinColumn()
     user: User;
-    
+
     @OneToOne(type => AgpaPhoto)
     @JoinColumn()
     photo: AgpaPhoto;
-    
-    @Column({ comment: 'Vote attribué à la photo', width: 1 })
+
+    @Column({ comment: "Vote attribué à la photo", width: 1 })
     score: number;
 }

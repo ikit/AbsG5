@@ -4,7 +4,6 @@ import { Immt } from "../entities";
 import { NotFoundError } from "routing-controllers";
 
 class ImmtService {
-
     private immtsRepo = null;
 
     public initService() {
@@ -15,7 +14,7 @@ class ImmtService {
      * Renvoie la dernière image du moment en date
      */
     public async last() {
-        return await this.immtsRepo.findOne({ order: { year: "DESC", day: "DESC" }});
+        return await this.immtsRepo.findOne({ order: { year: "DESC", day: "DESC" } });
     }
 
     /**
@@ -24,7 +23,7 @@ class ImmtService {
     public async getInitData() {
         const result = {
             immts: [],
-            total: 0,
+            total: 0
         };
 
         // On récupère la liste des 20 dernière images
@@ -76,13 +75,13 @@ class ImmtService {
 
     /**
      * Supprime une image du moment
-     * Une immt ne peut être supprimé que par un admin, 
+     * Une immt ne peut être supprimé que par un admin,
      * ou bien par le poster si il s'agit de la dernière immt ajouté
      */
     public async remove(year: number, day: number) {
         // TODO: retrieve user info to check permission to delete
 
-        let immt = await this.immtsRepo.find({ where: { year, day }, take: 1});
+        const immt = await this.immtsRepo.find({ where: { year, day }, take: 1 });
         if (!immt) {
             throw new NotFoundError(`Immt was not found.`);
         }

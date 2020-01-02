@@ -3,7 +3,6 @@ import { getRepository, Equal } from "typeorm";
 import { User } from "../entities";
 import { authService } from "../services";
 
-
 /**
  * Middleware permettant d'autoriser l'accès à l'utilisateur
  * Stratégie locale : on vérifie uniquement la présence du token en base
@@ -43,7 +42,7 @@ import { authService } from "../services";
  */
 export async function localAuthorizationChecker(action: Action, roles: string[]) {
     // on récupère le header authorization
-    const authorization: string = action.request.headers['authorization'];
+    const authorization: string = action.request.headers["authorization"];
     if (!authorization) {
         return false;
     }
@@ -65,14 +64,15 @@ export async function localAuthorizationChecker(action: Action, roles: string[])
 /**
  * Middleware permettant d'autoriser l'accès à l'utilisateur
  * Stratégie JWT : on vérifie le token JWT présent dans les headers
- * 
+ *
  * @param action action demandée au sein d'un controller
  * @param roles liste des rôles minimum
  * @returns boolean true is the user is authorized
  */
 export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
+    console.log("jwtAuthorizationChecker");
     // on récupère le header authorization
-    const authorization: string = action.request.headers['authorization'];
+    const authorization: string = action.request.headers["authorization"];
     if (!authorization) {
         return false;
     }
@@ -86,7 +86,7 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 
         // on vérifie les droits
         const isAuthorized = !!user && user.id && authService.checkRoles([], roles);
-    
+
         return isAuthorized;
     } catch (e) {
         return false;
@@ -95,7 +95,7 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 
 export async function currentUserChecker(action: Action) {
     // on récupère le header authorization
-    const authorization: string = action.request.headers['authorization'];
+    const authorization: string = action.request.headers["authorization"];
     if (!authorization) {
         return false;
     }

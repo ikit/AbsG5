@@ -12,13 +12,28 @@ export default new Vuex.Store({
         currentMonthEvents: [],
         passag: [],
         notifications: [],
+        // Galerie photos
         photosGallery: [],
         photosGalleryIndex: 0,
         photosGalleryDisplayed: false,
-        todayLabel: new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+        // Editeur photo
+        photosEditorDisplayed: false,
         agpaMeta: null,
     },
     mutations: {
+        login(state, data) {
+            // Get user avatar url
+            const idAsStr = `${data.id}`;
+            data.avatarUrl = `http://absolumentg.fr/assets/img/avatars/${idAsStr.padStart(3, '0')}.png`;
+            console.log("STORE LOGIN", data)
+
+            state.user = data;
+        },
+        logout(state) {
+            console.log("STORE LOGOUT")
+            state.user = null;
+        },
+
         updateUser(state, user) {
             state.user = user;
         },
@@ -73,9 +88,9 @@ export default new Vuex.Store({
             }
         }
     },
-        actions: {
-            photosGalleryNext(context) {
-                state.photosGalleryIndex = 0;
-            }
+    actions: {
+        photosGalleryNext(state) {
+            state.photosGalleryIndex = 0;
+        }
     }
 });
