@@ -1,25 +1,28 @@
 require("dotenv").config();
 
-const rootDir = process.env.NODE_ENV === "development" ? "src" : "build";
+const isDev = process.env.NODE_ENV === "development";
+const srcPath = isDev ? "src" : "build";
+const fileExt = isDev ? "ts" : "js";
 
 module.exports = [
     {
         name: "default",
-        type: "postgres",
-        host: "localhost",
-        port: 5432,
-        username: "postgres",
-        password: "postgres",
-        database: "absg",
+        type: process.env.DB_TYPE_DEFAULT,
+        host: process.env.DB_HOST_DEFAULT,
+        port: process.env.DB_PORT_DEFAULT,
+        username: process.env.DB_USER_DEFAULT,
+        password: process.env.DB_PASSWORD_DEFAULT,
+        database: process.env.DB_NAME_DEFAULT,
         synchronize: true,
         logging: false,
-        entities: [`${rootDir}/entities/**/*.{ts,js}`],
-        migrations: [`${rootDir}/migration/**/*.{ts,js}`],
-        subscribers: [`${rootDir}/subscriber/**/*.{ts,js}`],
+        entities: [`${srcPath}/entities/**/*.${fileExt}`],
+        migrations: [`${srcPath}/migration/**/*.${fileExt}`],
+        subscribers: [`${srcPath}/subscriber/**/*.${fileExt}`],
         cli: {
-            entitiesDir: `${rootDir}/entities`,
-            migrationsDir: `${rootDir}/migration`,
-            subscribersDir: `${rootDir}/subscriber`
-        }
+            entitiesDir: `${srcPath}/entities`,
+            migrationsDir: `${srcPath}/migration`,
+            subscribersDir: `${srcPath}/subscriber`
+        },
+        pgDump: "C:/Program Files/PostgreSQL/11/bin/pg_dump"
     }
 ];
