@@ -1,2 +1,2 @@
-var cmd = require('node-cmd');
-cmd.run('npm start');
+import * as cmd from "node-cmd";
+cmd.run("npm start");

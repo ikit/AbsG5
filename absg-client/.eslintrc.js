@@ -15,7 +15,7 @@ module.exports = {
         'semi': process.env.NODE_ENV === 'production' ? ["error", "always"] : ["off"] ,
         'indent': ["off"],
         'no-multiple-empty-lines': ["error", { max: 3, maxEOF: 1 }],
-'eslint-disable-next-line': "off"
+        'eslint-disable-next-line': "off"
 
     },
     parserOptions: {
