@@ -1,8 +1,8 @@
-import { AgpaCategory, AgpaPhoto, User } from "../../entities";
+import { AgpaCategory, AgpaPhoto } from "../../entities";
 import { getRepository } from "typeorm";
 import { AgpaPhase } from "./AgpaPhase";
-import { addDays, differenceInHours } from "date-fns";
-import { getPhasesBoundaries, getCurrentEdition, getCurrentPhase, agpaCtx } from "../agpaCommonHelpers";
+import { differenceInHours } from "date-fns";
+import { getPhasesBoundaries, getCurrentEdition, agpaCtx } from "../agpaCommonHelpers";
 
 export class AgpaContext {
     categories: Map<number, AgpaCategory>; // catId => category

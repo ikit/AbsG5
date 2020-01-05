@@ -28,6 +28,9 @@ export class User {
     @Column("json", { comment: "use to compute notifications for the user", nullable: true })
     lastActivity: any;
 
+    @Column({ comment: "Authentication token", nullable: true })
+    rootFamily: string;
+
     public fromJSON(json: any) {
         // TODO
     }

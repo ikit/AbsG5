@@ -735,31 +735,7 @@
 //     }
 // }
 
-// /**
-//  * getPalmaresPoint
-//  * Retourne le nombre de point palmares correspondant à une récompense
-//  *
-//  * @param $cat_id, l'id de la categorie
-//  * @param $award, le type de l'award (lice, bronze, argent, or, diamant)
-//  *
-//  * @return array[mixed], par catégorie, le classement final des 4 meilleures photos
-//  */
-// if ( ! function_exists('getPalmaresPoint'))
-// {
-//     function getPalmaresPoint($cat_id, $award)
-//     {
-//         // points array
-//         $palmaresPoints = array(
-//             -1 => array('diamant' => 6, 'or' => 5, 'argent' => 4, 'bronze' => 3, 'lice' => 0),
-//             -2 => array('diamant' => 5, 'or' => 4, 'argent' => 3, 'bronze' => 2, 'lice' => 0),
-//             -3 => array('diamant' => 4, 'or' => 3, 'argent' => 2, 'bronze' => 1, 'lice' => 0),
-//             0  => array('diamant' => 4, 'or' => 3, 'argent' => 2, 'bronze' => 1, 'lice' => 0),
-//         );
 
-//         $cat = ($cat_id > 0) ? 0 : $cat_id;
-//         return $palmaresPoints[$cat][$award];
-//     }
-// }
 
 // /**
 //  * deliverAwards

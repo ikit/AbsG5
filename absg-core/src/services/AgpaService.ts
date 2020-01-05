@@ -1,8 +1,7 @@
-import { getConnection, getRepository, Equal } from "typeorm";
-import { format, addDays } from "date-fns";
-import { AgpaPhoto, AgpaAward, AgpaAwardType, AgpaCategory, AgpaVote } from "../entities";
+import { getRepository } from "typeorm";
+import { AgpaPhoto } from "../entities";
 import { initAGPAContext, getMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
-import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
+import { archiveSummary, archiveEdition, archiveCategory, palmaresData } from "../middleware/agpaArchiveHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 
 class AgpaService {
@@ -44,6 +43,10 @@ class AgpaService {
         } else {
             return null;
         }
+    }
+
+    public getPalmaresData() {
+        return palmaresData(null, null);
     }
 
     public getCeremonyData(year: number) {

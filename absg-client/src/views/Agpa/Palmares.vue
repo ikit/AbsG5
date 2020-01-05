@@ -1,18 +1,51 @@
 <template>
-<div>
-    <h2>Palmares</h2>
-</div>
+<v-container fluid  grid-list-md>
+    <v-simple-table>
+    <template v-slot:default>
+      <thead>
+        <tr>
+          <th class="text-left">Photographe</th>
+          <th class="text-left">Total AGPA</th>
+          <th class="text-left">Total points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in palmares" :key="item.userId">
+          <td>{{ item.username }}</td>
+          <td>{{ item.totalAward }}</td>
+          <td>{{ item.totalPoints }}</td>
+        </tr>
+      </tbody>
+    </template>
+  </v-simple-table>
+</v-container>
 </template>
 
 
 <script>
+import axios from 'axios';
 
 export default {
-    name: 'Phase3',
+    name: 'Palmares',
     data: () => ({
+        palmares: null
     }),
     props: ['current'],
+    mounted () {
+        this.initView();
+    },
     methods: {
+        initView() {
+            // Reset photos list
+
+            axios.get(`/api/agpa/palmares`).then(response => {
+                console.log(response.data);
+                this.palmares = response.status === 200 ? response.data.data : null;
+                this.error = response.status !== 200 ? response : null;
+
+                this.isLoading = false;
+            });
+        },
     }
 };
 </script>

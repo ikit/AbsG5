@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
-import { JsonController, Param, Body, Get, Post, Delete, NotFoundError, Authorized } from "routing-controllers";
-import { AgpaPhoto, AgpaAward } from "../entities";
+import { JsonController, Param, Get, Delete, Authorized } from "routing-controllers";
+import { AgpaPhoto } from "../entities";
 import { agpaService } from "../services/AgpaService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
 
@@ -59,8 +59,7 @@ export class AgpaController {
     @Authorized()
     @Get("/palmares")
     getPalmares() {
-        // TODO
-        return {};
+        return agpaService.getPalmaresData();
     }
 
     @Authorized()
