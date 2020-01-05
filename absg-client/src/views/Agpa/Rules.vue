@@ -1,7 +1,7 @@
 <template>
     <div class="reglement">
 
-        <v-card class="version" >Règlement officiel des AGPA – Edition 2020 – Version du 28 décembre 2019</v-card>
+        <v-card class="version" >Règlement officiel des AGPA – Version du 28 décembre 2019</v-card>
 
         <a name="chap1"></a>
         <h2><span class="number">I.</span> Présentation des AGPA</h2>
@@ -9,9 +9,9 @@
 
         <p>Liste et description des catégories retenues :
         <ul>
-            <li><b>Portrait :</b> Photos mettant en évidence un personnage unique de plus de quinze ans au moment de la prise de vue;</li>
+            <li><b>Portrait :</b> Photos mettant en évidence un personnage unique d'au moins douze ans au moment de la prise de vue;</li>
             <li><b>Groupe et événement :</b> Toutes photos avec au moins un personnage (enfants comme adulte) sont acceptés dans cette catégorie;</li>
-            <li><b>Enfant :</b> Photos mettant en évidence un enfant de moins de quinze ans au moment de la prise de vue;</li>
+            <li><b>Portrait d'enfant :</b> Photos mettant en évidence un enfant de moins de douze ans au moment de la prise de vue;</li>
             <li><b>Nature :</b> Photos mettant en évidence un sujet principal floristique, faunistique ou naturel;</li>
             <li><b>Grand angle :</b> Tous types de paysages et panoramas;</li>
             <li><b>Manus Hominum :</b> Photos dont le sujet principal est marqué par l'empreinte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme ...);</li>
@@ -39,10 +39,14 @@
             <dt>2016</dt>
             <dd>Précision concernant les votes des enfants</dd>
             <dt>2019</dt>
-            <dd>Précision concernant les catégories Groupe et événement et Enfant</dd>
+            <dd><ul>
+                <li>Précision concernant les catégories Groupe et événement et Enfant;</li>
+                <li>L'attribution des points pour le palmarès et revue (avec application rétroactive).</li>
+                </ul>
+            </dd>
         </dl>
 
-        <p>Le déroulement de l’édition des AGPA 2013 est détaillé ci-dessous. Les dates et heures indiquées ne sont pas immuables ; elles pourront être modifiées si les circonstances l’exigent (les candidats seront alors prévenus sur le forum Absolument G).</p>
+        <p>Le déroulement de l’édition des AGPA est détaillé ci-dessous. Les dates et heures indiquées ne sont pas immuables ; elles pourront être modifiées si les circonstances l’exigent (les candidats seront alors prévenus sur le forum Absolument G).</p>
         <br/>
         <a name="chap2"></a>
         <h2><span class="number">II.</span> Candidature et enregistrement des photos</h2>
@@ -84,7 +88,7 @@
 
         <a name="chap3"></a>
         <h2><span class="number">III.</span> Visualisions et vérification des photos proposées</h2>
-        <p>La journée du 20 décembre, les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
+        <p>Une fois la phase d'enregistrement terminée, la phase de vérification des photos débute. Durant cette phase d'une journée en général, les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
         <p>Pendant cette période, les membres du forum peuvent :
         <ul>
             <li>Visualiser toutes les photos de tous les candidats ;</li>
@@ -97,14 +101,14 @@
         <a name="chap4"></a>
         <h2><span class="number">IV.</span> Votes</h2>
         <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants peuvent voter, cependant seuls les votes des jurés ayant 10 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
-        <p>La phase de vote s’étend du 21 décembre (0h00) jusqu'au 23 décembre (23h59). </p>
+        <p>La phase de vote dure en général 3 jours. </p>
         <p>Pendant cette période, les membres du forum peuvent :
         <ul>
             <li>Visualiser les photos de tous les candidats</li>
             <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie :
             <ul>
-                <li>3 points à la meilleure photo ;</li>
-                <li>2 points à la deuxième meilleure photo ;</li>
+                <li>1 à 3 étoiles aux meilleures photos;</li>
+                <li>2 étoiles à la deuxième meilleure photo ;</li>
                 <li>1 point à la troisième meilleure photo.</li>
             </ul></li>
             <li>Corriger leurs votes</li>
@@ -200,16 +204,18 @@
         <a name="chap5.3"></a>
         <h3><span class="number">V.3.</span> Palmarès des photographes</h3>
 
-        <p>Un système de points permet de représenter en un chiffre le palmarès accumulé par chaque participant. Ce système permet notamment de départager les ex-æquo (en favorisant le palmarès cumulé le plus faible) ou d’établir un palmarès général, toutes éditions confondues. Ces points sont attribués à chaque candidat en fonction des récompenses reçues, selon le barème suivant :
-        <table><tbody>
-            <tr><th></th><th>AGPA de diamant</th><th>AGPA d’or</th><th>AGPA d’argent</th><th>AGPA de bronze</th></tr>
-            <tr><th>Meilleur photographe</th><td>13</td><td>8</td><td>5</td><td>3</td></tr>
-            <tr><th>Meilleure photographie (général)</th><td>8</td><td>5</td><td>3</td><td>2</td></tr>
-            <tr><th>Meilleure photographie (catégorie)</th><td>5</td><td>3</td><td>2</td><td>1</td></tr>
-        </tbody></table>
+        <p>Un système de points permet de représenter en un chiffre le palmarès accumulé par chaque participant.
+            Ce système permet notamment de départager les ex-æquo (en favorisant le palmarès cumulé le plus faible) ou d’établir un palmarès général,
+            toutes éditions confondues. Ces points sont attribués à chaque candidat en fonction des récompenses reçues, selon le barème suivant :
+        <v-card style="width: 100%;">
+            <table style="width: 100%; text-align: center;"><tbody>
+                <tr><th>AGPA de diamant</th><th>AGPA d’or</th><th>AGPA d’argent</th><th>AGPA de bronze</th><th>Nominé</th></tr>
+                <tr><td>6</td><td>4</td><td>3</td><td>2</td><td>1</td></tr>
+            </tbody></table>
+        </v-card>
         </p>
 
-        <v-card class="version" >Règlement officiel des AGPA – Edition 2016 – Version du 28 décembre 2016</v-card>
+        <v-card class="version" >Règlement officiel des AGPA – Version du 28 décembre 2019</v-card>
         <div class="clear">&nbsp;</div>
     </div>
 </template>
@@ -246,6 +252,7 @@ h1 {
 .reglement {
     // font-family: "Tangerine", serif;
     // font-size: 30px;
+    text-align: justify;
     max-width: 800px;
     margin: auto;
 

@@ -56,7 +56,7 @@ export class AgpaController {
         return {};
     }
 
-    @Authorized()
+    //@Authorized()
     @Get("/palmares")
     getPalmares() {
         return agpaService.getPalmaresData();

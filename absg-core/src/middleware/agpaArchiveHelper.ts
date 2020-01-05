@@ -75,23 +75,21 @@ import { AgpaPalmares } from "./model/AgpaPalmares";
  */
 export function palmaresPoints(award: string) {
     const palmaresPoints = {
-        "diamond": 6,
-        "gold": 4,
-        "sylver": 3,
-        "bronze": 2,
-        "nominated": 1
+        diamond: 5,
+        gold: 4,
+        sylver: 3,
+        bronze: 2,
+        nominated: 1
     };
     return award in palmaresPoints ? palmaresPoints[award] : 0;
 }
-
-
 
 
 export async function palmaresData(user: string, year: number) {
     // On récupère le contexte sql
     const repo = getRepository(AgpaPhoto);
     // On récupère les données
-    let sql = `SELECT a.year, a.award, a."photoId", a."categoryId", p.title, p.filename, a."userId", u.username, u."rootFamily"
+    let sql = `SELECT a.year, a.award, a."photoId", a."categoryId", c.title as "catTitle", c.order, c.color, p.title, p.filename, a."userId", u.username, u."rootFamily"
         FROM agpa_award a
         INNER JOIN agpa_category c ON a."categoryId" = c.id
         INNER JOIN public."user" u ON a."userId" = u.id

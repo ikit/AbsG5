@@ -18,22 +18,33 @@ export class AgpaPalmares {
         this.to = to;
         this.totalAward = 0;
         this.totalPoints = 0;
-        this.statsByCategories = {};
+        this.statsByCategories = [];
     }
 
     // Ajoute un award au palmares et met à jours les stats
     addAward(award: any) {
         if (award.userId === this.userId && award.year >= this.from && award.year <= this.to) {
-            if (!(award.categoryId in this.statsByCategories)) {
-                this.statsByCategories[award.categoryId] = [0, 0, 0, 0, 0];
+            let cat = this.statsByCategories.find(e => {
+                return e.id === award.categoryId;
+            });
+            if (!cat) {
+                cat = {
+                    id: award.categoryId,
+                    title: award.catTitle,
+                    color: award.color,
+                    order: award.order,
+                    stats: [0, 0, 0, 0, 0, 0, 0] // nominated, bronze, sylver, gold, diamond, totalAgpa, totalPoints
+                };
+                this.statsByCategories.push(cat);
             }
-            const stats = this.statsByCategories[award.categoryId];
-            this.statsByCategories[award.categoryId] = [
-                award.award === "nominated" ? stats[0] + 1 : stats[0],
-                award.award === "bronze" ? stats[1] + 1 : stats[1],
-                award.award === "sylver" ? stats[2] + 1 : stats[2],
-                award.award === "gold" ? stats[3] + 1 : stats[3],
-                award.award === "diamond" ? stats[4] + 1 : stats[4]
+            cat.stats = [
+                award.award === "nominated" ? cat.stats[0] + 1 : cat.stats[0],
+                award.award === "bronze" ? cat.stats[1] + 1 : cat.stats[1],
+                award.award === "sylver" ? cat.stats[2] + 1 : cat.stats[2],
+                award.award === "gold" ? cat.stats[3] + 1 : cat.stats[3],
+                award.award === "diamond" ? cat.stats[4] + 1 : cat.stats[4],
+                award.award !== "nominated" ? cat.stats[5] + 1 : cat.stats[5],
+                cat.stats[6] + palmaresPoints(award.award)
             ];
             this.totalAward += award.award !== "nominated" ? 1 : 0;
             this.totalPoints += palmaresPoints(award.award);

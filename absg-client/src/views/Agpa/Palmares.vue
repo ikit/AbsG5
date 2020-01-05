@@ -1,24 +1,69 @@
 <template>
-<v-container fluid  grid-list-md>
-    <v-simple-table>
-    <template v-slot:default>
-      <thead>
-        <tr>
-          <th class="text-left">Photographe</th>
-          <th class="text-left">Total AGPA</th>
-          <th class="text-left">Total points</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in palmares" :key="item.userId">
-          <td>{{ item.username }}</td>
-          <td>{{ item.totalAward }}</td>
-          <td>{{ item.totalPoints }}</td>
-        </tr>
-      </tbody>
-    </template>
-  </v-simple-table>
-</v-container>
+<div>
+
+    <v-container fluid  grid-list-md style="padding: 0; padding-top: 2px">
+        <v-simple-table>
+            <template v-slot:default>
+            <thead>
+                <tr>
+                <th class="text-left">Photographe</th>
+                <th class="text-left">Total AGPA</th>
+                <th class="text-left">Total points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in palmares" :key="item.userId" @click="displaydetails(item)" style="cursor: pointer">
+                <td>{{ item.username }}</td>
+                <td>{{ item.totalAward }}</td>
+                <td>{{ item.totalPoints }}</td>
+                </tr>
+            </tbody>
+            </template>
+        </v-simple-table>
+    </v-container>
+
+    <v-dialog v-if="palmaresDetails" v-model="palmaresDetails" width="800px">
+        <v-card >
+            <v-card-title class="grey lighten-4 py-4 title">
+                Palmarès de {{ palmaresDetails.username }}
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+                <v-simple-table>
+                    <template v-slot:default>
+                    <thead>
+                        <tr>
+                            <th class="text-left"></th>
+                            <th class="text-left">Nomination</th>
+                            <th class="text-left">Bronze</th>
+                            <th class="text-left">Argent</th>
+                            <th class="text-left">Or</th>
+                            <th class="text-left">Diamant</th>
+                            <th class="text-left">AGPA total</th>
+                            <th class="text-left">Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="i in palmaresDetails.statsByCategories" :key="i.id">
+                            <td>{{ i.title }}</td>
+                            <td>{{ i.stats[0] }}</td>
+                            <td>{{ i.stats[1] }}</td>
+                            <td>{{ i.stats[2] }}</td>
+                            <td>{{ i.stats[3] }}</td>
+                            <td>{{ i.stats[4] }}</td>
+                            <td>{{ i.stats[5] }}</td>
+                            <td>{{ i.stats[6] }}</td>
+                        </tr>
+                    </tbody>
+                    </template>
+                </v-simple-table>
+            </v-container>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="closeDialog()">fermer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+</div>
 </template>
 
 
@@ -28,7 +73,8 @@ import axios from 'axios';
 export default {
     name: 'Palmares',
     data: () => ({
-        palmares: null
+        palmares: null,
+        palmaresDetails: null
     }),
     props: ['current'],
     mounted () {
@@ -46,6 +92,13 @@ export default {
                 this.isLoading = false;
             });
         },
+        displaydetails(palmares) {
+            this.palmaresDetails = palmares;
+            console.log("details", palmares);
+        },
+        closeDialog() {
+            this.palmaresDetails = null;
+        }
     }
 };
 </script>
