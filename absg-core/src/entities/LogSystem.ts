@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 
 export enum LogSeverity {
@@ -13,11 +13,11 @@ export enum LogSeverity {
 }
 
 @Entity()
-export class Log {
+export class LogSystem {
     @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
 
-    @ManyToOne(type => User)
+    @ManyToOne(() => User)
     @JoinColumn()
     user: User;
 
