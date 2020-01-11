@@ -32,7 +32,7 @@
                             </h2>
                         </v-card-title>
 
-                        <v-list class="passageRow">
+                        <v-list class="passage overflow-auto">
                         <template v-for="item in passage">
                             <v-list-item
                                 :key="item.title"
@@ -249,20 +249,12 @@ h2 {
 }
 
 
-.passageCol {
+.passage {
+    display: flex;
     div {
-        .date {
-            width: 40px;
-            height: 20px;
-            line-height: 20px;
-            text-align: center;
-        }
-    }
-}
-.passageRow {
-    display: table-row;
-    div {
-        display: table-cell;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
         width: 50px;
         vertical-align: top;
 
@@ -273,6 +265,7 @@ h2 {
             line-height: 20px;
             text-align: center;
         }
+
     }
 }
 
