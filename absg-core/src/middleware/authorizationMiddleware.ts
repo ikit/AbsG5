@@ -9,6 +9,7 @@ import { differenceInHours } from "date-fns";
  * @param user l'utilisateur concerné
  */
 export async function checkUserPassag(user: User) {
+    console.log(checkUserPassag, user);
     // On met à jours les stats de passage de l'utilisateur
     if (user) {
         const lastLog = await getRepository(LogPassag)
@@ -18,7 +19,9 @@ export async function checkUserPassag(user: User) {
             .getOne();
 
         // Si dernier passage noté à plus d'une heure, on en enregistre un autre
-        if (!lastLog || differenceInHours(new Date(), new Date(lastLog.datetime)) > 0) {
+        const lastDate = new Date(lastLog.datetime);
+        lastDate.setMinutes(0);
+        if (!lastLog || differenceInHours(new Date(), lastDate) > 0) {
             const log = new LogPassag();
             log.datetime = new Date();
             log.userId = user.id;
@@ -27,19 +30,12 @@ export async function checkUserPassag(user: User) {
     }
 }
 
-/**
- * Middleware permettant d'autoriser l'accès à l'utilisateur
- * Stratégie locale : on vérifie uniquement la présence du token en base
- * 
- * @param action action demandée au sein d'un controller
- * @param roles liste des rôles minimum
- * @returns boolean true is the user is authorized
- */
-export async function localAuthorizationChecker(action: Action, roles: string[]) {
+
+export async function getUserFromHeader(request) {
     // on récupère le header authorization
-    const authorization: string = action.request.headers["authorization"];
+    const authorization: string = request.headers["authorization"];
     if (!authorization) {
-        return false;
+        return null;
     }
 
     // on récupère le token
@@ -50,33 +46,27 @@ export async function localAuthorizationChecker(action: Action, roles: string[])
         where: { token: Equal(token) }
     });
 
-    // on vérifie les droits
-    const isAuthorized = !!user && authService.checkRoles([], roles);
+    // On met à jours les stats de passage de l'utilisateur
+    await checkUserPassag(user);
 
-    return isAuthorized;
+    return user;
 }
 
 /**
- * Middleware permettant d'autoriser l'accès à l'utilisateur
- * Stratégie JWT : on vérifie le token JWT présent dans les headers
+ * Stratégie JWT : on vérifie le token JWT présent dans les headers et est valide
  *
  * @param action action demandée au sein d'un controller
  * @param roles liste des rôles minimum
  * @returns boolean true is the user is authorized
  */
 export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
-    // on récupère le header authorization
-    const authorization: string = action.request.headers["authorization"];
-    if (!authorization) {
-        return false;
-    }
-
-    // on récupère le token
-    const token = authorization.substring(7);
+    console.log("jwtAuthorizationChecker");
+    // on récupère le user si il est défini dans le header
+    let user = await getUserFromHeader(action.request);
 
     try {
         // on vérifie que le token est valide
-        const user = authService.checkToken(token);
+        user = authService.checkToken(user.token);
 
         // on vérifie les droits
         const isAuthorized = !!user && user.id && authService.checkRoles([], roles);
@@ -91,20 +81,7 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 }
 
 export async function currentUserChecker(action: Action) {
-    // on récupère le header authorization
-    const authorization: string = action.request.headers["authorization"];
-    if (!authorization) {
-        return false;
-    }
-
-    // on récupère le token
-    const token = authorization.substring(7);
-
-    // on récupère le user
-    const user = await getRepository(User).findOne({
-        where: { token: Equal(token) }
-    });
-
-    // On retourne l'utilisateur si il existe
-    return user;
+    console.log("currentUserChecker");
+    // on retourn le user si il est défini dans le header
+    return await getUserFromHeader(action.request);;
 }
