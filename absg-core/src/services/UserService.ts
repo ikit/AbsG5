@@ -1,5 +1,5 @@
-import { getRepository } from "typeorm";
-import { User } from "../entities";
+import { getRepository, MoreThanOrEqual, Between } from "typeorm";
+import { User, LogPassag } from "../entities";
 
 class UserService {
     private usersRepo = null;
@@ -44,6 +44,13 @@ class UserService {
     /**
      *
      */
+    async getPassag(from: Date, to: Date = new Date()) {
+        return getRepository(LogPassag)
+            .createQueryBuilder("log")
+            .where({ datetime: Between(from, to) })
+            .orderBy("log.datetime", "ASC")
+            .getMany();
+    }
 }
 
 export const userService = new UserService();

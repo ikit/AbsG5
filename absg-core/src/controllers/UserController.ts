@@ -4,6 +4,7 @@ import { User } from "../entities";
 
 import { authService, citationService, eventService, immtService, userService } from "../services";
 import { success } from "../middleware/jsonHelper";
+import { subDays } from "date-fns";
 
 @JsonController("/users")
 export class UserController {
@@ -55,8 +56,8 @@ export class UserController {
             immt: await immtService.last(),
             citation: await citationService.random(),
             events: await eventService.getForMonth(current.getFullYear(), current.getMonth()),
-            passag: [],
-            logs: await userService.checkNotifications(1),
+            passag: await userService.getPassag(subDays(new Date(), 1)),
+            notifications: await userService.checkNotifications(1),
             user: {}
         };
 
