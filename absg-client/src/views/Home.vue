@@ -72,6 +72,7 @@ import store from '../store';
 import axios from 'axios';
 import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
+import { padNumber } from '../middleware/CommonHelper';
 import * as image3D from '3d-image';
 import Calendar from '../components/Calendar';
 
@@ -86,77 +87,7 @@ export default {
         menu: false,
 
         selected: [2],
-        passage: [
-        {
-            date: null,
-            time: '1h',
-            passage: [
-                { username: 'Bébé Ma\'anne', avatar: `./img/avatars/009.png` },
-            ],
-        },
-        {
-            date: '12/03/2019',
-            time: '0h',
-            passage: [
-                { username: 'Sev', avatar: `./img/avatars/010.png` },
-                { username: 'Olive', avatar: `./img/avatars/002.png` },
-                { username: 'Fannette', avatar: `./img/avatars/018.png` },
-                { username: 'Manouel', avatar: `./img/avatars/004.png` },
-            ],
-        },
-        {
-            date: null,
-            time: '23h',
-            passage: [
-                { username: 'Fannette', avatar: `./img/avatars/018.png` },
-                { username: 'Olive', avatar: `./img/avatars/002.png` },
-            ],
-        },
-        {
-            date: null,
-            time: '22h',
-            passage: [
-                { username: 'Bébé Ma\'anne', avatar: `./img/avatars/009.png` },
-                { username: 'Sev', avatar: `./img/avatars/010.png` },
-                { username: 'Olive', avatar: `./img/avatars/002.png` },
-                { username: 'Flo', avatar: `./img/avatars/005.png` },
-            ],
-        },
-        {
-            date: null,
-            time: '21h',
-            passage: [
-                { username: 'Annie', avatar: `./img/avatars/012.png` },
-            ],
-        },
-        {
-            date: null,
-            time: '20h',
-            passage: [],
-        },
-        {
-            date: null,
-            time: '19h',
-            passage: [
-                { username: 'Annie', avatar: `./img/avatars/012.png` },
-                { username: 'Olive', avatar: `./img/avatars/002.png` },
-            ],
-        },
-        {
-            date: null,
-            time: '18h',
-            passage: [],
-        },
-        {
-            date: null,
-            time: '17h',
-            passage: [],
-        },
-        {
-            date: null,
-            time: '16h',
-            passage: [],
-        }],
+        passage: [],
         methods: {
             toggle: function (index) {
                 const i = this.selected.indexOf(index);
@@ -187,6 +118,22 @@ export default {
                     this.isLoading = false;
                     store.commit('updateCitation', data.citation);
                     store.commit('updateImmt', data.immt);
+
+                    // On crée la listes des logs de passaG (les 24 dernières heures)
+                    this.passage = []
+                    const now = new Date();
+                    for (let hDelta = 0; hDelta<24; hDelta++) {
+                        let h = ((now.getHours() - hDelta) + 24) % 24;  // On simule le modulo
+                        console.log(data.passag[0])
+                        this.passage.unshift({
+                            time: `${h}h`,
+                            passage: data.passag
+                                .filter(e => new Date(e.datetime).getHours() === h)
+                                .map(e => ({ username: `${e.userId}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
+                        })
+
+                    }
+                    console.log(this.passage);
                 }
             });
         },

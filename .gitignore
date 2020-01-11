@@ -92,3 +92,4 @@ ENV/
 config.py
 coverage.xml
 Makefile
+absg-core/src/data/*.sql
