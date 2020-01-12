@@ -20,11 +20,11 @@ export function parseAxiosResponse(response) {
 
     response = response.data;
     // Check Absg error
-    if (!response.success) {
-        // Absg server error
-        console.log('ABSG ERROR', response);
-        return null;
-    }
+    // if (!response.success) {
+    //     // Absg server error
+    //     console.log('ABSG ERROR', response);
+    //     return null;
+    // }
 
     return response.data
 }

@@ -25,7 +25,7 @@
                             <h2>Passa G
                             <v-btn text
                                 style="position: absolute; right: 15px; top: 15px;"
-                                @click.stop="">
+                                @click.stop="displayPassagHistoryDialog()">
                                 <v-icon left>far fa-clock</v-icon>historique
                             </v-btn>
 
@@ -61,6 +61,23 @@
         </v-container>
 
 
+    <v-dialog v-model="passagHistoryDialogDisplayed" width="800px">
+        <v-card>
+            <v-card-title class="grey lighten-4 py-4 title">
+            Statistiques de passa G
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+                <highcharts :options="historyData"></highcharts>
+            </v-container>
+            <v-card-actions>
+            <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn text @click="passagHistoryDialogDisplayed=false">Fermer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+
     </div>
 </template>
 
@@ -75,17 +92,45 @@ import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { padNumber } from '../middleware/CommonHelper';
 import * as image3D from '3d-image';
 import Calendar from '../components/Calendar';
+import {Chart} from 'highcharts-vue';
 
 Vue.use(VueSilentbox);
 
 export default {
     components: {
-        Calendar
+        Calendar,
+        highcharts: Chart
     },
     store,
     data: () => ({
         menu: false,
-
+        passagHistoryDialogDisplayed: false,
+        historyData: {
+            chart: {
+                type: 'spline'
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: { title: { text: 'Visiteur unique' } },
+            tooltip: {
+                crosshairs: true,
+                shared: true
+            },
+            plotOptions: {
+                spline: {
+                    marker: {
+                        radius: 4,
+                        lineColor: '#666666',
+                        lineWidth: 1
+                    }
+                }
+            },
+            series: [{
+                name: 'visiteurs uniques',
+                data: []
+            }]
+        },
         selected: [2],
         passage: [],
         methods: {
@@ -132,6 +177,18 @@ export default {
                         })
 
                     }
+                }
+            });
+        },
+        displayPassagHistoryDialog() {
+            this.passagHistoryDialogDisplayed = true;
+            axios.get(`/api/users/passagHistory`).then(response => {
+                const data = parseAxiosResponse(response);
+                if (data) {
+                    this.isLoading = false;
+                    this.historyData.series[0].data = data.map(e => e.count);
+                    this.historyData.xAxis.categories = data.map(e => e.date);
+                    this.passagHistoryDialogDisplayed = true;
                 }
             });
         },
@@ -253,12 +310,13 @@ h2 {
         display: flex;
         flex-wrap: wrap;
         align-content: flex-start;
-        width: 50px;
+        min-width: 50px;
+        padding: 0;
         vertical-align: top;
 
         .date {
-            width: 50px;
-            width: 40px;
+            display: relative;
+            width: 100%;
             height: 20px;
             line-height: 20px;
             text-align: center;

@@ -63,4 +63,10 @@ export class UserController {
 
         return success(result);
     }
+
+    // @Authorized()
+    @Get("/passagHistory")
+    async passagHistory() {
+        return await userService.getPassagHistory();
+    }
 }

@@ -94,7 +94,7 @@
 import axios from 'axios';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
-import {Chart} from 'highcharts-vue'
+import {Chart} from 'highcharts-vue';
 import * as Reveal from 'reveal';
 
 export default {
