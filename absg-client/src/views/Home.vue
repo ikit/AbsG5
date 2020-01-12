@@ -124,16 +124,14 @@ export default {
                     const now = new Date();
                     for (let hDelta = 0; hDelta<24; hDelta++) {
                         let h = ((now.getHours() - hDelta) + 24) % 24;  // On simule le modulo
-                        console.log(data.passag[0])
                         this.passage.unshift({
                             time: `${h}h`,
                             passage: data.passag
                                 .filter(e => new Date(e.datetime).getHours() === h)
-                                .map(e => ({ username: `${e.userId}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
+                                .map(e => ({ username: `${e.username}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
                         })
 
                     }
-                    console.log(this.passage);
                 }
             });
         },

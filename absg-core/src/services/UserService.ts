@@ -1,5 +1,6 @@
 import { getRepository, MoreThanOrEqual, Between } from "typeorm";
 import { User, LogPassag } from "../entities";
+import { format } from "date-fns";
 
 class UserService {
     private usersRepo = null;
@@ -42,14 +43,16 @@ class UserService {
     }
 
     /**
-     *
+     * Retourne les logs de passage des membres sur le site entre 2 date
      */
     async getPassag(from: Date, to: Date = new Date()) {
-        return getRepository(LogPassag)
-            .createQueryBuilder("log")
-            .where({ datetime: Between(from, to) })
-            .orderBy("log.datetime", "ASC")
-            .getMany();
+        const sql = `SELECT l.*, u.username
+            FROM log_passag l
+            INNER JOIN "user" u ON u.id = l."userId" 
+            WHERE l."datetime" BETWEEN '${format(from,"YYYY-MM-DD")}' AND '${format(to,"YYYY-MM-DD")}'
+            ORDER BY l.datetime ASC`;
+        // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
+        return getRepository(LogPassag).query(sql);
     }
 }
 

@@ -9,23 +9,30 @@ import { differenceInHours } from "date-fns";
  * @param user l'utilisateur concerné
  */
 export async function checkUserPassag(user: User) {
-    console.log(checkUserPassag, user);
     // On met à jours les stats de passage de l'utilisateur
     if (user) {
-        const lastLog = await getRepository(LogPassag)
-            .createQueryBuilder("log")
-            .where({ userId: Equal(user.id) })
-            .orderBy("log.datetime", "DESC")
-            .getOne();
+        const sql = `SELECT l.*, u.username
+            FROM log_passag l
+            INNER JOIN "user" u ON u.id = l."userId" 
+            WHERE l."userId" = ${user.id}
+            ORDER BY l.datetime DESC
+            LIMIT 1`;
+        // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
+        let lastLog = await getRepository(LogPassag).query(sql);
+        lastLog = lastLog.length > 0 ? lastLog[0] : null;
 
         // Si dernier passage noté à plus d'une heure, on en enregistre un autre
-        const lastDate = new Date(lastLog.datetime);
-        lastDate.setMinutes(0);
-        if (!lastLog || differenceInHours(new Date(), lastDate) > 0) {
-            const log = new LogPassag();
-            log.datetime = new Date();
-            log.userId = user.id;
+        const log = new LogPassag();
+        log.datetime = new Date();
+        log.userId = user.id;
+        if (!lastLog) {
             await getRepository(LogPassag).save(log);
+        } else {
+            const lastDate = new Date(lastLog.datetime);
+            lastDate.setMinutes(0);
+            if (differenceInHours(new Date(), lastDate) > 0) {
+                await getRepository(LogPassag).save(log);
+            }
         }
     }
 }
