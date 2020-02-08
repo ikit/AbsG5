@@ -65,7 +65,9 @@
                                         @click.prevent="deleteCitationConfirmation(item)">
                                         <v-icon>fas fa-times</v-icon>
                                     </v-btn>
-                                    <b class="author">{{ item.author.label}}</b>
+                                    <div>
+                                        <b class="author">{{ item.author.label }}</b> <span v-if="item.year" class="year"> - {{ item.year }}</span>
+                                    </div>
                                     <div class="citation" v-html="item.citation"></div>
 
                                 </v-list-item-content>
@@ -398,5 +400,7 @@ export default {
 .editAction {
     right: 50px;
 }
-
+.year {
+    opacity: 0.5;
+}
 </style>
