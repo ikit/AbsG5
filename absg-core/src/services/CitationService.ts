@@ -1,14 +1,15 @@
-import { getRepository, Equal } from "typeorm";
-import { format } from "date-fns";
-import { Citation } from "../entities";
+import { getRepository } from "typeorm";
+import { Citation, User, Person } from "../entities";
 import { NotFoundError } from "routing-controllers";
-import { isNumber } from "util";
+import { isNumber, isString } from "util";
 
 class CitationService {
     private citationsRepo = null;
+    private personsRepo = null;
 
     public initService() {
         this.citationsRepo = getRepository(Citation);
+        this.personsRepo = getRepository(Person);
     }
 
     /**
@@ -65,7 +66,6 @@ class CitationService {
             query += `WHERE c."authorId"=${authorId} `;
         }
         query += ` ORDER BY c.id DESC OFFSET ${pageIndex * pageSize} LIMIT ${pageSize};`;
-        console.log(query);
         const citations = await this.citationsRepo.query(query);
 
         return { totalCitations, totalPages, pageSize, pageIndex, citations };
@@ -104,8 +104,39 @@ class CitationService {
      * avec les nouvelles données.
      * @param data les informations de la citations à ajouter ou mettre à jour
      */
-    public async save(citation: Citation) {
-        // TODO
+    public async save(user: User, citation: any) {
+        if (!citation) {
+            throw new Error("Merci de renseigner la citation");
+        }
+
+        // On vérifie que l'auteur est renseigné
+        if (!isNumber(citation.author) || citation.author < 1) {
+            throw new Error("Merci de renseigner l'auteur");
+        }
+        // On vérifie qu'on connait bien l'auteur
+        const author = await this.personsRepo.findOne(citation.author);
+        if (!author) {
+            throw new Error("L'auteur de la citation doit être de la famille (enregistré dans l'annuaire)");
+        }
+
+        // On vérifie que l'auteur est renseignée
+        if (!isString(citation.citation)) {
+            throw new Error("Merci de renseigner correctement la citation");
+        }
+
+        // On vérifie que l'année est correctement renseignée
+        const minYear = author.dateOfBirth ? new Date(author.dateOfBirth).getFullYear() : 1700;
+        citation.year = Number.parseInt(citation.year);
+        if (!citation.year || citation.year < minYear || citation.year > new Date().getFullYear()) {
+            throw new Error("L'année est optionnel mais doit forcement être une année valide");
+        }
+
+        // On enregistre la citation
+        citation.author = author;
+        citation.poster = user;
+        await this.citationsRepo.save(citation);
+
+        // On indique que tout s'est bien passé en retournant la citation
         return citation;
     }
 
@@ -116,7 +147,7 @@ class CitationService {
      */
     public async remove(id: number) {
         // TODO: retrieve user info to check permission to delete
-
+        console.log("DELETE", id);
         const citation = await this.citationsRepo.findOne(id);
         if (!citation) {
             throw new NotFoundError(`Citations was not found.`);

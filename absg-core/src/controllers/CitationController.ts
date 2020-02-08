@@ -1,6 +1,8 @@
-import { JsonController, Param, Body, Get, Post, Delete, Authorized, QueryParam } from "routing-controllers";
+import { JsonController, Param, Body, Get, Post, Delete, Authorized, QueryParam, Req } from "routing-controllers";
+import { Request } from "express";
 import { Citation } from "../entities";
 import { citationService } from "../services";
+import { getUserFromHeader } from "../middleware";
 
 @JsonController("/citations")
 export class CitationController {
@@ -40,18 +42,9 @@ export class CitationController {
 
     @Authorized()
     @Post("/")
-    async get(@Body() filteringData: any) {
-        return await citationService.getCitations(
-            filteringData.pageIndex,
-            filteringData.pageSize,
-            filteringData.authorId
-        );
-    }
-
-    @Authorized()
-    @Post("/")
-    async save(@Body() citation: Citation) {
-        return await citationService.save(citation);
+    async save(@Req() request: Request, @Body() citation: Citation) {
+        const user = await getUserFromHeader(request);
+        return await citationService.save(user, citation);
     }
 
     @Authorized()

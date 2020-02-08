@@ -46,13 +46,28 @@
                     <v-card style="margin-top: 15px">
                         <v-list dense>
                         <template v-for="item in citations">
-                            <v-list-item :key="item.id">
+                            <v-list-item
+                                class="citationRow"
+                                :key="item.id">
                                 <v-list-item-avatar>
                                     <img :src="item.author.url"/>
                                 </v-list-item-avatar>
                                 <v-list-item-content>
+                                    <v-btn text icon
+                                        color="primary"
+                                        class="editAction"
+                                        @click.prevent="editCitation(item)">
+                                        <v-icon>fas fa-pen</v-icon>
+                                    </v-btn>
+                                    <v-btn text icon
+                                        color="red"
+                                        class="deleteAction"
+                                        @click.prevent="deleteCitationConfirmation(item)">
+                                        <v-icon>fas fa-times</v-icon>
+                                    </v-btn>
                                     <b class="author">{{ item.author.label}}</b>
                                     <div class="citation" v-html="item.citation"></div>
+
                                 </v-list-item-content>
                             </v-list-item>
                         </template>
@@ -129,23 +144,32 @@
 
     <v-dialog v-model="citationEditor.open" width="800px">
         <v-card>
-            <v-card-title class="grey lighten-4 py-4 title">
-            Nouvelle citation
+            <v-card-title color="primary">
+            {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
             <v-layout row wrap>
                 <v-flex xs12>
-                    <v-text-field
+                    <v-autocomplete
                         prepend-icon="fas fa-user"
-                        placeholder="Autheur de la citation"
-                        v-model="citationEditor.author">
-                    </v-text-field>
+                        label="Autheur de la citation"
+                        :items="peopleList"
+                        :filter="filterAuthor"
+                        v-model="citationEditor.author"
+                    ></v-autocomplete>
                 </v-flex>
                 <v-flex xs12>
                     <v-text-field
                         prepend-icon="fas fa-quote-left"
-                        placeholder="La citation"
+                        label="La citation"
                         v-model="citationEditor.citation">
+                    </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                    <v-text-field
+                        prepend-icon="fas fa-calendar-alt"
+                        label="Année de référence (où la citation a été dite)"
+                        v-model="citationEditor.year">
                     </v-text-field>
                 </v-flex>
                 <v-flex xs12>
@@ -154,7 +178,7 @@
 
                             <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
                             <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                                Si vous ajoutez des précisions à la citation, merci de les mettre entre double parenthèses: "La citation" ((ma précision)).
+                                Merci de les mettre la citation entre double quotes, et les précisions entre parenthèses: "La citation" (ma précision).
                             </p>
                         </div>
                     </v-card>
@@ -164,8 +188,22 @@
             </v-container>
             <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="resetDialog()">Annuler</v-btn>
+            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
             <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="citationDeletion.open" width="800px">
+        <v-card>
+            <v-card-title color="primary">
+                Supprimer la citation
+            </v-card-title>
+            <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette citation ?</p>
+            <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="citationDeletion.open = false">Annuler</v-btn>
+            <v-btn color="accent" @click="deleteCitation()">Supprimer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -185,7 +223,7 @@ export default {
         isLoading: false, // Est-ce qu'on est en train de charger la liste des citations ou non
         authors: null, // map id => auteur info
         authorsList: [], // liste complete des auteurs (utilisé par les <select>)
-        authorsAutoComplete: [], // liste des auteurs filtré lors de l'autocomplete
+        peopleList: [], // lite complete des personnes enregistrées dans l'annuaire (utilisé pour l'autocomplete de l'auteur)
         totalCitations: 0, // nombre total de citations (tiens compte de si on filtre par auteur ou non)
         totalPages: 10, // nombre de page total
         citations: [], // liste des citations affichées sur la page courante
@@ -196,10 +234,15 @@ export default {
         },
         citationEditor: {
             open: false, // si oui ou non la boite de dialogue pour créer/éditer une citation est affichée
-            citationId: null, // l'ID de la citation (vaut -1 si pour la création)
+            id: null, // l'ID de la citation (vaut -1 si pour la création)
             citation: null, // le texte de la citation
             author: null, // l'auteur de la citation (texte saisie libre mais autocomplete avec liste des auteurs existant)
+            year: new Date().getFullYear(), // l'année de référence (où la citation à été prononcée)
         },
+        citationDeletion: {
+            open: false, // si oui ou non la boite de dialogue pour confirmer la suppression d'un citation est affichée
+            citation: null, // la citation à supprimer
+        }
     }),
     mounted () {
         this.isLoading = true;
@@ -214,6 +257,7 @@ export default {
                     const aData = getPeopleAvatar(a);
                     this.authorsList.push(aData);
                     this.authors[aData.id] = aData;
+                    this.peopleList.push({value: aData.id, text: aData.label });
                 }
                 // on récupère la liste des dernière citations
                 this.refreshList();
@@ -223,15 +267,19 @@ export default {
         }
     },
     methods: {
-        refreshList() {
+        refreshList(reset = false) {
             // On affiche l'indicateur de chargement
             this.isLoading = true;
+            // Est-ce qu'on force le reset
+            if (reset) {
+                this.filter.pageIndex = 0;
+                this.filter.authorId = null;
+            }
+
             // On appelle l'API avec les paramètres de filtrage
             axios.get(`/api/citations/list?authorId=${this.filter.authorId}&pageIndex=${this.filter.pageIndex}&pageSize=${this.filter.pageSize}`)
                 .then(response => {
                     const data = parseAxiosResponse(response);
-
-                    console.log(data);
                     this.totalCitations = data.totalCitations;
                     this.totalPages = data.totalPages;
                     this.filter.pageIndex = data.pageIndex;
@@ -240,7 +288,9 @@ export default {
                     this.citations = data.citations.map(i => ({
                         id: i.id,
                         citation: i.citation,
-                        author: this.authors[i.authorId]
+                        author: this.authors[i.authorId],
+                        authorId: i.authorId,
+                        year: i.year
                     }));
 
                     this.isLoading = false;
@@ -251,18 +301,57 @@ export default {
         },
         resetDialog (open = false) {
             this.citationEditor.open = open;
-            this.citationEditor.citationId = null;
+            this.citationEditor.id = null;
             this.citationEditor.citation = null;
             this.citationEditor.author = null;
+            this.citationEditor.year = new Date().getFullYear();
+        },
+        editCitation(citation) {
+            this.citationEditor.open = open;
+            this.citationEditor.id = citation.id;
+            this.citationEditor.citation = citation.citation;
+            this.citationEditor.author = citation.authorId;
+            this.citationEditor.year = citation.year;
+            console.log(this.citationEditor);
+        },
+        filterAuthor(item, queryText, itemText) {
+            const textOne = item.text.toLowerCase()
+            const textTwo = item.text.toLowerCase()
+            const searchText = queryText.toLowerCase()
+
+            return textOne.indexOf(searchText) > -1 || textTwo.indexOf(searchText) > -1
         },
         saveCitation: function () {
-            this.citations.push({
-                authorAvatar: `/img/avatars/016.png`,
-                authorId: 16,
-                authorName: this.citationEditor.author,
-                citation: this.citationEditor.citation,
-            });
-            this.resetDialog();
+            // On vérifie si tout est bien renseigné
+            this.citationEditor.isLoading = true;
+
+            // On envoie au serveur
+            axios.post(`/api/citations/`, this.citationEditor).then(
+                response => {
+                    // on reset l'IHM
+                    this.resetDialog();
+                    this.refreshList(true);
+                },
+                err => {
+                    store.commit('onError', err);
+                }
+            );
+        },
+        deleteCitationConfirmation: function(item) {
+            this.citationDeletion.open = true;
+            this.citationDeletion.citation = item;
+        },
+        deleteCitation: function () {
+            axios.delete(`/api/citations/${this.citationDeletion.citation.id}`).then(
+                response => {
+                    this.citationDeletion.citation = null;
+                    this.citationDeletion.open = false;
+                    this.refreshList(true);
+                },
+                err => {
+                    store.commit('onError', err);
+                }
+            );
         },
         formerPage() {
             this.filter.pageIndex = Math.max(0, this.filter.pageIndex - 1);
@@ -288,4 +377,26 @@ export default {
 .citation ::v-deep .note  {
     color: #999!important;
 }
+
+// .citationRow {
+//     border-bottom: 1px solid #ddd;
+// }
+.citationRow:hover {
+    background: rgba(15, 15, 30, 0.05);
+    .deleteAction, .editAction {
+        display: block;
+    }
+}
+.deleteAction, .editAction {
+    position: absolute;
+    text-align: center;
+    display: none;
+}
+.deleteAction {
+    right: 15px;
+}
+.editAction {
+    right: 50px;
+}
+
 </style>
