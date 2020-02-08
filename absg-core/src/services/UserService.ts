@@ -73,7 +73,6 @@ class UserService {
         console.log(sql)
         return getRepository(LogPassag).query(sql);
     }
-
 }
 
 export const userService = new UserService();

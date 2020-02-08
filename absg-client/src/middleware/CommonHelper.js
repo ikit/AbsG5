@@ -11,21 +11,12 @@ export function parseAxiosResponse(response) {
         return null;
     }
 
-    console.log('parseAxiosResponse', response);
     if (response.status !== 200) {
-        // http error
         console.log('NETWORK ERROR', response);
         return null;
     }
 
-    response = response.data;
-    // Check Absg error
-    // if (!response.success) {
-    //     // Absg server error
-    //     console.log('ABSG ERROR', response);
-    //     return null;
-    // }
-
+    // console.log('parseAxiosResponse', response);
     return response.data
 }
 
@@ -69,4 +60,13 @@ export function getPeopleAvatar(peopleData) {
 export function padNumber(value, size) {
     value = value.toString();
     return value.length >= size ? value :  new Array(size - value.length + 1).join('0') + value;
+}
+
+
+/**
+ * Retire les accents et les majuscules de la chaine de caratère
+ * @param {string} value la chaine de caractère à nettoyer
+ */
+export function cleanString(value) {
+    return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }

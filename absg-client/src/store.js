@@ -6,12 +6,13 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
+        citation: null, // la citation aléatoire
+        user: null, // les infos sur l'utilisateur connecté
+        notifications: [], // les notifications affichées dans la bar d'application
+
         immt: null,
-        citation: null,
-        user: null,
-        currentMonthEvents: [],
+        currentMonthEvents: [], // les événements du mois en cours
         passag: [],
-        notifications: [],
         // Galerie photos
         photosGallery: [],
         photosGalleryIndex: 0,
@@ -32,6 +33,14 @@ export default new Vuex.Store({
         logout(state) {
             console.log("STORE LOGOUT")
             state.user = null;
+        },
+
+        onError(state, axiosError) {
+            console.log("ERR AXIOS", axiosError);
+            // TODO: traitement de l'erreur en fonction de sa criticité
+            // 403 -> redirection
+            // 404 -> redirection
+            // 500 -> ...
         },
 
         updateUser(state, user) {

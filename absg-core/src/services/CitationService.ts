@@ -2,6 +2,7 @@ import { getRepository, Equal } from "typeorm";
 import { format } from "date-fns";
 import { Citation } from "../entities";
 import { NotFoundError } from "routing-controllers";
+import { isNumber } from "util";
 
 class CitationService {
     private citationsRepo = null;
@@ -53,18 +54,32 @@ class CitationService {
      * Renvoie les citations en fonction des informations de filtrage et de pagination
      */
     public async getCitations(pageIndex: number, pageSize: number, authorId: number) {
-        let query = `SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
+        // on calcule le nombre de citations max en fonction du filtre sur les auteurs
+        let query = "SELECT COUNT(*) FROM citation";
+        if (isNumber(authorId) && authorId > 0) {
+            query += ` WHERE "authorId"= ${authorId}`;
+        }
+        let totalCitations = await this.citationsRepo.query(query);
+        totalCitations = totalCitations[0].count;
+        console.log(totalCitations)
+
+        // 2: on borne la pagination en fonction du nombre max (pagesize = all quand filtre par auteur)
+        pageSize = isNumber(pageSize) && pageSize > 0 ? pageSize : 20;
+        const totalPages = Math.round(totalCitations / pageSize);
+        pageIndex = isNumber(pageIndex) && pageIndex > 0 && pageIndex < totalPages ? pageIndex : 0;
+
+        // on récupère les citations
+        query = `SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
             FROM citation c 
             LEFT JOIN "user" u ON c."posterId"=u.id
             LEFT JOIN person p ON c."authorId"=p.id `;
         if (authorId) {
             query += `WHERE c."authorId"=${authorId} `;
         }
-        query += `OFFSET ${pageIndex * pageSize} LIMIT ${pageSize} ORDER BY id DESC;`;
+        query += ` ORDER BY c.id DESC OFFSET ${pageIndex * pageSize} LIMIT ${pageSize};`;
+        const citations = await this.citationsRepo.query(query);
 
-        const result = await this.citationsRepo.query(query);
-
-        return result;
+        return { totalCitations, totalPages, pageSize, pageIndex, citations };
     }
 
     /**

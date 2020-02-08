@@ -178,6 +178,23 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+
+
+    <v-dialog v-model="errDialog" width="80vw">
+        <v-card>
+            <v-card-title class="grey lighten-4 py-4 title">
+            Une erreur s'est produite
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+               { { error} }
+            </v-container>
+            <v-card-actions>
+                <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn text @click="errDialog=false">OK</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </v-app>
 </template>
 
@@ -193,6 +210,7 @@ export default {
     store,
     data: () => ({
         dialog: false,
+        errDialog: false,
         darkMode: false,
         drawer: null,
         items: [

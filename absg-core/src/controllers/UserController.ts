@@ -61,7 +61,7 @@ export class UserController {
             user: {}
         };
 
-        return success(result);
+        return result;
     }
 
     // @Authorized()

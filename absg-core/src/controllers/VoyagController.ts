@@ -3,7 +3,6 @@ import { JsonController, Post, Body, BadRequestError, Get, Authorized } from "ro
 import { User } from "../entities";
 
 import { voyagService } from "../services";
-import { success } from "../middleware/jsonHelper";
 
 @JsonController("/voyag")
 export class VoyagController {
@@ -17,6 +16,6 @@ export class VoyagController {
     @Get("/")
     async welcom() {
         const result = await voyagService.getInitData();
-        return success(result);
+        return result;
     }
 }

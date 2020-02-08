@@ -48,7 +48,7 @@ export class AuthController {
             console.log(" > token", user.token);
             // On retourne l'utilisateur avec son token
             delete user.passwordHash;
-            return success(user);
+            return user;
         } catch (err) {
             throw new BadRequestError(`Wrong username or password.`);
         }

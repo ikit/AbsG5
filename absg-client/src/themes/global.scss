@@ -57,3 +57,13 @@ h1 {
         0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15);
     text-align: center;
 }
+
+.stickyHeader {
+    position: sticky;
+    top: 64px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 2px;
+    margin: 0px;
+    padding: 0px 15px;
+    z-index: 100;
+    background: white;
+}

@@ -19,6 +19,29 @@ export const router = new Router({
             name: 'home',
             component: Home,
         },
+        // Citations
+        {
+            path: '/citations',
+            component: () => import('./views/Citations.vue'),
+            children: [
+                {
+                    path: '',
+                    redirect: '/citations/browser'
+                },
+                {
+                    path: 'browser',
+                    component: () => import('./views/Citations/Browser.vue'),
+                },
+                {
+                    path: 'play',
+                    component: () => import('./views/Citations/Game.vue'),
+                },
+                {
+                    path: 'stats',
+                    component: () => import('./views/Citations/Stats.vue'),
+                }
+            ]
+        },
         // Photos
         {
             path: '/photos',
@@ -165,11 +188,6 @@ export const router = new Router({
             path: '/login',
             name: 'login',
             component: Login,
-        },
-        {
-            path: '/citations',
-            name: 'citations',
-            component: () => import('./views/Citations.vue'),
         },
         {
             path: '/voyag',

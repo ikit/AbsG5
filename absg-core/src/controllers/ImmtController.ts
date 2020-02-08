@@ -23,7 +23,7 @@ export class ImmtController {
     @Get("/init")
     async initData() {
         try {
-            return success(await immtService.getInitData());
+            return await immtService.getInitData();
         } catch (ex) {
             return issue("Impossible de récupérer les données d'initialisation de la section immt", ex);
         }
@@ -37,11 +37,7 @@ export class ImmtController {
     @Authorized()
     @Get("/:year([0-9]{4})/:day([0-9]{1,3})")
     async getById(@Param("year") year: number, @Param("day") day: number) {
-        try {
-            return success(await immtService.fromId(year, day));
-        } catch (ex) {
-            return issue(`Impossible de récupérer les données de l'image demandée`, ex);
-        }
+        return await immtService.fromId(year, day);
     }
 
     /**
@@ -51,30 +47,18 @@ export class ImmtController {
     @Authorized()
     @Post("/")
     async get(@Body() filteringData: any) {
-        try {
-            return success(await immtService.getImmts(filteringData.pageIndex, filteringData.pageSize));
-        } catch (ex) {
-            return issue("Impossible de récupérer les images demandées", ex);
-        }
+        return await immtService.getImmts(filteringData.pageIndex, filteringData.pageSize);
     }
 
     @Authorized()
     @Post("/")
     async save(@Body() citation: Immt) {
-        try {
-            return success(await immtService.save(citation));
-        } catch (ex) {
-            return issue(`Impossible de sauvegarder l'image`, ex);
-        }
+        return await immtService.save(citation);
     }
 
     @Authorized()
     @Delete("/:year([0-9]{4})/:day([0-9]{1,3})")
     async remove(@Param("year") year: number, @Param("day") day: number) {
-        try {
-            return success(await immtService.remove(year, day));
-        } catch (ex) {
-            return issue(`Impossible de supprimer l'image`, ex);
-        }
+        return await immtService.remove(year, day);
     }
 }
