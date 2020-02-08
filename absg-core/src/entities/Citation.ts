@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 import { Person } from "./Person";
 
@@ -17,4 +17,7 @@ export class Citation {
     @ManyToOne(type => Person)
     @JoinColumn()
     author: Person;
+    
+    @Column({ comment: "Année où a été prononcé la citation", nullable: true })
+    year: number;
 }

@@ -15,25 +15,11 @@ class CitationService {
      * Retourne les infos nécessaire à l'initialisation de l'écran "citation" du site
      */
     public async getInitData() {
-        const result = {
-            citations: [],
-            authors: [],
-            total: 0
-        };
-
-        // On récupère la liste des 20 dernière citations
-        result.citations = await this.citationsRepo.query(`SELECT c.* FROM citation c ORDER BY c.id DESC LIMIT 20;`);
-
         // On récupère la liste des autheurs
-        result.authors = await this.citationsRepo.query(`SELECT DISTINCT c."authorId" AS "id", p.firstname, p.surname 
+        return await this.citationsRepo.query(`SELECT DISTINCT c."authorId" AS "id", p.firstname, p.surname 
             FROM citation c 
             LEFT JOIN person p ON c."authorId"=p.id
             ORDER BY firstname ASC;`);
-
-        // On récupère le nombre total de citations
-        result.total = await this.citationsRepo.query(`SELECT COUNT(*) FROM citation;`);
-        result.total = result.total[0].count;
-        return result;
     }
 
     /**
@@ -54,17 +40,19 @@ class CitationService {
      * Renvoie les citations en fonction des informations de filtrage et de pagination
      */
     public async getCitations(pageIndex: number, pageSize: number, authorId: number) {
+        // controle sur les paramètres
+        authorId = isNumber(authorId) && authorId > 0 ? authorId : null;
+        pageSize = isNumber(pageSize) && pageSize > 0 ? pageSize : 20;
+
         // on calcule le nombre de citations max en fonction du filtre sur les auteurs
         let query = "SELECT COUNT(*) FROM citation";
-        if (isNumber(authorId) && authorId > 0) {
+        if (authorId) {
             query += ` WHERE "authorId"= ${authorId}`;
         }
         let totalCitations = await this.citationsRepo.query(query);
         totalCitations = totalCitations[0].count;
-        console.log(totalCitations)
 
         // 2: on borne la pagination en fonction du nombre max (pagesize = all quand filtre par auteur)
-        pageSize = isNumber(pageSize) && pageSize > 0 ? pageSize : 20;
         const totalPages = Math.round(totalCitations / pageSize);
         pageIndex = isNumber(pageIndex) && pageIndex > 0 && pageIndex < totalPages ? pageIndex : 0;
 
@@ -77,6 +65,7 @@ class CitationService {
             query += `WHERE c."authorId"=${authorId} `;
         }
         query += ` ORDER BY c.id DESC OFFSET ${pageIndex * pageSize} LIMIT ${pageSize};`;
+        console.log(query);
         const citations = await this.citationsRepo.query(query);
 
         return { totalCitations, totalPages, pageSize, pageIndex, citations };

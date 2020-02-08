@@ -15,6 +15,7 @@
                         <v-select
                             v-if="$vuetify.breakpoint.mdAndUp"
                             v-model="filter.authorId"
+                            v-on:change="refreshList"
                             :items="authorsList"
                             item-text="label"
                             item-value="id"
@@ -26,10 +27,17 @@
                         <v-btn
                             style="float: right; margin-top: 15px"
                             color="accent"
+                            :disabled="isLoading"
                             @click.stop="resetDialog(true)">
                             <v-icon left>fas fa-plus</v-icon>
                             <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
                         </v-btn>
+                        <v-progress-linear
+                            v-if="isLoading"
+                            style="position: absolute; bottom: 0; left: 0; right: 0;"
+                            indeterminate
+                            color="accent"
+                        ></v-progress-linear>
                     </div>
                 </template>
 
@@ -61,6 +69,7 @@
                                     text
                                     color="primary"
                                     class="ml-2"
+                                    :disabled="isLoading"
                                     v-on="on">
                                         {{ filter.pageSize }}
                                     <v-icon>fa-angle-down</v-icon>
@@ -84,6 +93,7 @@
                         <v-btn
                             fab small
                             dark
+                            :disabled="isLoading"
                             color="accent"
                             class="mr-1"
                             @click="formerPage">
@@ -92,6 +102,7 @@
                         <v-btn
                             fab small
                             dark
+                            :disabled="isLoading"
                             color="accent"
                             class="ml-1"
                             @click="nextPage"
@@ -104,7 +115,7 @@
         </v-container>
     </div>
 
-    <div v-if="!citations || citations.length == 0"
+    <div v-if="!isLoading && (!citations || citations.length == 0)"
         style="text-align:center;">
         <p style="margin: 70px auto">Aucune citation n'a encore été enregistrée... soyez le premier !</p>
         <v-btn
@@ -191,33 +202,32 @@ export default {
         },
     }),
     mounted () {
+        this.isLoading = true;
         if (!this.authors) {
             // Il faut initialiser la vue
             axios.get(`/api/citations/init`).then(response => {
-                const data = parseAxiosResponse(response);
+                const authors = parseAxiosResponse(response);
                 // On initialise les liste des auteurs de citations
                 this.authorsList = [{id: -1, label: "Tout le monde"}];
                 this.authors = {};
-                for (const a of data.authors) {
+                for (const a of authors) {
                     const aData = getPeopleAvatar(a);
                     this.authorsList.push(aData);
                     this.authors[aData.id] = aData;
                 }
                 // on récupère la liste des dernière citations
-                this.refreshList(this.filter);
+                this.refreshList();
             }).catch( err => {
                 store.commit('onError', err);
             });
-
-
         }
     },
     methods: {
-        refreshList(filter) {
+        refreshList() {
             // On affiche l'indicateur de chargement
             this.isLoading = true;
             // On appelle l'API avec les paramètres de filtrage
-            axios.get(`/api/citations/list?authorId=${filter.authorId}&pageIndex=${filter.pageIndex}&pageSize=${filter.pageSize}`)
+            axios.get(`/api/citations/list?authorId=${this.filter.authorId}&pageIndex=${this.filter.pageIndex}&pageSize=${this.filter.pageSize}`)
                 .then(response => {
                     const data = parseAxiosResponse(response);
 
@@ -256,15 +266,15 @@ export default {
         },
         formerPage() {
             this.filter.pageIndex = Math.max(0, this.filter.pageIndex - 1);
-            this.refreshList(this.filter);
+            this.refreshList();
         },
         nextPage() {
             this.filter.pageIndex = Math.min(this.totalPages, this.filter.pageIndex + 1);
-            this.refreshList(this.filter);
+            this.refreshList();
         },
         updateCitationsPerPage(count) {
             this.filter.pageSize = count;
-            this.refreshList(this.filter);
+            this.refreshList();
         }
     }
 };
