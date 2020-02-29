@@ -1,6 +1,7 @@
 import * as morgan from "morgan";
 import { format, createLogger, transports, config, addColors } from "winston";
 import { format as formatDate } from "date-fns";
+import { PgLogger } from "./pgLogger";
 
 const { combine, printf, timestamp, metadata, colorize } = format;
 
@@ -53,6 +54,9 @@ export const logger = createLogger({
                     return out;
                 })
             )
+        }),
+        new PgLogger({
+            format: combine(timestamp(), metadata({ fillExcept: ["message", "level", "timestamp"] }))
         })
     ]
 });
