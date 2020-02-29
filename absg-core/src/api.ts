@@ -7,10 +7,9 @@ import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import { agpaService, citationService, immtService, agendaService, voyagService, eventService } from "./services";
 import * as ormconfig from "../ormconfig";
 
-console.log("---");
 createConnections(ormconfig)
     .then(() => {
-        console.log("ORM connection created");
+        logger.info("ORM connection created");
 
         // Une fois la connection créé, on peut initialialiser les services
         agpaService.initService();
@@ -19,7 +18,7 @@ createConnections(ormconfig)
         agendaService.initService();
         voyagService.initService();
         eventService.initService();
-        console.log("AbsG services initialized");
+        logger.info("AbsG services initialized");
 
         // create express app
         const app = createExpressServer({
@@ -35,10 +34,7 @@ createConnections(ormconfig)
 
         // start express server
         app.listen(5000);
-
-        console.info("Server has started on port 5000.");
-
-        console.log("---");
+        logger.info("Server has started on port 5000.");
     })
     .catch(error => {
         console.error(error);
