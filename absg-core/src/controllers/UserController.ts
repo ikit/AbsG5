@@ -50,7 +50,6 @@ export class UserController {
     @Authorized()
     @Get("/welcom")
     async welcom() {
-        console.log("welcome !");
         const current = new Date();
         const result = {
             immt: await immtService.last(),

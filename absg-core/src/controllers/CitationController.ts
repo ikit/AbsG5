@@ -49,7 +49,8 @@ export class CitationController {
 
     @Authorized()
     @Delete("/:id")
-    async remove(@Param("id") id: number) {
-        return await citationService.remove(id);
+    async remove(@Req() request: Request, @Param("id") id: number) {
+        const user = await getUserFromHeader(request);
+        return await citationService.remove(user, id);
     }
 }

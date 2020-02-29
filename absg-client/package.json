@@ -23,6 +23,7 @@
     "register-service-worker": "^1.6.2",
     "reveal": "git+https://github.com/hakimel/reveal.js.git",
     "roboto-fontface": "*",
+    "rxjs": "^6.5.4",
     "vue": "^2.6.11",
     "vue-affix": "^0.5.2",
     "vue-orgchart": "^1.1.7",

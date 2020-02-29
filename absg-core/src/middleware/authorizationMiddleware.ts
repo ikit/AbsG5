@@ -37,7 +37,6 @@ export async function checkUserPassag(user: User) {
     }
 }
 
-
 export async function getUserFromHeader(request) {
     // on récupère le header authorization
     const authorization: string = request.headers["authorization"];
@@ -67,7 +66,6 @@ export async function getUserFromHeader(request) {
  * @returns boolean true is the user is authorized
  */
 export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
-    console.log("jwtAuthorizationChecker");
     // on récupère le user si il est défini dans le header
     let user = await getUserFromHeader(action.request);
 
@@ -88,7 +86,6 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 }
 
 export async function currentUserChecker(action: Action) {
-    console.log("currentUserChecker");
     // on retourn le user si il est défini dans le header
     return await getUserFromHeader(action.request);;
 }

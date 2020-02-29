@@ -1,10 +1,15 @@
 import * as Transport from "winston-transport";
 import { getRepository } from "typeorm";
-import { LogSystem } from "../entities";
+import { LogSystem, LogSeverity } from "../entities";
+import { WebsocketService } from "../services/WebsocketService";
 
 export class PgLogger extends Transport {
+    wsService = null;
+
     constructor(opts) {
         super(opts);
+
+        this.wsService = new WebsocketService();
     }
 
     log(info, callback) {
@@ -27,6 +32,14 @@ export class PgLogger extends Transport {
             }
 
             logRepo.save(log);
+
+            if (info.level === LogSeverity.notice) {
+                console.log("=> brodcasr")
+                this.wsService.broadcast({
+                    message: "notification",
+                    payload: log
+                });
+            }
         }
         callback();
     }

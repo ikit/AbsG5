@@ -146,7 +146,7 @@
 
     <v-dialog v-model="citationEditor.open" width="800px">
         <v-card>
-            <v-card-title color="primary">
+            <v-card-title class="grey lighten-4">
             {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
@@ -198,7 +198,7 @@
 
     <v-dialog v-model="citationDeletion.open" width="800px">
         <v-card>
-            <v-card-title color="primary">
+            <v-card-title>
                 Supprimer la citation
             </v-card-title>
             <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette citation ?</p>

@@ -6,6 +6,7 @@ import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import { agpaService, citationService, immtService, agendaService, voyagService, eventService } from "./services";
 import * as ormconfig from "../ormconfig";
+import { initWS } from "./wss";
 
 createConnections(ormconfig)
     .then(() => {
@@ -35,6 +36,9 @@ createConnections(ormconfig)
         // start express server
         app.listen(5000);
         logger.info("Server has started on port 5000.");
+
+        // start websocket server
+        initWS();
     })
     .catch(error => {
         console.error(error);

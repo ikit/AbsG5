@@ -1,7 +1,8 @@
 import { getRepository } from "typeorm";
-import { Citation, User, Person } from "../entities";
+import { Citation, User, Person, LogModule } from "../entities";
 import { NotFoundError } from "routing-controllers";
 import { isNumber, isString } from "util";
+import { logger } from "../middleware/logger";
 
 class CitationService {
     private citationsRepo = null;
@@ -134,7 +135,13 @@ class CitationService {
         // On enregistre la citation
         citation.author = author;
         citation.poster = user;
+        const newCitation = citation.id || null;
         await this.citationsRepo.save(citation);
+
+        logger.notice(
+            newCitation ? `Citation corrigé par ${user.username}` : `Nouvelle citation ajouté par ${user.username}`,
+            { userId: user.id, module: LogModule.citations }
+        );
 
         // On indique que tout s'est bien passé en retournant la citation
         return citation;
@@ -145,13 +152,16 @@ class CitationService {
      * Une citation ne peut être supprimé que par un admin,
      * ou bien par le poster si il s'agit de la dernière citation ajouté
      */
-    public async remove(id: number) {
+    public async remove(user: User, id: number) {
         // TODO: retrieve user info to check permission to delete
         console.log("DELETE", id);
         const citation = await this.citationsRepo.findOne(id);
         if (!citation) {
             throw new NotFoundError(`Citations was not found.`);
         }
+        
+        logger.notice(`Citation supprimé par ${user.username}`, { userId: user.id, module: LogModule.citations });
+
         return this.citationsRepo.remove(citation);
     }
 }

@@ -8,8 +8,8 @@
 
     <v-tabs centered>
         <v-tab :to="{path:'/citations/browser'}"> <v-icon>fas fa-bars</v-icon> &nbsp; Liste</v-tab>
-        <v-tab :to="{path:'/citations/play'}"> <v-icon>far fa-grin-tongue</v-icon> &nbsp; Devinettes</v-tab>
-        <v-tab :to="{path:'/citations/stats'}"> <v-icon>fas fa-chart-pie</v-icon> &nbsp; Statistiques</v-tab>
+        <v-tab :to="{path:'/citations/play'}" disabled> <v-icon>far fa-grin-tongue</v-icon> &nbsp; Devinettes</v-tab>
+        <v-tab :to="{path:'/citations/stats'}" disabled> <v-icon>fas fa-chart-pie</v-icon> &nbsp; Statistiques</v-tab>
     </v-tabs>
 
     <router-view></router-view>
