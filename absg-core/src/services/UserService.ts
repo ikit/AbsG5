@@ -49,7 +49,7 @@ class UserService {
         const sql = `SELECT l.*, u.username
             FROM log_passag l
             INNER JOIN "user" u ON u.id = l."userId" 
-            WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD")}' AND '${format(to, "YYYY-MM-DD")}'
+            WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD HH:mm")}:00' AND '${format(to, "YYYY-MM-DD HH:mm")}:00'
             ORDER BY l.datetime ASC`;
         // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
         return getRepository(LogPassag).query(sql);
@@ -70,7 +70,6 @@ class UserService {
                 ) d
             LEFT OUTER JOIN log_passag l ON d.date = to_char(date_trunc('day', l.datetime), 'YYYY-MM-DD')
             GROUP BY d.date;`;
-        console.log(sql)
         return getRepository(LogPassag).query(sql);
     }
 }
