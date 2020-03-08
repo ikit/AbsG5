@@ -19,6 +19,29 @@ export const router = new Router({
             name: 'home',
             component: Home,
         },
+        // Administration
+        {
+            path: '/admin',
+            component: () => import('./views/Admin.vue'),
+            children: [
+                {
+                    path: '',
+                    redirect: '/admin/dashboard'
+                },
+                {
+                    path: 'dashboard',
+                    component: () => import('./views/Admin/Dashboard.vue'),
+                },
+                {
+                    path: 'settings',
+                    component: () => import('./views/Admin/Settings.vue'),
+                },
+                {
+                    path: 'users',
+                    component: () => import('./views/Admin/Users.vue'),
+                }
+            ]
+        },
         // Citations
         {
             path: '/citations',
