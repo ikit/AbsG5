@@ -245,6 +245,8 @@ router.beforeEach((to, from, next) => {
 
     // Si accés restreint et pas d'authent, on redirige vers la page de login
     if (authRequired && !user) {
+
+        store.commit('logout');
         return next('/login');
     }
 
@@ -257,7 +259,7 @@ axios.interceptors.response.use(function (response) {
     return response
 }, function (error) {
     if (error.response.status === 401) {
-        store.dispatch('logout');
+        store.commit('logout');
         return router.push('/login');
     }
     if (error.response.status === 500) {

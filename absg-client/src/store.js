@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+import { getModuleInfo, getPeopleAvatar } from './middleware/CommonHelper';
+import { format } from "date-fns";
+import { fr } from "date-fns/locale"
 
 Vue.use(Vuex);
 
@@ -59,6 +62,18 @@ export default new Vuex.Store({
                 title: immt.title
             }];
             state.photosGalleryIndex = 0;
+        },
+        updateNotifications(state, notifications) {
+            state.notifications = notifications.map(e => {
+                const m = getModuleInfo(e.module);
+                return {
+                    module: m,
+                    message: e.message,
+                    datetime: new Date(e.datetime),
+                    dateLabel: format(new Date(e.datetime), "dd MMM h'h'mm", {locale: fr}),
+                    user: getPeopleAvatar(e)
+                };
+            });
         },
 
         photosGalleryReset(state, galery) {

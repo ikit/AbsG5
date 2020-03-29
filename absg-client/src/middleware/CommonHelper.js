@@ -1,6 +1,20 @@
 
 import axios from 'axios';
 
+
+export const MODULES = [
+    { id:"absg", icon: 'fas fa-info', name: 'System', url: null },
+    { id:"citations", icon: 'fas fa-quote-left', name: 'Citations', url: '/citations' },
+    { id:"photos", icon: 'fas fa-image', name: 'Photos', url: '/photos' },
+    { id:"discussions", icon: 'fas fa-comment', name: 'Discussions', url: '/discussions' },
+    { id:"agenda", icon: 'fas fa-address-book', name: 'Agenda', url: '/agenda' },
+    { id:"voyag", icon: 'fas fa-map-marked-alt', name: 'Voya G', url: '/voyag' },
+    { id:"agpa", icon: 'fas fa-camera', name: 'A.G.P.A', url: '/agpa' },
+    { id:"webg", icon: 'fas fa-globe', name: 'Web 3G', url: '/web3g' },
+    { id:"admin", icon: 'fas fa-cog', name: 'Admin', url: '/admin', roles: ["admin"]  }];
+
+
+
 /**
  * Analyse la réponse retourné par axios, afin de traiter les cas d'erreur
  * et retourne la réponse du server quand tout se passe bien; null sinon
@@ -48,11 +62,13 @@ export function checkAutentication(store, ) {
  * @param {any} peopleData
  */
 export function getPeopleAvatar(peopleData) {
-    const idAsStr = `${peopleData.id}`;
+    const id = peopleData.userId ? peopleData.userId : peopleData.id;
+    let username = peopleData.username ? peopleData.username : null;
+    const idAsStr = `${id}`;
     return {
-        id: peopleData.id,
+        id,
         url: `http://absolumentg.fr/assets/img/avatars/${idAsStr.padStart(3, '0')}.png`,
-        label: peopleData.surname ? peopleData.surname : peopleData.firstname
+        label: username ? username : peopleData.surname ? peopleData.surname : peopleData.firstname
     };
 }
 
@@ -69,4 +85,12 @@ export function padNumber(value, size) {
  */
 export function cleanString(value) {
     return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+/**
+ * Retourne les informations concernant un module
+ * @param string moduleName l'identifiant du module
+ */
+export function getModuleInfo(moduleName) {
+    return MODULES.find(e => e.id === moduleName);
 }

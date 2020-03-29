@@ -163,6 +163,7 @@ export default {
                     this.isLoading = false;
                     store.commit('updateCitation', data.citation);
                     store.commit('updateImmt', data.immt);
+                    store.commit('updateNotifications', data.notifications);
 
                     // On crée la listes des logs de passaG (les 24 dernières heures)
                     this.passage = []

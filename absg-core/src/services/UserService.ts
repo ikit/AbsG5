@@ -12,34 +12,28 @@ class UserService {
     /**
      * Retourne les infos nécessaire à l'initialisation de l'écran "citation" du site
      */
+    public async getLastNotifications() {
+        // On récupère les 50 dernières notifications sur les 7 derniers jours
+        const sql = `SELECT l.*, u.username
+            FROM log_system l
+            INNER JOIN "user" u ON u.id = l."userId" 
+            WHERE severity = 'notice'
+            ORDER BY l.datetime ASC
+            LIMIT 50`;
+        return getRepository(LogPassag).query(sql);
+    }
+
+    /**
+     * Valide les notifications "vues" par l'utilisateur en mettant à jour sa date de "dernière vue"
+     */
     public async checkNotifications(userId: number) {
-        return [
-            {
-                icon: "fas fa-quote-left",
-                url: "/citation",
-                label: "3 nouvelle citation"
-            },
-            {
-                icon: "fas fa-image",
-                url: "/photos/immt",
-                label: "1 nouvelle image du moment"
-            },
-            {
-                icon: "fas fa-images",
-                url: "/photos/albums",
-                label: 'Nouvel album créé par Olivier: "Noel 2019"'
-            },
-            {
-                icon: "fab fa-stack-overflow",
-                url: "/photos/vrac",
-                label: "75 photos triées depuis votre dernier passage"
-            },
-            {
-                icon: "fab fa-stack-overflow",
-                url: "/photos/vrac",
-                label: "75 photos triées"
-            }
-        ];
+        const user = await this.usersRepo.get(userId);
+        if (user) {
+            user.lastActivity = new Date();
+            this.usersRepo.save(user);
+            console.log("checkNotifications", user);
+        }
+        return new Date();
     }
 
     /**
@@ -49,7 +43,8 @@ class UserService {
         const sql = `SELECT l.*, u.username
             FROM log_passag l
             INNER JOIN "user" u ON u.id = l."userId" 
-            WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD HH:mm")}:00' AND '${format(to, "YYYY-MM-DD HH:mm")}:00'
+            WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD HH:mm")}:00' 
+            AND '${format(to, "YYYY-MM-DD HH:mm")}:00'
             ORDER BY l.datetime ASC`;
         // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
         return getRepository(LogPassag).query(sql);

@@ -1,6 +1,7 @@
 <template>
 <v-app id="inspire" :dark="darkMode">
     <v-app-bar
+        v-if="user"
         color="primary"
         dark
         app
@@ -25,10 +26,10 @@
             </div>
         </v-spacer>
         <v-badge color="accent" style="margin-right: 15px" overlap v-if="user">
-            <span slot="badge">8</span>
+            <span v-if="notifications.length > 0" slot="badge">{{ notifications.length }}</span>
             <v-btn icon
                 @click.stop="dialog = !dialog">
-                <v-icon>fas fa-bell</v-icon>
+                <v-icon>far fa-list-alt</v-icon>
             </v-btn>
         </v-badge>
         <v-menu offset-y bottom left v-if="user">
@@ -69,10 +70,10 @@
         <div class="menu" v-if="user">
             <v-list style="background: none">
                 <template v-for="item in items">
-                    <div class="menuItem" v-if="!item.roles || checkUserRolesMatch(item.roles)" :key="item.text">
-                        <router-link :to="item.route">
+                    <div class="menuItem" v-if="item.url && !item.roles || checkUserRolesMatch(item.roles)" :key="item.id">
+                        <router-link :to="item.url">
                             <v-icon color="inherit">{{ item.icon }}</v-icon><br/>
-                            <span style="display: inline-block; line-height: 1.1em;">{{ item.text }}</span>
+                            <span style="display: inline-block; line-height: 1.1em;">{{ item.name }}</span>
                         </router-link>
                     </div>
                 </template>
@@ -86,7 +87,7 @@
             </div>
         </div>
         <div class="mainContent" >
-            <router-view></router-view>
+            <router-view :socket="ws"></router-view>
             <div class="gallery" v-if="photosGalleryDisplayed">
                 <div style="position: relative; padding: 50px; height: 100%;" @click="photosGalleryAuto()">
                     <div class="galleryControl">
@@ -123,58 +124,32 @@
 
     <v-dialog v-model="dialog" width="800px">
         <v-card>
-            <v-card-title class="grey lighten-4 py-4 title">
-            Notifications
+            <v-card-title class="grey lighten-4">
+            Historiques des événements
             </v-card-title>
-            <v-container grid-list-sm class="pa-4">
-            <v-layout row wrap>
-                <v-flex xs12 align-center justify-space-between>
-                <v-layout align-center>
-                    <v-avatar size="40px" class="mr-3">
-                    <img
-                        src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
-                        alt="">
-                    </v-avatar>
-                    <v-text-field placeholder="Name"></v-text-field>
-                </v-layout>
-                </v-flex>
-                <v-flex xs6>
-                <v-text-field
-                    prepend-icon="business"
-                    placeholder="Company">
-                </v-text-field>
-                </v-flex>
-                <v-flex xs6>
-                <v-text-field
-                    placeholder="Job title">
-                </v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                <v-text-field
-                    prepend-icon="mail"
-                    placeholder="Email">
-                </v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                <v-text-field
-                    type="tel"
-                    prepend-icon="phone"
-                    placeholder="(000) 000 - 0000"
-                    mask="phone">
-                </v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                <v-text-field
-                    prepend-icon="notes"
-                    placeholder="Notes">
-                </v-text-field>
-                </v-flex>
-            </v-layout>
+            <v-container fluid  grid-list-md style="padding:0">
+                <v-list dense>
+                    <template v-for="(item, index) in notifications">
+                        <v-list-item
+                            class="citationRow"
+                            :key="index">
+                            <v-list-item-avatar>
+                                <img :src="item.user.url"/>
+                            </v-list-item-avatar>
+                            <v-list-item-content>
+                                <div style="display: flex;">
+                                    <v-icon style="flex">{{item.module.icon}}</v-icon>
+                                    <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.dateLabel }} - {{item.message}}</span>
+                                </div>
+
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
+                </v-list>
             </v-container>
             <v-card-actions>
-            <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
-            <v-spacer></v-spacer>
-            <v-btn text @click="dialog=false">Fermer</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn text @click="closeNotifications()">Fermer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -182,7 +157,7 @@
 
     <v-dialog v-model="errDialog" width="80vw">
         <v-card>
-            <v-card-title class="grey lighten-4 py-4 title">
+            <v-card-title class="grey lighten-4">
             Une erreur s'est produite
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
@@ -202,8 +177,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import store from './store';
+import axios from 'axios';
 import { mapState } from 'vuex';
-import { checkAutentication } from './middleware/CommonHelper';
+import { MODULES, checkAutentication, parseAxiosResponse } from  './middleware/CommonHelper';
+import { webSocket } from "rxjs/webSocket";
+
 
 export default {
     name: 'App',
@@ -213,16 +191,8 @@ export default {
         errDialog: false,
         darkMode: false,
         drawer: null,
-        items: [
-            { icon: 'fas fa-quote-left', text: 'Citations', route: '/citations' },
-            { icon: 'fas fa-image', text: 'Photos', route: '/photos' },
-            { icon: 'fas fa-comment', text: 'Discussions', route: '/discussions' },
-            { icon: 'fas fa-address-book', text: 'Agenda', route: '/agenda' },
-            { icon: 'fas fa-map-marked-alt', text: 'Voya G', route: '/voyag' },
-            { icon: 'fas fa-camera', text: 'A.G.P.A', route: '/agpa' },
-            { icon: 'fas fa-globe', text: 'Web 3G', route: '/web3g' },
-            { icon: 'fas fa-cog', text: 'Admin', route: '/admin', roles: ["admin"]  },
-        ]
+        ws: null,
+        items: MODULES
     }),
     props: {
         source: String
@@ -234,7 +204,23 @@ export default {
             return this.$route.router.go('/login');
         }
     },
+    mounted() {
+        // On initialise le websocket
+        console.log("init ws")
+        this.ws = webSocket("ws://localhost:5011");
+        this.ws.subscribe(
+            msg => this.processWebsocketMessage(msg),
+            err => this.processWebsocketError("Problème de mise à jour temps réel", err),
+            () => console.log("complete") // Called when connection is closed (for whatever reason).
+        );
+    },
     methods: {
+        processWebsocketMessage(msg) {
+            console.log("processWebsocketMessage", msg);
+        },
+        processWebsocketError(msg, err) {
+            console.log("processWebsocketError", msg, err);
+        },
         checkUserRolesMatch(roles) {
             let result = true;
             console.log("checkUserRolesMatch", roles);
@@ -255,6 +241,32 @@ export default {
         },
         photosGalleryAuto() {
             console.log('photosGalleryAuto');
+        },
+        closeNotifications() {
+            dialog=false;
+            axios.get(`/api/users/checkNotifications`).then(response => {
+                const data = parseAxiosResponse(response);
+                if (data) {
+                    this.isLoading = false;
+                    store.commit('updateCitation', data.citation);
+                    store.commit('updateImmt', data.immt);
+                    store.commit('updateNotifications', data.notifications);
+
+                    // On crée la listes des logs de passaG (les 24 dernières heures)
+                    this.passage = []
+                    const now = new Date();
+                    for (let hDelta = 0; hDelta<24; hDelta++) {
+                        let h = ((now.getHours() - hDelta) + 24) % 24;  // On simule le modulo
+                        this.passage.unshift({
+                            time: `${h}h`,
+                            passage: data.passag
+                                .filter(e => new Date(e.datetime).getHours() === h)
+                                .map(e => ({ username: `${e.username}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
+                        })
+
+                    }
+                }
+            });
         }
     },
     computed: {

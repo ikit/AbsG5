@@ -56,7 +56,7 @@ export class UserController {
             citation: await citationService.random(),
             events: await eventService.getForMonth(current.getFullYear(), current.getMonth()),
             passag: await userService.getPassag(subDays(new Date(), 1)),
-            notifications: await userService.checkNotifications(1),
+            notifications: await userService.getLastNotifications(),
             user: {}
         };
 
