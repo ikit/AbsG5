@@ -4,7 +4,15 @@ import { createExpressServer } from "routing-controllers";
 import * as bodyParser from "body-parser";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
-import { agpaService, citationService, immtService, agendaService, voyagService, eventService } from "./services";
+import {
+    agpaService,
+    citationService,
+    immtService,
+    agendaService,
+    voyagService,
+    eventService,
+    userService
+} from "./services";
 import * as ormconfig from "../ormconfig";
 import { initWS } from "./wss";
 
@@ -19,6 +27,7 @@ createConnections(ormconfig)
         agendaService.initService();
         voyagService.initService();
         eventService.initService();
+        userService.initService();
         logger.info("AbsG services initialized");
 
         // create express app

@@ -1,12 +1,37 @@
-import { getRepository, MoreThanOrEqual, Between } from "typeorm";
+import { getRepository } from "typeorm";
 import { User, LogPassag } from "../entities";
-import { format, subDays, differenceInDays } from "date-fns";
+import { format, differenceInDays } from "date-fns";
+import { isNumber } from "util";
 
 class UserService {
     private usersRepo = null;
 
     public initService() {
         this.usersRepo = getRepository(User);
+    }
+
+    /**
+     * Renvoie la liste des utilisateurs en fonction des informations de filtrage et de pagination
+     */
+    public async getUsers(pageIndex: number, pageSize: number) {
+        // controle sur les paramètres
+        pageSize = isNumber(pageSize) && pageSize > 0 ? pageSize : 20;
+
+        // on calcule le nombre de citations max en fonction du filtre sur les auteurs
+        let totalUsers = await this.usersRepo.query("SELECT COUNT(*) FROM user");
+        totalUsers = totalUsers[0].count;
+
+        // 2: on borne la pagination en fonction du nombre max (pagesize = all quand filtre par auteur)
+        const totalPages = Math.round(totalUsers / pageSize);
+        pageIndex = isNumber(pageIndex) && pageIndex > 0 && pageIndex < totalPages ? pageIndex : 0;
+
+        // on récupère les citations
+        const users = await this.usersRepo
+            .createQueryBuilder("u")
+            .leftJoinAndSelect("u.person", "person")
+            .getMany();
+
+        return { totalUsers, totalPages, pageSize, pageIndex, users };
     }
 
     /**

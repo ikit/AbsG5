@@ -1,16 +1,20 @@
 import { getRepository, Equal } from "typeorm";
-import { JsonController, Post, Body, BadRequestError, Get, Authorized } from "routing-controllers";
+import { JsonController, Post, Body, BadRequestError, Get, Authorized, QueryParam } from "routing-controllers";
 import { User } from "../entities";
 
 import { authService, citationService, eventService, immtService, userService } from "../services";
-import { success } from "../middleware/jsonHelper";
 import { subDays } from "date-fns";
 
+@Authorized()
 @JsonController("/users")
 export class UserController {
     private userRepo = getRepository(User);
 
-    @Authorized()
+    @Get("/list")
+    async list(@QueryParam("pageIndex") pageIndex: number, @QueryParam("pageSize") pageSize: number) {
+        return await userService.getUsers(pageIndex, pageSize);
+    }
+
     @Post("/")
     async save(@Body() payload: User) {
         // On vérifie qu'on a bien reçu tous les champs nécessaires
@@ -47,7 +51,6 @@ export class UserController {
      *  - L'historique des passages de la journée
      *  - Les dernières notifications non lues
      */
-    @Authorized()
     @Get("/welcom")
     async welcom() {
         const current = new Date();
@@ -63,7 +66,6 @@ export class UserController {
         return result;
     }
 
-    @Authorized()
     @Get("/passagHistory")
     async passagHistory() {
         return await userService.getPassagHistory();
