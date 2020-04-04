@@ -25,17 +25,16 @@ export default new Vuex.Store({
         agpaMeta: null,
     },
     mutations: {
-        login(state, data) {
-            // Get user avatar url
-            const idAsStr = `${data.id}`;
-            data.avatarUrl = `http://absolumentg.fr/assets/img/avatars/${idAsStr.padStart(3, '0')}.png`;
-            console.log("STORE LOGIN", data)
+        setCurrentUser(state, user) {
+            if (user) {
+                // Get user avatar url
+                const idAsStr = `${user.id}`;
+                user.avatarUrl = `http://absolumentg.fr/assets/img/avatars/${idAsStr.padStart(3, '0')}.png`;
+            } else {
+                state.user = null;
+            }
 
-            state.user = data;
-        },
-        logout(state) {
-            console.log("STORE LOGOUT")
-            state.user = null;
+            state.user = user;
         },
 
         onError(state, axiosError) {

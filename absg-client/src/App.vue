@@ -41,25 +41,25 @@
                 </v-btn>
             </template>
 
-            <v-list>
-                <v-list-item>
+            <v-list nav>
+                <v-list-item href="/me/informations">
                     <v-list-item-title :key="0">
                         <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations
                     </v-list-item-title>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item href="/me/stats">
                     <v-list-item-title :key="1">
                         <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-chart-bar</v-icon>Mes statistiques
                     </v-list-item-title>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item href="/me/password">
                     <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
                 </v-list-item>
                 <v-list-item>
                     <v-switch label="Mode nuit" v-model="darkMode"></v-switch>
                 </v-list-item>
                 <v-divider></v-divider>
-                <v-list-item>
+                <v-list-item @click="logout()">
                     <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Déconnexion</v-list-item-title>
                 </v-list-item>
             </v-list>
@@ -70,7 +70,7 @@
         <div class="menu" v-if="user">
             <v-list style="background: none">
                 <template v-for="item in items">
-                    <div class="menuItem" v-if="item.url && !item.roles || checkUserRolesMatch(item.roles)" :key="item.id">
+                    <div class="menuItem" v-if="item.url && !item.roles || checkUserRolesMatch(item)" :key="item.id">
                         <router-link :to="item.url">
                             <v-icon color="inherit">{{ item.icon }}</v-icon><br/>
                             <span style="display: inline-block; line-height: 1.1em;">{{ item.name }}</span>
@@ -179,8 +179,9 @@ import Vuex from 'vuex';
 import store from './store';
 import axios from 'axios';
 import { mapState } from 'vuex';
-import { MODULES, checkAutentication, parseAxiosResponse } from  './middleware/CommonHelper';
+import { MODULES, parseAxiosResponse } from  './middleware/CommonHelper';
 import { webSocket } from "rxjs/webSocket";
+import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
 
 
 export default {
@@ -197,16 +198,8 @@ export default {
     props: {
         source: String
     },
-    beforeCreate() {
-        const user = checkAutentication(store);
-        console.log(this.$route);
-        if (!user) {
-            return this.$route.router.go('/login');
-        }
-    },
     mounted() {
         // On initialise le websocket
-        console.log("init ws")
         this.ws = webSocket("ws://localhost:5011");
         this.ws.subscribe(
             msg => this.processWebsocketMessage(msg),
@@ -215,6 +208,10 @@ export default {
         );
     },
     methods: {
+        logout() {
+            logoutUser(store);
+            this.$router.push('/login');
+        },
         processWebsocketMessage(msg) {
             console.log("processWebsocketMessage", msg);
         },
@@ -223,7 +220,7 @@ export default {
         },
         checkUserRolesMatch(roles) {
             let result = true;
-            console.log("checkUserRolesMatch", roles);
+            console.log("TODO: menu item checkUserRolesMatch", roles);
             return result;
         },
         photosGalleryHide() {

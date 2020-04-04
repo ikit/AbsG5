@@ -259,59 +259,23 @@ export default {
     }),
     mounted () {
         this.isLoading = true;
-        if (!this.users) {
-            // Il faut initialiser la vue
-            axios.get(`/api/usersList/init`).then(response => {
-                const users = parseAxiosResponse(response);
-                // On initialise les liste des auteurs de usersList
-                this.personsList = [{id: -1, label: "Tout le monde"}];
-                this.users = {};
-                for (const a of users) {
-                    const aData = getPeopleAvatar(a);
-                    this.personsList.push(aData);
-                    this.users[aData.id] = aData;
-                    this.personsList.push({value: aData.id, text: aData.label });
-                }
-                // on récupère la liste des dernière usersList
-                this.refreshList();
-            }).catch( err => {
-                store.commit('onError', err);
-            });
-        }
+        axios.get(`/api/users/list`).then(response => {
+            const result = parseAxiosResponse(response);
+            // On initialise les liste des auteurs de usersList
+            this.personsList = [{id: -1, label: "Tout le monde"}];
+            this.users = {};
+            for (const u of result.users) {
+                const uData = { ...u, ...getPeopleAvatar(u)};
+                this.personsList.push(uData);
+                this.users[uData.id] = uData;
+                console.log("-", uData);
+            }
+        }).catch( err => {
+            store.commit('onError', err);
+        });
     },
     methods: {
-        refreshList(reset = false) {
-            // On affiche l'indicateur de chargement
-            this.isLoading = true;
-            // Est-ce qu'on force le reset
-            if (reset) {
-                this.filter.pageIndex = 0;
-                this.filter.authorId = null;
-            }
-
-            // On appelle l'API avec les paramètres de filtrage
-            axios.get(`/api/usersList/list?authorId=${this.filter.authorId}&pageIndex=${this.filter.pageIndex}&pageSize=${this.filter.pageSize}`)
-                .then(response => {
-                    const data = parseAxiosResponse(response);
-                    this.totalUsers = data.totalUsers;
-                    this.totalPages = data.totalPages;
-                    this.filter.pageIndex = data.pageIndex;
-                    this.filter.pageSize = data.pageSize;
-
-                    this.usersList = data.usersList.map(i => ({
-                        id: i.id,
-                        citation: i.citation,
-                        author: this.users[i.authorId],
-                        authorId: i.authorId,
-                        year: i.year
-                    }));
-
-                    this.isLoading = false;
-
-                }).catch( err => {
-                    store.commit('onError', err);
-                });
-        },
+        
         resetDialog (open = false) {
             this.userEditor.open = open;
             this.userEditor.id = null;
@@ -339,7 +303,7 @@ export default {
             this.userEditor.isLoading = true;
 
             // On envoie au serveur
-            axios.post(`/api/usersList/`, this.userEditor).then(
+            axios.post(`/api/users`, this.userEditor).then(
                 response => {
                     // on reset l'IHM
                     this.resetDialog();
@@ -355,7 +319,7 @@ export default {
             this.citationDeletion.citation = item;
         },
         deleteCitation: function () {
-            axios.delete(`/api/usersList/${this.citationDeletion.citation.id}`).then(
+            axios.delete(`/api/users/${this.citationDeletion.citation.id}`).then(
                 response => {
                     this.citationDeletion.citation = null;
                     this.citationDeletion.open = false;

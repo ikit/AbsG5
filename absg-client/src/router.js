@@ -1,22 +1,21 @@
 import Vue from 'vue';
-import Router from 'vue-router';
+import VueRouter from 'vue-router'
 import Home from './views/Home.vue';
 import E404 from './views/E404.vue';
 import Changelog from './views/Changelog.vue';
 import Login from './views/Login.vue';
 import axios from 'axios';
 import store from './store';
-import { checkAutentication } from './middleware/CommonHelper';
+import { checkAutentication } from './middleware/AuthHelper';
 
-Vue.use(Router);
+Vue.use(VueRouter);
 
-export const router = new Router({
+export const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
     routes: [
         {
             path: '/',
-            name: 'home',
             component: Home,
         },
         // Administration
@@ -129,7 +128,6 @@ export const router = new Router({
         },
         {
             path: '/discussions/forum/:id',
-            name: 'forum',
             component: () => import('./views/Discussions/Forum.vue'),
         },
         // Agenda
@@ -209,24 +207,20 @@ export const router = new Router({
         // Pages uniques
         {
             path: '/login',
-            name: 'login',
             component: Login,
         },
         {
             path: '/voyag',
-            name: 'voyag',
             component: () => import('./views/VoyaG.vue'),
         },
         {
             path: '/changelog',
-            name: 'changelog',
             component: Changelog
         },
 
         // Error management
         {
             path: '/404',
-            name: '404',
             component: E404
         },
         {
@@ -239,35 +233,40 @@ export const router = new Router({
 router.beforeEach((to, from, next) => {
     // Si la page nécessite une authent ou non
     const publicPages = ['/login'];
-    const authRequired = !publicPages.includes(to.path);
+    if (publicPages.includes(to.path)) {
+        return next();
+    }
 
+    // Si pas d'authent, on redirige vers la page de login
     const user = checkAutentication(store);
-
-    // Si accés restreint et pas d'authent, on redirige vers la page de login
-    if (authRequired && !user) {
-
-        store.commit('logout');
+    console.log("route-beforeEach", user);
+    if (!user) {
         return next('/login');
     }
+
+    // // Si accès restreint et pas le role, on redirige vers l'accueil
+    // TODO
 
     next();
   })
 
 
 // On intercepte les requêtes qui échouent, pour rediriger en conséquence
-axios.interceptors.response.use(function (response) {
-    return response
-}, function (error) {
-    if (error.response.status === 401) {
-        store.commit('logout');
-        return router.push('/login');
-    }
-    if (error.response.status === 500) {
-        console.log("TODO: 500", error.response);
-        return router.push('/404');
-    }
-    // Pour tout le reste on redirige vers 404
-    console.log("TODO: NOT MANAGED ERROR", error.response)
-    router.push('/404');
-    return Promise.reject(error)
-})
+axios.interceptors.response.use(
+    response => {
+        return response
+    },
+    error => {
+        // accès refusé, on redirige vers l'accueil
+        if (error.response.status === 401) {
+            return router.push('/login');
+        }
+
+        if (error.response.status === 500) {
+            console.log("TODO: 500", error.response);
+        }
+        // Pour tout le reste on redirige vers 404
+        console.log("TODO: NOT MANAGED ERROR", error.response)
+        router.push('/404');
+        return Promise.reject(error)
+    });

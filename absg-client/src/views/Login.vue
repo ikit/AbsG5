@@ -28,10 +28,11 @@
 
 
 <script>
-import Vue from 'vue';
-import axios from 'axios';
-import store from '../store';
-import { parseAxiosResponse, getPeopleAvatar } from '../middleware/CommonHelper';
+import Vue from "vue";
+import axios from "axios";
+import store from "../store";
+import { parseAxiosResponse, getPeopleAvatar } from "../middleware/CommonHelper";
+import { logUser } from "../middleware/AuthHelper";
 
 export default {
     name: "Login",
@@ -48,15 +49,9 @@ export default {
         }
         axios.post("/api/auth/login", data)
             .then(response => {
-                const user = parseAxiosResponse(response);
-                if (user && user.token) {
-                    // On sauvegarde les infos sur l'utilisateurs dans le store
-                    store.commit('login', user);
-                    // On sauvegarde localement le token de session dans le navigateur
-                    localStorage.setItem('user', JSON.stringify(user));
-                    // On indique à axios que désormais chaque requête faites à l'API devra transmettre le token de session dans le header
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-                }
+                let user = parseAxiosResponse(response);
+                // On log l'utilisateur
+                logUser(store, user);
                 // On redirige vers l'accueil
                 this.$router.replace({path: `/`});
             })
