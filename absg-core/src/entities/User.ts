@@ -31,7 +31,14 @@ export class User {
     @Column({ comment: "Authentication token", nullable: true })
     rootFamily: string;
 
+    @Column({ comment: "Si le compte est activé ou non", default: true })
+    isActive: boolean;
+
     public fromJSON(json: any) {
-        // TODO
+        Object.assign(this, json);
+        if (json.person) {
+            this.person = new Person().fromJSON(json.person);
+        }
+        return this;
     }
 }

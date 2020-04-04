@@ -70,8 +70,8 @@
         <div class="menu" v-if="user">
             <v-list style="background: none">
                 <template v-for="item in items">
-                    <div class="menuItem" v-if="item.url && !item.roles || checkUserRolesMatch(item)" :key="item.id">
-                        <router-link :to="item.url">
+                    <div class="menuItem" v-if="item.url && checkUserRolesMatch(item)" :key="item.id">
+                        <router-link :to="{ path: item.url }">
                             <v-icon color="inherit">{{ item.icon }}</v-icon><br/>
                             <span style="display: inline-block; line-height: 1.1em;">{{ item.name }}</span>
                         </router-link>
@@ -218,9 +218,15 @@ export default {
         processWebsocketError(msg, err) {
             console.log("processWebsocketError", msg, err);
         },
-        checkUserRolesMatch(roles) {
-            let result = true;
-            console.log("TODO: menu item checkUserRolesMatch", roles);
+        checkUserRolesMatch(item) {
+            let result = false;
+            if (item && this.user && Array.isArray(item.roles)) {
+                for (const r of this.user.roles) {
+                    if (item.roles.find(e => e === r)) {
+                        result = true;
+                    }
+                }
+            };
             return result;
         },
         photosGalleryHide() {

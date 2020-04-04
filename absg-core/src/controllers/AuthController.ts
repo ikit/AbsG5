@@ -3,6 +3,7 @@ import { JsonController, Post, Body, BadRequestError, Delete, CurrentUser, Get }
 import { User } from "../entities";
 import { authService } from "../services";
 import { logger } from "../middleware/logger";
+import { cleanString } from "../middleware/commonHelper";
 
 @JsonController("/auth")
 export class AuthController {
@@ -20,14 +21,16 @@ export class AuthController {
 
         logger.debug(" > payload ok");
         // On recherche l'utilisateur par son email ou par son username
-        const user = await this.userRepo.findOne({ where: { username: Equal(payload.username) } });
+        let user = await this.userRepo.query(
+            `SELECT * FROM "user" WHERE "usernameClean" ILIKE $1 AND "isActive" = TRUE LIMIT 1`,
+            [cleanString(payload.username)]
+        );
 
+        user = user[0];
         logger.debug(" > user", user);
         if (!user) {
             throw new BadRequestError(`Wrong username or password.`);
         }
-
-        logger.debug(" > pwd = ", await authService.hashPassword(payload.password));
 
         // On vérifie le mot de passe envoyé
         try {

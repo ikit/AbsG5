@@ -1,5 +1,5 @@
 import { getRepository, Equal } from "typeorm";
-import { JsonController, Post, Body, BadRequestError, Get, Authorized, QueryParam } from "routing-controllers";
+import { JsonController, Post, Body, BadRequestError, Get, Authorized } from "routing-controllers";
 import { User } from "../entities";
 
 import { authService, citationService, eventService, immtService, userService } from "../services";
@@ -11,36 +11,18 @@ export class UserController {
     private userRepo = getRepository(User);
 
     @Get("/list")
-    async list(@QueryParam("pageIndex") pageIndex: number, @QueryParam("pageSize") pageSize: number) {
-        return await userService.getUsers(pageIndex, pageSize);
+    async list() {
+        return await userService.getUsers();
     }
 
     @Post("/")
-    async save(@Body() payload: User) {
-        // On vérifie qu'on a bien reçu tous les champs nécessaires
-        const hasMissingField =
-            !payload || ["name", "username", "email", "password"].some(field => !payload.hasOwnProperty(field));
-
-        if (hasMissingField) {
-            throw new BadRequestError(`A field is missing.`);
+    async save(@Body() user: any) {
+        if (user && user.id === -1) {
+            return await userService.createUser(user);
+        } else if (user && user.id > -1) {
+            return await userService.saveUser(user);
         }
-
-        // On vérifie que username et email n'existent pas déjà
-        const usernameExists = await this.userRepo.findOne({ where: { usernameClean: Equal(payload.usernameClean) } });
-
-        if (usernameExists) {
-            throw new BadRequestError(`Username already used.`);
-        }
-
-        try {
-            // On chiffre le mot de passe
-            payload.passwordHash = await authService.hashPassword(payload.passwordHash);
-
-            // On stock le nouvel utilisateur en base
-            return this.userRepo.save(payload);
-        } catch (err) {
-            throw new Error(`An error occurred when saving the user.`);
-        }
+        throw new BadRequestError("informations incomplètes");
     }
 
     /**

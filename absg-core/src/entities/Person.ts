@@ -57,4 +57,9 @@ export class Person {
 
     @Column("json", { nullable: true, comment: "Dernière coordonnée GPS connu pour la personne (VoyaG)" })
     lastLocation: string;
+
+    fromJSON(json: any): Person {
+        Object.assign(this, json);
+        return this;
+    }
 }

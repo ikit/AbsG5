@@ -2,7 +2,6 @@ import { JsonController, Param, Body, Get, Post, Delete, Authorized } from "rout
 import { Immt } from "../entities";
 
 import { immtService } from "../services";
-import { issue } from "../middleware/jsonHelper";
 
 @Authorized()
 @JsonController("/immt")
@@ -23,7 +22,7 @@ export class ImmtController {
         try {
             return await immtService.getInitData();
         } catch (ex) {
-            return issue("Impossible de récupérer les données d'initialisation de la section immt", ex);
+            throw new Error("Impossible de récupérer les données d'initialisation de la section immt");
         }
     }
 

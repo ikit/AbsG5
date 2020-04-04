@@ -1,37 +1,107 @@
-import { getRepository } from "typeorm";
-import { User, LogPassag } from "../entities";
+import { getRepository, Equal } from "typeorm";
+import { User, LogPassag, Person } from "../entities";
 import { format, differenceInDays } from "date-fns";
-import { isNumber } from "util";
+import { cleanString } from "../middleware/commonHelper";
+import { authService } from ".";
+import { logger } from "../middleware/logger";
 
 class UserService {
     private usersRepo = null;
+    private personsRepo = null;
 
     public initService() {
         this.usersRepo = getRepository(User);
+        this.personsRepo = getRepository(Person);
     }
 
     /**
      * Renvoie la liste des utilisateurs en fonction des informations de filtrage et de pagination
      */
-    public async getUsers(pageIndex: number, pageSize: number) {
-        // controle sur les paramètres
-        pageSize = isNumber(pageSize) && pageSize > 0 ? pageSize : 20;
-
-        // on calcule le nombre de citations max en fonction du filtre sur les auteurs
-        let totalUsers = await this.usersRepo.query("SELECT COUNT(*) FROM user");
-        totalUsers = totalUsers[0].count;
-
-        // 2: on borne la pagination en fonction du nombre max (pagesize = all quand filtre par auteur)
-        const totalPages = Math.round(totalUsers / pageSize);
-        pageIndex = isNumber(pageIndex) && pageIndex > 0 && pageIndex < totalPages ? pageIndex : 0;
-
-        // on récupère les citations
+    public async getUsers() {
+        // on récupère les utilisateurs
         const users = await this.usersRepo
             .createQueryBuilder("u")
             .leftJoinAndSelect("u.person", "person")
+            .orderBy("u.id")
             .getMany();
 
-        return { totalUsers, totalPages, pageSize, pageIndex, users };
+        return { users };
+    }
+
+    /**
+     * Crée un nouvel utilisateur à partir des informations données
+     * @param userData les données du nouveau compte utilisateur
+     */
+    public async createUser(userData: any) {
+        logger.debug("createUser", userData);
+        // On vérifie qu'on a bien reçu tous les champs nécessaires
+        const hasMissingField =
+            !userData || ["id", "username", "password", "roles"].some(field => !userData.hasOwnProperty(field));
+
+        if (hasMissingField) {
+            throw new Error(
+                `Impossible de créer ou d'éditer le compte utilisateur. Certaines informations obligatoires sont manquantes`
+            );
+        }
+
+        // Si création, on vérifie que username n'existe pas déjà
+        const usernameClean = cleanString(userData.username);
+        const usernameExists = await this.usersRepo.findOne({
+            where: { usernameClean: Equal(usernameClean) },
+            relations: ["person"]
+        });
+        if (usernameExists) {
+            throw new Error(`Le pseudo est déjà pris`);
+        }
+        userData.usernameClean = usernameClean;
+
+        try {
+            // On crée le profile personnel associé a compte utilisateur
+            let person = new Person().fromJSON(userData.person);
+            person = await this.personsRepo.save(person);
+            userData.person = person;
+
+            // On chiffre le mot de passe
+            userData.passwordHash = await authService.hashPassword(userData.password);
+
+            // On stock le nouvel utilisateur en base
+            userData.id = null;
+            return this.usersRepo.save(userData);
+        } catch (err) {
+            throw new Error(`Erreur lors de la création du compte utilisateur: ${err.message}`);
+        }
+    }
+
+    /**
+     * Modifie un utilisateur à partir des informations données
+     * @param userData les données du nouveau compte utilisateur
+     */
+    public async saveUser(userData: any) {
+        logger.debug("edit user", userData);
+        // On commence par récupérer les infos en base de l'utilisateurs à modifier
+        const user = await this.usersRepo.findOne({ where: { id: Equal(userData.id) }, relations: ["person"] });
+
+        // On met de côté le mot de passe actuelle
+        const currentPwdHash = user.passwordHash;
+
+        // On met à jours les infos de l'utilisateur
+        user.fromJSON(userData);
+
+        // On gère le cas du password
+        if (userData.password) {
+            // on met à jour avec le nouveau mot de passe
+            user.passwordHash = await authService.hashPassword(userData.password);
+        } else {
+            // On garde l'ancien mot de passe
+            user.passwordHash = currentPwdHash;
+        }
+        try {
+            // On sauvegarde en base
+            await this.personsRepo.save(user.person);
+            return this.usersRepo.save(user);
+        } catch (err) {
+            throw new Error(`Erreur lors de l'édition du compte utilisateur: ${err.message}`);
+        }
     }
 
     /**
