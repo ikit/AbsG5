@@ -42,7 +42,14 @@
                                 <template v-for="(user, i2) in item.passage">
                                     <v-tooltip :key="i2" bottom>
                                         <template v-slot:activator="{ on }">
-                                            <img :key="i2" :src="user.avatar" :alt="user.username" v-on="on" height="40px" />
+                                            <img
+                                                :key="i2"
+                                                :src="user.avatar"
+                                                :alt="user.username"
+                                                v-on="on"
+                                                height="40px"
+                                                onError="this.src='/img/avatars/000.png';"
+                                                />
                                         </template>
                                         <span>{{ user.username }}</span>
                                     </v-tooltip>
