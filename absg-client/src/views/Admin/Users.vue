@@ -95,6 +95,7 @@
                         </v-text-field>
                         <v-select
                             prepend-icon="fas fa-user-tag"
+                            prepend-inner=""
                             v-model="userEditor.roles"
                             :items="roles"
                             attach
@@ -119,15 +120,21 @@
                             v-model="userEditor.person.firstname">
                         </v-text-field>
 
-                        <v-text-field
+                        <v-select
+                            :items="sexes"
+                            v-model="userEditor.person.sex"
                             label="Sexe"
-                            v-model="userEditor.person.sex">
-                        </v-text-field>
+                            item-text="label"
+                            item-value="id"
+                        ></v-select>
 
-                        <v-text-field
-                            label="Famille principale"
-                            v-model="userEditor.rootFamily">
-                        </v-text-field>
+                        <v-select
+                            :items="rootFamillies"
+                            v-model="userEditor.rootFamilly"
+                            label="Maison mère"
+                            item-text="label"
+                            item-value="id"
+                        ></v-select>
                     </v-col>
                 </v-row>
             </v-container>
@@ -202,6 +209,17 @@ export default {
             { id: "admin", label: "Admin", comment: "Donne l'accès aux outils avancés d'administration", color:"red"},
             { id: "archivist", label: "Archiviste", comment: "Donne l'accès aux outils avancés pour gérer/modérer les albums photos", color:"blue"},
         ],
+        sexes: [
+            { id: "undefined", label: "Non défini" },
+            { id: "male", label: "Homme" },
+            { id: "female", label: "Femme" }
+        ],
+        rootFamillies: [
+            { id: null, label: "Aucune" },
+            { id: "gueudelot", label: "Gueudelot" },
+            { id: "guibert", label: "Guibert" },
+            { id: "guyomard", label: "Guyomard" },
+        ],
         usersList: [], // liste des utilisateurs affichées sur la page courante
 
         // Les models des boites de dialogue
@@ -248,11 +266,11 @@ export default {
             this.userEditor.password = "";
             this.userEditor.email = "";
             this.userEditor.role = ["member"];
-            this.userEditor.rootFamilly = "";
+            this.userEditor.rootFamilly = null;
             this.userEditor.person = {
                 lastname: "",
                 firstname: "",
-                sex: "",
+                sex: "undefined",
                 email: "",
             }
         },
