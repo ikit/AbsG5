@@ -1,5 +1,5 @@
 <template>
-<div style="background: white">
+<div>
     <v-container>
         <v-card>
             <v-card-title>
@@ -130,7 +130,7 @@
 
                         <v-select
                             :items="rootFamillies"
-                            v-model="userEditor.rootFamilly"
+                            v-model="userEditor.rootFamily"
                             label="Maison mère"
                             item-text="label"
                             item-value="id"
@@ -229,7 +229,7 @@ export default {
             username: null, // son pseudo
             password: null, // pour initialiser ou réinitialiser son mot de passe
             roles: [], // les rôles de l'utilisateur (sans rôle c'est comme si le compte était inactif, il ne pourra accéder à rien)
-            rootFamilly: null, // la famille principale à laquelle ratacher l'utilisateur
+            rootFamily: null, // la famille principale à laquelle ratacher l'utilisateur
             person: { // la fiche info associé à l'utilisateur
                 lastname: null,
                 firstname: null,
@@ -264,9 +264,8 @@ export default {
             this.userEditor.id = -1;
             this.userEditor.username = "";
             this.userEditor.password = "";
-            this.userEditor.email = "";
-            this.userEditor.role = ["member"];
-            this.userEditor.rootFamilly = null;
+            this.userEditor.roles = ["member"];
+            this.userEditor.rootFamily = null;
             this.userEditor.person = {
                 lastname: "",
                 firstname: "",
@@ -279,8 +278,8 @@ export default {
             this.userEditor.id = user.id;
             this.userEditor.username = user.username;
             this.userEditor.password = "";
-            this.userEditor.email = user.email;
-            this.userEditor.role = user.roles;
+            this.userEditor.roles = user.roles;
+            this.userEditor.rootFamily = user.rootFamily;
             this.userEditor.person = user.person;
         },
         saveUser(user = null) {
@@ -336,36 +335,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@import '../../themes/global.scss';
 
-
-
-.citation ::v-deep .note  {
-    color: #999!important;
-}
-
-// .citationRow {
-//     border-bottom: 1px solid #ddd;
-// }
-.citationRow:hover {
-    background: rgba(15, 15, 30, 0.05);
-    .deleteAction, .editAction {
-        display: block;
-    }
-}
-.deleteAction, .editAction {
-    position: absolute;
-    text-align: center;
-    display: none;
-}
-.deleteAction {
-    right: 15px;
-}
-.editAction {
-    right: 50px;
-}
-.year {
-    opacity: 0.5;
-}
-</style>
