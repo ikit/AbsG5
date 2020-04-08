@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import { getModuleInfo, getPeopleAvatar } from './middleware/CommonHelper';
 import { format } from "date-fns";
-import { fr } from "date-fns/locale"
+import { fr } from "date-fns/locale";
 
 Vue.use(Vuex);
 
@@ -21,7 +21,7 @@ export default new Vuex.Store({
         photosGalleryIndex: 0,
         photosGalleryDisplayed: false,
         // Editeur photo
-        photosEditorDisplayed: false,
+        photoMetadataEditorDisplayed: false,
         agpaMeta: null,
     },
     mutations: {
@@ -79,11 +79,18 @@ export default new Vuex.Store({
             state.photosGallery = galery;
             state.photosGalleryIndex = 0;
         },
+        photoMetadataEditorDisplay(state) {
+            state.photoMetadataEditorDisplayed = true;
+        },
+        photoMetadataEditorHide(state) {
+            state.photoMetadataEditorDisplayed = false;
+        },
         photosGalleryDisplay(state) {
             state.photosGalleryDisplayed = true;
         },
         photosGalleryHide(state) {
             state.photosGalleryDisplayed = false;
+            state.photoMetadataEditorDisplayed = false;
         },
         photosGalleryNext(state) {
             if (state.photosGallery.length > 1) {

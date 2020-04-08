@@ -87,7 +87,7 @@ export const router = new VueRouter({
                 },
                 {
                     path: 'sorting',
-                    component: () => import('./views/Photos/ToSort.vue'),
+                    component: () => import('./views/Photos/ToCheck.vue'),
                 },
                 {
                     path: 'albums',

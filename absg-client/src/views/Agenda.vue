@@ -12,6 +12,7 @@
         <v-tab :to="{path:'/agenda/events'}"> <v-icon>fas fa-calendar-alt</v-icon> &nbsp; Calendrier</v-tab>
         <v-tab :to="{path:'/agenda/trombi'}"> <v-icon>fas fa-user-circle</v-icon> &nbsp; Trombinoscope</v-tab>
         <v-tab :to="{path:'/agenda/genealogy'}"> <v-icon>fas fa-sitemap</v-icon> &nbsp; Généalogie</v-tab>
+        <v-tab :to="{path:'/agenda/web3g'}"> <v-icon>fas fa-globe</v-icon> &nbsp; Web 3G</v-tab>
     </v-tabs>
 
     <router-view></router-view>

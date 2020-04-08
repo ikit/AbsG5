@@ -15,6 +15,7 @@ export * from "./Parameter";
 export * from "./PassaG";
 export * from "./Person";
 export * from "./PersonLocation";
+export * from "./Photo";
 export * from "./Place";
 export * from "./User";
 export * from "./Website";

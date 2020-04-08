@@ -9,7 +9,7 @@ export const MODULES = [
     { id:"agenda", icon: 'fas fa-address-book', name: 'Agenda', url: '/agenda', roles: ["member"] },
     { id:"voyag", icon: 'fas fa-map-marked-alt', name: 'Voya G', url: '/voyag', roles: ["member"] },
     { id:"agpa", icon: 'fas fa-camera', name: 'A.G.P.A', url: '/agpa', roles: ["member"] },
-    { id:"webg", icon: 'fas fa-globe', name: 'Web 3G', url: '/web3g', roles: ["member"] },
+    { id:"stats", icon: 'fas fa-chart-pie', name: 'Statistiques', url: '/stats', roles: ["member"] },
     { id:"admin", icon: 'fas fa-cog', name: 'Admin', url: '/admin', roles: ["admin"]  }];
 
 

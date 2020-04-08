@@ -4,6 +4,8 @@ import { createExpressServer } from "routing-controllers";
 import * as bodyParser from "body-parser";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
+import * as express from "express";
+
 import {
     agpaService,
     citationService,
@@ -37,6 +39,10 @@ createConnections(ormconfig)
             authorizationChecker: jwtAuthorizationChecker,
             currentUserChecker
         });
+
+        if (process.env.NODE_ENV === "development") {
+            app.use("/sphotos", express.static(process.env.PHOTOS_ROOT_PATH));
+        }
 
         app.use(bodyParser.json()); // parse request as JSON
         app.use(accessLogHandler()); // access logs

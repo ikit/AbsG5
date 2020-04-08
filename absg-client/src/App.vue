@@ -66,7 +66,7 @@
         </v-menu>
     </v-app-bar>
 
-    <v-content id="bgcontent">
+    <v-content id="bgcontent" style="background: #f9f9f9">
         <div class="menu" v-if="user">
             <v-list style="background: none">
                 <template v-for="item in items">
@@ -109,10 +109,78 @@
                             @click.stop="photosGalleryHide()"
                             @keyup.esc.stop="photosGalleryHide()"><i class="fas fa-times"></i> Fermer</button>
                     </div>
+                    <div style="display: flex; max-height: 100%;">
+                        <!-- La photo -->
+                        <div style="flex: 1 1 0; max-height: 100%;">
+                            <img :src="photoDisplayed.url"/>
+                            <div v-if="photoDisplayed.hasOwnProperty('title')" style="text-align: center">
+                                {{photoDisplayed.title}}
+                            </div>
+                        </div>
+                        <!-- L'éditeur de meta data -->
+                        <v-card
+                            v-if="photoMetadataEditorDisplayed"
+                            dark
+                            style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px">
+                            <v-form style="text-align: left">
+                                <p style="font-familly: monospace; line-height: 35px; font-size: 20px;">
+                                    <v-icon style="vertical-align: middle">fas fa-info-circle</v-icon> ID: {{ photoDisplayed.folder }} {{ photoDisplayed.id }}
+                                </p>
+                                <v-checkbox
+                                    label="Photo légendaire"
+                                ></v-checkbox>
+                                <v-checkbox
+                                    label="Classer la photo"
+                                ></v-checkbox>
 
-                    <img :src="photoDisplayed.url"/>
-                    <div style="text-align: center">
-                        {{photoDisplayed.title}}
+                                <v-textarea
+                                    v-model="photoDisplayed.comment"
+                                    label="Commentaire"
+                                    prepend-icon="fas fa-pen"
+                                ></v-textarea>
+
+                                <v-text-field
+                                    v-model="photoDisplayed.date"
+                                    label="Date"
+                                    placeholder="YYYY-MM-DD HH:mm"
+                                    prepend-icon="far fa-calendar-alt"
+                                ></v-text-field>
+
+                                 <v-autocomplete
+                                    v-model="photoDisplayed.persons"
+                                    :items="persons"
+                                    label="Personnes"
+                                    prepend-icon="fas fa-user"
+                                    multiple
+                                ></v-autocomplete>
+
+                                 <v-autocomplete
+                                    v-model="photoDisplayed.place"
+                                    :items="places"
+                                    label="Lieux"
+                                    prepend-icon="fas fa-map-marker-alt"
+                                ></v-autocomplete>
+
+                                <v-text-field
+                                    v-model="photoDisplayed.gps"
+                                    placeholder="Position GPS"
+                                    style="padding: 0; margin-left: 34px; margin-top: 0;"
+                                ></v-text-field>
+
+
+                                <div style="text-align: center">
+                                    <v-btn
+                                        color="accent"
+                                        style="margin-top: 30px"
+                                        @click="resetValidation"
+                                    >
+                                    <v-icon>fas fa-save</v-icon>
+                                    &nbsp; Enregistrer et suivante &nbsp;
+                                    <v-icon>fas fa-chevron-right</v-icon>
+                                    </v-btn>
+                                </div>
+                            </v-form>
+                        </v-card>
                     </div>
                 </div>
             </div>
@@ -193,7 +261,10 @@ export default {
         darkMode: false,
         drawer: null,
         ws: null,
-        items: MODULES
+        items: MODULES,
+        // Galerie photo editor
+        photoDisplayedDateMenu: false,
+        persons: ["olivier", "Annie", "Gérard", "Emmanuel", "Sébastien", "Fanny"]
     }),
     props: {
         source: String
@@ -282,6 +353,9 @@ export default {
         photosGalleryDisplayed() {
             return this.$store.state.photosGalleryDisplayed;
         },
+        photoMetadataEditorDisplayed() {
+            return this.$store.state.photoMetadataEditorDisplayed;
+        },
         photosGallery () {
             return this.$store.state.photosGallery;
         },
@@ -289,9 +363,11 @@ export default {
             return this.$store.state.photosGalleryIndex;
         },
         photoDisplayed () {
-            if (this.$store.state.photosGalleryIndex >= 0 && this.$store.state.photosGalleryIndex < this.$store.state.photosGallery.length) {
-                return this.$store.state.photosGallery[this.$store.state.photosGalleryIndex];
+            if (this.photosGalleryIndex >= 0 && this.photosGalleryIndex < this.photosGallery.length) {
+                console.log("DISPLAY", this.photosGallery[this.photosGalleryIndex]);
+                return this.photosGallery[this.photosGalleryIndex];
             }
+            console.log("DISPLAY", "http://localhost:8080/img/immt-new.png");
             return 'http://localhost:8080/img/immt-new.png';
         },
         // Editeur photos
