@@ -1,11 +1,5 @@
 <template>
 <div>
-    <img
-        v-if="$vuetify.breakpoint.mdAndUp"
-        src="/img/immt-new.png"
-        style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
-    <h1>Les photos de famille</h1>
-
     <v-tabs centered>
         <v-tab :to="{path:'/photos/immt'}"> <v-icon>fas fa-image</v-icon> &nbsp; Immt</v-tab>
         <v-tab :to="{path:'/photos/albums'}"> <v-icon>fas fa-images</v-icon> &nbsp; Albums</v-tab>

@@ -172,7 +172,7 @@
                                     <v-btn
                                         color="accent"
                                         style="margin-top: 30px"
-                                        @click="resetValidation"
+                                        @click="savePhotoMetadata()"
                                     >
                                     <v-icon>fas fa-save</v-icon>
                                     &nbsp; Enregistrer et suivante &nbsp;
@@ -315,6 +315,11 @@ export default {
         },
         photosGalleryAuto() {
             console.log('photosGalleryAuto');
+        },
+        savePhotoMetadata() {
+            axios.post(`/api/photos/save`, this.photoDisplayed).catch(
+                err => store.commit('onError', err)
+            );
         },
         closeNotifications() {
             dialog=false;

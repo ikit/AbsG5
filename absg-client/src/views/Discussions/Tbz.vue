@@ -47,19 +47,19 @@ export default {
                 id: 2,
                 avatar: `/img/avatars/002.png`,
                 username: 'Olive',
-                rootFamilly: 'gueudelot',
+                rootFamily: 'gueudelot',
             },
             13: {
                 id: 13,
                 avatar: `/img/avatars/013.png`,
                 username: 'Poupette',
-                rootFamilly: 'guyomard'
+                rootFamily: 'guyomard'
             },
             15: {
                 id: 15,
                 avatar: `/img/avatars/015.png`,
                 username: 'Sylve',
-                rootFamilly: 'guibert',
+                rootFamily: 'guibert',
             }
         },
         discussion: { // model: Discussion.js

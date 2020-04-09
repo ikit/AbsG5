@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Get, Authorized } from "routing-controllers";
+import { JsonController, Get, Authorized, Post, Body } from "routing-controllers";
 import { Photo } from "../entities";
 
 @Authorized()
@@ -25,5 +25,19 @@ export class UserController {
             thumb: `${process.env.PHOTOS_ROOT_URL}${p.folder}/THUMB/${p.id}.jpg`,
             url: `${process.env.PHOTOS_ROOT_URL}${p.folder}/WEB/${p.id}.jpg`
         }));
+    }
+
+    /**
+     * Sauvegarde les métadonnées d'une photo
+     */
+    @Post("/save")
+    async savePhoto(@Body() metadata) {
+        const photo = await this.repo.findOne({ where: { id: metadata.id, folder: metadata.folder } });
+        if (photo) {
+            Object.assign(photo, metadata);
+            this.repo.save(photo);
+            return photo;
+        }
+        return null;
     }
 }
