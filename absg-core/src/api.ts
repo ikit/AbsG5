@@ -5,6 +5,8 @@ import * as bodyParser from "body-parser";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import * as express from "express";
+import * as fileUpload from "express-fileupload";
+import * as os from "os";
 
 import {
     agpaService,
@@ -41,10 +43,18 @@ createConnections(ormconfig)
         });
 
         if (process.env.NODE_ENV === "development") {
-            app.use("/sphotos", express.static(process.env.PHOTOS_ROOT_PATH));
+            app.use("/sphotos", express.static(process.env.PHOTOS_PATH));
         }
 
+        // enable files upload
+        app.use(
+            fileUpload({
+                createParentPath: true
+            })
+        );
+
         app.use(bodyParser.json()); // parse request as JSON
+        app.use(bodyParser.urlencoded({ extended: true }));
         app.use(accessLogHandler()); // access logs
         app.use(errorLogHandler()); // error logs
 

@@ -1,7 +1,10 @@
 import { getConnection, getRepository, Equal } from "typeorm";
-import { format } from "date-fns";
-import { Immt } from "../entities";
+import { format, getDayOfYear } from "date-fns";
+import { Immt, User, LogModule } from "../entities";
 import { NotFoundError } from "routing-controllers";
+import * as fs from "fs";
+import * as path from "path";
+import { logger } from "../middleware/logger";
 
 class ImmtService {
     private immtsRepo = null;
@@ -64,12 +67,26 @@ class ImmtService {
     }
 
     /**
-     * Ajoute ou met à jour une immt existante (si l'id est fourni)
-     * avec les nouvelles données.
-     * @param data les informations de l'image du moment à ajouter ou mettre à jour
+     * Sauvegarde une image du moment
+     * @param image l'image
+     * @param title le titre de l'image du moment
+     * @param user l'utilisateur qui poste l'image du moment
      */
-    public async save(immt: Immt) {
-        // TODO
+    public async save(image: any, title: string, user: User) {
+        const immt = new Immt();
+        immt.user = user;
+        immt.year = new Date().getFullYear();
+        immt.title = title;
+        immt.day = getDayOfYear(new Date());
+
+        const filename = path.join(process.env.IMMT_PATH, `${immt.year}_${immt.day.toString().padStart(3, '0')}.jpg`);
+        fs.writeFileSync(filename, image.buffer);
+        this.immtsRepo.save(immt);
+        
+        logger.notice(`Nouvelle image du moment ajouté par ${user.username}`, {
+            { userId: user.id, module: LogModule.photos }
+        );
+
         return immt;
     }
 

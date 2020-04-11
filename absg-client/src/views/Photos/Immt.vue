@@ -1,71 +1,41 @@
 <template>
 <div>
-    <div>
-        <v-container fluid  grid-list-md>
-            <v-data-iterator
-                :items="immts"
-                :items-per-page="filter.pageSize"
-                :page="filter.pageIndex"
-                :search="filter.request"
-                hide-default-footer>
+    <v-container fluid  grid-list-md style="padding:0">
+        <v-data-iterator
+            :items="immts"
+            :items-per-page="filter.pageSize"
+            :page="filter.pageIndex"
+            :search="filter.request"
+            hide-default-footer>
 
-                <template v-slot:header>
-                    <v-toolbar class="mb-1">
+            <template v-slot:header>
+                <div class="stickyHeader">
+                    <v-row style="" align="center" justify="center">
                         <v-text-field
                             v-model="filter.request"
                             prepend-inner-icon="fa-search"
                             label="Rechercher"
                             style="margin-top: 25px;">
                         </v-text-field>
+                        <span class="grey--text">{{immts.length}} images</span>
                         <v-spacer></v-spacer>
+
                         <v-btn
                             color="accent"
                             @click.stop="resetDialog(true)">
                             <v-icon left>fas fa-plus</v-icon>
                             <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
                         </v-btn>
-                    </v-toolbar>
-                </template>
+                        <v-spacer></v-spacer>
 
-
-                <template v-slot:default="props">
-                    <v-card style="margin-top: 15px">
-                        <v-container fluid>
-                            <v-layout row wrap>
-                                <v-flex v-for="(immt, index) in immts" :key="immt.id" style="min-width: 200px; width: 15%; margin: 15px">
-                                    <div>
-                                        <div style="width: 200px; height: 200px; margin: auto;">
-                                            <div style="width: 200px; height: 200px; display: table-cell; text-align: center; vertical-align: middle;">
-                                                <img class="thumb"
-                                                    :src="immt.thumb"
-                                                    @click="photosGalleryDisplay(index)"/>
-                                            </div>
-                                        </div>
-                                        <div style="">
-                                        </div>
-                                        <v-card style="margin-bottom: 50px">
-                                            <div style="text-align: center">
-                                                {{ immt.title }}
-                                            </div>
-                                            <div style="text-align: center; font-size: 0.8em; opacity: 0.7">
-                                                {{ immt.username }} le {{ immt.date }} </div>
-                                        </v-card>
-                                    </div>
-                                </v-flex>
-                            </v-layout>
-                        </v-container>
-                    </v-card>
-                </template>
-
-                <template v-slot:footer>
-                    <v-row class="mt-2" style="margin: 0 5px" align="center" justify="center">
-                        <span class="grey--text">{{ totalImmts }} images. Immt par page</span>
+                        <span class="grey--text">Images par page</span>
                         <v-menu offset-y>
                             <template v-slot:activator="{ on }">
                                 <v-btn
                                     text
                                     color="primary"
                                     class="ml-2"
+                                    :disabled="isLoading"
                                     v-on="on">
                                         {{ filter.pageSize }}
                                     <v-icon>fa-angle-down</v-icon>
@@ -73,7 +43,7 @@
                             </template>
                                 <v-list>
                                 <v-list-item
-                                    v-for="(number, index) in [10, 20, 50]"
+                                    v-for="(number, index) in [24, 48, 96]"
                                     :key="index"
                                     @click="updateImmtsPerPage(number)">
                                     <v-list-item-title>{{ number }}</v-list-item-title>
@@ -84,45 +54,70 @@
                         <v-spacer></v-spacer>
 
                         <span class="mr-4 grey--text" >
-                            Page {{ filter.pageIndex +1}} / {{ totalPages }}
+                            Page {{ filter.pageIndex}} / {{ numberOfPages }}
                         </span>
                         <v-btn
-                            fab small
-                            dark
-                            color="accent"
-                            class="mr-1"
+                            icon small
+                            :disabled="isLoading"
                             @click="formerPage">
                             <v-icon>fa-chevron-left</v-icon>
                         </v-btn>
                         <v-btn
-                            fab small
-                            dark
-                            color="accent"
-                            class="ml-1"
+                            icon small
+                            :disabled="isLoading"
                             @click="nextPage"
                         >
                             <v-icon>fa-chevron-right</v-icon>
                         </v-btn>
                     </v-row>
-                </template>
-            </v-data-iterator>
-        </v-container>
-    </div>
+                </div>
+            </template>
+
+            <template v-slot:default="props">
+                <v-container fluid grid-list-sm>
+                    <v-layout row wrap>
+                        <v-flex v-for="(p, index) in props.items" :key="p.id" style="text-align: center;">
+                            <div style="width: 250px; height: 250px; margin: auto;">
+                                <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+                                    <img :src="p.thumb" class="thumb" :alt="p.id" @click="photosGalleryDisplay(index + (filter.pageIndex - 1) * filter.pageSize)">
+                                </div>
+                            </div>
+                            <v-card style="margin-bottom: 50px">
+                                <div style="text-align: center">
+                                    {{ p.title }}
+                                </div>
+                                <div style="text-align: center; font-size: 0.8em; opacity: 0.7">
+                                    {{ p.username }} le {{ p.date }} </div>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </template>
+        </v-data-iterator>
+    </v-container>
 
 
     <v-dialog v-model="immtEditor.open" width="800px">
         <v-card>
             <v-card-title class="grey lighten-4 py-4 title">
-            Nouvelle image du moment
+                Nouvelle image du moment
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
-                <ImageEditor style="height: 300px; position: relative"/>
-                <!-- <v-text-field label="Donnez un titre à l'image" v-model='immtEditor.title' prepend-icon='fas fa-feather-alt'></v-text-field> -->
+
+                <v-text-field
+                    prepend-icon="fas fa-feather-alt"
+                    label="Titre"
+                    v-model="immtEditor.title">
+                </v-text-field>
+                <ImageEditor ref="imgEditor" style="height: 300px; position: relative"/>
+                <div v-if="immtEditor.isLoading">
+                    Enregistrement en cours : {{ immtEditor.complete }}%
+                </div>
             </v-container>
             <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-            <v-btn color="accent" @click="saveImmt()">Enregistrer</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" :disabled="immtEditor.isLoading" @click="resetDialog()">Annuler</v-btn>
+                <v-btn color="accent" :disabled="immtEditor.isLoading" @click="saveImmt()">Enregistrer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -155,9 +150,9 @@ export default {
         },
         immtEditor: {
             open: false,
-            image: null,
             title: null,
-            isValid: true,
+            isLoading: false,
+            complete: 0,
         },
     }),
     mounted () {
@@ -189,18 +184,41 @@ export default {
         },
         resetDialog (open = false) {
             this.immtEditor.open = open;
-            this.immtEditor.citationId = null;
-            this.immtEditor.citation = null;
-            this.immtEditor.author = null;
+            this.immtEditor.title = null;
+            this.immtEditor.isLoading = false;
+            this.immtEditor.complete = 0;
         },
         saveImmt: function () {
-            this.citations.push({
-                authorAvatar: `/img/avatars/016.png`,
-                authorId: 16,
-                authorName: this.immtEditor.author,
-                citation: this.immtEditor.citation,
-            });
-            this.resetDialog();
+            const { imgEditor } = this.$refs;
+
+            this.immtEditor.isLoading = true;
+
+            // On récupère l'image
+            axios.get(imgEditor.imageUrl(), { responseType: 'blob' }).then(
+                response => {
+                    const formData = new FormData();
+                    formData.append("title", "Coucou c'est moi !");
+                    formData.append("image", response.data )
+
+                    // On envoie tout au serveur pour qu'il enregistre la nouvelle image du moment
+                    axios.post(`/api/immt`, formData, {
+                        headers: {
+                            "Content-Type" : "multipart/form-data",
+                        },
+                        onUploadProgress: progressEvent => {
+                            this.immtEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
+                        }
+                    })
+                    .then(newImmt => {
+                        // On ajoute l'image à la liste des immt
+                        this.immts.unshift(newImmt);
+                        this.resetDialog();
+                    })
+                    .catch(err => {
+                        store.commit("onError", err);
+                    });
+                }
+            );
         },
         formerPage() {
             console.log("page précédente");

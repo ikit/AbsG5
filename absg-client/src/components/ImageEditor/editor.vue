@@ -1,80 +1,36 @@
 <template>
-  <div class="editor">
-    <div
-      class="canvas"
-      @dblclick="dblclick"
-    >
-      <img
-        ref="image"
-        :alt="data.name"
-        :src="data.url"
-        @loadstart="start"
-        @load="start"
-      >
+    <div class="editor">
+        <div class="canvas" @dblclick="dblclick">
+            <img
+                ref="image"
+                :alt="data.name"
+                :src="data.url"
+                @loadstart="start"
+                @load="start"
+            />
+        </div>
+
+        <div v-if="cropper" class="toolbar" @click="click">
+            <button data-action="move" title="Déplacer (M)">
+                <i class="fas fa-arrows-alt"></i>
+            </button>
+            <button data-action="crop" title="Rogner (C)">
+                <i class="fas fa-crop-alt"></i>
+            </button>
+            <button data-action="rotate-left" title="Rotation à gauche (L)">
+                <i class="fas fa-undo"></i>
+            </button>
+            <button data-action="rotate-right" title="Rotation à droite (R)">
+                <i class="fas fa-redo"></i>
+            </button>
+            <button data-action="flip-horizontal" title="Flip horizontal (H)">
+                <i class="fas fa-arrows-alt-h"></i>
+            </button>
+            <button data-action="flip-vertical" title="Flip vertical (V)">
+                <i class="fas fa-arrows-alt-v"></i>
+            </button>
+        </div>
     </div>
-    <div
-      v-if="cropper"
-      class="toolbar"
-      @click="click"
-    >
-      <button
-        class="toolbar__button"
-        data-action="move"
-        title="Move (M)"
-      >
-      <i class="fas fa-arrows-alt"></i>
-      </button>
-      <button
-        class="toolbar__button"
-        data-action="crop"
-        title="Crop (C)"
-      >
-        <i class="fas fa-crop-alt"></i>
-      </button>
-      <button
-        class="toolbar__button"
-        data-action="zoom-in"
-        title="Zoom In (I)"
-      >
-        <i class="fas fa-search-plus"></i>
-      </button>
-      <button
-        class="toolbar__button"
-        data-action="zoom-out"
-        title="Zoom Out (O)"
-      >
-        <i class="fas fa-search-minus"></i>
-      </button>
-      <button
-        class="toolbar__button"
-        data-action="rotate-left"
-        title="Rotate Left (L)"
-      >
-        <i class="fas fa-undo"></i>
-      </button>
-      <button
-        class="toolbar__button"
-        data-action="rotate-right"
-        title="Rotate Right (R)"
-      >
-        <i class="fas fa-redo"></i>
-      </button>
-      <button
-        class="toolbar__button"
-        data-action="flip-horizontal"
-        title="Flip Horizontal (H)"
-      >
-        <i class="fas fa-arrows-alt-h"></i>
-      </button>
-      <button
-        class="toolbar__button"
-        data-action="flip-vertical"
-        title="Flip Vertical (V)"
-      >
-        <i class="fas fa-arrows-alt-v"></i>
-      </button>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -108,304 +64,287 @@ export default {
 
     methods: {
         click({ target }) {
-        const { cropper } = this;
-        const action = target.getAttribute('data-action') || target.parentElement.getAttribute('data-action');
+            const { cropper, data } = this;
+            const action = target.getAttribute('data-action') || target.parentElement.getAttribute('data-action');
 
-        switch (action) {
-            case 'move':
-            case 'crop':
-            cropper.setDragMode(action);
-            break;
+            switch (action) {
+                case 'move':
+                case 'crop':
+                    cropper.setDragMode(action);
+                    break;
+                case 'zoom-in':
+                    cropper.zoom(0.1);
+                    break;
+                case 'zoom-out':
+                    cropper.zoom(-0.1);
+                    break;
+                case 'rotate-left':
+                    cropper.rotate(-90);
+                    break;
+                case 'rotate-right':
+                    cropper.rotate(90);
+                    break;
+                case 'flip-horizontal':
+                    cropper.scaleX(-cropper.getData().scaleX || -1);
+                    break;
+                case 'flip-vertical':
+                    cropper.scaleY(-cropper.getData().scaleY || -1);
+                    break;
 
-            case 'zoom-in':
-            cropper.zoom(0.1);
-            break;
+                default:
+            }
 
-            case 'zoom-out':
-            cropper.zoom(-0.1);
-            break;
-
-            case 'rotate-left':
-            cropper.rotate(-90);
-            break;
-
-            case 'rotate-right':
-            cropper.rotate(90);
-            break;
-
-            case 'flip-horizontal':
-            cropper.scaleX(-cropper.getData().scaleX || -1);
-            break;
-
-            case 'flip-vertical':
-            cropper.scaleY(-cropper.getData().scaleY || -1);
-            break;
-
-            default:
-        }
+            this.update({
+                cropped: data.cropped,
+                cropping: data.cropping,
+                previousUrl: data.url,
+                url: cropper.getCroppedCanvas(data.type === 'image/png' ? {} : {
+                    fillColor: '#fff',
+                }).toDataURL(data.type),
+            });
         },
 
         keydown(e) {
-        switch (e.key) {
-            // Undo crop
-            case 'z':
-            if (e.ctrlKey) {
-                e.preventDefault();
-                this.restore();
+            switch (e.key) {
+                // Undo crop
+                case 'z':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        this.restore();
+                    }
+                    break;
+                // Delete the image
+                case 'Delete':
+                    this.reset();
+                    break;
+                default:
             }
 
-            break;
+            const { cropper } = this;
 
-            // Delete the image
-            case 'Delete':
-            this.reset();
-            break;
+            if (!cropper) {
+                return;
+            }
 
-            default:
-        }
-
-        const { cropper } = this;
-
-        if (!cropper) {
-            return;
-        }
-
-        switch (e.key) {
-            // Crop the image
-            case 'Enter':
-            this.crop();
-            break;
-
-            // Clear crop area
-            case 'Escape':
-            this.clear();
-            break;
-
-            // Move to the left
-            case 'ArrowLeft':
-            e.preventDefault();
-            cropper.move(-1, 0);
-            break;
-
-            // Move to the top
-            case 'ArrowUp':
-            e.preventDefault();
-            cropper.move(0, -1);
-            break;
-
-            // Move to the right
-            case 'ArrowRight':
-            e.preventDefault();
-            cropper.move(1, 0);
-            break;
-
-            // Move to the bottom
-            case 'ArrowDown':
-            e.preventDefault();
-            cropper.move(0, 1);
-            break;
-
-            // Enter crop mode
-            case 'c':
-            cropper.setDragMode('crop');
-            break;
-
-            // Enter move mode
-            case 'm':
-            cropper.setDragMode('move');
-            break;
-
-            // Zoom in
-            case 'i':
-            cropper.zoom(0.1);
-            break;
-
-            // Zoom out
-            case 'o':
-            cropper.zoom(-0.1);
-            break;
-
-            // Rotate left
-            case 'l':
-            cropper.rotate(-90);
-            break;
-
-            // Rotate right
-            case 'r':
-            cropper.rotate(90);
-            break;
-
-            // Flip horizontal
-            case 'h':
-            cropper.scaleX(-cropper.getData().scaleX || -1);
-            break;
-
-            // Flip vertical
-            case 'v':
-            cropper.scaleY(-cropper.getData().scaleY || -1);
-            break;
-
-            default:
-        }
+            switch (e.key) {
+                // Crop the image
+                case 'Enter':
+                    this.crop();
+                    break;
+                // Clear crop area
+                case 'Escape':
+                    this.clear();
+                    break;
+                // Move to the left
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    cropper.move(-1, 0);
+                    break;
+                // Move to the top
+                case 'ArrowUp':
+                    e.preventDefault();
+                    cropper.move(0, -1);
+                    break;
+                // Move to the right
+                case 'ArrowRight':
+                    e.preventDefault();
+                    cropper.move(1, 0);
+                    break;
+                // Move to the bottom
+                    case 'ArrowDown':
+                    e.preventDefault();
+                    cropper.move(0, 1);
+                    break;
+                // Enter crop mode
+                case 'c':
+                    cropper.setDragMode('crop');
+                    break;
+                // Enter move mode
+                case 'm':
+                    cropper.setDragMode('move');
+                    break;
+                // Zoom in
+                case 'i':
+                    cropper.zoom(0.1);
+                    break;
+                // Zoom out
+                case 'o':
+                    cropper.zoom(-0.1);
+                    break;
+                // Rotate left
+                case 'l':
+                    cropper.rotate(-90);
+                    break;
+                // Rotate right
+                case 'r':
+                    cropper.rotate(90);
+                    break;
+                // Flip horizontal
+                case 'h':
+                    cropper.scaleX(-cropper.getData().scaleX || -1);
+                    break;
+                // Flip vertical
+                case 'v':
+                    cropper.scaleY(-cropper.getData().scaleY || -1);
+                    break;
+                default:
+            }
         },
 
         dblclick(e) {
-        if (e.target.className.indexOf('cropper-face') >= 0) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.crop();
-        }
+            if (e.target.className.indexOf('cropper-face') >= 0) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.crop();
+            }
         },
 
         start() {
-        const { data } = this;
+            const { data } = this;
 
-        if (data.cropped || this.cropper) {
-            return;
-        }
-
-        this.cropper = new Cropper(this.$refs.image, {
-            autoCrop: false,
-            dragMode: 'move',
-            background: false,
-
-            ready: () => {
-            if (this.croppedData) {
-                this.cropper
-                .crop()
-                .setData(this.croppedData)
-                .setCanvasData(this.canvasData)
-                .setCropBoxData(this.cropBoxData);
-
-                this.croppedData = null;
-                this.canvasData = null;
-                this.cropBoxData = null;
+            if (data.cropped || this.cropper) {
+                return;
             }
-            },
 
-            crop: ({ detail }) => {
-            if (detail.width > 0 && detail.height > 0 && !data.cropping) {
-                this.update({
-                cropping: true,
-                });
-            }
-            },
-        });
+            this.cropper = new Cropper(this.$refs.image, {
+                autoCrop: false,
+                dragMode: 'move',
+                background: false,
+
+                ready: () => {
+                    if (this.croppedData) {
+                        this.cropper
+                            .crop()
+                            .setData(this.croppedData)
+                            .setCanvasData(this.canvasData)
+                            .setCropBoxData(this.cropBoxData);
+                        this.croppedData = null;
+                        this.canvasData = null;
+                        this.cropBoxData = null;
+                    }
+                },
+
+                crop: ({ detail }) => {
+                    if (detail.width > 0 && detail.height > 0 && !data.cropping) {
+                        this.update({ cropping: true });
+                    }
+                },
+            });
         },
 
         stop() {
-        if (this.cropper) {
-            this.cropper.destroy();
-            this.cropper = null;
-        }
+            if (this.cropper) {
+                this.cropper.destroy();
+                this.cropper = null;
+            }
         },
 
         crop() {
-        const { cropper, data } = this;
+            const { cropper, data } = this;
 
-        if (data.cropping) {
-            this.croppedData = cropper.getData();
-            this.canvasData = cropper.getCanvasData();
-            this.cropBoxData = cropper.getCropBoxData();
-            this.update({
-            cropped: true,
-            cropping: false,
-            previousUrl: data.url,
-            url: cropper.getCroppedCanvas(data.type === 'image/png' ? {} : {
-                fillColor: '#fff',
-            }).toDataURL(data.type),
-            });
-            this.stop();
-        }
+            if (data.cropping) {
+                this.croppedData = cropper.getData();
+                this.canvasData = cropper.getCanvasData();
+                this.cropBoxData = cropper.getCropBoxData();
+                this.update({
+                    cropped: true,
+                    cropping: false,
+                    previousUrl: data.url,
+                    url: cropper.getCroppedCanvas(data.type === 'image/png' ? {} : {
+                        fillColor: '#fff',
+                    }).toDataURL(data.type),
+                });
+                this.stop();
+            }
         },
 
         clear() {
-        if (this.data.cropping) {
-            this.cropper.clear();
-            this.update({
-            cropping: false,
-            });
-        }
+            if (this.data.cropping) {
+                this.cropper.clear();
+                this.update({ cropping: false });
+            }
         },
 
         restore() {
-        if (this.data.cropped) {
-            this.update({
-            cropped: false,
-            previousUrl: '',
-            url: this.data.previousUrl,
-            });
-        }
+            if (this.data.cropped) {
+                this.update({
+                    cropped: false,
+                    previousUrl: '',
+                    url: this.data.previousUrl,
+                });
+            }
         },
 
         reset() {
-        this.stop();
-        this.update({
-            cropped: false,
-            cropping: false,
-            loaded: false,
-            name: '',
-            previousUrl: '',
-            type: '',
-            url: '',
-        });
+            this.stop();
+            this.update({
+                cropped: false,
+                cropping: false,
+                loaded: false,
+                name: '',
+                previousUrl: '',
+                type: '',
+                url: '',
+            });
         },
 
         update(data) {
-        Object.assign(this.data, data);
+            Object.assign(this.data, data);
         },
     },
 };
 </script>
 
 <style lang="scss" scoped>
+@import '../../themes/global.scss';
+
 .editor {
-  height: 100%;
+    height: 100%;
+    border: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .canvas {
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: center;
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
 
-  & > img {
-    max-height: 100%;
-    max-width: 100%;
-  }
+    & > img {
+        max-height: 100%;
+        max-width: 100%;
+    }
 }
 
 .toolbar {
-  background-color: rgba(0, 0, 0, .5);
-  bottom: 1rem;
-  color: #fff;
-  height: 2rem;
-  left: 50%;
-  margin-left: -8rem;
-  position: absolute;
-  width: 16rem;
-  z-index: 2015;
+    background-color: rgba(0, 0, 0, .5);
+    top: 0;
+    bottom: 0;
+    color: #fff;
+    left: 0;
+    position: absolute;
+    width: 2rem;
+    z-index: 2015;
 }
 
-.toolbar__button {
-  background-color: transparent;
-  border-width: 0;
-  color: #fff;
-  cursor: pointer;
-  display: block;
-  float: left;
-  font-size: .875rem;
-  height: 2rem;
-  text-align: center;
-  width: 2rem;
-
-  &:focus {
-    outline: none;
-  }
-
-  &:hover {
-    background-color: #0074d9;
+button {
+    background-color: transparent;
+    border-width: 0;
     color: #fff;
-  }
+    cursor: pointer;
+    display: block;
+    float: left;
+    font-size: .875rem;
+    height: 2rem;
+    text-align: center;
+    width: 2rem;
+
+    &:focus {
+        outline: none;
+    }
+
+    &:hover {
+        background-color: $accent;
+        color: #fff;
+    }
 }
 </style>

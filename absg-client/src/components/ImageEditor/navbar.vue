@@ -1,67 +1,38 @@
 <template>
-  <div class="navbar">
-    <nav
-      class="nav"
-      @click="click"
-    >
-      <label
-        v-if="!data.loaded"
-        class="nav__button"
-        for="file"
-        title="Upload"
-        role="button"
-      ><v-icon>fas fa-upload</v-icon>
-      </label>
-      <button
-        v-if="data.cropped"
-        type="button"
-        class="nav__button"
-        data-action="restore"
-        title="Undo (Ctrl + Z)"
-      >
-        <v-icon>fas fa-undo</v-icon>
-      </button>
-      <button
-        v-if="data.loaded && !data.cropping"
-        type="button"
-        class="nav__button nav__button--danger"
-        data-action="remove"
-        title="Delete (Delete)"
-      >
-        <v-icon>fas fa-trash</v-icon>
-      </button>
-      <button
-        v-if="data.cropping"
-        type="button"
-        class="nav__button nav__button--danger"
-        data-action="clear"
-        title="Cancel (Esc)"
-      >
-        <v-icon>fas fa-ban</v-icon>
-      </button>
-      <button
-        v-if="data.cropping"
-        type="button"
-        class="nav__button nav__button--success"
-        data-action="crop"
-        title="OK (Enter)"
-      >
-        <v-icon>fas fa-check</v-icon>
-      </button>
-      <a
-        v-if="downloadable && data.loaded"
-        class="nav__button nav__button--success"
-        title="Download"
-        :download="data.name"
-        :href="data.url"
-      ><v-icon>fa fa-upload</v-icon></a>
-      <a
-        class="nav__button"
-        href="https://github.com/fengyuanchen/photo-editor"
-        title="View on GitHub"
-      ><v-icon>fab fa-github</v-icon></a>
-    </nav>
-  </div>
+    <div class="navbar">
+        <nav class="nav" @click="click">
+            <button
+                v-if="data.cropped"
+                data-action="restore"
+                title="Undo (Ctrl + Z)"
+            >
+                <v-icon>fas fa-undo</v-icon>
+            </button>
+        <button
+            v-if="data.loaded && !data.cropping"
+            data-action="remove"
+            title="Supprimer l'image (Suppr)"
+        >
+            <v-icon>fas fa-trash</v-icon>
+        </button>
+        <button
+            v-if="data.cropping"
+            data-action="clear"
+            title="Annuler le rognage (Esc)"
+        >
+            <v-icon>fas fa-ban</v-icon>
+        </button>
+        <button
+            v-if="data.cropping"
+            type="button"
+            class="nav__button"
+            data-action="crop"
+            title="Valider le rognage (Enter)"
+        >
+            <v-icon>fas fa-check</v-icon>
+        </button>
+        </nav>
+    </div>
 </template>
 
 <script>
@@ -92,12 +63,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../../themes/global.scss';
+
 .navbar {
   float: right;
 }
 
-.nav__button {
-    background-color: transparent;
+button {
+    background: none;
     border-width: 0;
     color: #fff;
     cursor: pointer;
@@ -113,16 +86,9 @@ export default {
     }
 
     &:hover {
-        background-color: #0074d9;
+        background-color: $accent;
         color: #fff;
     }
 }
 
-.nav--success:hover {
-    background-color: #2ecc40;
-}
-
-.nav--danger:hover {
-    background-color: #ff4136;
-}
 </style>

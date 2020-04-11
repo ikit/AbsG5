@@ -1,5 +1,14 @@
-import { JsonController, Param, Body, Get, Post, Delete, Authorized } from "routing-controllers";
-import { Immt } from "../entities";
+import {
+    JsonController,
+    Param,
+    Body,
+    Get,
+    Post,
+    Delete,
+    Authorized,
+    UploadedFile,
+    CurrentUser
+} from "routing-controllers";
 
 import { immtService } from "../services";
 
@@ -10,17 +19,17 @@ export class ImmtController {
      * Renvoie la dernière image du moment en date
      */
     @Get("")
-    async last() {
-        return await immtService.last();
+    last() {
+        return immtService.last();
     }
 
     /**
      * Récupère les infos pour initialiser l'écran des Immt
      */
     @Get("/init")
-    async initData() {
+    initData() {
         try {
-            return await immtService.getInitData();
+            return immtService.getInitData();
         } catch (ex) {
             throw new Error("Impossible de récupérer les données d'initialisation de la section immt");
         }
@@ -32,26 +41,36 @@ export class ImmtController {
      * @param day  le jour dans l'année de l'immt
      */
     @Get("/:year([0-9]{4})/:day([0-9]{1,3})")
-    async getById(@Param("year") year: number, @Param("day") day: number) {
-        return await immtService.fromId(year, day);
+    getById(@Param("year") year: number, @Param("day") day: number) {
+        return immtService.fromId(year, day);
     }
 
     /**
      * Récupère les immt en fonction des données de filtrage fournis
      * @param filteringData
      */
-    @Post("/")
-    async get(@Body() filteringData: any) {
-        return await immtService.getImmts(filteringData.pageIndex, filteringData.pageSize);
+    @Get("/")
+    get(@Body() filteringData: any) {
+        return immtService.getImmts(filteringData.pageIndex, filteringData.pageSize);
     }
 
+    /**
+     * Enregistre une nouvelle image du moment
+     * @param image l'image
+     * @param body d'autres informations sur l'image comme l'auteur et le titre
+     */
     @Post("/")
-    async save(@Body() citation: Immt) {
-        return await immtService.save(citation);
+    async save(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() session: any) {
+        console.log("========= SAVE IMMT");
+        console.log(image);
+        console.log(body);
+        console.log(session);
+        console.log("========= SAVE IMMT");
+        return immtService.save(image, body.title, session);
     }
 
     @Delete("/:year([0-9]{4})/:day([0-9]{1,3})")
-    async remove(@Param("year") year: number, @Param("day") day: number) {
-        return await immtService.remove(year, day);
+    remove(@Param("year") year: number, @Param("day") day: number) {
+        return immtService.remove(year, day);
     }
 }

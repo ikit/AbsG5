@@ -1,7 +1,6 @@
 <template>
   <div>
     <header class="header">
-      <span class="title">Photo Editor</span>
       <Navbar
         :data="data"
         @change="change"
@@ -65,19 +64,23 @@ export default {
             switch (action) {
                 case 'crop':
                     editor.crop();
-                break;
+                    break;
                 case 'clear':
                     editor.clear();
-                break;
+                    break;
                 case 'restore':
                     editor.restore();
-                break;
+                    break;
                 case 'remove':
                     editor.reset();
-                break;
+                    break;
                 default:
             }
         },
+
+        imageUrl() {
+            return this.data.url;
+        }
     }
 }
 </script>
@@ -88,49 +91,24 @@ export default {
 @import '../themes/global.scss';
 
 
-.sr-only {
-  border: 0;
-  clip: rect(0, 0, 0, 0);
-  height: 1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  white-space: nowrap;
-  width: 1px;
-}
-
 .header {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-  background-color: #666;
-  height: 3rem;
-  overflow: hidden;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  position: relative;
-  z-index: 1;
+    height: 3rem;
+    overflow: hidden;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    position: relative;
+    z-index: 1;
 }
-@media (min-width: 768px) {
-  .header {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
-.title {
-  color: #fff;
-  display: block;
-  float: left;
-  font-size: 1.125rem;
-  line-height: 3rem;
-}
+
 .main {
-  background-color: #333;
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 3rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
 }
 </style>

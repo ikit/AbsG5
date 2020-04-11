@@ -255,7 +255,7 @@ export default {
             }
             this.isLoading = false;
         }).catch( err => {
-            store.commit('onError', err);
+            store.commit("onError", err);
         });
     },
     methods: {
