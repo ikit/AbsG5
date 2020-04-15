@@ -188,7 +188,6 @@ export default {
     store,
     data: () => ({
         isLoading: false, // Est-ce qu'on est en train de charger la liste des utilisateurs ou non
-
         headers : [
           { text: 'Utilisateur', value: 'username' },
           { text: 'Nom', value: 'person.lastname' },
@@ -298,7 +297,7 @@ export default {
                     that.resetDialog();
                     // On ajoute le nouvel utilisateur à la liste
                     console.log("SAVED USER", savedUser);
-                    that.refreshList(savedUser);
+                    that.refreshUser(savedUser);
                 },
                 err => {
                     store.commit('onError', err);

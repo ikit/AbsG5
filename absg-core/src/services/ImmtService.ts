@@ -82,10 +82,11 @@ class ImmtService {
         const filename = path.join(process.env.IMMT_PATH, `${immt.year}_${immt.day.toString().padStart(3, '0')}.jpg`);
         fs.writeFileSync(filename, image.buffer);
         this.immtsRepo.save(immt);
-        
+
         logger.notice(`Nouvelle image du moment ajouté par ${user.username}`, {
-            { userId: user.id, module: LogModule.photos }
-        );
+            userId: user.id,
+            module: LogModule.photos
+        });
 
         return immt;
     }
