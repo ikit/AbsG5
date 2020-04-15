@@ -1,7 +1,7 @@
 import { getConnection, getRepository, Equal } from "typeorm";
 import { format } from "date-fns";
-import { Immt, Person } from "../entities";
-import { NotFoundError } from "routing-controllers";
+import { Person, User, LogModule } from "../entities";
+import { logger } from "../middleware/logger";
 
 class AgendaService {
     private personsRepo = null;
@@ -9,6 +9,40 @@ class AgendaService {
     public initService() {
         this.personsRepo = getRepository(Person);
     }
+
+    public listPersons() {
+        return this.personsRepo
+            .createQueryBuilder("p")
+            .leftJoinAndSelect("p.homePlace", "place")
+            .orderBy("p.lastname")
+            .addOrderBy("p.firstname")
+            .getMany();
+    }
+
+    /**
+     * Crée ou modifie (si l'id est renseigné) une entrée de l'agenda
+     * @param person l'entrée de l'agenda
+     * @param user l'utilisateur qui demande l'action
+     */
+    public async savePerson(person: Person, user: User) {
+        const personId = person.id;
+        person = await this.personsRepo.save(person);
+
+        logger.notice(
+            personId
+                ? `Fiche de ${person.getFullname()} ajouté au répertoirepar ${user.username}`
+                : `Nouvelle entrée ajouté au répertoirepar ${user.username}`,
+            {
+                userId: user.id,
+                module: LogModule.agenda
+            }
+        );
+        return person;
+    }
+
+
+
+
 
     /**
      * Retourne les infos nécessaire à l'initialisation de l'écran "immt" du site

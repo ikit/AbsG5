@@ -1,11 +1,5 @@
 <template>
 <div>
-    <img
-        v-if="$vuetify.breakpoint.mdAndUp"
-        src="/img/immt-new.png"
-        style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
-    <h1>L'agenda de la famille</h1>
-
     <v-tabs centered>
         <v-tab :to="{path:'/agenda/directory'}"> <v-icon>fas fa-address-book</v-icon> &nbsp; Répertoire</v-tab>
         <v-tab :to="{path:'/agenda/locations'}"> <v-icon>fas fa-map-marked-alt</v-icon> &nbsp; Lieux</v-tab>

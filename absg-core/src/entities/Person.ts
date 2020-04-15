@@ -39,9 +39,8 @@ export class Person {
     @JoinColumn()
     homePlace: Place;
 
-    @OneToOne(type => Place)
-    @JoinColumn()
-    jobPlace: Place;
+    @Column("json", { nullable: true, comment: "Liste des emplois" })
+    jobs: any;
 
     @Column({ nullable: true, comment: `Numéro de téléphone personnel` })
     phone: string;
@@ -61,5 +60,13 @@ export class Person {
     fromJSON(json: any): Person {
         Object.assign(this, json);
         return this;
+    }
+
+    getFullname() : string {
+        if (this.surname) {
+            return this.surname;
+        }
+        const fullname = `${this.firstname} ${this.lastname}`.trim();
+        return fullname ? fullname : `Personne ID ${this.id}`;
     }
 }

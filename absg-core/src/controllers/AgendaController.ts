@@ -1,15 +1,25 @@
-import { JsonController, Get, Authorized } from "routing-controllers";
+import { JsonController, Get, Authorized, Post, Body, CurrentUser } from "routing-controllers";
 
 import { agendaService } from "../services";
+import { Person } from "../entities";
 
 @Authorized()
 @JsonController("/agenda")
 export class AgendaController {
     /**
-     * Récupère les infos pour initialiser l'écran des Agenda
+     * Récupère la liste complète des personnes dans l'agenda
      */
-    @Get("/init")
-    async initData() {
-        return await agendaService.getInitData();
+    @Get("/persons")
+    listPersons() {
+        return agendaService.listPersons();
+    }
+
+    /**
+     * Crée ou modifie (si l'id est renseigné) une entrée de l'agenda
+     * @param person 
+     */
+    @Post("/person")
+    savePerson(@Body() person: Person, @CurrentUser() session: any) {
+        return agendaService.savePerson(person, session);
     }
 }

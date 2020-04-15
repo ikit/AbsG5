@@ -14,7 +14,8 @@ export enum LogSeverity {
 export enum LogModule {
     absg = "absg",
     citations = "citations",
-    photos = "photos"
+    photos = "photos",
+    agenda = "agenda"
 }
 
 @Entity()
