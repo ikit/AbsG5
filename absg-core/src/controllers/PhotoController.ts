@@ -22,8 +22,8 @@ export class UserController {
 
         return photos.map(p => ({
             ...p,
-            thumb: `${process.env.PHOTOS_ROOT_URL}${p.folder}/THUMB/${p.id}.jpg`,
-            url: `${process.env.PHOTOS_ROOT_URL}${p.folder}/WEB/${p.id}.jpg`
+            thumb: `${process.env.URL_FILES}photos/${p.folder}/THUMB/${p.id}.jpg`,
+            url: `${process.env.URL_FILES}photos/${p.folder}/WEB/${p.id}.jpg`
         }));
     }
 

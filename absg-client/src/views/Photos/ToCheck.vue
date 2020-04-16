@@ -112,9 +112,6 @@ export default {
             store.commit('photoMetadataEditorDisplay');
             store.commit('photosGalleryDisplay');
         },
-        photosGalleryHide() {
-            store.commit('photosGalleryHide');
-        },
         nextPage () {
             if (this.filter.pageIndex < this.numberOfPages) this.filter.pageIndex += 1
         },

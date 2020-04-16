@@ -43,7 +43,7 @@ createConnections(ormconfig)
         });
 
         if (process.env.NODE_ENV === "development") {
-            app.use("/sphotos", express.static(process.env.PHOTOS_PATH));
+            app.use("/sphotos", express.static(process.env.PATH_FILES));
         }
 
         // enable files upload

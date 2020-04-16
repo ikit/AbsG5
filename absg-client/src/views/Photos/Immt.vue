@@ -159,20 +159,20 @@ export default {
         if (!this.authors) {
             // Il faut initialiser la vue
             this.isLoading = true;
-            axios.get(`/api/immt/init`).then(response => {
+            axios.get(`/api/immt/`).then(response => {
                 const data = parseAxiosResponse(response);
-                this.immts = data.immts.map(i => {
-                    const id = `${i.year}_${padNumber(i.day, 3)}`
+                this.immts = data.map(i => {
                     return {
-                        id,
+                        id: i.id,
                         username: i.posterName,
                         title: i.title,
                         date: new Date().toLocaleDateString(),
-                        url: `http://absolumentg.fr/assets/img/immt/${id}.jpg`,
-                        thumb: `http://absolumentg.fr/assets/img/immt/mini/${id}.jpg`,
+                        url: i.url,
+                        thumb: i.thumb,
                     }
                 });
-                this.totalImmts = data.total;
+                console.log(this.immts);
+                this.totalImmts = this.immts.length;
                 this.isLoading = false;
                 store.commit('photosGalleryReset', this.immts);
             });
@@ -197,7 +197,7 @@ export default {
             axios.get(imgEditor.imageUrl(), { responseType: 'blob' }).then(
                 response => {
                     const formData = new FormData();
-                    formData.append("title", "Coucou c'est moi !");
+                    formData.append("title", this.immtEditor.title);
                     formData.append("image", response.data )
 
                     // On envoie tout au serveur pour qu'il enregistre la nouvelle image du moment

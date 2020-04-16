@@ -18,7 +18,7 @@ export class ImmtController {
     /**
      * Renvoie la dernière image du moment en date
      */
-    @Get("")
+    @Get("/last")
     last() {
         return immtService.last();
     }
@@ -26,13 +26,9 @@ export class ImmtController {
     /**
      * Récupère les infos pour initialiser l'écran des Immt
      */
-    @Get("/init")
+    @Get("/")
     initData() {
-        try {
-            return immtService.getInitData();
-        } catch (ex) {
-            throw new Error("Impossible de récupérer les données d'initialisation de la section immt");
-        }
+        return immtService.all();
     }
 
     /**

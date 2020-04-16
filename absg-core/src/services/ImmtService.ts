@@ -1,10 +1,10 @@
-import { getConnection, getRepository, Equal } from "typeorm";
-import { format, getDayOfYear } from "date-fns";
+import { getRepository } from "typeorm";
+import { getDayOfYear } from "date-fns";
 import { Immt, User, LogModule } from "../entities";
 import { NotFoundError } from "routing-controllers";
-import * as fs from "fs";
 import * as path from "path";
 import { logger } from "../middleware/logger";
+import { saveImage } from "../middleware/commonHelper";
 
 class ImmtService {
     private immtsRepo = null;
@@ -23,22 +23,24 @@ class ImmtService {
     /**
      * Retourne les infos nécessaire à l'initialisation de l'écran "immt" du site
      */
-    public async getInitData() {
-        const result = {
-            immts: [],
-            total: 0
-        };
+    public async all() {
+        // On récupère les photos à checker
+        const immts = await this.immtsRepo
+            .createQueryBuilder("i")
+            .leftJoinAndSelect("i.user", "user")
+            .orderBy("i.year", "DESC")
+            .addOrderBy("i.day", "DESC")
+            .getMany();
 
-        // On récupère la liste des 20 dernière images
-        result.immts = await this.immtsRepo.query(`SELECT i.*, u.username AS "posterName"
-            FROM immt i
-            LEFT JOIN "user" u ON i."userId"=u.id
-            ORDER BY year DESC, day DESC LIMIT 20;`);
-
-        // On récupère le nombre total de citations
-        result.total = await this.immtsRepo.query(`SELECT COUNT(*) FROM immt;`);
-        result.total = result.total[0].count;
-        return result;
+        return immts.map(i => {
+            const id = `${i.year}_${i.day.toString().padStart(3, "0")}`;
+            return {
+                ...i,
+                id,
+                thumb: `${process.env.URL_FILES}immt/mini/${id}.jpg`,
+                url: `${process.env.URL_FILES}immt/${id}.jpg`
+            };
+        });
     }
 
     /**
@@ -79,8 +81,9 @@ class ImmtService {
         immt.title = title;
         immt.day = getDayOfYear(new Date());
 
-        const filename = path.join(process.env.IMMT_PATH, `${immt.year}_${immt.day.toString().padStart(3, '0')}.jpg`);
-        fs.writeFileSync(filename, image.buffer);
+        const thumb = path.join(process.env.PATH_FILES, `immt/mini/${immt.year}_${immt.day.toString().padStart(3, '0')}.jpg`);
+        const web = path.join(process.env.PATH_FILES, `immt/${immt.year}_${immt.day.toString().padStart(3, '0')}.jpg`);
+        await saveImage(image.buffer, thumb, web, null);
         this.immtsRepo.save(immt);
 
         logger.notice(`Nouvelle image du moment ajouté par ${user.username}`, {
