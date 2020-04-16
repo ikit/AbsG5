@@ -1,23 +1,30 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, OneToMany } from "typeorm";
-import { Person } from "./Person";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 export class Place {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ comment: "Nom de l'endroit" })
+    @Column({ comment: "Nom d usage du lieux" })
     name: string;
 
-    @Column({ nullable: true, comment: "Description" })
-    description: string;
+    @Column({ comment: "Adresse complète du lieux", nullable: true })
+    address: string;
 
-    @Column({ comment: "Coordonnée GPS" })
-    location: string;
+    @Column({ comment: "URL vers la visite virtuelle", nullable: true })
+    virtualVisitUrl: string;
 
-    @OneToMany(
-        type => Person,
-        p => p.id
-    )
-    inhabitants: Person[];
+    @Column({ comment: "Téléphone fixe", nullable: true })
+    phone: string;
+
+    @Column({ comment: "Coordonnée GPS", nullable: true })
+    gps: string;
+
+    @Column({ comment: "Photo illustrant le lieux", nullable: true })
+    photo: string;
+
+    fromJSON(data: any) {
+        Object.assign(this, data);
+        return this;
+    }
 }

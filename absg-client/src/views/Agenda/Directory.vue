@@ -4,7 +4,7 @@
         <v-card>
             <v-card-title>
                 <v-text-field
-                    v-model="filter.quickFilter"
+                    v-model="quickFilter"
                     append-icon="fas fa-search"
                     label="Rechercher"
                     single-line
@@ -19,7 +19,7 @@
             <v-data-table
                 :headers="headers"
                 :items="persons"
-                :search="filter.quickFilter"
+                :search="quickFilter"
                 :loading="isLoading"
                 loading-text="Récupération des données..."
             >
@@ -192,11 +192,7 @@ export default  {
             { text: 'Emploi', value: 'job' },
             { text: '', value: 'actions' },
         ],
-        filter: {
-            quickfilter: null, // un filtre par recherche de mot clés multichamps: cf construction du champs quickfilter dans mounted()
-            pageIndex: 0, // page courante affiché (0 = page 1)
-            pageSize: 20, // nombre de usersList affichées par page
-        },
+        quickfilter: null, // un filtre par recherche de mot clés multichamps
         sexes: [
             { id: "undefined", label: "Non défini" },
             { id: "male", label: "Homme" },
@@ -243,7 +239,7 @@ export default  {
                 }
             ],
         }
-        }),
+    }),
     mounted() {
         this.isLoading = true;
         axios.get(`/api/agenda/persons`).then(response => {
@@ -319,7 +315,7 @@ export default  {
             }
 
             // On vérifie si tout est bien renseigné
-            this.userEditor.isLoading = true;
+            this.personEditor.isLoading = true;
             const that = this;
 
             // On envoie au serveur
