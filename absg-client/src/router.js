@@ -6,7 +6,7 @@ import Changelog from './views/Changelog.vue';
 import Login from './views/Login.vue';
 import axios from 'axios';
 import store from './store';
-import { checkAutentication } from './middleware/AuthHelper';
+import { checkAutentication, logoutUser } from './middleware/AuthHelper';
 
 Vue.use(VueRouter);
 
@@ -239,7 +239,6 @@ router.beforeEach((to, from, next) => {
 
     // Si pas d'authent, on redirige vers la page de login
     const user = checkAutentication(store);
-    console.log("route-beforeEach", user);
     if (!user) {
         return next('/login');
     }
@@ -257,13 +256,19 @@ axios.interceptors.response.use(
         return response
     },
     error => {
-        // accès refusé, on redirige vers l'accueil
+        // Session invalide, on force la déconnection/reconnection de l'utilisateur
         if (error.response.status === 401) {
+            logoutUser(store);
             return router.push('/login');
         }
-
+        // Accès refusé, on redirige vers l'accueil
+        if (error.response.status === 403) {
+            return router.push('/');
+        }
+        // Erreur du serveur
         if (error.response.status === 500) {
-            console.log("TODO: 500", error.response);
+            store.commit(store, error);
+            return;
         }
         // Pour tout le reste on redirige vers 404
         console.log("TODO: NOT MANAGED ERROR", error.response)

@@ -38,11 +38,7 @@ export default new Vuex.Store({
         },
 
         onError(state, axiosError) {
-            console.log("ERR AXIOS", axiosError);
-            // TODO: traitement de l'erreur en fonction de sa criticité
-            // 403 -> redirection
-            // 404 -> redirection
-            // 500 -> ...
+            console.log("ERR SERVER", axiosError);
         },
 
         updateUser(state, user) {
