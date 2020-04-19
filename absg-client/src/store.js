@@ -23,8 +23,18 @@ export default new Vuex.Store({
         // Editeur photo
         photoMetadataEditorDisplayed: false,
         agpaMeta: null,
+        // Erreur
+        errorDisplayed: false,
+        error: null
     },
     mutations: {
+
+        onError(state, axiosError) {
+            console.log("ERR SERVER", axiosError);
+            state.error = axiosError;
+            state.errorDisplayed = true;
+        },
+
         setCurrentUser(state, user) {
             if (user) {
                 // Get user avatar url
@@ -36,11 +46,6 @@ export default new Vuex.Store({
 
             state.user = user;
         },
-
-        onError(state, axiosError) {
-            console.log("ERR SERVER", axiosError);
-        },
-
         updateUser(state, user) {
             state.user = user;
         },

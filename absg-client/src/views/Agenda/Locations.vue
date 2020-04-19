@@ -4,7 +4,7 @@
         <v-card>
             <v-card-title>
                 <v-text-field
-                    v-model="quickFilter"
+                    v-model="filter.search"
                     append-icon="fas fa-search"
                     label="Rechercher"
                     single-line
@@ -19,7 +19,7 @@
             <v-data-table
                 :headers="headers"
                 :items="places"
-                :search="quickFilter"
+                :search="filter.search"
                 :loading="isLoading"
                 loading-text="Récupération des données..."
             >
@@ -123,7 +123,7 @@ export default {
             { text: 'Coordonnées GPS', value: 'gps' },
             { text: '', value: 'actions', align: 'end' },
         ],
-        quickfilter: "", // un filtre par recherche de mot clés multichamps
+        filter: { search: "" }, // un filtre par recherche de mot clés multichamps
         places: [],
         placesGallery: [],
         placeEditor: {

@@ -62,7 +62,7 @@ export class Person {
         return this;
     }
 
-    getFullname() : string {
+    getFullname(): string {
         if (this.surname) {
             return this.surname;
         }

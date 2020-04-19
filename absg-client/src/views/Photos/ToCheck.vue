@@ -96,7 +96,6 @@ export default {
         axios.get(`/api/photos/to-check`).then(response => {
             this.photos = parseAxiosResponse(response);
             store.commit('photosGalleryReset', this.photos);
-            console.log(this.photos);
         }).catch( err => {
             store.commit('onError', err);
         });

@@ -18,13 +18,17 @@ class AgendaService {
     /**
      * Récupère la liste de toutes les personnes de l'agenda
      */
-    public listPersons() {
-        return this.personsRepo
+    public async listPersons() {
+        const persons = await this.personsRepo
             .createQueryBuilder("p")
             .leftJoinAndSelect("p.homePlace", "place")
             .orderBy("p.lastname")
             .addOrderBy("p.firstname")
             .getMany();
+        return persons.map(e => {
+            const p = new Person().fromJSON(e);
+            return { ...p, fullname: p.getFullname() };
+        });
     }
 
     /**

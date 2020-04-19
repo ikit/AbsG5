@@ -7,13 +7,15 @@ export class Photo {
     original = "";      // Url vers l'original                  (peut-être null)
     title = "";         // Le titre donné à la photo            (peut-être null)
     author = "";        // L'auteur de la photo                 (peut être null)
-    // Info additionnelles pour les photos albums
+    // Metada
     comment = "";       // Un commentaire sur la photo
-    date = new Date;    // La date à laquelle à été prise la photo
-    location = "";      // L'endroit où a été pris la photo
-    albums = [];        // Liste des albums dans lesquels la photo apparaît
+    date = "";          // La date à laquelle à été prise la photo
+    persons = [];       // Les nom/prénoms des principales personnes présentent sur la photo
+    place = "";         // L'endroit où a été pris la photo
+    gps = ""            // Les coordonnées GPS
     // Infos additionnel pour les photos des AGPA
     rank = 0;           // Le classement de la photo dans sa catégorie
     note = 0;           // La note qu'elle a obtenue
     votes = 0;          // Le nombre de vote qu'elle à obtenue
+
 }

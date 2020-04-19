@@ -15,7 +15,6 @@ export class UserController {
         // On récupère les photos à checker
         const photos = await this.repo
             .createQueryBuilder("p")
-            .leftJoinAndSelect("p.place", "place")
             .where("NOT p.checked")
             .orderBy("p.id")
             .getMany();

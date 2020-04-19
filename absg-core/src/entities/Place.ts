@@ -25,6 +25,12 @@ export class Place {
 
     fromJSON(data: any) {
         Object.assign(this, data);
+        // Post-traitement pour corriger le bug de conversion txt/json des valeurs null
+        for (const [key, value] of Object.entries(this)) {
+            if (value === "null") {
+                this[key] = null;
+            }
+        }
         return this;
     }
 }

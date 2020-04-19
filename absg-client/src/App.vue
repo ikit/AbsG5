@@ -17,7 +17,6 @@
                     </template>
                     <span>Revenir à l'accueil</span>
                 </v-tooltip>
-
             </span>
         </v-toolbar-title>
         <v-spacer>
@@ -118,73 +117,12 @@
                             </div>
                         </div>
                         <!-- L'éditeur de meta data -->
-                        <v-card
+                        <PhotoMetadataEditor
                             v-if="photoMetadataEditorDisplayed"
-                            dark
-                            style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px">
-                            <v-form style="text-align: left">
-                                <p style="font-familly: monospace; line-height: 35px; font-size: 20px;">
-                                    <v-icon style="vertical-align: middle">fas fa-info-circle</v-icon> ID: {{ photoDisplayed.folder }} {{ photoDisplayed.id }}
-                                </p>
-                                <v-checkbox
-                                    label="Photo légendaire"
-                                ></v-checkbox>
-                                <v-checkbox
-                                    label="Classer la photo"
-                                ></v-checkbox>
-
-                                <v-textarea
-                                    v-model="photoDisplayed.comment"
-                                    label="Commentaire"
-                                    prepend-icon="fas fa-pen"
-                                ></v-textarea>
-
-                                <v-text-field
-                                    v-model="photoDisplayed.date"
-                                    label="Date"
-                                    placeholder="YYYY-MM-DD HH:mm"
-                                    prepend-icon="far fa-calendar-alt"
-                                ></v-text-field>
-
-                                 <v-autocomplete
-                                    v-model="photoDisplayed.persons"
-                                    :items="persons"
-                                    label="Personnes"
-                                    prepend-icon="fas fa-user"
-                                    multiple
-                                ></v-autocomplete>
-
-                                 <v-autocomplete
-                                    v-model="photoDisplayed.place"
-                                    :items="places"
-                                    label="Lieux"
-                                    prepend-icon="fas fa-map-marker-alt"
-                                ></v-autocomplete>
-
-                                <v-text-field
-                                    v-model="photoDisplayed.gps"
-                                    placeholder="Position GPS"
-                                    style="padding: 0; margin-left: 34px; margin-top: 0;"
-                                ></v-text-field>
-
-
-                                <div style="text-align: center">
-                                    <v-btn
-                                        color="accent"
-                                        style="margin-top: 30px"
-                                        @click="savePhotoMetadata()"
-                                    >
-                                    <v-icon>fas fa-save</v-icon>
-                                    &nbsp; Enregistrer et suivante &nbsp;
-                                    <v-icon>fas fa-chevron-right</v-icon>
-                                    </v-btn>
-                                </div>
-                            </v-form>
-                        </v-card>
+                            :photo="photoDisplayed"
+                            style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px"></PhotoMetadataEditor>
                     </div>
                 </div>
-            </div>
-            <div class="photoEditor" v-if="photosEditorDisplayed">
             </div>
         </div>
     </v-content>
@@ -223,7 +161,7 @@
     </v-dialog>
 
 
-    <v-dialog v-model="errDialog" width="80vw">
+    <v-dialog v-model="errorDisplayed" width="80vw">
         <v-card>
             <v-card-title class="grey lighten-4">
             Une erreur s'est produite
@@ -234,7 +172,7 @@
             <v-card-actions>
                 <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn text @click="errDialog=false">OK</v-btn>
+                <v-btn text @click="errorDisplayed=false">OK</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -250,11 +188,15 @@ import { mapState } from 'vuex';
 import { MODULES, parseAxiosResponse } from  './middleware/CommonHelper';
 import { webSocket } from "rxjs/webSocket";
 import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
+import PhotoMetadataEditor from './components/PhotoMetadataEditor.vue';
 
 
 export default {
     name: 'App',
     store,
+    components: {
+        PhotoMetadataEditor
+    },
     data: () => ({
         dialog: false,
         errDialog: false,
@@ -262,6 +204,7 @@ export default {
         drawer: null,
         ws: null,
         items: MODULES,
+
         // Galerie photo editor
         photoDisplayedDateMenu: false,
         persons: ["olivier", "Annie", "Gérard", "Emmanuel", "Sébastien", "Fanny"]
@@ -316,20 +259,12 @@ export default {
         photosGalleryAuto() {
             console.log('photosGalleryAuto');
         },
-        savePhotoMetadata() {
-            axios.post(`/api/photos/save`, this.photoDisplayed).catch(
-                err => store.commit('onError', err)
-            );
-        },
         closeNotifications() {
             dialog=false;
             axios.get(`/api/users/checkNotifications`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
-                    store.commit('updateCitation', data.citation);
-                    store.commit('updateImmt', data.immt);
-                    store.commit('updateNotifications', data.notifications);
 
                     // On crée la listes des logs de passaG (les 24 dernières heures)
                     this.passage = []
@@ -378,6 +313,13 @@ export default {
         // Editeur photos
         photosEditorDisplayed() {
             return this.$store.state.photosEditorDisplayed;
+        },
+        // Erreur
+        errorDisplayed() {
+            return this.$store.state.errorDisplayed;
+        },
+        error() {
+            return this.$store.state.error;
         }
     }
 };
