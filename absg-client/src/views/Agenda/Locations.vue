@@ -13,7 +13,7 @@
                 <v-spacer></v-spacer>
                 <v-btn @click="resetDialog(true)">
                     <v-icon small>fa-plus</v-icon>
-                    Nouvelle entrée
+                    Nouveau lieu
                 </v-btn>
             </v-card-title>
             <v-data-table
