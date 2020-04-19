@@ -59,8 +59,8 @@ createConnections(ormconfig)
         app.use(errorLogHandler()); // error logs
 
         // start express server
-        app.listen(5000);
-        logger.info("Server has started on port 5000.");
+        app.listen(process.env.API_PORT);
+        logger.info(`Server has started on port ${process.env.API_PORT}.`);
 
         // start websocket server
         initWS();
