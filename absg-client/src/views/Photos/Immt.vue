@@ -11,6 +11,14 @@
             <template v-slot:header>
                 <div class="stickyHeader">
                     <v-row style="" align="center" justify="center">
+
+                        <v-btn
+                            color="accent"
+                            @click.stop="resetDialog(true)">
+                            <v-icon left>fas fa-plus</v-icon>
+                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
+                        </v-btn>
+
                         <v-text-field
                             v-model="filter.request"
                             prepend-inner-icon="fa-search"
@@ -20,12 +28,6 @@
                         <span class="grey--text">{{immts.length}} images</span>
                         <v-spacer></v-spacer>
 
-                        <v-btn
-                            color="accent"
-                            @click.stop="resetDialog(true)">
-                            <v-icon left>fas fa-plus</v-icon>
-                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
-                        </v-btn>
                         <v-spacer></v-spacer>
 
                         <span class="grey--text">Images par page</span>
@@ -143,9 +145,8 @@ export default {
         totalPages: 0,
         immts: [],
         filter: {
-            request: "",
             authorId: null,
-            pageIndex: 0,
+            pageIndex: 1,
             pageSize: 20,
         },
         immtEditor: {
@@ -176,6 +177,11 @@ export default {
                 this.isLoading = false;
                 store.commit('photosGalleryReset', this.immts);
             });
+        }
+    },
+    computed: {
+        numberOfPages () {
+            return Math.ceil(this.immts.length / this.filter.pageSize)
         }
     },
     methods: {
@@ -220,14 +226,11 @@ export default {
                 }
             );
         },
-        formerPage() {
-            console.log("page précédente");
+        nextPage () {
+            if (this.filter.pageIndex < this.numberOfPages) this.filter.pageIndex += 1
         },
-        nextPage() {
-            console.log("page suivante");
-        },
-        updateImmtsPerPage(count) {
-            console.log("updateImmtsPerPage");
+        formerPage () {
+            if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1
         },
         photosGalleryDisplay(index) {
             store.commit('photosGallerySetIndex', index);

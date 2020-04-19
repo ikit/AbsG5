@@ -88,7 +88,7 @@ export default {
         photos: [], // La liste des photos à trier
         filter: {
             search: null, // recherche multicritère
-            pageIndex: 1, // page courante affiché (0 = page 1)
+            pageIndex: 1, // page courante affiché
             pageSize: 24, // nombre de citations affichées par page
         },
     }),
