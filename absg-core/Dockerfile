@@ -9,6 +9,7 @@ WORKDIR /app
 COPY  . .
 
 RUN npm install 
+RUN ls -l
 RUN npm run build
 
 # Stage II - 
