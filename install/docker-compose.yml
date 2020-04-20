@@ -1,51 +1,100 @@
-version: '3.5'
+version: "3.5"
 
 networks:
-  AZERTY_TEST_net:
-    name: AZERTY_TEST_net
+  absg5_net:
+    name: absg5_net
+
+# WORKS WITH WIN10 BUT NOT WITH UBUNTU XENIAL ..... why... :'(
+# volumes:
+#   absg5-db-data:
+#     driver: local
+#       driver_opts:
+#         type: "none"
+#         o: "bind"
+#         device: "/var/absg5/absg5_db"
+#   absg5-files-data:
+#     driver: local
+#       driver_opts:
+#         type: "none"
+#         o: "bind"
+#         device: "/var/absg5/absg5_files"
+#   absg5-pgadmin-data:
+#     driver: local
+#       driver_opts:
+#         type: "none"
+#         o: "bind"
+#         device: "/var/absg5/pgadmin"
 
 services:
-  AZERTY_TEST_db:
-    container_name: AZERTY_TEST_db
-    image: postgres
+  absg5_db:
+    container_name: absg5_db
+    image: docker.io/postgres:11.5
     restart: always
-    volumes:
-      - /var/c/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=AZERTY_TEST
-      - POSTGRES_DB=AZERTY_TEST
-      - POSTGRES_USER=AZERTY_TEST
+      - POSTGRES_PASSWORD=rGkHyc27b5B4DJxXJ9JBndY4ce
+      - POSTGRES_DB=absg
+      - POSTGRES_USER=absg
     networks:
-      - AZERTY_TEST_net
+      - absg5_net
+    volumes:
+      # - absg5-db-data:/var/lib/postgresql/data
+      - /var/absg5/absg5_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
-  AZERTY_TEST_pgadmin:
-    container_name: AZERTY_TEST_pgadmin
+
+  absg5_pgadmin:
+    container_name: absg5_pgadmin
     image: dpage/pgadmin4
     restart: always
-    volumes:
-      - /var/AZERTY_TEST/pgadmin:/var/lib/pgadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=user@domain.com
-      - PGADMIN_DEFAULT_PASSWORD=AZERTY_TEST
-    networks:
-      - AZERTY_TEST_net
-    ports:
-      - "20013:80"
-
-  AZERTY_TEST_cloud:
-    container_name: AZERTY_TEST_cloud
-    image: nextcloud:apache
-    volumes:
-      - /var/AZERTY_TEST/nextcloud:/var/www/html
+      - PGADMIN_DEFAULT_EMAIL=zaffa@absg.fr
+      - PGADMIN_DEFAULT_PASSWORD=EyeTEV7P6kvUkhm2
     depends_on:
-      - AZERTY_TEST_db
-    environment:
-      - POSTGRES_USER=AZERTY_TEST
-      - POSTGRES_DB=AZERTY_TEST
-      - POSTGRES_PASSWORD=AZERTY_TEST
-      - POSTGRES_HOST=AZERTY_TEST_db
+      - absg5_db
     networks:
-      - AZERTY_TEST_net
+      - absg5_net
     ports:
-      - "20011:80"
-      - "20012:443"
+      - "9013:80"
+
+  absg5_core:
+    container_name: absg5_core
+    image: absg5-core-image
+    restart: always
+    volumes:
+      # - absg5-files-data:/var/absg5/files
+      - /var/absg5/absg5_files:/var/absg5/files
+    depends_on:
+      - absg5_db
+    environment:
+      - NODE_ENV=production
+      - API_PORT=5010
+      - WS_PORT=5011
+      - DB_TYPE_DEFAULT=postgres
+      - DB_HOST_DEFAULT=absg5_db
+      - DB_PORT_DEFAULT=5432
+      - DB_USER_DEFAULT=absg
+      - DB_PASSWORD_DEFAULT=rGkHyc27b5B4DJxXJ9JBndY4ce
+      - DB_NAME_DEFAULT=absg
+      - PATH_FILES=/var/absg5/files
+      - URL_FILES=http://absolumentg.fr/files/
+    networks:
+      - absg5_net
+    ports:
+      - "9010:5010"
+      - "9011:5011"
+
+  absg5_client:
+    container_name: absg5_client
+    image: absg5-client-image
+    restart: always
+    ports:
+      - "9012:80"
+    depends_on:
+      - absg5_core
+    networks:
+      - absg5_net
