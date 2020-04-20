@@ -3,9 +3,6 @@ import * as jwt from "jsonwebtoken";
 import { User } from "../entities";
 
 class AuthService {
-    private SECRET = "EyVgkGdxM58b>A6df&vrb+X4<Sk,Z[UJ";
-    private EXPIRES_IN = 60 * 60;
-
     /**
      * Chiffre un mot de passe
      *
@@ -35,14 +32,15 @@ class AuthService {
             return null;
         }
 
-        const expiresIn = this.EXPIRES_IN;
         const payload = {
             id: user.id,
             username: user.username,
-            expiresIn
+            expiresAt: new Date().getTime() + +process.env.AUTH_SESSION_DURATION_MS
         };
 
-        return jwt.sign(payload, this.SECRET, { expiresIn });
+        return jwt.sign(payload, process.env.AUTH_SESSION_SALT, {
+            expiresIn: +process.env.AUTH_SESSION_DURATION_MS / 1000
+        });
     }
 
     /**
@@ -51,7 +49,7 @@ class AuthService {
      * @param token
      */
     checkToken(token: string) {
-        return jwt.verify(token, this.SECRET);
+        return jwt.verify(token, process.env.AUTH_SESSION_SALT);
     }
 
     /**
