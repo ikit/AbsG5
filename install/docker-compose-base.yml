@@ -31,7 +31,7 @@ services:
     image: docker.io/postgres:11.5
     restart: always
     environment:
-      - POSTGRES_PASSWORD=rGkHyc27b5B4DJxXJ9JBndY4ce
+      - POSTGRES_PASSWORD=postgresSecretPassword
       - POSTGRES_DB=absg
       - POSTGRES_USER=absg
     networks:
@@ -52,8 +52,8 @@ services:
     image: dpage/pgadmin4
     restart: always
     environment:
-      - PGADMIN_DEFAULT_EMAIL=zaffa@absg.fr
-      - PGADMIN_DEFAULT_PASSWORD=EyeTEV7P6kvUkhm2
+      - PGADMIN_DEFAULT_EMAIL=pgSuperAdmin@domain.com
+      - PGADMIN_DEFAULT_PASSWORD=pgSuperAdminSecretPassword
     depends_on:
       - absg5_db
     networks:
@@ -74,14 +74,16 @@ services:
       - NODE_ENV=production
       - API_PORT=5010
       - WS_PORT=5011
+      - AUTH_SESSION_DURATION_MS=3600000
+      - AUTH_SESSION_SALT=jwtSecretSalt
       - DB_TYPE_DEFAULT=postgres
       - DB_HOST_DEFAULT=absg5_db
       - DB_PORT_DEFAULT=5432
       - DB_USER_DEFAULT=absg
-      - DB_PASSWORD_DEFAULT=rGkHyc27b5B4DJxXJ9JBndY4ce
+      - DB_PASSWORD_DEFAULT=postgresSecretPassword
       - DB_NAME_DEFAULT=absg
       - PATH_FILES=/var/absg5/files
-      - URL_FILES=http://absolumentg.fr/files/
+      - URL_FILES=https://domain.com/files/
     networks:
       - absg5_net
     ports:

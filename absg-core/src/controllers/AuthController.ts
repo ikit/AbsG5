@@ -11,15 +11,13 @@ export class AuthController {
 
     @Post("/login")
     async login(@Body() payload) {
-        logger.debug("login", payload);
         // On vérifie qu'on a bien reçu tous les champs nécessaires
         const hasMissingField = !payload || ["username", "password"].some(field => !payload.hasOwnProperty(field));
 
         if (hasMissingField) {
-            throw new BadRequestError(`A field is missing.`);
+            throw new BadRequestError(`Vous devez fournir un identifiant et un mot de passe pour vous authentifier.`);
         }
 
-        logger.debug(" > payload ok");
         // On recherche l'utilisateur par son email ou par son username
         let user = await this.userRepo.query(
             `SELECT * FROM "user" WHERE "usernameClean" ILIKE $1 AND "isActive" = TRUE LIMIT 1`,
@@ -27,8 +25,8 @@ export class AuthController {
         );
 
         user = user[0];
-        logger.debug(" > user", user);
         if (!user) {
+            logger.warning(`Tentative de connection avec identifiant inconnu: ${payload.username}`);
             throw new BadRequestError(`Wrong username or password.`);
         }
 
@@ -36,8 +34,8 @@ export class AuthController {
         try {
             const isPasswordCorrect = await authService.checkPassword(payload.password, user.passwordHash);
 
-            logger.debug(" > pwd", isPasswordCorrect);
             if (!isPasswordCorrect) {
+                logger.warning(`Tentative de connection avec identifiant inconnu: ${payload.username}`);
                 throw new BadRequestError(`Wrong username or password.`);
             }
 
@@ -48,12 +46,13 @@ export class AuthController {
                 token: user.token
             });
 
-            logger.debug(" > token", user.token);
             // On retourne l'utilisateur avec son token
             delete user.passwordHash;
+            logger.info(`Connection de l'utilisateur ${user.username}`);
             return user;
         } catch (err) {
-            throw new BadRequestError(`Wrong username or password.`);
+            logger.error(`Tentative de connection: ${err.message}`);
+            throw err;
         }
     }
 
