@@ -1,7 +1,6 @@
 import { JsonController, Get, Authorized, Post, Body, CurrentUser, UploadedFile } from "routing-controllers";
 
 import { agendaService } from "../services";
-import { Person, Place } from "../entities";
 
 @Authorized()
 @JsonController("/agenda")
@@ -16,11 +15,13 @@ export class AgendaController {
 
     /**
      * Crée ou modifie (si l'id est renseigné) une personne de l'agenda
-     * @param person 
+     * @param image l'image uploadé si défini
+     * @param body les informations sur la personne au format json
+     * @param session les informations sur l'utilisateur qui effectue la demande
      */
     @Post("/person")
-    savePerson(@Body() person: Person, @CurrentUser() session: any) {
-        return agendaService.savePerson(person, session);
+    savePerson(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() session: any) {
+        return agendaService.savePerson(body, image, session);
     }
 
     /**

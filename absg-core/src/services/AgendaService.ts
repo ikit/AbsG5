@@ -1,4 +1,4 @@
-import { getConnection, getRepository, Equal } from "typeorm";
+import { getRepository } from "typeorm";
 import { format } from "date-fns";
 import { Person, User, LogModule, Place } from "../entities";
 import { logger } from "../middleware/logger";
@@ -21,35 +21,59 @@ class AgendaService {
     public async listPersons() {
         const persons = await this.personsRepo
             .createQueryBuilder("p")
-            .leftJoinAndSelect("p.homePlace", "place")
             .orderBy("p.lastname")
             .addOrderBy("p.firstname")
             .getMany();
         return persons.map(e => {
             const p = new Person().fromJSON(e);
-            return { ...p, fullname: p.getFullname() };
+            return {
+                ...p,
+                fullname: p.getFullname(),
+                thumb: p.photo ? `${process.env.URL_FILES}persons/mini/${p.photo}` : null,
+                url: p.photo ? `${process.env.URL_FILES}persons/${p.photo}` : null
+            };
         });
     }
 
     /**
-     * Crée ou modifie (si l'id est renseigné) une entrée de l'agenda
-     * @param person l'entrée de l'agenda
+     * Crée ou modifie (si l'id est renseigné) une entrée de répertoire
+     * @param personData l'entrée du répertoire
+     * @param image l'image pour illustrer la personne dans le répertoire
      * @param user l'utilisateur qui demande l'action
      */
-    public async savePerson(person: Person, user: User) {
-        const personId = person.id;
+    public async savePerson(personData: any, image: any, user: User) {
+        const personId = Number.parseInt(personData.id);
+        let person = new Person();
+        if (personId) {
+            person = await this.personsRepo.findOne(personId);
+        }
+        personData.id = personId ? personId : null; // pour éviter les problèmes lors du save en DB
+        person.fromJSON(personData);
         person = await this.personsRepo.save(person);
+
+        if (image) {
+            const thumb = path.join(process.env.PATH_FILES, `persons/mini/${person.id}.jpg`);
+            const web = path.join(process.env.PATH_FILES, `persons/${person.id}.jpg`);
+            await saveImage(image.buffer, thumb, web, null);
+
+            person.photo = `${person.id}.jpg`;
+            this.personsRepo.save(person);
+        }
 
         logger.notice(
             personId
-                ? `Fiche de ${person.getFullname()} modifié dans le répertoire par ${user.username}`
-                : `Nouvelle entrée ajouté au répertoire par ${user.username}`,
+                ? `La fiche de "${person.getFullname()}" a été modifié dans le répertoire par ${user.username}`
+                : `Nouvelle fiche "${person.getFullname()}" a été ajouté au répertoire par ${user.username}`,
             {
                 userId: user.id,
                 module: LogModule.agenda
             }
         );
-        return person;
+        return {
+            ...person,
+            thumb: person.photo ? `${process.env.URL_FILES}persons/${person.photo}` : null,
+            url: person.photo ? `${process.env.URL_FILES}persons/${person.photo}` : null
+        };
     }
 
     /**

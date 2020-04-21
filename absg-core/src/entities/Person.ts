@@ -1,7 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
-import { Place } from "./Place";
-import { User } from "./User";
-import { Website } from "./Website";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 export enum Sex {
     female,
@@ -35,30 +32,40 @@ export class Person {
     @Column({ nullable: true, comment: "Date du décé" })
     dateOfDeath: Date;
 
-    @OneToOne(type => Place)
-    @JoinColumn()
-    homePlace: Place;
+    @Column({ nullable: true, comment: "Adresse de la personne" })
+    address: string;
 
-    @Column("json", { nullable: true, comment: "Liste des emplois" })
-    jobs: any;
+    @Column({ nullable: true, comment: "Le dernier emplois exercé par cette personne" })
+    job: string;
 
-    @Column({ nullable: true, comment: `Numéro de téléphone personnel` })
+    @Column({ nullable: true, comment: "Numéro de téléphone personnel" })
     phone: string;
 
-    @Column({ nullable: true, comment: `Email` })
+    @Column({ nullable: true, comment: "Email" })
     email: string;
 
-    @OneToMany(
-        type => Website,
-        website => website.id
-    )
-    websites: Website[];
+    @Column({ comment: "Photo de la personne", nullable: true })
+    photo: string;
 
     @Column("json", { nullable: true, comment: "Dernière coordonnée GPS connu pour la personne (VoyaG)" })
     lastLocation: string;
 
     fromJSON(json: any): Person {
         Object.assign(this, json);
+        console.log(json);
+        // Post-traitement pour corriger le bug de conversion txt/json des valeurs null
+        for (const [key, value] of Object.entries(this)) {
+            if (value === "null" || value === "undefined") {
+                this[key] = null;
+            }
+        }
+        if (this.dateOfBirth && typeof this.dateOfBirth != "object") {
+            this.dateOfBirth = new Date(this.dateOfBirth);
+        }
+        if (this.dateOfDeath && typeof this.dateOfDeath != "object") {
+            this.dateOfDeath = new Date(this.dateOfDeath);
+        }
+        console.log(this);
         return this;
     }
 

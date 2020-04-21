@@ -22,6 +22,8 @@
                 :search="filter.search"
                 :loading="isLoading"
                 loading-text="Récupération des données..."
+                no-data-text="Aucun lieu enregistré dans l'annuaire."
+                no-results-text="Aucun lieu trouvé."
             >
                 <template v-slot:item.name="{ item }">
                     <div v-if="item.thumb" class="thumb">
@@ -179,8 +181,8 @@ export default {
             }
         },
         openMap(place) {
-            if (place && (place.gps || place.virtualVisitUrl)) {
-                const url = `https://www.google.com/maps/place/${place.gps || place.virtualVisitUrl}`;
+            if (place && (place.gps || place.address)) {
+                const url = `https://www.google.com/maps/place/${place.gps || place.address}`;
                 const win = window.open(url, '_blank');
                 win.focus();
             }
@@ -215,9 +217,7 @@ export default {
         },
 
         refreshList(place) {
-
             const idx = this.places.findIndex(e => e.id === place.id);
-
             if (idx > -1) {
                 this.places[idx] = place;
             } else {
@@ -226,7 +226,6 @@ export default {
         },
 
         savePlace() {
-            // On vérifie si tout est bien renseigné
             this.placeEditor.isLoading = true;
             const { imgEditor } = this.$refs;
 
@@ -262,7 +261,6 @@ export default {
 
             // On envoie tout au serveur pour qu'il enregistre
             const that = this;
-            console.log("POST ",this.placeEditor)
             axios.post(`/api/agenda/place`, formData, {
                 headers: {
                     "Content-Type" : "multipart/form-data",

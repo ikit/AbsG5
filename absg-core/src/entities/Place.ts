@@ -27,7 +27,7 @@ export class Place {
         Object.assign(this, data);
         // Post-traitement pour corriger le bug de conversion txt/json des valeurs null
         for (const [key, value] of Object.entries(this)) {
-            if (value === "null") {
+            if (value === "null" || value === "undefined") {
                 this[key] = null;
             }
         }

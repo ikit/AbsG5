@@ -214,7 +214,7 @@ export default {
     },
     mounted() {
         // On initialise le websocket
-        const host = process.env.NODE_ENV === "production" ? `wss://${window.location.hostname}/ws` : `ws://${window.location.hostname}:5011`;
+        const host = process.env.NODE_ENV === "production" ? `wss://${window.location.hostname}/ws` : `ws://localhost:5011`;
         this.ws = webSocket(host);
         this.ws.subscribe(
             msg => this.processWebsocketMessage(msg),
