@@ -214,7 +214,9 @@ export default {
     },
     mounted() {
         // On initialise le websocket
-        this.ws = webSocket("ws://localhost:5011");
+        const host = `wss://${window.location.hostname}:5011`;
+        console.log(host);
+        this.ws = webSocket(host);
         this.ws.subscribe(
             msg => this.processWebsocketMessage(msg),
             err => this.processWebsocketError("Problème de mise à jour temps réel", err),

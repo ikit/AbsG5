@@ -8,8 +8,8 @@ class AuthService {
      *
      * @param password le mot de passe en clair
      */
-    async hashPassword(password: string) {
-        return await bcrypt.hash(password, 10);
+    hashPassword(password: string) {
+        return bcrypt.hash(password, 10);
     }
 
     /**
