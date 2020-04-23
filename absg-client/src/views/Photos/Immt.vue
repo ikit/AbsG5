@@ -76,7 +76,7 @@
             <template v-slot:default="props">
                 <v-container fluid grid-list-sm>
                     <v-layout row wrap>
-                        <v-flex v-for="(p, index) in props.items" :key="p.id" style="text-align: center;">
+                        <v-flex v-for="(p, index) in props.items" :key="p.id" style="text-align: center; max-width: 250px;">
                             <div style="width: 250px; height: 250px; margin: auto;">
                                 <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
                                     <img :src="p.thumb" class="thumb" :alt="p.id" @click="photosGalleryDisplay(index + (filter.pageIndex - 1) * filter.pageSize)">
@@ -87,7 +87,7 @@
                                     {{ p.title }}
                                 </div>
                                 <div style="text-align: center; font-size: 0.8em; opacity: 0.7">
-                                    {{ p.username }} le {{ p.date }} </div>
+                                    {{ p.user ? p.user.username : "" }} le {{ p.date }} </div>
                             </v-card>
                         </v-flex>
                     </v-layout>
@@ -103,13 +103,19 @@
                 Nouvelle image du moment
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
+                <div v-if="immtEditor.displayTodayWarning" style="position: relative; color: #ff8f00; padding-left: 40px;">
+                    <v-icon color="warning" style="position:absolute; top: 10px; left: 0">fas fa-exclamation-triangle</v-icon>
+                    Attention, il y a déjà une image pour aujourd'hui. <br/>
+                    Vous allez donc remplacer l'image existante par une nouvelle.
+                </div>
+
 
                 <v-text-field
                     prepend-icon="fas fa-feather-alt"
                     label="Titre"
                     v-model="immtEditor.title">
                 </v-text-field>
-                <ImageEditor ref="imgEditor" style="height: 300px; position: relative"/>
+                <ImageEditor ref="imgEditor" icon="fas fa-camera" style="height: 300px;"/>
                 <div v-if="immtEditor.isLoading">
                     Enregistrement en cours : {{ immtEditor.complete }}%
                 </div>
@@ -129,6 +135,7 @@
 <script>
 import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
+import { addDays, format } from 'date-fns';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
 
@@ -140,6 +147,7 @@ export default {
     data: () => ({
         isLoading: false,
         immts: [],
+        todayId: "",
         filter: {
             authorId: null,
             pageIndex: 1,
@@ -147,6 +155,7 @@ export default {
         },
         immtEditor: {
             open: false,
+            displayTodayWarning: false,
             title: null,
             isLoading: false,
             complete: 0,
@@ -156,14 +165,24 @@ export default {
         if (!this.authors) {
             // Il faut initialiser la vue
             this.isLoading = true;
+            const t = new Date();
+            this.todayId = format(new Date(), "yyyy_DDD", { useAdditionalDayOfYearTokens: true });
+            console.log(this.todayId);
+
             axios.get(`/api/immt/`).then(response => {
                 const data = parseAxiosResponse(response);
                 this.immts = data.map(i => {
+                    const tokens = i.id.split("_");
+                    let date = new Date(tokens[0], 0, 1);
+                    date = addDays(date, +tokens[1]);
+                    if (this.todayId === i.id) {
+                        this.immtEditor.displayTodayWarning = true;
+                    }
                     return {
                         id: i.id,
                         username: i.posterName,
                         title: i.title,
-                        date: new Date().toLocaleDateString(),
+                        date: date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }),
                         url: i.url,
                         thumb: i.thumb,
                     }
@@ -179,6 +198,8 @@ export default {
         }
     },
     methods: {
+
+
         initGallery() {
             store.commit('photosGalleryReset', this.immts);
         },
@@ -187,10 +208,12 @@ export default {
             this.immtEditor.title = null;
             this.immtEditor.isLoading = false;
             this.immtEditor.complete = 0;
+
+            const { imgEditor } = this.$refs;
+            imgEditor.reset();
         },
         saveImmt: function () {
             const { imgEditor } = this.$refs;
-
             this.immtEditor.isLoading = true;
 
             // On récupère l'image

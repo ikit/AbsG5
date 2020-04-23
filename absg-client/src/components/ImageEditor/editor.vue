@@ -31,7 +31,7 @@
             </button>
 
             <!-- Bouttons spéciaux (en bas) -->
-            <div>
+            <div style="position: absolute; bottom:0">
                 <button
                     v-if="data.loaded && !data.cropping"
                     data-action="remove"
