@@ -5,6 +5,9 @@
             :items-per-page="filter.pageSize"
             :page="filter.pageIndex"
             :search="filter.request"
+            loading-text="Récupération des photos..."
+            no-data-text="Aucune photo à trier."
+            no-results-text="Aucune photo trouvée."
             hide-default-footer>
 
             <template v-slot:header>
@@ -12,32 +15,6 @@
                     <v-row style="" align="center" justify="center">
                         <span class="grey--text">{{photos.length}} photos à trier</span>
                         <v-spacer></v-spacer>
-
-                        <!-- <span class="grey--text">Photos par page</span>
-                        <v-menu offset-y>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    class="ml-2"
-                                    :disabled="isLoading"
-                                    v-on="on">
-                                        {{ filter.pageSize }}
-                                    <v-icon>fa-angle-down</v-icon>
-                                </v-btn>
-                            </template>
-                                <v-list>
-                                <v-list-item
-                                    v-for="(number, index) in [24, 48, 96]"
-                                    :key="index"
-                                    @click="updateCitationsPerPage(number)">
-                                    <v-list-item-title>{{ number }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu> -->
-
-                        <v-spacer></v-spacer>
-
                         <v-btn
                             icon small
                             :disabled="isLoading"

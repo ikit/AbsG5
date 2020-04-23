@@ -37,12 +37,10 @@
                         </v-menu>
 
                         <v-text-field
-                            v-if="filter.type === 'name'"
                             v-model="filter.search"
                             prepend-inner-icon="fa-search"
                             label="Rechercher une personne">
                         </v-text-field>
-                        <!-- <span class="grey--text">{{immts.length}} images</span> -->
                         <v-spacer></v-spacer>
 
 
@@ -79,7 +77,13 @@
                 <v-container fluid grid-list-sm>
                     <v-layout row wrap>
                         <v-flex v-for="(p, index) in props.items" :key="p.id">
-                            <v-img :src="p.thumb" class="thumb" style="margin: auto" :alt="p.id" @click="photosGalleryDisplay(index + (filter.pageIndex - 1) * filter.pageSize)" width="150px" height="150px"></v-img>
+                            <v-img
+                                width="150px"
+                                height="150px"
+                                class="thumb"
+                                :src="p.thumb"
+                                :alt="p.id"
+                                @click="photosGalleryDisplay(index + (filter.pageIndex - 1) * filter.pageSize)"></v-img>
                         </v-flex>
                     </v-layout>
                 </v-container>
@@ -88,19 +92,42 @@
     </v-container>
 
 
-    <v-dialog v-model="trombiEditor.open" width="800px">
+    <v-dialog v-model="trombiEditor.open" width="400px">
         <v-card>
             <v-card-title class="grey lighten-4 py-4 title">
                 Nouvelle trombinette
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
 
-                <v-text-field
-                    prepend-icon="fas fa-feather-alt"
-                    label="Titre"
-                    v-model="trombiEditor.date">
-                </v-text-field>
-                <ImageEditor ref="imgEditor" style="height: 300px; position: relative"/>
+                <v-combobox
+                    v-model="trombiEditor.person"
+                    :items="persons"
+                    label="Qui"
+                    prepend-icon="fas fa-user"
+                ></v-combobox>
+
+                <v-menu
+                    v-model="trombiEditor.dateOfTrombiMenu"
+                    :close-on-content-click="true"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="290px"
+                >
+                    <template v-slot:activator="{ on }">
+                        <v-text-field
+                            :rules="editorRules.date"
+                            v-model="trombiEditor.date"
+                            clearable
+                            label="Quand"
+                            prepend-icon="far fa-calendar-alt"
+                            v-on="on"
+                        ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="trombiEditor.date" @input="dateOfTrombiMenu = false"></v-date-picker>
+                </v-menu>
+
+                <ImageEditor ref="imgEditor" icon="fas fa-camera" style="height: 300px;"/>
                 <div v-if="trombiEditor.isLoading">
                     Enregistrement en cours : {{ trombiEditor.complete }}%
                 </div>
@@ -108,7 +135,7 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn text color="primary" :disabled="trombiEditor.isLoading" @click="resetDialog()">Annuler</v-btn>
-                <v-btn color="accent" :disabled="trombiEditor.isLoading" @click="saveImmt()">Enregistrer</v-btn>
+                <v-btn color="accent" :disabled="trombiEditor.isLoading" @click="saveTrombi()">Enregistrer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -130,6 +157,7 @@ export default {
     data: () => ({
         isLoading: false,
         photos: [],
+        persons: [],
         filter: {
             type: "nom",
             search: null,
@@ -139,17 +167,40 @@ export default {
         trombiEditor: {
             open: false,
             date: null,
+            person: null,
             isLoading: false,
             complete: 0,
+
+            dateOfTrombiMenu: false,
         },
+        editorRules: {
+            photo: [
+                value => !value || value.size < 2000000 || 'La taille de la photo doit être inférieur à 2 MB',
+            ],
+            date: [
+                value => {
+                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
+                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                }
+            ],
+        }
 
     }),
     mounted () {
         this.isLoading = true;
+        // On récupère la liste des personnes et des lieux de l'agenda pour l'aide à la saisie
+        if (this.persons.length === 0) {
+            axios.get(`/api/agenda/persons`).then(response => {
+                this.persons = parseAxiosResponse(response).filter(e => e.lastname && e.firstname).map(e => (
+                    `${e.firstname} ${e.lastname}`.trim()
+                ));
+            });
+        }
+        // On récupère la liste des photos
         axios.get(`/api/agenda/trombi/`).then(response => {
             this.photos = parseAxiosResponse(response);
             this.isLoading = false;
-            // store.commit('photosGalleryReset', this.immts);
+            store.commit('photosGalleryReset', this.photos);
         });
     },
     computed: {
@@ -159,38 +210,38 @@ export default {
     },
     methods: {
         initGallery() {
-            store.commit('photosGalleryReset', this.immts);
+            store.commit('photosGalleryReset', this.photos);
         },
         resetDialog (open = false) {
-            this.immtEditor.open = open;
-            this.immtEditor.title = null;
-            this.immtEditor.isLoading = false;
-            this.immtEditor.complete = 0;
+            this.trombiEditor.open = open;
+            this.trombiEditor.date = null;
+            this.trombiEditor.isLoading = false;
+            this.trombiEditor.complete = 0;
         },
-        saveImmt: function () {
+        saveTrombi: function () {
             const { imgEditor } = this.$refs;
 
-            this.immtEditor.isLoading = true;
+            this.trombiEditor.isLoading = true;
 
             // On récupère l'image
             axios.get(imgEditor.imageUrl(), { responseType: 'blob' }).then(
                 response => {
                     const formData = new FormData();
-                    formData.append("title", this.immtEditor.title);
+                    formData.append("date", this.trombiEditor.date);
                     formData.append("image", response.data )
 
                     // On envoie tout au serveur pour qu'il enregistre la nouvelle image du moment
-                    axios.post(`/api/immt`, formData, {
+                    axios.post(`/api/agenda/trombi`, formData, {
                         headers: {
                             "Content-Type" : "multipart/form-data",
                         },
                         onUploadProgress: progressEvent => {
-                            this.immtEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
+                            this.trombiEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
                         }
                     })
-                    .then(newImmt => {
-                        // On ajoute l'image à la liste des immt
-                        this.immts.unshift(newImmt);
+                    .then(newTrombi => {
+                        // On ajoute l'image à la liste
+                        this.photos.unshift(newTrombi);
                         this.resetDialog();
                     })
                     .catch(err => {
@@ -216,4 +267,14 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
+
+
+.thumb {
+    margin: auto;
+    background: white;
+    padding: 1px;
+    box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+    cursor: pointer;
+}
+
 </style>
