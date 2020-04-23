@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { differenceInMonths, format } from "date-fns";
 
 export enum Sex {
     female,
@@ -73,5 +74,26 @@ export class Person {
         }
         const fullname = `${this.firstname} ${this.lastname}`.trim();
         return fullname ? fullname : `Personne ID ${this.id}`;
+    }
+
+    getAge(year = null): string {
+        let age = "";
+        let birth = null;
+        if (this.dateOfBirth) {
+            birth = new Date(this.dateOfBirth);
+            let lastDay = year ? new Date(year, 11, 31) : new Date();
+            if (this.dateOfDeath && this.dateOfDeath.getTime() < lastDay.getTime()) {
+                lastDay = this.dateOfDeath;
+            }
+
+            const y = lastDay.getFullYear() - birth.getFullYear();
+            if (y > 1) {
+                age = `${y} ans`;
+            } else {
+                const m = differenceInMonths(lastDay, birth);
+                age = `${m} mois`;
+            }
+        }
+        return age;
     }
 }

@@ -1,5 +1,4 @@
 import { getRepository } from "typeorm";
-import { format } from "date-fns";
 import { Person, User, LogModule, Place } from "../entities";
 import { logger } from "../middleware/logger";
 import * as fs from "fs";
@@ -155,7 +154,6 @@ class AgendaService {
         files.forEach(file => {
             if (fs.statSync(path.join(folderPath, file)).isFile() && file.endsWith("jpg")) {
                 const tokens = file.substring(0, file.length - 4).split("_");
-                
                 if (tokens.length === 2 && persons.hasOwnProperty(tokens[0])) {
                     const pid = tokens[0];
                     const year = Number.parseInt(tokens[1].substr(0, 4));
@@ -165,14 +163,13 @@ class AgendaService {
                     filesList.push({
                         pid,
                         date: new Date(year, month, day),
-                        title: `${p.getFullname()} - ${year}`,
+                        title: `${p.getFullname()} - ${year} - ${p.getAge(year)}`,
                         thumb: `${process.env.URL_FILES}trombi/${file}`, // `${process.env.URL_FILES}trombi/mini/${file}`,
                         url: `${process.env.URL_FILES}trombi/${file}`
                     });
                 }
             }
         });
-        console.log(filesList);
         return filesList;
     }
 

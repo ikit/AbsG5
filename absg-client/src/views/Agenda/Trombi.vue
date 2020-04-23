@@ -6,6 +6,7 @@
             :items-per-page="filter.pageSize"
             :page="filter.pageIndex"
             :search="filter.search"
+            :custom-filter="searchMethod"
             loading-text="Récupération des données..."
             no-data-text="Aucune photo enregistré dans le trombinoscope."
             no-results-text="Aucune photo trouvée."
@@ -14,32 +15,10 @@
             <template v-slot:header>
                 <div class="stickyHeader">
                     <v-row style="" align="center" justify="center">
-                        <v-menu offset-y>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    class="ml-2"
-                                    :disabled="isLoading"
-                                    v-on="on">
-                                        {{ filter.type }}
-                                    <v-icon>fa-angle-down</v-icon>
-                                </v-btn>
-                            </template>
-                                <v-list>
-                                <v-list-item
-                                    v-for="(type, index) in ['nom', 'date', 'age']"
-                                    :key="index"
-                                    @click="updateFilterType(index)">
-                                    <v-list-item-title>{{ type }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-
                         <v-text-field
                             v-model="filter.search"
                             prepend-inner-icon="fa-search"
-                            label="Rechercher une personne">
+                            label="Filtre par nom, age ou année">
                         </v-text-field>
                         <v-spacer></v-spacer>
 
@@ -157,6 +136,7 @@ export default {
     data: () => ({
         isLoading: false,
         photos: [],
+        displayedhotos: [],
         persons: [],
         filter: {
             type: "nom",
@@ -199,6 +179,7 @@ export default {
         // On récupère la liste des photos
         axios.get(`/api/agenda/trombi/`).then(response => {
             this.photos = parseAxiosResponse(response);
+            console.log(this.photos);
             this.isLoading = false;
             store.commit('photosGalleryReset', this.photos);
         });
@@ -260,6 +241,13 @@ export default {
             store.commit('photosGallerySetIndex', index);
             store.commit('photosGalleryDisplay');
         },
+
+        searchMethod(items, search) {
+            if (!search) {
+                return items;
+            }
+            return items.filter(e => e != null && e.title.toLowerCase().indexOf(search.toLowerCase()) > -1);
+        }
     }
 }
 </script>
