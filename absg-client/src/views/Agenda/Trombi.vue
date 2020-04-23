@@ -58,7 +58,7 @@
                         <v-flex v-for="(p, index) in props.items" :key="p.id">
                             <v-img
                                 width="150px"
-                                height="150px"
+                                height="200px"
                                 class="thumb"
                                 :src="p.thumb"
                                 :alt="p.id"
@@ -83,6 +83,7 @@
                     :items="persons"
                     label="Qui"
                     prepend-icon="fas fa-user"
+                    item-text="fullname"
                 ></v-combobox>
 
                 <v-menu
@@ -171,15 +172,12 @@ export default {
         // On récupère la liste des personnes et des lieux de l'agenda pour l'aide à la saisie
         if (this.persons.length === 0) {
             axios.get(`/api/agenda/persons`).then(response => {
-                this.persons = parseAxiosResponse(response).filter(e => e.lastname && e.firstname).map(e => (
-                    `${e.firstname} ${e.lastname}`.trim()
-                ));
+                this.persons = parseAxiosResponse(response).filter(e => e.lastname && e.firstname);
             });
         }
         // On récupère la liste des photos
         axios.get(`/api/agenda/trombi/`).then(response => {
             this.photos = parseAxiosResponse(response);
-            console.log(this.photos);
             this.isLoading = false;
             store.commit('photosGalleryReset', this.photos);
         });
@@ -198,6 +196,8 @@ export default {
             this.trombiEditor.date = null;
             this.trombiEditor.isLoading = false;
             this.trombiEditor.complete = 0;
+            const { imgEditor } = this.$refs;
+            imgEditor.reset();
         },
         saveTrombi: function () {
             const { imgEditor } = this.$refs;
@@ -209,6 +209,7 @@ export default {
                 response => {
                     const formData = new FormData();
                     formData.append("date", this.trombiEditor.date);
+                    formData.append("person", JSON.stringify(this.trombiEditor.person));
                     formData.append("image", response.data )
 
                     // On envoie tout au serveur pour qu'il enregistre la nouvelle image du moment
@@ -221,8 +222,8 @@ export default {
                         }
                     })
                     .then(newTrombi => {
-                        // On ajoute l'image à la liste
-                        this.photos.unshift(newTrombi);
+                        // On ajoute l'image au début de la liste
+                        this.photos.unshift(parseAxiosResponse(newTrombi));
                         this.resetDialog();
                     })
                     .catch(err => {

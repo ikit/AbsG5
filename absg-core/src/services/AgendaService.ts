@@ -4,6 +4,7 @@ import { logger } from "../middleware/logger";
 import * as fs from "fs";
 import * as path from "path";
 import { saveImage } from "../middleware/commonHelper";
+import { format } from "date-fns";
 
 class AgendaService {
     private personsRepo = null;
@@ -164,16 +165,39 @@ class AgendaService {
                         pid,
                         date: new Date(year, month, day),
                         title: `${p.getFullname()} - ${year} - ${p.getAge(year)}`,
-                        thumb: `${process.env.URL_FILES}trombi/${file}`, // `${process.env.URL_FILES}trombi/mini/${file}`,
+                        thumb: `${process.env.URL_FILES}trombi/mini/${file}`,
                         url: `${process.env.URL_FILES}trombi/${file}`
                     });
                 }
             }
         });
-        return filesList;
+        // On retourne la liste "mélangée"
+        return filesList.sort(() => 0.5 - Math.random());
     }
 
-    saveTrombi(trombiData: any, image: any, user: User) {
+    async saveTrombi(trombiData: any, image: any, user: User) {
+        if (image && trombiData && trombiData.person && trombiData.date) {
+            const p = new Person().fromJSON(JSON.parse(trombiData.person));
+            const d = new Date(trombiData.date);
+            const filename = `${p.id}_${format(d, "YYYYMMDD")}.jpg`;
+            const title = `${p.getFullname()} - ${d.getFullYear()} - ${p.getAge(d.getFullYear())}`;
+
+            const thumb = path.join(process.env.PATH_FILES, `trombi/mini/${filename}`);
+            const url = path.join(process.env.PATH_FILES, `trombi/${filename}`);
+            await saveImage(image.buffer, thumb, url, null);
+
+            logger.notice(`Nouvelle trombinette "${title}" a été ajouté par ${user.username}`, {
+                userId: user.id,
+                module: LogModule.agenda
+            });
+            return {
+                pid: p.id,
+                date: d,
+                title,
+                thumb: `${process.env.URL_FILES}trombi/mini/${filename}`,
+                url: `${process.env.URL_FILES}trombi/${filename}`
+            };
+        }
         return null;
     }
 }

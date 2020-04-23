@@ -167,7 +167,6 @@ export default {
             this.isLoading = true;
             const t = new Date();
             this.todayId = format(new Date(), "yyyy_DDD", { useAdditionalDayOfYearTokens: true });
-            console.log(this.todayId);
 
             axios.get(`/api/immt/`).then(response => {
                 const data = parseAxiosResponse(response);

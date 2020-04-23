@@ -296,7 +296,6 @@ export default {
                     // on reset l'IHM
                     that.resetDialog();
                     // On ajoute le nouvel utilisateur à la liste
-                    console.log("SAVED USER", savedUser);
                     that.refreshUser(savedUser);
                 },
                 err => {
@@ -322,7 +321,6 @@ export default {
             return r ? r.label : "";
         },
         refreshUser(user) {
-            console.log("REFRESH LIST", user);
             const idx = this.usersList.findIndex(e => e.id === user.id);
             if (idx > -1) {
                 this.usersList[idx] = user;
