@@ -8,12 +8,12 @@
             hide-default-footer>
 
             <template v-slot:header>
-                <div class="stickyHeader">
+                <div class="stickyHeader" style="padding: 15px 20px;">
                     <v-row style="" align="center" justify="center">
                         <span class="grey--text">{{photos.length}} photos à trier</span>
                         <v-spacer></v-spacer>
 
-                        <span class="grey--text">Photos par page</span>
+                        <!-- <span class="grey--text">Photos par page</span>
                         <v-menu offset-y>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -34,19 +34,19 @@
                                     <v-list-item-title>{{ number }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
-                        </v-menu>
+                        </v-menu> -->
 
                         <v-spacer></v-spacer>
 
-                        <span class="mr-4 grey--text" >
-                            Page {{ filter.pageIndex}} / {{ numberOfPages }}
-                        </span>
                         <v-btn
                             icon small
                             :disabled="isLoading"
                             @click="formerPage">
                             <v-icon>fa-chevron-left</v-icon>
                         </v-btn>
+                        <span class="grey--text" >
+                            {{ filter.pageIndex}} / {{ numberOfPages }}
+                        </span>
                         <v-btn
                             icon small
                             :disabled="isLoading"

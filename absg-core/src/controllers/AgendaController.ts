@@ -42,4 +42,23 @@ export class AgendaController {
     savePlace(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() session: any) {
         return agendaService.savePlace(body, image, session);
     }
+
+    /**
+     * Récupère la liste complète des photos du trombinoscope
+     */
+    @Get("/trombi")
+    async listTrombi() {
+        return await agendaService.listTrombi();
+    }
+
+    /**
+     * Crée ou modifie (si l'id et la date sotn les mêmes) une photo du trombinoscope
+     * @param image l'image uploadé si défini
+     * @param body les informations sur la photo
+     * @param session les informations sur l'utilisateur qui effectue la demande
+     */
+    @Post("/trombi")
+    saveTrombi(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() session: any) {
+        return agendaService.saveTrombi(body, image, session);
+    }
 }

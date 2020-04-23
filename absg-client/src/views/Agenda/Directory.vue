@@ -263,13 +263,13 @@ export default  {
             ],
             dateOfBirth: [
                 value => {
-                    const pattern = /^([0-9]{4})+(-[0-9]{2}(-[0-9]{2})?)?$/
+                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
                     return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
                 }
             ],
             dateOfDeath: [
                 value => {
-                    const pattern = /^([0-9]{4})+(-[0-9]{2}(-[0-9]{2})?)?$/
+                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
                     return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
                 }
             ],
@@ -282,6 +282,7 @@ export default  {
             let galleryIndex = 0;
             this.persons = data.map(e => ({
                 ...e,
+                name: `${e.lastname} ${e.firstname} ${e.firstname2} ${e.surname}`,
                 age: this.computeAge(e),
                 galleryIndex: galleryIndex++,
                 title: e.name,
@@ -297,7 +298,7 @@ export default  {
             let death = null;
             if (person.dateOfBirth) {
                 birth = new Date(person.dateOfBirth);
-                const lastDay = person.dateOfDeath ? person.dateOfDeath : new Date();
+                const lastDay = person.dateOfDeath ? new Date(person.dateOfDeath) : new Date();
                 const y = lastDay.getFullYear() - birth.getFullYear();
                 if (y > 1) {
                     age = `${y} ans`;
@@ -308,7 +309,7 @@ export default  {
                 birth = format(birth, "dd/MM/yyyy");
             }
             if (person.dateOfDeath) {
-                death = format(new Date(person.person.dateOfDeath), "dd/MM/yyyy");
+                death = format(new Date(person.dateOfDeath), "dd/MM/yyyy");
             }
 
             return { age, birth, death };
@@ -342,6 +343,10 @@ export default  {
             this.personEditor.phone = null;
             this.personEditor.email = null;
             this.personEditor.photo = null;
+
+            const { imgEditor } = this.$refs;
+            imgEditor.reset();
+
             this.personEditor.complete = 0;
         },
 
@@ -354,7 +359,7 @@ export default  {
             this.personEditor.surname = person.surname;
             this.personEditor.sex = person.sex;
             this.personEditor.dateOfBirth = person.dateOfBirth;
-            this.personEditor.dateOfDeath = person.lastDay;
+            this.personEditor.dateOfDeath = person.dateOfDeath;
             this.personEditor.address = person.address;
             this.personEditor.job = person.job;
             this.personEditor.phone = person.phone;
@@ -366,9 +371,22 @@ export default  {
         refreshList(person) {
             const idx = this.persons.findIndex(e => e.id === person.id);
             if (idx > -1) {
-                this.persons[idx] = person;
+                const newEntry = {
+                    ...person,
+                    name: `${person.lastname} ${person.firstname} ${person.firstname2} ${person.surname}`,
+                    age: this.computeAge(person),
+                    galleryIndex: this.persons[idx].galleryIndex,
+                    title: person.name,
+                };
+                this.persons.splice(idx, 1, newEntry)
             } else {
-                this.persons.push(person);
+                this.persons.push({
+                    ...person,
+                    name: `${person.lastname} ${person.firstname} ${person.firstname2} ${person.surname}`,
+                    age: this.computeAge(person),
+                    galleryIndex: person.photo ? this.persons.filter(e => e.thumb).length : null,
+                    title: person.name,
+                });
             }
         },
 
@@ -425,7 +443,6 @@ export default  {
             })
             .then( response => {
                 const savedPerson = parseAxiosResponse(response);
-                console.log("SAVED Person", savedPerson);
                 // on reset l'IHM
                 that.resetDialog();
                 // On ajoute ou met à jour la liste

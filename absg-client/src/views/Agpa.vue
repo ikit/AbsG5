@@ -1,14 +1,5 @@
 <template>
 <div class="agpa" >
-
-    <img
-        v-if="$vuetify.breakpoint.mdAndUp"
-        src="/img/immt-new.png"
-        style="width: 206px; height: 120px; position: absolute; left: 10px;"/>
-    <h1>Absolument G Photos Awards</h1>
-
-
-
     <v-tabs centered>
         <v-tab :to="{path:'/agpa/'}"> <v-icon>fas fa-star</v-icon> &nbsp; Edition 2019</v-tab>
         <v-tab :to="{path:'/agpa/rules'}"> <v-icon>fas fa-scroll</v-icon> &nbsp; Réglement</v-tab>

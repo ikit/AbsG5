@@ -11,24 +11,15 @@
             <template v-slot:header>
                 <div class="stickyHeader">
                     <v-row style="" align="center" justify="center">
-
-                        <v-btn
-                            color="accent"
-                            @click.stop="resetDialog(true)">
-                            <v-icon left>fas fa-plus</v-icon>
-                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
-                        </v-btn>
-
                         <v-text-field
                             v-model="filter.request"
                             prepend-inner-icon="fa-search"
-                            label="Rechercher"
-                            style="margin-top: 25px;">
+                            label="Rechercher">
                         </v-text-field>
-                        <span class="grey--text">{{immts.length}} images</span>
+                        <!-- <span class="grey--text">{{immts.length}} images</span> -->
                         <v-spacer></v-spacer>
 
-                        <v-spacer></v-spacer>
+                        <!-- <v-spacer></v-spacer>
 
                         <span class="grey--text">Images par page</span>
                         <v-menu offset-y>
@@ -51,25 +42,32 @@
                                     <v-list-item-title>{{ number }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
-                        </v-menu>
+                        </v-menu> -->
 
-                        <v-spacer></v-spacer>
 
-                        <span class="mr-4 grey--text" >
-                            Page {{ filter.pageIndex}} / {{ numberOfPages }}
-                        </span>
                         <v-btn
                             icon small
                             :disabled="isLoading"
                             @click="formerPage">
                             <v-icon>fa-chevron-left</v-icon>
                         </v-btn>
+                        <span class="grey--text" >
+                            Page {{ filter.pageIndex}} / {{ numberOfPages }}
+                        </span>
                         <v-btn
                             icon small
                             :disabled="isLoading"
                             @click="nextPage"
                         >
                             <v-icon>fa-chevron-right</v-icon>
+                        </v-btn>
+
+                        <v-spacer></v-spacer>
+
+                        <v-btn
+                            @click.stop="resetDialog(true)">
+                            <v-icon left>fas fa-plus</v-icon>
+                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
                         </v-btn>
                     </v-row>
                 </div>
@@ -141,8 +139,6 @@ export default {
     store,
     data: () => ({
         isLoading: false,
-        totalImmts: 0,
-        totalPages: 0,
         immts: [],
         filter: {
             authorId: null,
@@ -172,8 +168,6 @@ export default {
                         thumb: i.thumb,
                     }
                 });
-                console.log(this.immts);
-                this.totalImmts = this.immts.length;
                 this.isLoading = false;
                 store.commit('photosGalleryReset', this.immts);
             });

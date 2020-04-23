@@ -78,6 +78,13 @@ export default {
             }
         },
 
+        reset() {
+            const { editor } = this.$refs;
+            if (editor) {
+                editor.reset();
+            }
+        },
+
         imageUrl() {
             return this.data.url;
         }

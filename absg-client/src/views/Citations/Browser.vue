@@ -1,215 +1,214 @@
 <template>
-<div style="background: white">
+    <v-container fluid  grid-list-md style="padding:0">
+        <div v-if="citations && citations.length > 0">
+            <v-container fluid  grid-list-md style="padding:0">
+                <v-data-iterator
+                    :items="citations"
+                    :items-per-page="filter.pageSize"
+                    :page="filter.pageIndex"
+                    :search="filter.request"
+                    hide-default-footer>
 
-    <div v-if="citations && citations.length > 0">
-        <v-container fluid  grid-list-md style="padding:0">
-            <v-data-iterator
-                :items="citations"
-                :items-per-page="filter.pageSize"
-                :page="filter.pageIndex"
-                :search="filter.request"
-                hide-default-footer>
-
-                <template v-slot:header>
-                    <div class="stickyHeader">
-                        <v-select
-                            v-if="$vuetify.breakpoint.mdAndUp"
-                            v-model="filter.authorId"
-                            v-on:change="refreshList"
-                            :items="authorsList"
-                            item-text="label"
-                            item-value="id"
-                            prepend-inner-icon="fa-user"
-                            label="Citations de"
-                            style="display: inline-block; width: 300px; margin-right: 50px">
-                        </v-select>
-                        <span class="grey--text">{{ totalCitations }} citations</span>
-                        <v-btn
-                            style="float: right; margin-top: 15px"
-                            color="accent"
-                            :disabled="isLoading"
-                            @click.stop="resetDialog(true)">
-                            <v-icon left>fas fa-plus</v-icon>
-                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
-                        </v-btn>
-                        <v-progress-linear
-                            v-if="isLoading"
-                            style="position: absolute; bottom: 0; left: 0; right: 0;"
-                            indeterminate
-                            color="accent"
-                        ></v-progress-linear>
-                    </div>
-                </template>
-
-
-                <template v-slot:default="props">
-                    <v-card style="margin-top: 15px">
-                        <v-list dense>
-                        <template v-for="item in citations">
-                            <v-list-item
-                                class="citationRow"
-                                :key="item.id">
-                                <v-list-item-avatar>
-                                    <img :src="item.author.url"/>
-                                </v-list-item-avatar>
-                                <v-list-item-content>
-                                    <v-btn text icon
-                                        color="primary"
-                                        class="editAction"
-                                        @click.prevent="editCitation(item)">
-                                        <v-icon>fas fa-pen</v-icon>
-                                    </v-btn>
-                                    <v-btn text icon
-                                        color="red"
-                                        class="deleteAction"
-                                        @click.prevent="deleteCitationConfirmation(item)">
-                                        <v-icon>fas fa-times</v-icon>
-                                    </v-btn>
-                                    <div>
-                                        <b class="author">{{ item.author.label }}</b> <span v-if="item.year" class="year"> - {{ item.year }}</span>
-                                    </div>
-                                    <div class="citation" v-html="item.citation"></div>
-
-                                </v-list-item-content>
-                            </v-list-item>
-                        </template>
-                        </v-list>
-                    </v-card>
-                </template>
-
-                <template v-slot:footer>
-                    <v-row class="mt-2" style="margin: 0 5px" align="center" justify="center">
-                        <span class="grey--text">Citations par page</span>
-                        <v-menu offset-y>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    class="ml-2"
-                                    :disabled="isLoading"
-                                    v-on="on">
-                                        {{ filter.pageSize }}
-                                    <v-icon>fa-angle-down</v-icon>
-                                </v-btn>
-                            </template>
-                                <v-list>
-                                <v-list-item
-                                    v-for="(number, index) in [10, 20, 50]"
-                                    :key="index"
-                                    @click="updateCitationsPerPage(number)">
-                                    <v-list-item-title>{{ number }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-
-                        <v-spacer></v-spacer>
-
-                        <span class="mr-4 grey--text" >
-                            Page {{ filter.pageIndex +1}} / {{ totalPages }}
-                        </span>
-                        <v-btn
-                            fab small
-                            dark
-                            :disabled="isLoading"
-                            color="accent"
-                            class="mr-1"
-                            @click="formerPage">
-                            <v-icon>fa-chevron-left</v-icon>
-                        </v-btn>
-                        <v-btn
-                            fab small
-                            dark
-                            :disabled="isLoading"
-                            color="accent"
-                            class="ml-1"
-                            @click="nextPage"
-                        >
-                            <v-icon>fa-chevron-right</v-icon>
-                        </v-btn>
-                    </v-row>
-                </template>
-            </v-data-iterator>
-        </v-container>
-    </div>
-
-    <div v-if="!isLoading && (!citations || citations.length == 0)"
-        style="text-align:center;">
-        <p style="margin: 70px auto">Aucune citation n'a encore été enregistrée... soyez le premier !</p>
-        <v-btn
-            color="accent"
-            @click.stop="resetDialog(true)">
-            <v-icon left>fas fa-plus</v-icon>
-            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
-        </v-btn>
-    </div>
-
-
-    <v-dialog v-model="citationEditor.open" width="800px">
-        <v-card>
-            <v-card-title class="grey lighten-4">
-            {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
-            </v-card-title>
-            <v-container grid-list-sm class="pa-4">
-            <v-layout row wrap>
-                <v-flex xs12>
-                    <v-autocomplete
-                        prepend-icon="fas fa-user"
-                        label="Autheur de la citation"
-                        :items="peopleList"
-                        :filter="filterAuthor"
-                        v-model="citationEditor.author"
-                    ></v-autocomplete>
-                </v-flex>
-                <v-flex xs12>
-                    <v-text-field
-                        prepend-icon="fas fa-quote-left"
-                        label="La citation"
-                        v-model="citationEditor.citation">
-                    </v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                    <v-text-field
-                        prepend-icon="fas fa-calendar-alt"
-                        label="Année de référence (où la citation a été dite)"
-                        v-model="citationEditor.year">
-                    </v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                    <v-card>
-                        <div style="position: relative;">
-
-                            <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
-                            <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                                Merci de les mettre la citation entre double quotes, et les précisions entre parenthèses: "La citation" (ma précision).
-                            </p>
+                    <template v-slot:header>
+                        <div class="stickyHeader">
+                            <v-select
+                                v-if="$vuetify.breakpoint.mdAndUp"
+                                v-model="filter.authorId"
+                                v-on:change="refreshList"
+                                :items="authorsList"
+                                item-text="label"
+                                item-value="id"
+                                prepend-inner-icon="fa-user"
+                                label="Citations de"
+                                style="display: inline-block; width: 300px; margin-right: 50px">
+                            </v-select>
+                            <span class="grey--text">{{ totalCitations }} citations</span>
+                            <v-btn
+                                style="float: right; margin-top: 15px"
+                                color="accent"
+                                :disabled="isLoading"
+                                @click.stop="resetDialog(true)">
+                                <v-icon left>fas fa-plus</v-icon>
+                                <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
+                            </v-btn>
+                            <v-progress-linear
+                                v-if="isLoading"
+                                style="position: absolute; bottom: 0; left: 0; right: 0;"
+                                indeterminate
+                                color="accent"
+                            ></v-progress-linear>
                         </div>
-                    </v-card>
+                    </template>
 
-                </v-flex>
-            </v-layout>
+
+                    <template v-slot:default="props">
+                        <v-card style="margin-top: 15px">
+                            <v-list dense>
+                            <template v-for="item in citations">
+                                <v-list-item
+                                    class="citationRow"
+                                    :key="item.id">
+                                    <v-list-item-avatar>
+                                        <img :src="item.author.url"/>
+                                    </v-list-item-avatar>
+                                    <v-list-item-content>
+                                        <v-btn text icon
+                                            color="primary"
+                                            class="editAction"
+                                            @click.prevent="editCitation(item)">
+                                            <v-icon>fas fa-pen</v-icon>
+                                        </v-btn>
+                                        <v-btn text icon
+                                            color="red"
+                                            class="deleteAction"
+                                            @click.prevent="deleteCitationConfirmation(item)">
+                                            <v-icon>fas fa-times</v-icon>
+                                        </v-btn>
+                                        <div>
+                                            <b class="author">{{ item.author.label }}</b> <span v-if="item.year" class="year"> - {{ item.year }}</span>
+                                        </div>
+                                        <div class="citation" v-html="item.citation"></div>
+
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </template>
+                            </v-list>
+                        </v-card>
+                    </template>
+
+                    <template v-slot:footer>
+                        <v-row class="mt-2" style="margin: 0 5px" align="center" justify="center">
+                            <span class="grey--text">Citations par page</span>
+                            <v-menu offset-y>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        class="ml-2"
+                                        :disabled="isLoading"
+                                        v-on="on">
+                                            {{ filter.pageSize }}
+                                        <v-icon>fa-angle-down</v-icon>
+                                    </v-btn>
+                                </template>
+                                    <v-list>
+                                    <v-list-item
+                                        v-for="(number, index) in [10, 20, 50]"
+                                        :key="index"
+                                        @click="updateCitationsPerPage(number)">
+                                        <v-list-item-title>{{ number }}</v-list-item-title>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+
+                            <v-spacer></v-spacer>
+
+                            <span class="mr-4 grey--text" >
+                                Page {{ filter.pageIndex +1}} / {{ totalPages }}
+                            </span>
+                            <v-btn
+                                fab small
+                                dark
+                                :disabled="isLoading"
+                                color="accent"
+                                class="mr-1"
+                                @click="formerPage">
+                                <v-icon>fa-chevron-left</v-icon>
+                            </v-btn>
+                            <v-btn
+                                fab small
+                                dark
+                                :disabled="isLoading"
+                                color="accent"
+                                class="ml-1"
+                                @click="nextPage"
+                            >
+                                <v-icon>fa-chevron-right</v-icon>
+                            </v-btn>
+                        </v-row>
+                    </template>
+                </v-data-iterator>
             </v-container>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-            <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+        </div>
 
-    <v-dialog v-model="citationDeletion.open" width="800px">
-        <v-card>
-            <v-card-title>
-                Supprimer la citation
-            </v-card-title>
-            <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette citation ?</p>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="citationDeletion.open = false">Annuler</v-btn>
-            <v-btn color="accent" @click="deleteCitation()">Supprimer</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
-</div>
+        <div v-if="!isLoading && (!citations || citations.length == 0)"
+            style="text-align:center;">
+            <p style="margin: 70px auto">Aucune citation n'a encore été enregistrée... soyez le premier !</p>
+            <v-btn
+                color="accent"
+                @click.stop="resetDialog(true)">
+                <v-icon left>fas fa-plus</v-icon>
+                <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
+            </v-btn>
+        </div>
+
+
+        <v-dialog v-model="citationEditor.open" width="800px">
+            <v-card>
+                <v-card-title class="grey lighten-4">
+                {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
+                </v-card-title>
+                <v-container grid-list-sm class="pa-4">
+                <v-layout row wrap>
+                    <v-flex xs12>
+                        <v-autocomplete
+                            prepend-icon="fas fa-user"
+                            label="Autheur de la citation"
+                            :items="peopleList"
+                            :filter="filterAuthor"
+                            v-model="citationEditor.author"
+                        ></v-autocomplete>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-text-field
+                            prepend-icon="fas fa-quote-left"
+                            label="La citation"
+                            v-model="citationEditor.citation">
+                        </v-text-field>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-text-field
+                            prepend-icon="fas fa-calendar-alt"
+                            label="Année de référence (où la citation a été dite)"
+                            v-model="citationEditor.year">
+                        </v-text-field>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-card>
+                            <div style="position: relative;">
+
+                                <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
+                                <p style="margin-left: 50px; padding: 10px; font-style: italic">
+                                    Merci de les mettre la citation entre double quotes, et les précisions entre parenthèses: "La citation" (ma précision).
+                                </p>
+                            </div>
+                        </v-card>
+
+                    </v-flex>
+                </v-layout>
+                </v-container>
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
+                <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="citationDeletion.open" width="800px">
+            <v-card>
+                <v-card-title>
+                    Supprimer la citation
+                </v-card-title>
+                <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette citation ?</p>
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="citationDeletion.open = false">Annuler</v-btn>
+                <v-btn color="accent" @click="deleteCitation()">Supprimer</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </v-container>
 </template>
 
 

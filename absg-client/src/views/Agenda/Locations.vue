@@ -219,6 +219,24 @@ export default {
         refreshList(place) {
             const idx = this.places.findIndex(e => e.id === place.id);
             if (idx > -1) {
+                const newEntry = {
+                    ...place,
+                    galleryIndex: this.places[idx].galleryIndex,
+                    title: place.name,
+                };
+                this.places.splice(idx, 1, newEntry)
+            } else {
+                this.places.push({
+                    ...place,
+                    galleryIndex: place.photo ? this.places.filter(e => e.thumb).length : null,
+                    title: place.name,
+                });
+            }
+        },
+
+        refreshList(place) {
+            const idx = this.places.findIndex(e => e.id === place.id);
+            if (idx > -1) {
                 this.places[idx] = place;
             } else {
                 this.places.push(place);

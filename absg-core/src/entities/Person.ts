@@ -52,7 +52,6 @@ export class Person {
 
     fromJSON(json: any): Person {
         Object.assign(this, json);
-        console.log(json);
         // Post-traitement pour corriger le bug de conversion txt/json des valeurs null
         for (const [key, value] of Object.entries(this)) {
             if (value === "null" || value === "undefined") {
@@ -65,7 +64,6 @@ export class Person {
         if (this.dateOfDeath && typeof this.dateOfDeath != "object") {
             this.dateOfDeath = new Date(this.dateOfDeath);
         }
-        console.log(this);
         return this;
     }
 

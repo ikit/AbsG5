@@ -135,31 +135,49 @@ class AgendaService {
     }
 
     /**
-     * Retourne les infos nécessaire à l'initialisation de l'écran "immt" du site
+     * Récupère la liste complète des photos du trombinoscope
      */
-    public async getInitData() {
-        const result = {
-            persons: [],
-            places: [],
-            totalPersons: 0,
-            totalPlaces: 0,
-            events: [],
-            totalEvents: 0
-        };
+    async listTrombi() {
+        // On récupère la liste des personnes du répertoire
+        const personsData = await this.personsRepo
+            .createQueryBuilder("p")
+            .orderBy("p.lastname")
+            .addOrderBy("p.firstname")
+            .getMany();
+        const persons = {};
+        for (const p of personsData) {
+            persons[p.id] = new Person().fromJSON(p);
+        }
 
-        // On récupère la liste des personnes
-        result.persons = await this.personsRepo.query(`SELECT * FROM person`);
-        result.totalPersons = result.persons.length;
-        // On récupère la liste des lieux
-        result.places = await this.personsRepo.query(`SELECT * FROM place`);
-        result.totalPlaces = result.places.length;
-        // On récupère l'association des lieux aux personnes
-        // Todo
-        // On récupère les liste des 100 dernièrs événements
-        result.events = await this.personsRepo.query(`SELECT * FROM event_g LIMIT 100`);
-        result.totalPlaces = result.places.length;
+        const filesList = [];
+        const folderPath = path.join(process.env.PATH_FILES, "trombi");
+        const files = await fs.readdirSync(folderPath);
+        files.forEach(file => {
+            if (fs.statSync(path.join(folderPath, file)).isFile() && file.endsWith("jpg")) {
+                const tokens = file.substring(0, file.length - 4).split("_");
+                
+                if (tokens.length === 2 && persons.hasOwnProperty(tokens[0])) {
+                    const pid = tokens[0];
+                    const year = Number.parseInt(tokens[1].substr(0, 4));
+                    const month = Number.parseInt(tokens[1].substr(4, 2));
+                    const day = Number.parseInt(tokens[1].substr(6));
+                    const p = persons[pid];
+                    filesList.push({
+                        pid,
+                        date: new Date(year, month, day),
+                        title: `${p.getFullname()} - ${year}`,
+                        thumb: `${process.env.URL_FILES}trombi/${file}`, // `${process.env.URL_FILES}trombi/mini/${file}`,
+                        url: `${process.env.URL_FILES}trombi/${file}`
+                    });
+                }
+            }
+        });
+        console.log(filesList);
+        return filesList;
+    }
 
-        return result;
+    saveTrombi(trombiData: any, image: any, user: User) {
+        return null;
     }
 }
 

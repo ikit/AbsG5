@@ -53,15 +53,6 @@ export default {
         };
     },
 
-    mounted() {
-        window.addEventListener('keydown', (this.onKeydown = this.keydown.bind(this)));
-    },
-
-    beforeDestroy() {
-        window.removeEventListener('keydown', this.onKeydown);
-        this.stop();
-    },
-
     methods: {
         click({ target }) {
             const { cropper, data } = this;
@@ -102,93 +93,6 @@ export default {
                     fillColor: '#fff',
                 }).toDataURL(data.type),
             });
-        },
-
-        keydown(e) {
-            switch (e.key) {
-                // Undo crop
-                case 'z':
-                    if (e.ctrlKey) {
-                        e.preventDefault();
-                        this.restore();
-                    }
-                    break;
-                // Delete the image
-                case 'Delete':
-                    this.reset();
-                    break;
-                default:
-            }
-
-            const { cropper } = this;
-
-            if (!cropper) {
-                return;
-            }
-
-            switch (e.key) {
-                // Crop the image
-                case 'Enter':
-                    this.crop();
-                    break;
-                // Clear crop area
-                case 'Escape':
-                    this.clear();
-                    break;
-                // Move to the left
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    cropper.move(-1, 0);
-                    break;
-                // Move to the top
-                case 'ArrowUp':
-                    e.preventDefault();
-                    cropper.move(0, -1);
-                    break;
-                // Move to the right
-                case 'ArrowRight':
-                    e.preventDefault();
-                    cropper.move(1, 0);
-                    break;
-                // Move to the bottom
-                    case 'ArrowDown':
-                    e.preventDefault();
-                    cropper.move(0, 1);
-                    break;
-                // Enter crop mode
-                case 'c':
-                    cropper.setDragMode('crop');
-                    break;
-                // Enter move mode
-                case 'm':
-                    cropper.setDragMode('move');
-                    break;
-                // Zoom in
-                case 'i':
-                    cropper.zoom(0.1);
-                    break;
-                // Zoom out
-                case 'o':
-                    cropper.zoom(-0.1);
-                    break;
-                // Rotate left
-                case 'l':
-                    cropper.rotate(-90);
-                    break;
-                // Rotate right
-                case 'r':
-                    cropper.rotate(90);
-                    break;
-                // Flip horizontal
-                case 'h':
-                    cropper.scaleX(-cropper.getData().scaleX || -1);
-                    break;
-                // Flip vertical
-                case 'v':
-                    cropper.scaleY(-cropper.getData().scaleY || -1);
-                    break;
-                default:
-            }
         },
 
         dblclick(e) {
