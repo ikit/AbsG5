@@ -5,9 +5,7 @@
         @dragover="dragover"
         @drop="drop"
     >
-        <v-icon style="display: block; position: absolute; left: 50%; font-size: 70px; top: 50px; margin-left: -35px">fas fa-download</v-icon>
-
-        <p>Déposer votre image ici, ou bien
+        <p>Déposer la photo ici, ou bien
         <label class="browse">sélectionnez là...
             <input
                 id="file"
@@ -36,8 +34,8 @@ export default {
         read(files) {
             return new Promise((resolve, reject) => {
                 if (!files || files.length === 0) {
-                resolve();
-                return;
+                    resolve();
+                    return;
                 }
 
                 const file = files[0];
@@ -108,6 +106,8 @@ export default {
     }
 }
 
+
+
 .sr-only {
   border: 0;
   clip: rect(0, 0, 0, 0);
@@ -129,4 +129,5 @@ export default {
         text-decoration: underline;
     }
 }
+
 </style>

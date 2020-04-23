@@ -1,22 +1,18 @@
 <template>
-  <div>
-    <header class="header">
-      <Navbar
-        :data="data"
-        @change="change"
-      />
-    </header>
+  <div style="border: 1px solid rgba(0, 0, 0, 0.4); position: relative" v-bind:style="{ 'margin-left': icon ? '33px' : '0' }">
+
+    <v-icon  style="display: block; position: absolute; left: -33px; top: 0;">{{icon}}</v-icon>
     <main class="main">
-      <Editor
-        v-if="data.loaded"
-        ref="editor"
-        :data="data"
-      />
-      <Loader
-        v-else
-        ref="loader"
-        :data="data"
-      />
+        <Editor
+            v-if="data.loaded"
+            ref="editor"
+            :data="data"
+        />
+        <Loader
+            v-else
+            ref="loader"
+            :data="data"
+        />
     </main>
   </div>
 </template>
@@ -31,20 +27,23 @@ import './ImageEditor';
 import Vue from 'vue';
 import Editor from './ImageEditor/editor.vue';
 import Loader from './ImageEditor/loader.vue';
-import Navbar from './ImageEditor/navbar.vue';
 Vue.component(Editor.name, Editor);
 Vue.component(Loader.name, Loader);
-Vue.component(Navbar.name, Navbar);
 
 
 
 export default {
     components: {
         Editor,
-        Loader,
-        Navbar
+        Loader
     },
     name: 'ImageEditor',
+    props: {
+        icon: {
+            type: String,
+            default: () => "",
+        },
+    },
     data() {
         return {
             data: {
@@ -59,25 +58,6 @@ export default {
         };
     },
     methods: {
-        change(action) {
-            const { editor } = this.$refs;
-            switch (action) {
-                case 'crop':
-                    editor.crop();
-                    break;
-                case 'clear':
-                    editor.clear();
-                    break;
-                case 'restore':
-                    editor.restore();
-                    break;
-                case 'remove':
-                    editor.reset();
-                    break;
-                default:
-            }
-        },
-
         reset() {
             const { editor } = this.$refs;
             if (editor) {
@@ -118,4 +98,5 @@ export default {
     right: 0;
     top: 0;
 }
+
 </style>

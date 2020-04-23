@@ -1,6 +1,6 @@
 <template>
     <div class="editor">
-        <div class="canvas" @dblclick="dblclick">
+        <div class="canvas">
             <img
                 ref="image"
                 :alt="data.name"
@@ -11,24 +11,50 @@
         </div>
 
         <div v-if="cropper" class="toolbar" @click="click">
-            <button data-action="move" title="Déplacer (M)">
+            <button data-action="move" title="Déplacer">
                 <i class="fas fa-arrows-alt"></i>
             </button>
-            <button data-action="crop" title="Rogner (C)">
+            <button data-action="crop" title="Rogner">
                 <i class="fas fa-crop-alt"></i>
             </button>
-            <button data-action="rotate-left" title="Rotation à gauche (L)">
+            <button data-action="rotate-left" title="Rotation à gauche">
                 <i class="fas fa-undo"></i>
             </button>
-            <button data-action="rotate-right" title="Rotation à droite (R)">
+            <button data-action="rotate-right" title="Rotation à droite">
                 <i class="fas fa-redo"></i>
             </button>
-            <button data-action="flip-horizontal" title="Flip horizontal (H)">
+            <button data-action="flip-horizontal" title="Flip horizontal">
                 <i class="fas fa-arrows-alt-h"></i>
             </button>
-            <button data-action="flip-vertical" title="Flip vertical (V)">
+            <button data-action="flip-vertical" title="Flip vertical">
                 <i class="fas fa-arrows-alt-v"></i>
             </button>
+
+            <!-- Bouttons spéciaux (en bas) -->
+            <div>
+                <button
+                    v-if="data.loaded && !data.cropping"
+                    data-action="remove"
+                    title="Supprimer l'image"
+                >
+                    <v-icon>fas fa-trash</v-icon>
+                </button>
+                <button
+                    v-if="data.cropping"
+                    data-action="clear"
+                    title="Annuler le rognage"
+                >
+                    <v-icon>fas fa-ban</v-icon>
+                </button>
+                <button
+                    v-if="data.cropping"
+                    type="button"
+                    data-action="applyCrop"
+                    title="Valider le rognage"
+                >
+                    <v-icon>fas fa-check</v-icon>
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -44,14 +70,12 @@ export default {
             default: () => ({}),
         },
     },
-    data() {
-        return {
-            canvasData: null,
-            cropBoxData: null,
-            croppedData: null,
-            cropper: null,
-        };
-    },
+    data: () => ({
+        canvasData: null,
+        cropBoxData: null,
+        croppedData: null,
+        cropper: null,
+    }),
 
     methods: {
         click({ target }) {
@@ -81,13 +105,23 @@ export default {
                 case 'flip-vertical':
                     cropper.scaleY(-cropper.getData().scaleY || -1);
                     break;
-
+                case 'remove':
+                    this.reset();
+                    return;
+                    break;
+                case 'clear':
+                    this.clear();
+                    return;
+                    break;
+                case 'applyCrop':
+                    this.crop();
+                    return;
+                    break;
                 default:
             }
 
             this.update({
-                cropped: data.cropped,
-                cropping: data.cropping,
+                cropped: false,
                 previousUrl: data.url,
                 url: cropper.getCroppedCanvas(data.type === 'image/png' ? {} : {
                     fillColor: '#fff',
@@ -95,18 +129,10 @@ export default {
             });
         },
 
-        dblclick(e) {
-            if (e.target.className.indexOf('cropper-face') >= 0) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.crop();
-            }
-        },
-
         start() {
             const { data } = this;
 
-            if (data.cropped || this.cropper) {
+            if (this.cropper) {
                 return;
             }
 
@@ -114,19 +140,6 @@ export default {
                 autoCrop: false,
                 dragMode: 'move',
                 background: false,
-
-                ready: () => {
-                    if (this.croppedData) {
-                        this.cropper
-                            .crop()
-                            .setData(this.croppedData)
-                            .setCanvasData(this.canvasData)
-                            .setCropBoxData(this.cropBoxData);
-                        this.croppedData = null;
-                        this.canvasData = null;
-                        this.cropBoxData = null;
-                    }
-                },
 
                 crop: ({ detail }) => {
                     if (detail.width > 0 && detail.height > 0 && !data.cropping) {
@@ -147,9 +160,6 @@ export default {
             const { cropper, data } = this;
 
             if (data.cropping) {
-                this.croppedData = cropper.getData();
-                this.canvasData = cropper.getCanvasData();
-                this.cropBoxData = cropper.getCropBoxData();
                 this.update({
                     cropped: true,
                     cropping: false,
@@ -158,6 +168,7 @@ export default {
                         fillColor: '#fff',
                     }).toDataURL(data.type),
                 });
+                // On valide le crop et relance le cropper si besoin
                 this.stop();
             }
         },
@@ -166,16 +177,6 @@ export default {
             if (this.data.cropping) {
                 this.cropper.clear();
                 this.update({ cropping: false });
-            }
-        },
-
-        restore() {
-            if (this.data.cropped) {
-                this.update({
-                    cropped: false,
-                    previousUrl: '',
-                    url: this.data.previousUrl,
-                });
             }
         },
 
@@ -194,6 +195,7 @@ export default {
 
         update(data) {
             Object.assign(this.data, data);
+            return this.data;
         },
     },
 };
@@ -204,7 +206,6 @@ export default {
 
 .editor {
     height: 100%;
-    border: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .canvas {
