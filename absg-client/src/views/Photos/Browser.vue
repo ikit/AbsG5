@@ -4,16 +4,32 @@
             :items="photos"
             :items-per-page="filter.pageSize"
             :page="filter.pageIndex"
-            :search="filter.request"
+            :search="filter.search"
             loading-text="Récupération des photos..."
             no-data-text="Aucune photo à trier."
             no-results-text="Aucune photo trouvée."
             hide-default-footer>
 
             <template v-slot:header>
-                <div class="stickyHeader" style="padding: 15px 20px;">
+                <div class="stickyHeader" >
                     <v-row style="" align="center" justify="center">
-                        <span class="grey--text">{{photos.length}} photos à trier</span>
+
+                        <v-text-field
+                            label="Rechercher"
+                            prepend-icon="fas fa-search"
+                            v-model="filter.search"
+                            style="max-width: 300px;">
+                        </v-text-field>
+                        <v-spacer></v-spacer>
+
+                        <v-select
+                            v-model="filter.collection"
+                            :items="filter.collections"
+                            label="Photos"
+                            prepend-icon="fas fa-bars"
+                            style="max-width: 300px;"
+                        ></v-select>
+
                         <v-spacer></v-spacer>
                         <v-btn
                             icon small
@@ -33,6 +49,7 @@
                         </v-btn>
                     </v-row>
                 </div>
+                <div class="grey--text" style="font-size: 0.9em; display: block; position: absolute; right: 15px; top: 110px;">{{photos.length}} photos</div>
             </template>
 
             <template v-slot:default="props">
@@ -65,9 +82,25 @@ export default {
         photos: [], // La liste des photos à trier
         filter: {
             search: null, // recherche multicritère
-            pageIndex: 1, // page courante affiché
-            pageSize: 24, // nombre de citations affichées par page
+            collection: "Toutes",
+            collections: ["Toutes", "A trier", "Triées"],
+            pageIndex: 1, // page courante affichée
+            pageSize: 24, // nombre de photos affichées par page
         },
+        rules: {
+            from: [
+                value => {
+                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
+                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                }
+            ],
+            to: [
+                value => {
+                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
+                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                }
+            ],
+        }
     }),
     mounted() {
         axios.get(`/api/photos/to-check`).then(response => {

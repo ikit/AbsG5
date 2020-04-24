@@ -1,6 +1,4 @@
 <template>
-<div>
-
     <v-container fluid v-if="summary" style="text-align: center;">
         <v-layout row wrap>
             <v-flex v-for="edition in summary" :key="edition.year" style="min-width: 380px; max-width:800px; width: 40%; margin: 15px">
@@ -36,7 +34,6 @@
             </v-flex>
         </v-layout>
     </v-container>
-</div>
 </template>
 
 

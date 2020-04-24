@@ -78,21 +78,13 @@ export const router = new VueRouter({
                     component: () => import('./views/Photos/Immt.vue'),
                 },
                 {
-                    path: 'random',
-                    component: () => import('./views/Photos/Random.vue'),
-                },
-                {
-                    path: 'loose',
-                    component: () => import('./views/Photos/Loose.vue'),
-                },
-                {
-                    path: 'sorting',
-                    component: () => import('./views/Photos/ToCheck.vue'),
-                },
-                {
                     path: 'albums',
                     component: () => import('./views/Photos/Albums.vue'),
-                }
+                },
+                {
+                    path: 'browser',
+                    component: () => import('./views/Photos/Browser.vue'),
+                },
             ]
         },
         // Discussions
