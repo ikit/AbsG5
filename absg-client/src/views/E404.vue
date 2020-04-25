@@ -2,7 +2,7 @@
     <div>
         <h1>404</h1>
         <hr/>
-        <p>La page que vous demandez n'a pas été trouvée.</p>
+        <p>La page demandée n'existe pas.</p>
         <p>N'hésitez pas à en parler à Olivier si ça vous paraît bizarre.</p>
         <p class="token">Numéro de log <span style="color: red">{{ debugToken }}</span></p>
     </div>
@@ -11,10 +11,11 @@
 
 <script>
 import Vue from 'vue';
+import { format } from 'date-fns';
 
 export default {
     data: () => ({
-        debugToken: new Date().toISOString().substr(0,19).replace(/[\-T:]/g, "")
+        debugToken: format(new Date(), "yyyyMMddHHmmss")
     })
 }
 </script>

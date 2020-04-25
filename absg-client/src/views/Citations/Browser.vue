@@ -1,135 +1,61 @@
 <template>
-    <v-container fluid  grid-list-md style="padding:0">
-        <div v-if="citations && citations.length > 0">
-            <v-container fluid  grid-list-md style="padding:0">
-                <v-data-iterator
-                    :items="citations"
-                    :items-per-page="filter.pageSize"
-                    :page="filter.pageIndex"
-                    :search="filter.request"
-                    hide-default-footer>
+<div>
 
-                    <template v-slot:header>
-                        <div class="stickyHeader">
-                            <v-select
-                                v-if="$vuetify.breakpoint.mdAndUp"
-                                v-model="filter.authorId"
-                                v-on:change="refreshList"
-                                :items="authorsList"
-                                item-text="label"
-                                item-value="id"
-                                prepend-inner-icon="fa-user"
-                                label="Citations de"
-                                style="display: inline-block; width: 300px; margin-right: 50px">
-                            </v-select>
-                            <span class="grey--text">{{ totalCitations }} citations</span>
-                            <v-btn
-                                style="float: right; margin-top: 15px"
-                                color="accent"
-                                :disabled="isLoading"
-                                @click.stop="resetDialog(true)">
-                                <v-icon left>fas fa-plus</v-icon>
-                                <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
-                            </v-btn>
-                            <v-progress-linear
-                                v-if="isLoading"
-                                style="position: absolute; bottom: 0; left: 0; right: 0;"
-                                indeterminate
-                                color="accent"
-                            ></v-progress-linear>
-                        </div>
-                    </template>
+    <v-container>
+        <v-card>
+            <v-card-title>
+                <v-text-field
+                    v-model="filter.search"
+                    append-icon="fas fa-search"
+                    label="Rechercher"
+                    single-line
+                    hide-details
+                ></v-text-field>
+                <v-spacer></v-spacer>
+                <v-btn @click="resetDialog(true)">
+                    <v-icon small>fa-plus</v-icon>
+                    Nouvelle citation
+                </v-btn>
+            </v-card-title>
 
-
-                    <template v-slot:default="props">
-                        <v-card style="margin-top: 15px">
-                            <v-list dense>
-                            <template v-for="item in citations">
-                                <v-list-item
-                                    class="citationRow"
-                                    :key="item.id">
-                                    <v-list-item-avatar>
-                                        <img :src="item.author.url"/>
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <v-btn text icon
-                                            color="primary"
-                                            class="editAction"
-                                            @click.prevent="editCitation(item)">
-                                            <v-icon>fas fa-pen</v-icon>
-                                        </v-btn>
-                                        <v-btn text icon
-                                            color="red"
-                                            class="deleteAction"
-                                            @click.prevent="deleteCitationConfirmation(item)">
-                                            <v-icon>fas fa-times</v-icon>
-                                        </v-btn>
-                                        <div>
-                                            <b class="author">{{ item.author.label }}</b> <span v-if="item.year" class="year"> - {{ item.year }}</span>
-                                        </div>
-                                        <div class="citation" v-html="item.citation"></div>
-
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </template>
-                            </v-list>
-                        </v-card>
-                    </template>
-
-                    <template v-slot:footer>
-                        <v-row class="mt-2" style="margin: 0 5px" align="center" justify="center">
-                            <span class="grey--text">Citations par page</span>
-                            <v-menu offset-y>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn
-                                        text
-                                        color="primary"
-                                        class="ml-2"
-                                        :disabled="isLoading"
-                                        v-on="on">
-                                            {{ filter.pageSize }}
-                                        <v-icon>fa-angle-down</v-icon>
-                                    </v-btn>
-                                </template>
-                                    <v-list>
-                                    <v-list-item
-                                        v-for="(number, index) in [10, 20, 50]"
-                                        :key="index"
-                                        @click="updateCitationsPerPage(number)">
-                                        <v-list-item-title>{{ number }}</v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-
-                            <v-spacer></v-spacer>
-
-                            <span class="mr-4 grey--text" >
-                                Page {{ filter.pageIndex +1}} / {{ totalPages }}
-                            </span>
-                            <v-btn
-                                fab small
-                                dark
-                                :disabled="isLoading"
-                                color="accent"
-                                class="mr-1"
-                                @click="formerPage">
-                                <v-icon>fa-chevron-left</v-icon>
-                            </v-btn>
-                            <v-btn
-                                fab small
-                                dark
-                                :disabled="isLoading"
-                                color="accent"
-                                class="ml-1"
-                                @click="nextPage"
+            <v-data-table
+                :headers="headers"
+                :items="citations"
+                :search="filter.search"
+                :custom-filter="searchMethod"
+                loading-text="Récupération des citations..."
+                no-data-text="Aucune citation enregistrée."
+                no-results-text="Aucune citation trouvée."
+            >
+                <template v-slot:item.citation="{ item }">
+                    <div style="display: flex; vertical-align: middle">
+                        <v-avatar size="36px" style="flex: 0 1 1">
+                            <img
+                                alt="Avatar"
+                                :src="item.author.url"
                             >
-                                <v-icon>fa-chevron-right</v-icon>
-                            </v-btn>
-                        </v-row>
-                    </template>
-                </v-data-iterator>
-            </v-container>
-        </div>
+                        </v-avatar>
+
+                        <div class="citation" v-html="item.citation"></div>
+                    </div>
+                </template>
+                <template v-slot:item.author="{ item }">
+                    {{ item.author.label }} <span v-if="item.year" class="year"> - {{ item.year }}</span>
+                </template>
+
+                <template v-slot:item.actions="{ item }">
+                    <v-icon small class="mr-2" @click="editCitation(item)">
+                        fa-pen
+                    </v-icon>
+                    <v-icon small class="mr-2" @click="deleteCitationConfirmation(item)">
+                        fas fa-times
+                    </v-icon>
+                </template>
+
+            </v-data-table>
+        </v-card>
+    </v-container>
+
 
         <div v-if="!isLoading && (!citations || citations.length == 0)"
             style="text-align:center;">
@@ -208,7 +134,8 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-container>
+
+</div>
 </template>
 
 
@@ -222,14 +149,18 @@ export default {
     store,
     data: () => ({
         isLoading: false, // Est-ce qu'on est en train de charger la liste des citations ou non
+        headers: [
+            { text: `Citation`, value: 'citation' },
+            { text: `Auteur`, value: 'author' },
+            { text: '', value: 'actions', align: 'end' },
+        ],
         authors: null, // map id => auteur info
         authorsList: [], // liste complete des auteurs (utilisé par les <select>)
         peopleList: [], // lite complete des personnes enregistrées dans l'annuaire (utilisé pour l'autocomplete de l'auteur)
-        totalCitations: 0, // nombre total de citations (tiens compte de si on filtre par auteur ou non)
-        totalPages: 10, // nombre de page total
         citations: [], // liste des citations affichées sur la page courante
         filter: {
             authorId: null, // ID de l'auteur sélectionné
+            search: null,
             pageIndex: 0, // page courante affiché (0 = page 1)
             pageSize: 20, // nombre de citations affichées par page
         },
@@ -281,10 +212,6 @@ export default {
             axios.get(`/api/citations/list?authorId=${this.filter.authorId}&pageIndex=${this.filter.pageIndex}&pageSize=${this.filter.pageSize}`)
                 .then(response => {
                     const data = parseAxiosResponse(response);
-                    this.totalCitations = data.totalCitations;
-                    this.totalPages = data.totalPages;
-                    this.filter.pageIndex = data.pageIndex;
-                    this.filter.pageSize = data.pageSize;
 
                     this.citations = data.citations.map(i => ({
                         id: i.id,
@@ -354,17 +281,16 @@ export default {
                 }
             );
         },
-        formerPage() {
-            this.filter.pageIndex = Math.max(0, this.filter.pageIndex - 1);
-            this.refreshList();
-        },
-        nextPage() {
-            this.filter.pageIndex = Math.min(this.totalPages, this.filter.pageIndex + 1);
-            this.refreshList();
-        },
-        updateCitationsPerPage(count) {
-            this.filter.pageSize = count;
-            this.refreshList();
+
+        searchMethod(value, search, item) {
+            console.log("search", item);
+            if (!search) {
+                return item;
+            }
+            return item != null && (
+                item.citation.toLowerCase().indexOf(search.toLowerCase()) > -1
+                || item.author.label.toLowerCase().indexOf(search.toLowerCase()) > -1
+            );
         }
     }
 };
@@ -377,6 +303,7 @@ export default {
 
 .citation ::v-deep .note  {
     color: #999!important;
+    flex: 1 0 1;
 }
 
 // .citationRow {

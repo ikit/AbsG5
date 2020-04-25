@@ -1,24 +1,14 @@
 <template>
-<div class="home">
-    <img
-        v-if="$vuetify.breakpoint.mdAndUp"
-        src="/img/forum-new.png"
-        style="height: 120px; position: absolute; left: 10px;"/>
-
-
-
-    <h1 style="position: relative">Les discussions
-        <!-- <v-btn
-            style="position: absolute; top: 57px; right: 14px"
-            color="accent"
-            @click.stop="newDiscussion()">
-            <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
-        </v-btn> -->
-
-    </h1>
-
+<div>
     <v-tabs centered>
-        <v-tab :to="{path:'/discussions/tbz'}"> <v-icon>fas fa-comment-dots</v-icon> &nbsp; T.B.Z.</v-tab>
+        <v-tab :to="{path:'/discussions/tbz'}">
+            <v-badge right color="accent">
+                <template v-slot:badge>
+                    <span>3</span>
+                </template>
+                <v-icon>fas fa-comment-dots</v-icon> &nbsp; T.B.Z.
+            </v-badge>
+        </v-tab>
         <v-tab> <v-icon>far fa-comment</v-icon> &nbsp; Lanslevillard</v-tab>
         <v-tab> <v-icon>far fa-comment</v-icon> &nbsp; Malaucène</v-tab>
         <v-tab> <v-icon>far fa-comment-dots</v-icon> &nbsp; A.G.P.A.</v-tab>

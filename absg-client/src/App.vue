@@ -27,7 +27,7 @@
         <v-badge color="accent" style="margin-right: 15px" overlap v-if="user">
             <span v-if="notifications.length > 0" slot="badge">{{ notifications.length }}</span>
             <v-btn icon
-                @click.stop="dialog = !dialog">
+                @click.stop="notifDialog = !notifDialog">
                 <v-icon>far fa-list-alt</v-icon>
             </v-btn>
         </v-badge>
@@ -86,7 +86,7 @@
             </div>
         </div>
         <div class="mainContent" >
-            <router-view :socket="ws"></router-view>
+            <router-view :socket="ws" style="min-height: 100%"></router-view>
             <div class="gallery" v-if="photosGalleryDisplayed">
                 <div style="position: relative; padding: 50px; height: 100%;" @click="photosGalleryAuto()">
                     <div class="galleryControl">
@@ -128,12 +128,12 @@
     </v-content>
 
 
-    <v-dialog v-model="dialog" width="800px">
+    <v-dialog v-model="notifDialog" width="800px">
         <v-card>
             <v-card-title class="grey lighten-4">
             Historiques des événements
             </v-card-title>
-            <v-container fluid  grid-list-md style="padding:0">
+            <v-container fluid  grid-list-md style="padding:0; height: 60vh; overflow: hidden; overflow-y: scroll;">
                 <v-list dense>
                     <template v-for="(item, index) in notifications">
                         <v-list-item
@@ -198,7 +198,7 @@ export default {
         PhotoMetadataEditor
     },
     data: () => ({
-        dialog: false,
+        notifDialog: false,
         errDialog: false,
         darkMode: false,
         drawer: null,
@@ -261,27 +261,27 @@ export default {
             console.log('photosGalleryAuto');
         },
         closeNotifications() {
-            dialog=false;
-            axios.get(`/api/users/checkNotifications`).then(response => {
-                const data = parseAxiosResponse(response);
-                if (data) {
-                    this.isLoading = false;
+            this.notifDialog = false;
+            // axios.get(`/api/users/checkNotifications`).then(response => {
+            //     const data = parseAxiosResponse(response);
+            //     if (data) {
+            //         this.isLoading = false;
 
-                    // On crée la listes des logs de passaG (les 24 dernières heures)
-                    this.passage = []
-                    const now = new Date();
-                    for (let hDelta = 0; hDelta<24; hDelta++) {
-                        let h = ((now.getHours() - hDelta) + 24) % 24;  // On simule le modulo
-                        this.passage.unshift({
-                            time: `${h}h`,
-                            passage: data.passag
-                                .filter(e => new Date(e.datetime).getHours() === h)
-                                .map(e => ({ username: `${e.username}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
-                        })
+            //         // On crée la listes des logs de passaG (les 24 dernières heures)
+            //         this.passage = []
+            //         const now = new Date();
+            //         for (let hDelta = 0; hDelta<24; hDelta++) {
+            //             let h = ((now.getHours() - hDelta) + 24) % 24;  // On simule le modulo
+            //             this.passage.unshift({
+            //                 time: `${h}h`,
+            //                 passage: data.passag
+            //                     .filter(e => new Date(e.datetime).getHours() === h)
+            //                     .map(e => ({ username: `${e.username}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
+            //             })
 
-                    }
-                }
-            });
+            //         }
+            //     }
+            // });
         }
     },
     computed: {
