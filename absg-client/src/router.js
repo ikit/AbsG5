@@ -262,8 +262,11 @@ axios.interceptors.response.use(
             store.commit(store, error);
             return;
         }
-        // Pour tout le reste on redirige vers 404
-        console.log("TODO: NOT MANAGED ERROR", error.response)
-        router.push('/404');
+
+        // Si il s'agit d'une route IHM inconnu on redirige vers 404
+        if (!error.config.url.startsWith("/api/")) {
+            router.push('/404');
+        }
+        // Si il s'agit d'une route interne (appel au serveur) on reste sur la même page
         return Promise.reject(error)
     });

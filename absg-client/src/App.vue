@@ -161,18 +161,21 @@
     </v-dialog>
 
 
-    <v-dialog v-model="errorDisplayed" width="80vw">
+    <v-dialog v-model="error.displayed" width="80vw">
         <v-card>
-            <v-card-title class="grey lighten-4">
-            Une erreur s'est produite
+            <v-card-title class="error">
+                <v-icon color="#fff">fas fa-exclamation-circle</v-icon> &nbsp; Une erreur s'est produite
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
-               { { error} }
+               <pre><span style="font-weight: bold">Date:    </span> {{ error.log }}</pre>
+               <pre><span style="font-weight: bold">Requête: </span> {{ error.query ? error.query : "-" }}</pre>
+               <pre><span style="font-weight: bold">Status:  </span> {{ error.htmlError ? error.htmlError : "-" }}</pre>
+               <pre style="border: 1px solid #999; margin-top: 10px; padding: 5px">{{ error.msg ? error.msg : "Aucune information sur l'erreur :(" }}</pre>
             </v-container>
             <v-card-actions>
-                <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
+                <v-btn text @click="copyError()"><v-icon>far fa-copy</v-icon> &nbsp; Copier l'erreur</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn text @click="errorDisplayed=false">OK</v-btn>
+                <v-btn text @click="error.displayed=false">OK</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -233,6 +236,10 @@ export default {
         processWebsocketError(msg, err) {
             console.log("processWebsocketError", msg, err);
         },
+        copyError() {
+            navigator.clipboard.writeText(`Erreur Absolument G\nDate: ${this.error.log}\nRequête: ${this.error.query}\nStatus: ${this.error.htmlError}\nError: ${this.error.msg}`);;
+        },
+
         checkUserRolesMatch(item) {
             let result = false;
             if (item && this.user && Array.isArray(item.roles)) {
@@ -288,7 +295,8 @@ export default {
         ...mapState([
             'citation',
             'user',
-            'notifications'
+            'notifications',
+            'error'
         ]),
         // Gallerie photos
         photosGalleryDisplayed() {
@@ -315,13 +323,6 @@ export default {
         photosEditorDisplayed() {
             return this.$store.state.photosEditorDisplayed;
         },
-        // Erreur
-        errorDisplayed() {
-            return this.$store.state.errorDisplayed;
-        },
-        error() {
-            return this.$store.state.error;
-        }
     }
 };
 </script>

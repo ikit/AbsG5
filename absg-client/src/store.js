@@ -24,15 +24,22 @@ export default new Vuex.Store({
         photoMetadataEditorDisplayed: false,
         agpaMeta: null,
         // Erreur
-        errorDisplayed: false,
-        error: null
+        error: {
+            displayed: false,
+            query: "",
+            msg: "",
+            log: ""
+        }
     },
     mutations: {
 
         onError(state, axiosError) {
             console.log("ERR SERVER", axiosError);
-            state.error = axiosError;
-            state.errorDisplayed = true;
+            state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
+            state.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`;
+            state.error.msg =  axiosError;
+            state.error.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
+            state.error.displayed = true;
         },
 
         setCurrentUser(state, user) {
