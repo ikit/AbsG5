@@ -4,7 +4,7 @@ import { Citation } from "../entities";
 import { citationService } from "../services";
 import { getUserFromHeader } from "../middleware";
 
-@Authorized()
+//@Authorized()
 @JsonController("/citations")
 export class CitationController {
     @Get("")
@@ -12,23 +12,9 @@ export class CitationController {
         return await citationService.random();
     }
 
-    @Get("/init")
-    async initData() {
-        return await citationService.getInitData();
-    }
-
     @Get("/list")
-    async list(
-        @QueryParam("pageIndex") pageIndex: number,
-        @QueryParam("pageSize") pageSize: number,
-        @QueryParam("authorId") authorId: number = null
-    ) {
-        return await citationService.getCitations(pageIndex, pageSize, authorId);
-    }
-
-    @Get("/:id([0-9]+)")
-    async getById(@Param("id") id: number) {
-        return await citationService.fromId(id);
+    async list(@QueryParam("authorId") authorId: number = null) {
+        return await citationService.getCitations(authorId);
     }
 
     @Get("/author/:id([0-9]+)")

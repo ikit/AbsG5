@@ -14,76 +14,46 @@ class CitationService {
     }
 
     /**
-     * Retourne les infos nécessaire à l'initialisation de l'écran "citation" du site
-     */
-    public async getInitData() {
-        // On récupère la liste des autheurs
-        return await this.citationsRepo.query(`SELECT DISTINCT c."authorId" AS "id", p.firstname, p.surname 
-            FROM citation c 
-            LEFT JOIN person p ON c."authorId"=p.id
-            ORDER BY firstname ASC;`);
-    }
-
-    /**
      * Renvoie une citation au hasard
      */
     public async random() {
-        const result = await this.citationsRepo
-            .query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
-            FROM citation c 
-            LEFT JOIN "user" u ON c."posterId"=u.id
-            LEFT JOIN person p ON c."authorId"=p.id
-            ORDER BY RANDOM() LIMIT 1;`);
-
-        return result[0];
+        return this.citationsRepo
+            .createQueryBuilder("c")
+            .leftJoinAndSelect("c.author", "a")
+            .leftJoinAndSelect("c.poster", "p")
+            .orderBy("RANDOM()")
+            .getOne();
     }
 
     /**
      * Renvoie les citations en fonction des informations de filtrage et de pagination
      */
-    public async getCitations(pageIndex: number, pageSize: number, authorId: number) {
+    public async getCitations(authorId: number = null) {
         // controle sur les paramètres
         authorId = isNumber(authorId) && authorId > 0 ? authorId : null;
-        pageSize = isNumber(pageSize) && pageSize > 0 ? pageSize : 20;
-
-        // on calcule le nombre de citations max en fonction du filtre sur les auteurs
-        let query = "SELECT COUNT(*) FROM citation";
-        if (authorId) {
-            query += ` WHERE "authorId"= ${authorId}`;
-        }
-        let totalCitations = await this.citationsRepo.query(query);
-        totalCitations = totalCitations[0].count;
-
-        // 2: on borne la pagination en fonction du nombre max (pagesize = all quand filtre par auteur)
-        const totalPages = Math.round(totalCitations / pageSize);
-        pageIndex = isNumber(pageIndex) && pageIndex > 0 && pageIndex < totalPages ? pageIndex : 0;
 
         // on récupère les citations
-        query = `SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
-            FROM citation c 
-            LEFT JOIN "user" u ON c."posterId"=u.id
-            LEFT JOIN person p ON c."authorId"=p.id `;
-        if (authorId) {
-            query += `WHERE c."authorId"=${authorId} `;
-        }
-        query += ` ORDER BY c.id DESC OFFSET ${pageIndex * pageSize} LIMIT ${pageSize};`;
-        const citations = await this.citationsRepo.query(query);
-
-        return { totalCitations, totalPages, pageSize, pageIndex, citations };
-    }
-
-    /**
-     * Renvoie une citation à partir de son identifiant
-     */
-    public async fromId(citationId: number) {
-        const result = await this.citationsRepo
-            .query(`SELECT c.*, u.username AS "posterName", p.firstname AS "authorFirstname", p.surname AS "authorSurname" 
-            FROM citation c 
-            LEFT JOIN "user" u ON c."posterId"=u.id
-            LEFT JOIN person p ON c."authorId"=p.id
-            WHERE c.id=${citationId}`);
-
-        return result[0];
+        const citations = await this.citationsRepo
+            .createQueryBuilder("c")
+            .leftJoinAndSelect("c.author", "a")
+            .where(authorId ? `a.id = ${authorId}` : 1)
+            .orderBy("c.id", "DESC")
+            .getMany();
+        return citations.map(e => {
+            const c = new Citation().fromJSON(e);
+            const photos = c.author ? c.author.getPhotos(c.year) : [null, null];
+            return {
+                id: c.id,
+                citation: c.citation,
+                year: c.year,
+                author: {
+                    id: c.author.id,
+                    fullname: c.author.getFullname(),
+                    thumb: photos[0],
+                    large: photos[1]
+                }
+            };
+        });
     }
 
     /**
@@ -157,10 +127,13 @@ class CitationService {
         console.log("DELETE", id);
         const citation = await this.citationsRepo.findOne(id);
         if (!citation) {
-            throw new NotFoundError(`Citations was not found.`);
+            throw new NotFoundError(`La citation n°${id} n'existe pas.`);
         }
-        
-        logger.notice(`Citation supprimé par ${user.username}`, { userId: user.id, module: LogModule.citations });
+
+        logger.notice(`Citation n°${id} supprimée par ${user.username}`, {
+            userId: user.id,
+            module: LogModule.citations
+        });
 
         return this.citationsRepo.remove(citation);
     }

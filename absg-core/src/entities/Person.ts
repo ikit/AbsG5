@@ -33,7 +33,7 @@ export class Person {
     @Column({ nullable: true, comment: "Date du décé" })
     dateOfDeath: Date;
 
-    @Column({ nullable: true, comment: "Adresse de la personne" })
+    @Column({ nullable: true, comment: "Dernière adresse connue de la personne" })
     address: string;
 
     @Column({ nullable: true, comment: "Le dernier emplois exercé par cette personne" })
@@ -49,7 +49,10 @@ export class Person {
     photo: string;
 
     @Column("json", { nullable: true, comment: "Dernière coordonnée GPS connu pour la personne (VoyaG)" })
-    lastLocation: string;
+    lastLocation: any;
+
+    @Column("json", { nullable: true, comment: "Liste des photos du trombinoscope concernant la personne" })
+    trombi: any;
 
     fromJSON(json: any): Person {
         Object.assign(this, json);
@@ -95,5 +98,45 @@ export class Person {
             }
         }
         return age;
+    }
+
+    // Trouve parmi la liste des photos du trombinoscope le concernant, la photo la plus proche
+    // de l'année demandé (respecte la chronologie, donc la photo ne peut pas être plus récente)
+    // Si aucune trombi trouvé, prend la photo de l'annuaire
+    getPhotos(year: number = null): string[] {
+        let filename = null;
+        let folder = null;
+        if (!year) {
+            year = new Date().getFullYear();
+        }
+
+        if (Array.isArray(this.trombi)) {
+            folder = "trombi/";
+            let filenameYear = 0;
+            for (const t of this.trombi) {
+                const ty = Number.parseInt(t.substring(0, 4));
+                if (ty > year) {
+                    break;
+                }
+                if (ty >= filenameYear) {
+                    filenameYear = ty;
+                    filename = `${this.id}_${t}.jpg`;
+                }
+            }
+            
+            if (this.id == 2) {
+                console.log(folder, filename);
+            }
+        }
+
+        if (!filename) {
+            filename = this.photo;
+            folder = "persons/";
+        }
+
+        return [
+            `${process.env.URL_FILES}${folder}mini/${filename ? filename : "no-photo.png"}`,
+            `${process.env.URL_FILES}${folder}${filename ? filename : "no-photo.png"}`
+        ];
     }
 }

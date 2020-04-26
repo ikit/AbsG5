@@ -17,7 +17,15 @@ export class Citation {
     @ManyToOne(type => Person)
     @JoinColumn()
     author: Person;
-    
+
     @Column({ comment: "Année où a été prononcé la citation", nullable: true })
     year: number;
+
+    fromJSON(json: any): Citation {
+        Object.assign(this, json);
+        if (this.author) {
+            this.author = new Person().fromJSON(this.author);
+        }
+        return this;
+    }
 }

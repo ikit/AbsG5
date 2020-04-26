@@ -1,6 +1,5 @@
 <template>
 <div>
-
     <v-container>
         <v-card>
             <v-card-title>
@@ -30,17 +29,14 @@
                 <template v-slot:item.citation="{ item }">
                     <div style="display: flex; vertical-align: middle">
                         <v-avatar size="36px" style="flex: 0 1 1">
-                            <img
-                                alt="Avatar"
-                                :src="item.author.url"
-                            >
+                            <img alt="photo" :src="item.author.thumb"/>
                         </v-avatar>
-
-                        <div class="citation" v-html="item.citation"></div>
+                        <div class="citation" style="margin-left: 10px; font-size: 1.1em;" v-html="item.citation"></div>
                     </div>
                 </template>
                 <template v-slot:item.author="{ item }">
-                    {{ item.author.label }} <span v-if="item.year" class="year"> - {{ item.year }}</span>
+                    {{ item.author.fullname }}
+                    <p v-if="item.year" class="year">{{ item.year }}</p>
                 </template>
 
                 <template v-slot:item.actions="{ item }">
@@ -51,89 +47,77 @@
                         fas fa-times
                     </v-icon>
                 </template>
-
             </v-data-table>
         </v-card>
     </v-container>
 
 
-        <div v-if="!isLoading && (!citations || citations.length == 0)"
-            style="text-align:center;">
-            <p style="margin: 70px auto">Aucune citation n'a encore été enregistrée... soyez le premier !</p>
-            <v-btn
-                color="accent"
-                @click.stop="resetDialog(true)">
-                <v-icon left>fas fa-plus</v-icon>
-                <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle citation</span>
-            </v-btn>
-        </div>
+    <v-dialog v-model="citationEditor.open" width="800px">
+        <v-card>
+            <v-card-title class="grey lighten-4">
+            {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+            <v-layout row wrap>
+                <v-flex xs12>
+                    <v-autocomplete
+                        prepend-icon="fas fa-user"
+                        label="Autheur de la citation"
+                        :items="persons"
+                        v-model="citationEditor.author"
+                        item-text="fullname"
+                        item-value="id"
+                    ></v-autocomplete>
+                </v-flex>
+                <v-flex xs12>
+                    <v-text-field
+                        prepend-icon="fas fa-quote-left"
+                        label="La citation"
+                        v-model="citationEditor.citation">
+                    </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                    <v-text-field
+                        prepend-icon="fas fa-calendar-alt"
+                        label="Année de référence (où la citation a été dite)"
+                        v-model="citationEditor.year">
+                    </v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                    <v-card>
+                        <div style="position: relative;">
 
+                            <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
+                            <p style="margin-left: 50px; padding: 10px; font-style: italic">
+                                Merci de les mettre la citation entre double quotes, et les précisions entre parenthèses: "La citation" (ma précision).
+                            </p>
+                        </div>
+                    </v-card>
 
-        <v-dialog v-model="citationEditor.open" width="800px">
-            <v-card>
-                <v-card-title class="grey lighten-4">
-                {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
-                </v-card-title>
-                <v-container grid-list-sm class="pa-4">
-                <v-layout row wrap>
-                    <v-flex xs12>
-                        <v-autocomplete
-                            prepend-icon="fas fa-user"
-                            label="Autheur de la citation"
-                            :items="peopleList"
-                            :filter="filterAuthor"
-                            v-model="citationEditor.author"
-                        ></v-autocomplete>
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-text-field
-                            prepend-icon="fas fa-quote-left"
-                            label="La citation"
-                            v-model="citationEditor.citation">
-                        </v-text-field>
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-text-field
-                            prepend-icon="fas fa-calendar-alt"
-                            label="Année de référence (où la citation a été dite)"
-                            v-model="citationEditor.year">
-                        </v-text-field>
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-card>
-                            <div style="position: relative;">
+                </v-flex>
+            </v-layout>
+            </v-container>
+            <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
+            <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 
-                                <v-icon style="position: absolute; top: 18px; left: 22px;">fas fa-info</v-icon>
-                                <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                                    Merci de les mettre la citation entre double quotes, et les précisions entre parenthèses: "La citation" (ma précision).
-                                </p>
-                            </div>
-                        </v-card>
-
-                    </v-flex>
-                </v-layout>
-                </v-container>
-                <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-                <v-btn color="accent" @click="saveCitation()">Enregistrer</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <v-dialog v-model="citationDeletion.open" width="800px">
-            <v-card>
-                <v-card-title>
-                    Supprimer la citation
-                </v-card-title>
-                <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette citation ?</p>
-                <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="citationDeletion.open = false">Annuler</v-btn>
-                <v-btn color="accent" @click="deleteCitation()">Supprimer</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+    <v-dialog v-model="citationDeletion.open" width="800px">
+        <v-card>
+            <v-card-title>
+                Supprimer la citation
+            </v-card-title>
+            <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette citation ?</p>
+            <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="citationDeletion.open = false">Annuler</v-btn>
+            <v-btn color="accent" @click="deleteCitation()">Supprimer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 
 </div>
 </template>
@@ -154,16 +138,9 @@ export default {
             { text: `Auteur`, value: 'author' },
             { text: '', value: 'actions', align: 'end' },
         ],
-        authors: null, // map id => auteur info
-        authorsList: [], // liste complete des auteurs (utilisé par les <select>)
-        peopleList: [], // lite complete des personnes enregistrées dans l'annuaire (utilisé pour l'autocomplete de l'auteur)
-        citations: [], // liste des citations affichées sur la page courante
-        filter: {
-            authorId: null, // ID de l'auteur sélectionné
-            search: null,
-            pageIndex: 0, // page courante affiché (0 = page 1)
-            pageSize: 20, // nombre de citations affichées par page
-        },
+        citations: [],
+        persons: [],
+        filter: { search: "" },
         citationEditor: {
             open: false, // si oui ou non la boite de dialogue pour créer/éditer une citation est affichée
             id: null, // l'ID de la citation (vaut -1 si pour la création)
@@ -178,55 +155,27 @@ export default {
     }),
     mounted () {
         this.isLoading = true;
-        if (!this.authors) {
-            // Il faut initialiser la vue
-            axios.get(`/api/citations/init`).then(response => {
-                const authors = parseAxiosResponse(response);
-                // On initialise les liste des auteurs de citations
-                this.authorsList = [{id: -1, label: "Tout le monde"}];
-                this.authors = {};
-                for (const a of authors) {
-                    const aData = getPeopleAvatar(a);
-                    this.authorsList.push(aData);
-                    this.authors[aData.id] = aData;
-                    this.peopleList.push({value: aData.id, text: aData.label });
-                }
-                // on récupère la liste des dernière citations
-                this.refreshList();
-            }).catch( err => {
-                store.commit('onError', err);
-            });
+        // On récupère la liste des personnes (pour l'aide à la saisie)
+        axios.get(`/api/agenda/persons`).then(response => {
+            this.persons = parseAxiosResponse(response);
+        }).catch( err => {
+            store.commit('onError', err);
+        });
+
+        // On récupère la liste des citations
+        axios.get(`/api/citations/list`).then(response => {
+            this.citations = parseAxiosResponse(response);
+            this.isLoading = false;
+        }).catch( err => {
+            store.commit('onError', err);
+        });
+    },
+    computed: {
+        numberOfPages () {
+            return Math.ceil(this.citations.length / this.filter.pageSize)
         }
     },
     methods: {
-        refreshList(reset = false) {
-            // On affiche l'indicateur de chargement
-            this.isLoading = true;
-            // Est-ce qu'on force le reset
-            if (reset) {
-                this.filter.pageIndex = 0;
-                this.filter.authorId = null;
-            }
-
-            // On appelle l'API avec les paramètres de filtrage
-            axios.get(`/api/citations/list?authorId=${this.filter.authorId}&pageIndex=${this.filter.pageIndex}&pageSize=${this.filter.pageSize}`)
-                .then(response => {
-                    const data = parseAxiosResponse(response);
-
-                    this.citations = data.citations.map(i => ({
-                        id: i.id,
-                        citation: i.citation,
-                        author: this.authors[i.authorId],
-                        authorId: i.authorId,
-                        year: i.year
-                    }));
-
-                    this.isLoading = false;
-
-                }).catch( err => {
-                    store.commit('onError', err);
-                });
-        },
         resetDialog (open = false) {
             this.citationEditor.open = open;
             this.citationEditor.id = null;
@@ -238,16 +187,9 @@ export default {
             this.citationEditor.open = open;
             this.citationEditor.id = citation.id;
             this.citationEditor.citation = citation.citation;
-            this.citationEditor.author = citation.authorId;
+            this.citationEditor.author = citation.author.id;
             this.citationEditor.year = citation.year;
             console.log(this.citationEditor);
-        },
-        filterAuthor(item, queryText, itemText) {
-            const textOne = item.text.toLowerCase()
-            const textTwo = item.text.toLowerCase()
-            const searchText = queryText.toLowerCase()
-
-            return textOne.indexOf(searchText) > -1 || textTwo.indexOf(searchText) > -1
         },
         saveCitation: function () {
             // On vérifie si tout est bien renseigné
@@ -255,10 +197,21 @@ export default {
 
             // On envoie au serveur
             axios.post(`/api/citations/`, this.citationEditor).then(
-                response => {
-                    // on reset l'IHM
+                citation => {
+                    // on ferme la boite de dialogue
                     this.resetDialog();
-                    this.refreshList(true);
+
+                    console.log("UPDATE", citation)
+
+                    // On met à jour l'IHM
+                    const idx = this.citations.findIndex(e => e.id === citation.id);
+                    if (idx > -1) {
+                        // Maj citation existante
+                        this.citations.splice(idx, 1, citation)
+                    } else {
+                        // ajout de la nouvelle citation
+                        this.citations.push(citation);
+                    }
                 },
                 err => {
                     store.commit('onError', err);
@@ -271,10 +224,16 @@ export default {
         },
         deleteCitation: function () {
             axios.delete(`/api/citations/${this.citationDeletion.citation.id}`).then(
-                response => {
+                removedCitation => {
+                    // On met à jour l'IHM
                     this.citationDeletion.citation = null;
                     this.citationDeletion.open = false;
-                    this.refreshList(true);
+
+                    const idx = this.citations.findIndex(e => e.id === removedCitation.id);
+                    if (idx > -1) {
+                        // Maj citation existante
+                        this.citations.splice(idx, 1)
+                    }
                 },
                 err => {
                     store.commit('onError', err);
@@ -283,13 +242,12 @@ export default {
         },
 
         searchMethod(value, search, item) {
-            console.log("search", item);
             if (!search) {
                 return item;
             }
             return item != null && (
                 item.citation.toLowerCase().indexOf(search.toLowerCase()) > -1
-                || item.author.label.toLowerCase().indexOf(search.toLowerCase()) > -1
+                || item.author.fullname.toLowerCase().indexOf(search.toLowerCase()) > -1
             );
         }
     }
@@ -328,5 +286,6 @@ export default {
 }
 .year {
     opacity: 0.5;
+    margin: 0;
 }
 </style>

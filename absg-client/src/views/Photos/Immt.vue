@@ -197,8 +197,6 @@ export default {
         }
     },
     methods: {
-
-
         initGallery() {
             store.commit('photosGalleryReset', this.immts);
         },
