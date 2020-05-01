@@ -76,10 +76,10 @@
             <template v-slot:default="props">
                 <v-container fluid grid-list-sm>
                     <v-layout row wrap>
-                        <v-flex v-for="(p, index) in props.items" :key="p.id" style="text-align: center; max-width: 250px;">
+                        <v-flex v-for="p in props.items" :key="p.id" style="text-align: center; max-width: 250px;">
                             <div style="width: 250px; height: 250px; margin: auto;">
                                 <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                    <img :src="p.thumb" class="thumb" :alt="p.id" @click="photosGalleryDisplay(index + (filter.pageIndex - 1) * filter.pageSize)">
+                                    <img :src="p.thumb" class="thumb" :alt="p.id" @click="photosGalleryDisplay(p.index)">
                                 </div>
                             </div>
                             <v-card style="margin-bottom: 50px">
@@ -169,6 +169,7 @@ export default {
             this.todayId = format(new Date(), "yyyy_DDD", { useAdditionalDayOfYearTokens: true });
 
             axios.get(`/api/immt/`).then(response => {
+                let idx = 0;
                 const data = parseAxiosResponse(response);
                 this.immts = data.map(i => {
                     const tokens = i.id.split("_");
@@ -184,6 +185,7 @@ export default {
                         date: date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }),
                         url: i.url,
                         thumb: i.thumb,
+                        index: idx++
                     }
                 });
                 this.isLoading = false;

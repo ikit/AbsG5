@@ -163,11 +163,11 @@ export default {
         this.isLoading = true;
         axios.get(`/api/agenda/places`).then(response => {
             const data = parseAxiosResponse(response);
-            let galleryIndex = 0;
+            let idx = 0;
             this.places = data.map(e => ({
                 ...e,
-                galleryIndex: galleryIndex++,
                 title: e.name,
+                galleryIndex: e.thumb ? idx++ : null
             }));
             store.commit('photosGalleryReset', this.places.filter(e => e.thumb));
             this.isLoading = false;
@@ -217,30 +217,28 @@ export default {
         },
 
         refreshList(place) {
-            const idx = this.places.findIndex(e => e.id === place.id);
+            this.isLoading = true;
+            let idx = this.places.findIndex(e => e.id === place.id);
             if (idx > -1) {
                 const newEntry = {
                     ...place,
-                    galleryIndex: this.places[idx].galleryIndex,
                     title: place.name,
                 };
                 this.places.splice(idx, 1, newEntry)
             } else {
                 this.places.push({
                     ...place,
-                    galleryIndex: place.photo ? this.places.filter(e => e.thumb).length : null,
                     title: place.name,
                 });
             }
-        },
-
-        refreshList(place) {
-            const idx = this.places.findIndex(e => e.id === place.id);
-            if (idx > -1) {
-                this.places[idx] = place;
-            } else {
-                this.places.push(place);
-            }
+            // On met à jour la gallerie photo et ses index
+            idx = 0;
+            this.places = this.places.map(e => ({
+                ...e,
+                galleryIndex: e.thumb ? idx++ : null
+            }));
+            store.commit('photosGalleryReset', this.places.filter(e => e.thumb));
+            this.isLoading = false;
         },
 
         savePlace() {

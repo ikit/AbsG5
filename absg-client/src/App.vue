@@ -253,7 +253,6 @@ export default {
         },
         photosGalleryHide() {
             store.commit('photosGalleryHide');
-            console.log("couc", this.user);
         },
         photosGalleryPrev() {
             store.commit('photosGalleryPrev');
@@ -313,10 +312,8 @@ export default {
         },
         photoDisplayed () {
             if (this.photosGalleryIndex >= 0 && this.photosGalleryIndex < this.photosGallery.length) {
-                console.log("DISPLAY", this.photosGallery[this.photosGalleryIndex]);
                 return this.photosGallery[this.photosGalleryIndex];
             }
-            console.log("DISPLAY", "http://localhost:8080/img/immt-new.png");
             return 'http://localhost:8080/img/immt-new.png';
         },
         // Editeur photos

@@ -55,10 +55,10 @@
             <template v-slot:default="props">
                 <v-container fluid grid-list-sm>
                     <v-layout row wrap>
-                        <v-flex v-for="(p, index) in props.items" :key="p.id" style="text-align: center;">
+                        <v-flex v-for="p in props.items" :key="p.id" style="text-align: center;">
                             <div style="width: 250px; height: 250px; margin: auto;">
                                 <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                    <img :src="p.thumb" class="thumb" :alt="p.id" @click="photosGalleryDisplay(index + (filter.pageIndex - 1) * filter.pageSize)">
+                                    <img :src="p.thumb" class="thumb" :alt="p.id" @click="photosGalleryDisplay(p.index)">
                                 </div>
                             </div>
                         </v-flex>
@@ -104,7 +104,8 @@ export default {
     }),
     mounted() {
         axios.get(`/api/photos/to-check`).then(response => {
-            this.photos = parseAxiosResponse(response);
+            let idx = 0;
+            this.photos = parseAxiosResponse(response).map(e => ({ ...e, index: idx++ }));
             store.commit('photosGalleryReset', this.photos);
         }).catch( err => {
             store.commit('onError', err);

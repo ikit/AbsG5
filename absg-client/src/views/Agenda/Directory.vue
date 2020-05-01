@@ -279,14 +279,15 @@ export default  {
         this.isLoading = true;
         axios.get(`/api/agenda/persons`).then(response => {
             const data = parseAxiosResponse(response);
-            let galleryIndex = 0;
+            let idx = 0;
             this.persons = data.map(e => ({
                 ...e,
                 name: `${e.lastname} ${e.firstname} ${e.firstname2} ${e.surname}`,
                 age: this.computeAge(e),
-                galleryIndex: galleryIndex++,
                 title: e.name,
+                galleryIndex: e.thumb ? idx++ : null
             }));
+            idx = 0;
             store.commit('photosGalleryReset', this.persons.filter(e => e.thumb));
             this.isLoading = false;
         });
@@ -369,13 +370,13 @@ export default  {
         },
 
         refreshList(person) {
-            const idx = this.persons.findIndex(e => e.id === person.id);
+            this.isLoading = true;
+            let idx = this.persons.findIndex(e => e.id === person.id);
             if (idx > -1) {
                 const newEntry = {
                     ...person,
                     name: `${person.lastname} ${person.firstname} ${person.firstname2} ${person.surname}`,
                     age: this.computeAge(person),
-                    galleryIndex: this.persons[idx].galleryIndex,
                     title: person.name,
                 };
                 this.persons.splice(idx, 1, newEntry)
@@ -384,10 +385,18 @@ export default  {
                     ...person,
                     name: `${person.lastname} ${person.firstname} ${person.firstname2} ${person.surname}`,
                     age: this.computeAge(person),
-                    galleryIndex: person.photo ? this.persons.filter(e => e.thumb).length : null,
                     title: person.name,
                 });
             }
+
+            // On met à jour la gallerie photo et ses index
+            idx = 0;
+            this.places = this.places.map(e => ({
+                ...e,
+                galleryIndex: e.thumb ? idx++ : null
+            }));
+            store.commit('photosGalleryReset', this.places.filter(e => e.thumb));
+            this.isLoading = false;
         },
 
         savePerson() {

@@ -179,7 +179,6 @@ export default {
         axios.get(`/api/agenda/trombi/`).then(response => {
             this.photos = parseAxiosResponse(response);
             this.isLoading = false;
-            store.commit('photosGalleryReset', this.photos);
         });
     },
     computed: {
@@ -188,9 +187,6 @@ export default {
         }
     },
     methods: {
-        initGallery() {
-            store.commit('photosGalleryReset', this.photos);
-        },
         resetDialog (open = false) {
             this.trombiEditor.open = open;
             this.trombiEditor.date = null;
@@ -239,6 +235,7 @@ export default {
             if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1
         },
         photosGalleryDisplay(index) {
+            store.commit('photosGalleryReset', this.photos.filter(e => e != null && e.title.toLowerCase().indexOf(this.filter.search.toLowerCase()) > -1));
             store.commit('photosGallerySetIndex', index);
             store.commit('photosGalleryDisplay');
         },
