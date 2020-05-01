@@ -242,7 +242,7 @@ export default {
 
         checkUserRolesMatch(item) {
             let result = false;
-            if (item && this.user && Array.isArray(item.roles)) {
+            if (item && Array.isArray(item.roles) && this.user && Array.isArray(this.user.roles)) {
                 for (const r of this.user.roles) {
                     if (item.roles.find(e => e === r)) {
                         result = true;
