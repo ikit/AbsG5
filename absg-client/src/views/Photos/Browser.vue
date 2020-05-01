@@ -5,6 +5,7 @@
             :items-per-page="filter.pageSize"
             :page="filter.pageIndex"
             :search="filter.search"
+            :expanded="expandedPhotos"
             loading-text="Récupération des photos..."
             no-data-text="Aucune photo à trier."
             no-results-text="Aucune photo trouvée."
@@ -80,6 +81,7 @@ export default {
     store,
     data: () => ({
         photos: [], // La liste des photos à trier
+        expandedPhotos: [],
         filter: {
             search: null, // recherche multicritère
             collection: "Toutes",
@@ -118,6 +120,7 @@ export default {
     },
     methods: {
         photosGalleryDisplay(index) {
+            console.log(this.expandedPhotos);
             store.commit('photosGallerySetIndex', index);
             store.commit('photoMetadataEditorDisplay');
             store.commit('photosGalleryDisplay');

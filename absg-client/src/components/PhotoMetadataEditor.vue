@@ -9,6 +9,8 @@
                 v-model="photo.comment"
                 label="Commentaire"
                 prepend-icon="fas fa-pen"
+                rows="1"
+                auto-grow
             ></v-textarea>
 
             <v-text-field
@@ -17,6 +19,7 @@
                 :rules="photosEditorRules.date"
                 placeholder="YYYY-MM-DD HH:mm"
                 prepend-icon="far fa-calendar-alt"
+                validate-on-blur
             ></v-text-field>
 
             <v-combobox
@@ -25,7 +28,9 @@
                 label="Personnes"
                 prepend-icon="fas fa-user"
                 multiple
-                chips
+                small-chips
+                deletable-chips
+                auto-select-first
             ></v-combobox>
 
             <v-combobox
@@ -78,7 +83,7 @@ export default {
             date: [
                 value => {
                     const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2}( [0-9]{2}(-[0-9]{2})?)?)?)?$/
-                    return pattern.test(value) || "La valeur doit être une date valide: YYYY-MM-DD HH-mm"
+                    return !value || pattern.test(value) || "La valeur doit être une date valide: YYYY-MM-DD HH-mm"
                 }
             ]
         },

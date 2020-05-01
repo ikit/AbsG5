@@ -120,7 +120,7 @@
                         <PhotoMetadataEditor
                             v-if="photoMetadataEditorDisplayed"
                             :photo="photoDisplayed"
-                            style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px"></PhotoMetadataEditor>
+                            style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px; overflow: auto;"></PhotoMetadataEditor>
                     </div>
                 </div>
             </div>

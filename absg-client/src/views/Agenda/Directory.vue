@@ -128,6 +128,7 @@
                                     label="Date de naissance"
                                     prepend-icon="far fa-calendar-alt"
                                     clearable
+                                    validate-on-blur
                                     v-on="on"
                                 ></v-text-field>
                             </template>
@@ -149,6 +150,7 @@
                                     clearable
                                     label="Date du décè"
                                     prepend-icon="far fa-calendar-alt"
+                                    validate-on-blur
                                     v-on="on"
                                 ></v-text-field>
                             </template>
@@ -264,13 +266,13 @@ export default  {
             dateOfBirth: [
                 value => {
                     const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                    return !value || pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
                 }
             ],
             dateOfDeath: [
                 value => {
                     const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                    return !value || pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
                 }
             ],
         }

@@ -101,6 +101,7 @@
                             clearable
                             label="Quand"
                             prepend-icon="far fa-calendar-alt"
+                            validate-on-blur
                             v-on="on"
                         ></v-text-field>
                     </template>
@@ -161,7 +162,7 @@ export default {
             date: [
                 value => {
                     const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                    return !value || pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
                 }
             ],
         }
