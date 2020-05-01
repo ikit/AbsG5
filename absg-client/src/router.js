@@ -89,38 +89,14 @@ export const router = new VueRouter({
         },
         // Discussions
         {
-            path: '/discussions',
-            component: () => import('./views/Discussions.vue'),
+            path: '/forum',
+            component: () => import('./views/Forum.vue'),
             children: [
                 {
-                    path: '',
-                    redirect: '/discussions/tbz'
-                },
-                {
-                    path: 'tbz',
-                    component: () => import('./views/Discussions/Tbz.vue'),
-                },
-                {
-                    path: 'locations',
-                    component: () => import('./views/Agenda/Locations.vue'),
-                },
-                {
-                    path: 'events',
-                    component: () => import('./views/Agenda/Events.vue'),
-                },
-                {
-                    path: 'trombi',
-                    component: () => import('./views/Agenda/Trombi.vue'),
-                },
-                {
-                    path: 'genealogy',
-                    component: () => import('./views/Agenda/Genealogy.vue'),
+                    path: 'read/:topicId',
+                    component: () => import('./views/Forum/Read.vue'),
                 }
             ]
-        },
-        {
-            path: '/discussions/forum/:id',
-            component: () => import('./views/Discussions/Forum.vue'),
         },
         // Agenda
         {

@@ -10,7 +10,7 @@ export * from "./Forum";
 export * from "./Immt";
 export * from "./LogPassag";
 export * from "./LogSystem";
-export * from "./Message";
+export * from "./ForumMessage";
 export * from "./Parameter";
 export * from "./PassaG";
 export * from "./Person";

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
 import { Forum } from "./Forum";
-import { Message } from "./Message";
+import { Message } from "./ForumMessage";
 
 export enum DiscussionType {
     thread,

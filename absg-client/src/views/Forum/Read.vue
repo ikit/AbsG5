@@ -215,6 +215,7 @@ export default {
         }
     }),
     mounted: () => {
+
     },
     methods: {
         ckInput(newValue, instance, eventInfo, batch) {
