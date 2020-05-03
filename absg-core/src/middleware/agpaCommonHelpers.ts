@@ -11,15 +11,28 @@ export const agpaCtx = new AgpaContext();
  * @return l'année de l'édition en cours
  */
 export function getCurrentEdition(): number {
-    // Une édition commence au 1er octobre pour se terminer fin décembre
-    // Mais en fonction du calendrier, peut déborder sur janvier/février de l'année suivante
-    // Donc si on est avant octobre, il s'agit de l'édition précédente, sinon il s'agit de l'année courante :)
+    // Une édition commence toujours au 1er octobre pour se terminer fin décembre
+    // Mais en fonction du calendrier, peut déborder sur janvier de l'année suivante
+    // Donc si on est avant 1er février, il s'agit de l'édition précédente, sinon il s'agit de l'année courante
     const date = new Date();
     let editionYear = date.getFullYear();
-    if (date.getMonth() < 9) {
+    // Si en janvier
+    if (date.getMonth() == 0) {
         editionYear--;
     }
     return editionYear;
+}
+
+/**
+ * Vérifie que l'année est une année valide pour les AGPA.
+ * @param year l'année à tester, retourne l'année de l'édition en cours sinon
+ */
+export function checkValidYear(year): number {
+    const currentYear = getCurrentEdition();
+    if (!Number.isInteger(year) || year < 2006 || year <= currentYear) {
+        year = currentYear;
+    }
+    return year;
 }
 
 /**
@@ -64,44 +77,47 @@ export function getPhasesBoundaries(): AgpaPhase[] {
  * @return le "contexte"
  */
 export async function initAGPAContext(date: Date) {
-    return agpaCtx.checkForReset();
+    return agpaCtx.checkForReset(date.getFullYear());
 }
 
 /**
- * showRules
- * Affiche le réglement en ligne. L'essentiel du réglement est écrit directement dans le template chargé...
- * Cette fonction s'occupe essentiellement de calculer les dates afin que le réglement colle avec l'édition courante.
+ * getMetaData
+ * Récupère toutes les informations concernant une édition
  *
  * @return
  */
-export async function getMetaData() {
+export async function getMetaData(year = null): Promise<any> {
     const repo = getRepository(AgpaPhoto);
     const currentYear = getCurrentEdition();
+    year = checkValidYear(year);
 
     const data = {
-        currentYear: currentYear,
-        maxYear: currentYear - 1,
+        year, // L'année de l'édition en cours
+        maxYear: currentYear - 1, // L'année max pour les archives
         minYear: 2006,
-        catBefore2012: [1, 2, 3, 4, 5, 6, -2, -1],
-        catSince2012: [1, 2, 7, 3, 4, 5, 8, 6, -2, -3, -1],
         boudaries: getPhasesBoundaries(),
-        categories: {}
+        categoriesOrders: [], // La liste ordonnées des (id des) catégories de l'année en cours
+        categories: {} // Données sur chaques catégories
     };
 
     // On récupère les données des catégories
-    let sql = `SELECT id, title, description, color FROM agpa_category`;
-    let result = await repo.query(sql);
+    const sql = `SELECT c.* , v.title as "vTitle", v.description as "vDescription"
+        FROM agpa_category c
+        LEFT JOIN agpa_category_variation v ON v.id = c.id AND v.year = ${year}
+        WHERE (c.to IS NULL OR c.to >= ${year}) AND c.from <= ${year} AND c.id <> -4
+        ORDER BY c."order"`;
+    const result = await repo.query(sql);
     for (const row of result) {
-        data.categories[row.id] = row;
-    }
-
-    // On récupère les données des catégories spéciales
-    sql = `SELECT id, year, title, description FROM agpa_category_variation WHERE year > 0`;
-    result = await repo.query(sql);
-    const cat8 = data.categories[8];
-    cat8.variants = {};
-    for (const row of result) {
-        cat8.variants[row.year] = { title: row.title, description: row.description };
+        if (row.id > 0) {
+            data.categoriesOrders.push(row.id);
+        }
+        
+        data.categories[row.id] = {
+            id: row.id,
+            title: row.vTitle ? row.vTitle : row.title,
+            description: row.vDescription ? row.vDescription : row.description,
+            color: row.color
+        };
     }
 
     return data;

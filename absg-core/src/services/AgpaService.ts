@@ -1,60 +1,67 @@
 import { getRepository } from "typeorm";
-import { AgpaPhoto } from "../entities";
+import { AgpaPhoto, User } from "../entities";
 import { initAGPAContext, getMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
-import { archiveSummary, archiveEdition, archiveCategory, palmaresData } from "../middleware/agpaArchiveHelper";
+import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
+import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 
 class AgpaService {
-    private photosRepo = null;
-
-    public initService() {
-        this.photosRepo = getRepository(AgpaPhoto);
-    }
-
     /**
-     * Retourne les informations sur l'édition en cours (AgpaContext)
+     * Initialisation du service
      */
-    public welcom() {
-        return initAGPAContext(new Date());
+    initService() {
+        // Rien à faire
     }
 
     /**
      * Retourne les informations sur les anciennes éditions
+     * @param user l'utilisateur qui demande les informations
      */
-    public getArchiveSummary() {
-        return archiveSummary();
+    getArchiveSummary(user: User) {
+        return archiveSummary(user);
     }
 
     /**
-     *
-     * @param year Retourne les informations sur une ancienne édition
+     * Retourne les informations sur une ancienne édition
+     * @param year l'année de l'édition
+     * @param user l'utilisateur qui demande les informations
      */
-    public getArchiveEdition(year: number) {
+    getArchiveEdition(year: number, user: User) {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
-            return archiveEdition(year);
-        } else {
-            return null;
+            return archiveEdition(year, user);
         }
+        return null;
     }
 
-    public getArchiveCategory(year: number, catId: number) {
+    /**
+     * Retourne les informations sur une catégorie d'une édition
+     * @param year l'année de l'édition
+     * @param catId l'id de la catégorie
+     * @param user l'utilisateur qui demande les informations
+     */
+    getArchiveCategory(year: number, catId: number, user: User) {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
-            return archiveCategory(year, catId);
-        } else {
-            return null;
+            return archiveCategory(year, catId, user);
         }
+        return null;
     }
 
-    public getPalmaresData() {
+    /**
+     * Récupère toutes les statistiques "palmarès" de l'ensemble des éditions
+     */
+    getPalmaresData() {
         return palmaresData(null, null);
     }
 
-    public getCeremonyData(year: number) {
+    /**
+     * 
+     * @param year 
+     */
+    getCeremonyData(year: number) {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
             return ceremonyData(year);
-        } else {
-            return null;
         }
+        return null;
     }
 }
 

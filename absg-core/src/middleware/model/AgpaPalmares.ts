@@ -1,4 +1,4 @@
-import { palmaresPoints } from "../agpaArchiveHelper";
+import { palmaresPoints } from "../agpaPalmaresHelper";
 
 /**
  * Décris une entrée de palmarès pour un user donnée

@@ -9,7 +9,7 @@ import { getMetaData } from "./agpaCommonHelpers";
 export async function ceremonyData(year: number) {
     // On récupère les photos
     const repo = getRepository(AgpaPhoto);
-    const meta = await getMetaData();
+    const meta = await getMetaData(year);
 
     // Init data
     const edition = {

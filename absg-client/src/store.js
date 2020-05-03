@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
-import { getModuleInfo, getPeopleAvatar } from './middleware/CommonHelper';
+import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from './middleware/CommonHelper';
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -120,8 +120,8 @@ export default new Vuex.Store({
         },
         initAGPA(state) {
             if (!state.agpaMeta) {
-                axios.get(`/api/agpa/metadata`).then(response => {
-                    state.agpaMeta = response.status === 200 ? response.data : null;
+                axios.get(`/api/agpa`).then(response => {
+                    state.agpaMeta = parseAxiosResponse(response);
                 });
             }
         }

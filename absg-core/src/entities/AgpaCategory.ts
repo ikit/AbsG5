@@ -1,6 +1,4 @@
 import { Entity, PrimaryColumn, Column } from "typeorm";
-import { AgpaPhoto } from "./AgpaPhoto";
-import { User } from "./User";
 
 @Entity()
 export class AgpaCategory {
@@ -18,6 +16,12 @@ export class AgpaCategory {
 
     @Column({ comment: "Couleur de la catégorie", length: 7 })
     color: string;
+
+    @Column({ comment: "Première année où la catégorie est apparue", nullable: true  })
+    from: number;
+
+    @Column({ comment: "Dernière année où la catégorie était jouable", nullable: true })
+    to: number;
 
     // Transient properties
     photos: number[]; // liste des id des photos de la catégorie

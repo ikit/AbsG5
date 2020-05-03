@@ -1,63 +1,153 @@
 <template>
     <section id="content">
-        <div v-if="isLoading" style="width: 50px; margin: 50px auto;">
-            <v-progress-circular
-                :size="50"
-                color="primary"
-                indeterminate>
-            </v-progress-circular>
-        </div>
-        <div v-if="!isLoading && !current">Une erreur est survenue :( ...<br/>{{ error }}</div>
 
-        <div v-if="current">
-            <v-card style="line-height: 75px; margin-bottom: 16px; font-family: 'Tangerine', serif; color: orange; font-size: 3em;">
-
+        <div class="stickyHeader">
+            <v-row style="padding: 15px">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <router-link :to="{path: '/agpa/archives/' }" style="text-decoration: none;  position: absolute; left: 10px; line-height: 65px;">
-                            <v-icon style="color: orange; vertical-align: middle" v-on="on">fas fa-bars</v-icon>
-                        </router-link>
+                        <v-btn
+                            v-on="on"
+                            depressed small
+                            :to="{path: '/agpa/archives/' }">
+                            <v-icon left>fas fa-chevron-left</v-icon>
+                            <span v-if="$vuetify.breakpoint.mdAndUp">Retour</span>
+                        </v-btn>
                     </template>
                     <span>Retour au sommaire des archives</span>
                 </v-tooltip>
 
-                Edition
-                <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextYear(-1)">
-                    <v-icon>fas fa-chevron-left</v-icon>
-                </v-btn>
+                <v-spacer></v-spacer>
 
-                {{ year }}
-                <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextYear(1)">
-                    <v-icon>fas fa-chevron-right</v-icon>
-                </v-btn>
-            </v-card>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            icon small
+                            v-on="on"
+                            :disabled="isLoading"
+                            @click="gotoNextYear(-1)">
+                            <v-icon>fa-chevron-left</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Edition précédente</span>
+                </v-tooltip>
+                <span class="grey--text" >
+                    {{ year }}
+                </span>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            icon small
+                            v-on="on"
+                            :disabled="isLoading"
+                            @click="gotoNextYear(1)">
+                            <v-icon>fa-chevron-right</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Edition suivante</span>
+                </v-tooltip>
+
+                <v-spacer></v-spacer>
+            </v-row>
+            <v-progress-linear
+                color="accent"
+                indeterminate
+                v-if="isLoading"
+                style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px">
+            </v-progress-linear>
+        </div>
+
+        <div v-if="current && agpaMeta">
+            <v-row style="margin: 15px; ">
+                <v-card width="400px">
+                    classement auteurs
+                </v-card>
+                <v-spacer></v-spacer>
+                <v-card width="400px">
+                    meilleur photo
+                </v-card>
+                <v-spacer></v-spacer>
+                <v-card width="400px">
+                    meilleur titre
+                </v-card>
+            </v-row>
+
+            <v-row v-for="catIdx of current.categoriesOrders" :key="catIdx" style="margin: 15px; margin-top: 50px; flex-wrap: nowrap;">
+                <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+                    <img :src="`/img/agpa/cupesMaxi/c${catIdx}.png`" width="100px" style="position: absolute; top: -50px; left: 150px"/>
+                    <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
+                        <span style="font-family: 'Tangerine', serif; font-size: 2em">
+                            {{ current.categories[catIdx].title }}
+                        </span>
+                        <v-spacer></v-spacer>
+                        <v-tooltip bottom>
+                            <v-spacer></v-spacer>
+                            <template v-slot:activator="{ on }">
+                                <span v-on="on" style="line-height: 48px"><i class="far fa-user"></i> {{ current.categories[catIdx].totalUsers }}</span>
+                            </template>
+                            <span >Nombre total de participants</span>
+                        </v-tooltip>
+                        &nbsp; &nbsp;
+                        <v-tooltip bottom>
+                            <v-spacer></v-spacer>
+                            <template v-slot:activator="{ on }">
+                                <span v-on="on" style="line-height: 48px"><i class="far fa-image"></i> {{ current.categories[catIdx].totalPhotos }}</span>
+                            </template>
+                            <span >Nombre total de photos</span>
+                        </v-tooltip>
+                    </v-row>
+
+                    <v-list>
+                        <v-simple-table dense>
+                            <template v-slot:default>
+                                <tbody>
+                                    <tr v-for="p of current.categories[catIdx].photos" :key="p.id">
+                                        <td style="text-align: left">
+                                            <span v-for="a of p.awards" :key="a">
+                                                <i v-if="a == 'diamond'" class="fas fa-circle" style="color: #c3f1ff"></i>
+                                                <i v-if="a == 'gold'" class="fas fa-circle" style="color: #c68b00"></i>
+                                                <i v-if="a == 'sylver'" class="fas fa-circle" style="color: #9b9b9b"></i>
+                                                <i v-if="a == 'bronze'" class="fas fa-circle" style="color: #964c31"></i>
+                                                <i v-if="a == 'nominated'" class="far fa-circle"></i>
+                                                <i v-if="a == 'honor'" class="far fa-smile"></i>
+                                            </span>
+                                        </td>
+                                        <td style="text-align: left">{{ p.user.username }}</td>
+                                        <td style="text-align: left">{{ p.title }}</td>
+                                    </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    v-on="on"
+                                    style="margin-top: 20px"
+                                    depressed
+                                    :to="{path: `/agpa/archives/${year}/${catIdx}` }">
+                                    <v-icon left>far fa-images</v-icon>
+                                    <span v-if="$vuetify.breakpoint.mdAndUp">Gallerie</span>
+                                </v-btn>
+                            </template>
+                            <span>Voir les photos de la catégorie {{current.categories[catIdx].title}} </span>
+                        </v-tooltip>
+                    </v-list>
 
 
-            <v-container fluid v-if="current && agpaMeta">
-                <v-layout row wrap v-for="(cat, catIdx) in categories" :key="catIdx">
-                    <h2 :class="`catHeader cat${catIdx}`">{{ agpaMeta.categories[catIdx].title }}</h2>
-
-                    <v-container fluid v-if="cat">
-                        <v-layout row wrap>
-                            <v-flex v-for="photo in cat" :key="photo.idx" style="min-width: 250px; width: 15%; margin: 15px">
-                                <div>
-                                    <div style="width: 250px; height: 250px; margin: auto;">
-                                        <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                            <v-tooltip bottom>
-                                                <template v-slot:activator="{ on }">
-                                                        <img class="thumb" :src="photo.thumb" @click="photosGalleryDisplay(photo.idx)"/>
-                                                </template>
-                                                <span>{{ photo.username }} - {{ photo.title }}</span>
-                                            </v-tooltip>
-                                        </div>
-                                    </div>
-                                </div>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-
-                </v-layout>
-            </v-container>
+                </v-card>
+                <div style="overflow: hidden; display: flex; width: 100%;">
+                    <div v-for="photo of current.categories[catIdx].photos" :key="photo.id" style="display: inline-block; width: 250px; height: 250px; margin: auto;">
+                        <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <img class="thumb" v-on="on" :src="photo.thumb" @click="photosGalleryDisplay(photo.idx)"/>
+                                </template>
+                                <span>{{ photo.username }} - {{ photo.title }}</span>
+                            </v-tooltip>
+                        </div>
+                    </div>
+                </div>
+            </v-row>
         </div>
     </section>
 </template>
@@ -67,6 +157,7 @@
 import axios from 'axios';
 import store from '../../store';
 import { mapState } from 'vuex';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 
 export default {
@@ -76,8 +167,6 @@ export default {
         current: null,
         error: null,
         year: 0,
-        photosGalery: [],
-        categories: {}
     }),
     computed: { ...mapState([
         'agpaMeta',
@@ -94,34 +183,36 @@ export default {
     },
     methods: {
         initView() {
+            this.isLoading = true;
+
             // Reset photos list
             this.photosGalery = [];
             this.year = Number.parseInt(this.$route.params.year);
             this.category = Number.parseInt(this.$route.params.catId);
+
             axios.get(`/api/agpa/archives/${this.year}`).then(response => {
-                this.current = response.status === 200 ? response.data : null;
-                this.error = response.status !== 200 ? response : null;
+                this.current = parseAxiosResponse(response);
                 // Prepare photo galery
                 if (this.current) {
+                    const photosGalery = [];
                     let idx = 0;
                     for (let catId in this.current.categories) {
                         const cat = this.current.categories[catId];
                         if (catId > 0) {
-                            const photos = [];
-                            let max = 4;
-                            for (let photo of cat.photos) {
-                                const p = agpaPhotoToGalleryPhoto(photo);
+                            for (let photoIdx = 0;  photoIdx < this.current.categories[catId].photos.length; photoIdx++) {
+                                const p = agpaPhotoToGalleryPhoto(this.current.categories[catId].photos[photoIdx]);
                                 p.idx = idx;
-                                photos.push(p);
-                                this.photosGalery.push(p);
+                                photosGalery.push(p);
                                 idx++;
-                                max--;
-                                if (max === 0) break;
+                                this.current.categories[catId].photos[photoIdx] = {
+                                    ...this.current.categories[catId].photos[photoIdx],
+                                    ...p
+                                }
                             }
-                            this.categories[catId] = photos;
                         }
                     }
-                    store.commit('photosGalleryReset', this.photosGalery);
+                    console.log(this.current)
+                    store.commit('photosGalleryReset', photosGalery);
                 }
                 this.isLoading = false;
             });

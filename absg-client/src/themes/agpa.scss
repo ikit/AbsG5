@@ -71,43 +71,26 @@ h1 {
 }
 
 .catHeader {
-    padding-left: 150px;
-    line-height: 100px;
-    width: 100%;
-    text-align: left;
+    text-align: center;
     font-family: 'Tangerine', serif;
     font-size: 3em;
-    background-position-x: 16px;
-    box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+    line-height: 1em;
 }
 .catHeader:hover {
     cursor: pointer;
 }
 
-.cat1 {
-    color: #f99;
-    background-image: url('/img/agpa/c1-mini.png');
-}
-.cat2 { color: #F3DA80;
-    background-image: url('/img/agpa/c2-mini.png'); }
-.cat3 { color: #69C841;
-    background-image: url('/img/agpa/c3-mini.png'); }
-.cat4 { color: #FFA263;
-    background-image: url('/img/agpa/c4-mini.png'); }
-.cat5 { color: #7BB9FF;
-    background-image: url('/img/agpa/c5-mini.png'); }
-.cat6 { color: #E292FF;
-    background-image: url('/img/agpa/c6-mini.png'); }
-.cat7 { color: #77E0CC;
-    background-image: url('/img/agpa/c7-mini.png'); }
-.cat8 { color: #CED99A;
-    background-image: url('/img/agpa/c8-mini.png'); }
-.cat-1 { color: #d0d0d0;
-    background-image: url('/img/agpa/cx1-mini.png'); }
-.cat-2 { color: #d0d0d0;
-    background-image: url('/img/agpa/cx2-mini.png'); }
-.cat-3 { color: #d0d0d0;
-    background-image: url('/img/agpa/cx3-mini.png'); }
+.cat1 { color: #f99; }
+.cat2 { color: #F3DA80; }
+.cat3 { color: #69C841; }
+.cat4 { color: #FFA263; }
+.cat5 { color: #7BB9FF; }
+.cat6 { color: #E292FF; }
+.cat7 { color: #77E0CC; }
+.cat8 { color: #CED99A; }
+.cat-1 { color: #d0d0d0; }
+.cat-2 { color: #d0d0d0; }
+.cat-3 { color: #d0d0d0; }
 
 
 .card {

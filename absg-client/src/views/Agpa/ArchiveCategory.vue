@@ -1,57 +1,92 @@
 <template>
     <section id="content">
-        <div v-if="isLoading" style="width: 50px; margin: 50px auto;">
-            <v-progress-circular
-                :size="50"
-                color="primary"
-                indeterminate>
-            </v-progress-circular>
+
+        <div class="stickyHeader">
+            <v-row style="padding: 15px">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            v-on="on"
+                            depressed small
+                            :to="{path: `/agpa/archives/${year}` }">
+                            <v-icon left>fas fa-chevron-left</v-icon>
+                            <span v-if="$vuetify.breakpoint.mdAndUp">Retour</span>
+                        </v-btn>
+                    </template>
+                    <span>Retour au sommaire de l'édition</span>
+                </v-tooltip>
+
+                <v-spacer></v-spacer>
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            icon small
+                            v-on="on"
+                            :disabled="isLoading"
+                            @click="gotoNextYear(-1)">
+                            <v-icon>fa-chevron-left</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Edition précédente</span>
+                </v-tooltip>
+                <span class="grey--text" >
+                    {{ year }}
+                </span>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            icon small
+                            v-on="on"
+                            :disabled="isLoading"
+                            @click="gotoNextYear(1)">
+                            <v-icon>fa-chevron-right</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Edition suivante</span>
+                </v-tooltip>
+
+                <v-spacer></v-spacer>
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            icon small
+                            v-on="on"
+                            :disabled="isLoading"
+                            @click="gotoNextCat(-1)">
+                            <v-icon>fas fa-chevron-left</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Catégorie précédente</span>
+                </v-tooltip>
+                <span class="grey--text" >
+                    {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
+                </span>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            icon small
+                            v-on="on"
+                            :disabled="isLoading"
+                            @click="gotoNextCat(1)">
+                            <v-icon>fas fa-chevron-right</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Catégorie suivante</span>
+                </v-tooltip>
+
+                <v-spacer></v-spacer>
+            </v-row>
+            <v-progress-linear
+                color="accent"
+                indeterminate
+                v-if="isLoading"
+                style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px">
+            </v-progress-linear>
         </div>
-        <div v-if="!isLoading && !current">Une erreur est survenue :( ...<br/>{{ error }}</div>
 
         <div v-if="current">
-            <v-card style="line-height: 75px; margin: 30px 20px; font-family: 'Tangerine', serif; color: orange; font-size: 3em;">
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <router-link :to="{path: '/agpa/archives/' }" style="text-decoration: none;  position: absolute; left: 10px; line-height: 65px;">
-                            <v-icon style="color: orange; vertical-align: middle" v-on="on">fas fa-bars</v-icon>
-                        </router-link>
-                    </template>
-                    <span>Retour au sommaire des archives</span>
-                </v-tooltip>
-
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <router-link :to="{path: '/agpa/archives/' + year }" style="text-decoration: none; color: orange">
-                            <span v-on="on">Edition</span>
-                        </router-link>
-                    </template>
-                    <span>Retour au sommaire de l'édition {{ year }}</span>
-                </v-tooltip>
-                <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextYear(-1)">
-                    <v-icon>fas fa-chevron-left</v-icon>
-                </v-btn>
-
-                {{ year }}
-                <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextYear(1)">
-                    <v-icon>fas fa-chevron-right</v-icon>
-                </v-btn>
-
-                <div style="display: inline-block; width: 100px;">
-                </div>
-
-                Catégorie
-                <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextCat(-1)">
-                    <v-icon>fas fa-chevron-left</v-icon>
-                </v-btn>
-                {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
-                <v-btn text icon color="orange" style="vertical-align: inherit;" @click="gotoNextCat(1)">
-                    <v-icon>fas fa-chevron-right</v-icon>
-                </v-btn>
-            </v-card>
-
             <v-container fluid v-if="current">
                 <v-layout row wrap>
                     <v-flex v-for="(photo, index) in photosGalery" :key="photo.id" style="min-width: 250px; width: 15%; margin: 15px">
@@ -86,6 +121,7 @@
 import axios from 'axios';
 import store from '../../store';
 import { mapState } from 'vuex';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 
 
@@ -94,10 +130,8 @@ export default {
     data: () => ({
         isLoading: true,
         current: null,
-        error: null,
         year: 0,
         category: null,
-        liteboxOn: false,
         photosGalery: []
     }),
     computed: { ...mapState([
@@ -119,9 +153,8 @@ export default {
             this.photosGalleryIndex = 0;
             this.year = Number.parseInt(this.$route.params.year);
             this.category = Number.parseInt(this.$route.params.catId);
-            axios.get(`/api/agpa/archives/${this.year}/${this.$route.params.catId}`).then(response => {
-                this.current = response.status === 200 ? response.data : null;
-                this.error = response.status !== 200 ? response : null;
+            axios.get(`/api/agpa/archives/${this.year}/${this.category}`).then(response => {
+                this.current = parseAxiosResponse(response);
                 // Prepare photo galery
                 if (this.current) {
                     for (let photo of this.current.photos) {
@@ -146,11 +179,10 @@ export default {
             this.$router.replace({path: `/agpa/archives/${nextYear}/${this.category}`});
         },
         gotoNextCat(step) {
-            const cats = this.year < 2012 ? this.agpaMeta.catBefore2012 : this.agpaMeta.catSince2012;
-            let catIdx = cats.indexOf(this.category);
-            catIdx += step;
-            catIdx %= cats.length;
-            this.$router.replace({path: `/agpa/archives/${this.year}/${cats[catIdx]}`});
+            let catIdx = this.current.categoriesOrders.indexOf(this.category);
+            catIdx += step + this.current.categoriesOrders.length;
+            catIdx %= this.current.categoriesOrders.length;
+            this.$router.replace({path: `/agpa/archives/${this.year}/${this.current.categoriesOrders[catIdx]}`});
         }
     }
 };
