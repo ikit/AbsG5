@@ -1,5 +1,36 @@
 <template>
-    <section id="content">
+<v-container>
+    <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
+    <v-card v-if="currentMonth > 0 && currentMonth < 9" style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;">
+        <img src="/img/agpa/cupesMaxi/c1.png" height="100px" style="position: absolute; top: -50px; left: 244px"/>
+        <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
+            L'édition <span style="font-size: 2em; font-weight: normal; padding-right: 3px;"> {{ currentYear }}</span> des A.G.P.A. n'a pas encore démarrée.
+        </p>
+        <v-timeline >
+            <v-timeline-item small v-for="item in phases" :key="item.id" right>
+                <template v-slot:opposite>
+                    <span> {{ item.start }}</span>
+                </template>
+                {{ item.label }}
+            </v-timeline-item>
+        </v-timeline>
+        <v-card v-if="!special" style="margin: 15px; font-weight: bold; color: #ff8f00; padding: 15px">
+            <v-icon color="warning" style="width: 50px">fas fa-exclamation-triangle</v-icon>
+            Aucun thème pour la catégorie spéciale n'a été décidé
+        </v-card>
+        <v-card v-if="special" style="margin: 15px; text-align: center; padding: 15px">
+            <p style="opacity: 0.5; ">Thème de l'année</p>
+            <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">{{ special.title }}</p>
+            <p style="font-style: italic">{{ special.description }}</p>
+        </v-card>
+        <v-card style="margin: 15px; padding: 15px">
+            <v-icon style="width: 50px">fas fa-info</v-icon>
+            N'hésitez pas à discuter de l'organisation sur <a href="/forum/noel">le forum</a>.
+        </v-card>
+    </v-card>
+
+    <!-- Affichage de l'édition en cours -->
+    <section v-else>
         <div v-if="isLoading" style="width: 50px; margin: 50px auto;">
             <v-progress-circular
                 :size="50"
@@ -14,11 +45,16 @@
         <Phase4 v-if="current && current.phase == 4" :current="current"></Phase4>
         <Phase5 v-if="current && current.phase == 5" :current="current"></Phase5>
     </section>
+</v-container>
 </template>
 
 
 <script>
 import axios from 'axios';
+import { mapState } from 'vuex';
+import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
+import { format } from 'date-fns';
+import { fr } from "date-fns/locale";
 import Phase1 from './Phase1';
 import Phase2 from './Phase2';
 import Phase3 from './Phase3';
@@ -38,16 +74,36 @@ export default {
     data: () => ({
         isLoading: true,
         current: null,
+        currentMonth: null,
+        currentYear: null,
         error: null,
+        phases: [
+            { number: 1, label: "Enregistrement des photos", start: format(new Date(2020, 9, 1), "do MMM 'à' HH'h'mm", {locale: fr}) },
+            { number: 2, label: "Validation des photos", start: format(new Date(2020, 11, 19), "dd MMM 'à' HH'h'mm", {locale: fr}) },
+            { number: 3, label: "Votes", start: format(new Date(2020, 11, 20), "dd MMM 'à' HH'h'mm", {locale: fr}) },
+            { number: 4, label: "Dépouillement", start: format(new Date(2020, 11, 24, 15), "dd MMM 'à' HH'h'mm", {locale: fr}) },
+            { number: 5, label: "Cérémonie des AGPA", start: format(new Date(2020, 11, 24, 20, 30), "dd MMM 'à' HH'h'mm", {locale: fr}) },
+        ],
+        special: { title: "Confinés", description: "#RestezChezVous #AvecDuSavon" },
     }),
     mounted () {
-        console.log("mounted");
-        axios.get('/api/agpa').then(response => {
-            console.log(response);
-            this.current = response.status === 200 ? response.data : null;
-            this.error = response.status !== 200 ? response : null;
-            this.isLoading = false;
-        });
+        this.currentMonth = new Date().getMonth();
+        this.currentYear = new Date().getFullYear();
+        if (this.currentMonth === 0) {
+            // Si mois janvier, on affiche toujours l'édition de l'année précédence
+
+        } else if (this.currentMonth >= 9) {
+            // Si mois >= octobre, on affiche l'édition en cours
+            axios.get('/api/agpa').then(response => {
+                this.current = parseAxiosResponse(response);
+                this.isLoading = false;
+            });
+        } else {
+            // Sinon, on a affiche message d'attente avant début de la phase 1
+
+                console.log(this.agpaMeta);
+        }
+
     },
     methods: {
 
@@ -78,6 +134,11 @@ export default {
             });
             this.resetDialog();
         }
+    },
+    computed: {
+        ...mapState([
+            'agpaMeta',
+        ]),
     }
 };
 </script>

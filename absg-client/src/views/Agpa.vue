@@ -1,7 +1,7 @@
 <template>
 <div class="agpa" >
     <v-tabs centered>
-        <v-tab :to="{path:'/agpa/'}"> <v-icon>fas fa-star</v-icon> &nbsp; Edition 2019</v-tab>
+        <v-tab :to="{path:'/agpa/'}"> <v-icon>fas fa-star</v-icon> &nbsp; Edition {{ agpaMeta ? agpaMeta.currentYear : "" }}</v-tab>
         <v-tab :to="{path:'/agpa/rules'}"> <v-icon>fas fa-scroll</v-icon> &nbsp; Réglement</v-tab>
         <v-tab :to="{path:'/agpa/archives'}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
         <v-tab :to="{path:'/agpa/palmares'}"> <v-icon>fas fa-trophy</v-icon> &nbsp; Palmarès</v-tab>
@@ -18,20 +18,23 @@
 
 <script>
 import store from '../store';
+import { mapState } from 'vuex';
 
 export default {
     store,
     data: () => ({
-        nav: {
-            section: 2
-        },
+        currentEditionYear: null
     }),
     mounted() {
-        // A l'init des AGPA, on récupère si besoin les méta donnée des AGPA
         store.commit('initAGPA');
     },
     props: ['darkMode'],
     methods: {
+    },
+    computed: {
+        ...mapState([
+            'agpaMeta',
+        ]),
     }
 };
 </script>
