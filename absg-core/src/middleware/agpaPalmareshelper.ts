@@ -66,10 +66,8 @@ import { AgpaPalmares } from "./model/AgpaPalmares";
 //     }
 // }
 
-
 /**
  * Retourne le nombre de point palmares correspondant à une récompense
- *
  * @param award, le type de l'award (lice, bronze, argent, or, diamant)
  * @return la valeur en point
  */
@@ -84,9 +82,14 @@ export function palmaresPoints(award: string) {
     return award in palmaresPoints ? palmaresPoints[award] : 0;
 }
 
-
-export async function palmaresData(year: number, user: string) {
-    year = checkValidYear(year);
+/**
+ * Récupère l'ensemble des données palmares pour une période demandé
+ * @param from  première année prise en compte (par défaut 2006)
+ * @param to  dernière année à prendre en compte (par défaut l'année de la dernière édition terminée)
+ */
+export async function palmaresData(from: number = null, to: number = null) {
+    from = checkValidYear(from, 2006);
+    to = checkValidYear(to);
     // On récupère le contexte sql
     const repo = getRepository(AgpaPhoto);
     // On récupère les données
@@ -95,33 +98,8 @@ export async function palmaresData(year: number, user: string) {
         INNER JOIN agpa_category c ON a."categoryId" = c.id
         INNER JOIN public."user" u ON a."userId" = u.id
         INNER JOIN person up ON u."personId" = up.id
-        LEFT JOIN agpa_photo p ON a."photoId" = p.id `;
-
-    // On affiche les palmarès de qui ?
-    if (user == "gueudelot" || user == "guibert" || user == "guyomard") {
-        sql += `WHERE u."rootFamily"='${user} '`;
-    } else {
-        const userId = Number.parseInt(user);
-        if (userId) {
-            sql += `WHERE a."userId"=${user} `;
-        }
-    }
-
-    // On détermine la date limite
-    let maxYear = getCurrentEdition();
-    const phases = getPhasesBoundaries();
-    if (phases[4].startDate > new Date()) {
-        maxYear -= 1;
-    }
-
-    // On affiche le palmarès de quelle année ?
-    if (year > 0 && year <= maxYear) {
-        sql += `AND a.year=${year} `;
-    } else {
-        sql += `AND a.year<=${maxYear} `;
-        year = 0;
-    }
-    sql += `ORDER BY a."categoryId" ASC, a.year ASC`;
+        LEFT JOIN agpa_photo p ON a."photoId" = p.id 
+        ORDER BY a."categoryId" ASC, a.year ASC`;
     let result = await repo.query(sql);
 
     const tmp = new Map<number, AgpaPalmares>();
@@ -129,8 +107,9 @@ export async function palmaresData(year: number, user: string) {
         if (a.userId in tmp) {
             tmp[a.userId].addAward(a);
         } else {
-            tmp[a.userId] = new AgpaPalmares(a.userId, year !== 0 ? year : 2006, year !== 0 ? year : maxYear);
+            tmp[a.userId] = new AgpaPalmares(a.userId, from, to);
             tmp[a.userId].username = a.username;
+            tmp[a.userId].rootFamily = a.rootFamily;
             tmp[a.userId].addAward(a);
         }
     }
@@ -146,12 +125,18 @@ export async function palmaresData(year: number, user: string) {
         return b.totalPoints - a.totalPoints;
     });
 
-    return {
-        data: result,
-        filer: {
-            user,
-            year
-        },
-        selectedUser: null
-    };
+    // On récupère la participation de chaque photographe
+    sql = `SELECT "userId", COUNT(DISTINCT(year)) as total, MIN(year) as first, MAX(year) as last
+        FROM agpa_photo GROUP BY "userId"`;
+    const participation = await repo.query(sql);
+    for (const row of participation) {
+        const item = result.find(e => e.userId === row.userId);
+        if (item) {
+            item.participation = { total: row.total, first: row.first, last: row.last };
+        }
+    }
+
+    console.log(result)
+
+    return result;
 }

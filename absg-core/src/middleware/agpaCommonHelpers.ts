@@ -27,10 +27,10 @@ export function getCurrentEdition(): number {
  * Vérifie que l'année est une année valide pour les AGPA.
  * @param year l'année à tester, retourne l'année de l'édition en cours sinon
  */
-export function checkValidYear(year): number {
+export function checkValidYear(year, defaultYear: number = null): number {
     const currentYear = getCurrentEdition();
-    if (!Number.isInteger(year) || year < 2006 || year <= currentYear) {
-        year = currentYear;
+    if (!Number.isInteger(year) || year < 2006 || year >= currentYear) {
+        year = defaultYear ? checkValidYear(defaultYear) : currentYear;
     }
     return year;
 }

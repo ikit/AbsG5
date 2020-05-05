@@ -1,25 +1,129 @@
 <template>
 <div>
+    <v-container>
+        <v-card>
+            <v-card-title>
+                <v-text-field
+                    v-model="filter.search"
+                    prepend-icon="fas fa-search"
+                    label="Rechercher"
+                    single-line
+                    hide-details
+                    style="max-width:400px"
+                ></v-text-field>
+            </v-card-title>
+            <v-data-table
+                :headers="headers"
+                :items="palmares"
+                :search="filter.search"
+                :loading="isLoading"
+                :custom-filter="searchMethod"
+                loading-text="Récupération des données..."
+                no-data-text="Aucun palmarès disponible."
+                no-results-text="Aucune personne trouvée."
+            >
+                <template v-slot:item.photographe="{ item }">
+                    <img :src="item.url" style="height: 40px; margin-right: 15px; vertical-align: middle"/>
+                    <span style="font-size: 1.2em">{{ item.username }}</span>
+                </template>
 
-    <v-container fluid  grid-list-md style="padding: 0; padding-top: 2px">
-        <v-simple-table>
-            <template v-slot:default>
-            <thead>
-                <tr>
-                <th class="text-left">Photographe</th>
-                <th class="text-left">Total AGPA</th>
-                <th class="text-left">Total points</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="item in palmares" :key="item.userId" @click="displaydetails(item)" style="cursor: pointer">
-                <td>{{ item.username }}</td>
-                <td>{{ item.totalAward }}</td>
-                <td>{{ item.totalPoints }}</td>
-                </tr>
-            </tbody>
-            </template>
-        </v-simple-table>
+                <template v-slot:item.awards="{ item }">
+                    <template v-if="item.awards.diamond">
+                        <i class="fas fa-circle" style="color: #c3f1ff"></i> {{ item.awards.diamond }}
+                    </template>
+                    <template v-if="item.awards.gold">
+                        <i class="fas fa-circle" style="color: #c68b00"></i> {{ item.awards.gold }}
+                    </template>
+                    <template v-if="item.awards.sylver">
+                        <i class="fas fa-circle" style="color: #9b9b9b"></i> {{ item.awards.sylver }}
+                    </template>
+                    <template v-if="item.awards.bronze">
+                        <i class="fas fa-circle" style="color: #964c31"></i> {{ item.awards.bronze }}
+                    </template>
+                    <template v-if="item.awards.nominated">
+                        <i class="far fa-circle"></i> {{ item.awards.nominated }}
+                    </template>
+                    <template v-if="item.awards.honor">
+                        <i class="far fa-smile"></i> {{ item.awards.honor }}
+                    </template>
+                </template>
+
+                <template v-slot:item.score="{ item }">
+                    <span style="font-weight: bold">{{ item.totalPoints }} </span> <template v-if="item.totalPoints > 1">pts</template><template v-else>pt</template>
+                </template>
+
+                <template v-slot:item.participation="{ item }">
+                    <span style="font-weight: bold">{{ item.participation.total }}</span> fois
+                    <template v-if="item.participation.first != item.participation.last">
+                        <span style="font-style: italic; opacity: 0.5">(de {{ item.participation.first }} à {{ item.participation.last }})</span>
+                    </template>
+                    <template v-else>
+                        <span style="font-style: italic; opacity: 0.5">(en {{ item.participation.first }})</span>
+                    </template>
+                </template>
+
+                <template v-slot:item.bestYear="{ item }">
+                    <v-tooltip right v-if="item.bestYear.stats[7] > 0">
+                        <template v-slot:activator="{ on }">
+                            <span v-on="on">{{ item.bestYear.year }}
+                                <span style="opacity: 0.5">({{ item.bestYear.stats[6] }} awards - {{ item.bestYear.stats[7] }} pts)</span>
+                            </span>
+                        </template>
+
+                        <template v-if="item.bestYear.stats[5]">
+                            <i class="fas fa-circle" style="color: #c3f1ff"></i> {{ item.bestYear.stats[5] }}
+                        </template>
+                        <template v-if="item.bestYear.stats[4]">
+                            <i class="fas fa-circle" style="color: #c68b00"></i> {{ item.bestYear.stats[4] }}
+                        </template>
+                        <template v-if="item.bestYear.stats[3]">
+                            <i class="fas fa-circle" style="color: #9b9b9b"></i> {{ item.bestYear.stats[3] }}
+                        </template>
+                        <template v-if="item.bestYear.stats[2]">
+                            <i class="fas fa-circle" style="color: #964c31"></i> {{ item.bestYear.stats[2] }}
+                        </template>
+                        <template v-if="item.bestYear.stats[0]">
+                            <i class="far fa-smile"></i> {{ item.bestYear.stats[0] }}
+                        </template>
+                    </v-tooltip>
+                </template>
+
+                <template v-slot:item.bestCat="{ item }">
+                    <v-tooltip right v-if="item.bestYear.stats[6] > 0">
+                        <template v-slot:activator="{ on }">
+                            <span v-on="on">{{ item.bestCat.title }}
+                                <span style="opacity: 0.5">({{item.bestCat.stats[5] }} awards - {{item.bestCat.stats[6] }} pts)</span>
+                            </span>
+                        </template>
+
+                        <template v-if="item.bestCat.stats[4]">
+                            <i class="fas fa-circle" style="color: #c3f1ff"></i> {{ item.bestCat.stats[4] }}
+                        </template>
+                        <template v-if="item.bestCat.stats[3]">
+                            <i class="fas fa-circle" style="color: #c68b00"></i> {{ item.bestCat.stats[3] }}
+                        </template>
+                        <template v-if="item.bestCat.stats[2]">
+                            <i class="fas fa-circle" style="color: #9b9b9b"></i> {{ item.bestCat.stats[2] }}
+                        </template>
+                        <template v-if="item.bestCat.stats[1]">
+                            <i class="fas fa-circle" style="color: #964c31"></i> {{ item.bestCat.stats[1] }}
+                        </template>
+                        <template v-if="item.bestCat.stats[0]">
+                            <i class="far fa-circle"></i> {{ item.bestCat.stats[0] }}
+                        </template>
+                    </v-tooltip>
+                </template>
+
+
+
+                <template v-slot:item.actions="{ item }">
+                    <v-icon small class="mr-2" @click="displaydetails(item)">
+                        fa-search
+                    </v-icon>
+                </template>
+
+            </v-data-table>
+        </v-card>
     </v-container>
 
     <v-dialog v-if="palmaresDetails" v-model="palmaresDetails" width="800px">
@@ -69,11 +173,23 @@
 
 <script>
 import axios from 'axios';
+import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 
 export default {
     name: 'Palmares',
     data: () => ({
-        palmares: null,
+        isLoading: false,
+        headers: [
+            { text: 'Photographe', value: 'photographe' },
+            { text: 'Score', value: 'score' },
+            { text: 'Participation', value: 'participation' },
+            { text: 'Récompenses', value: 'awards' },
+            { text: 'Meilleure année', value: 'bestYear' },
+            { text: 'Meilleure catégorie', value: 'bestCat' },
+            { text: '', value: 'actions' },
+        ],
+        filter: { search: "" }, // un filtre par recherche de mot clés multichamps
+        palmares: [],
         palmaresDetails: null
     }),
     props: ['current'],
@@ -82,22 +198,27 @@ export default {
     },
     methods: {
         initView() {
-            // Reset photos list
-
+            this.isLoading = true;
             axios.get(`/api/agpa/palmares`).then(response => {
-                console.log(response.data);
-                this.palmares = response.status === 200 ? response.data.data : null;
-                this.error = response.status !== 200 ? response : null;
-
+                this.palmares = parseAxiosResponse(response).map( e => ({
+                    ...e,
+                    ...getPeopleAvatar(e)
+                }));
                 this.isLoading = false;
             });
         },
         displaydetails(palmares) {
             this.palmaresDetails = palmares;
-            console.log("details", palmares);
         },
         closeDialog() {
             this.palmaresDetails = null;
+        },
+
+        searchMethod(value, search, item) {
+            if (value && search && item ) {
+                return `${item.username} ${item.rootFamily}`.toLowerCase().indexOf(search.toLowerCase()) > -1;
+            }
+            return false
         }
     }
 };
@@ -106,21 +227,4 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
-
-h1 {
-    display: block;
-    font-size: 2em;
-    margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-    text-align: center;
-    color: $primary;
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
-    font-size: 40px;
-    font-family: "Comfortaa", sans-serif;
-    margin: 20px 0 60px 0;
-}
 </style>

@@ -1,18 +1,21 @@
 <template>
     <div class="container">
 
-        <h1>Absolument G - V5 alpha</h1>
+        <h1>Absolument G - V6 alpha</h1>
         <a style="display: block; text-align: center" href="https://trello.com/b/LDvwctf7/absg-5" target="_blank"> Voir la feuille de route </a>
 
-        <!-- <h2>V5 RC 1 - juil 2020</h2>
-        <p>Evolutions</p>
-        <ul>
-            <li></li>
-        </ul>
-        <p>Bug corrigés</p>
-        <ul>
-            <li></li>
-        </ul> -->
+        <h2>Alpha 6 - mar 2020</h2>
+        <v-card>
+            <p>Evolutions</p>
+            <ul>
+                <li>AGPA: prise en compte de l'évolution des catégories au fils des éditions</li>
+            </ul>
+            <p>Bug corrigés</p>
+            <ul>
+                <li>Authentification: fin de session, reconnection/déconnection, redirection écran login</li>
+                <li>Agenda: fix formulaire d'édition/création des ficher personne et lieux de l'agenda</li>
+            </ul>
+        </v-card>
 
 
 
@@ -28,10 +31,13 @@
                 <li>Agenda: Ajout/édition d'entrées du répertoire des personnes</li>
                 <li>Agenda: Visualisation (filtrage et pagination) du répertoire des lieux</li>
                 <li>Agenda: Ajout/édition d'entrées du répertoire des lieux</li>
+                <li>Déploiement en ligne de la version alpha (dev.absolumentg.fr) ainsi qu'outils d'admistration de la base de donnée (pgadmin)</li>
+                <li>Citations: Refactorisation et mise à jour pour cohérence de l'interface avec le reste du site</li>
             </ul>
             <p>Bug corrigés</p>
             <ul>
                 <li>Authentification: fin de session, reconnection/déconnection, redirection écran login</li>
+                <li>Agenda: fix formulaire d'édition/création des ficher personne et lieux de l'agenda</li>
             </ul>
         </v-card>
 
