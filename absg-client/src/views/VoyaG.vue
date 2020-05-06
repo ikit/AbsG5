@@ -3,7 +3,7 @@
 
 
         <div id="map-wrap" style="height: 100vh">
-            <l-map ref="theMap" :zoom="zoom" :center="center">
+            <l-map ref="theMap" :zoom="zoom" :center="center" zoomControl="false">
                 <l-tile-layer :url="url"></l-tile-layer>
                 <l-marker-cluster ref="markersLayer">
                     <l-marker v-for="p in persons" :key="p.id" :lat-lng="p.location">

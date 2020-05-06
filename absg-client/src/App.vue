@@ -1,5 +1,32 @@
 <template>
 <v-app id="inspire" :dark="darkMode">
+    <v-navigation-drawer v-if="user && !$vuetify.breakpoint.lgAndUp" v-model="drawerOpen" app style="height: 100%; z-index: 1000">
+        <v-list nav dense>
+            <v-list-item to="/" style="margin-top: 60px">
+                <v-list-item-action>
+                    <v-icon>fas fa-home</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                    <v-list-item-title>
+                        Accueil
+                    </v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+            <template v-for="item in menuItems">
+                <v-list-item  v-if="item.url && checkUserRolesMatch(item)" :key="item.id" link :to="{ path: item.url }">
+                    <v-list-item-action>
+                        <v-icon>{{ item.icon }}</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title>
+                            {{ item.name }}
+                        </v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </template>
+        </v-list>
+    </v-navigation-drawer>
+
     <v-app-bar
         v-if="user"
         color="primary"
@@ -7,30 +34,35 @@
         app
         fixed
         style="z-index: 2000">
-        <v-toolbar-title>
+         <v-app-bar-nav-icon v-if="!$vuetify.breakpoint.lgAndUp" @click.stop="drawerOpen = !drawerOpen"/>
+
+        <v-toolbar-title v-if="$vuetify.breakpoint.lgAndUp">
             <!-- <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon> -->
-            <span class="hidden-sm-and-down">
-                <router-link to="/"><span class="absg">Absolument <span>G</span></span></router-link>
+            <span>
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <v-icon color="primary" dark v-on="on">home</v-icon>
+                        <router-link to="/" v-on="on"><span class="absg">Absolument <span>G</span></span></router-link>
                     </template>
                     <span>Revenir à l'accueil</span>
                 </v-tooltip>
             </span>
         </v-toolbar-title>
         <v-spacer>
-            <div v-if="citation" style="text-align:center; margin: 0 100px">
-                <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; " v-html="citation.citation"></span>
-            </div>
-        </v-spacer>
-        <v-badge color="accent" style="margin-right: 15px" overlap v-if="user">
-            <span v-if="notifications.length > 0" slot="badge">{{ notifications.length }}</span>
-            <v-btn icon
-                @click.stop="notifDialog = !notifDialog">
-                <v-icon>far fa-list-alt</v-icon>
-            </v-btn>
-        </v-badge>
+        <div v-if="citation && $vuetify.breakpoint.lgAndUp" style="text-align:center; margin: 0 100px">
+            <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; " v-html="citation.citation"></span>
+        </div>
+        </v-spacer >
+        <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+                <v-badge color="accent" style="margin-right: 15px" overlap v-if="user">
+                    <span v-if="notifications.length > 0" slot="badge">{{ notifications.length }}</span>
+                    <v-btn icon v-on="on" @click.stop="notifDialog = !notifDialog">
+                        <v-icon>far fa-bell</v-icon>
+                    </v-btn>
+                </v-badge>
+            </template>
+            <span>Voir l'historique des événements</span>
+        </v-tooltip>
         <v-menu offset-y bottom left v-if="user">
             <template v-slot:activator="{ on, attrs }">
                 <v-btn depressed color="primary" v-bind="attrs" v-on="on">
@@ -66,9 +98,9 @@
     </v-app-bar>
 
     <v-content id="bgcontent" style="background: #f9f9f9">
-        <div class="menu" v-if="user">
+        <div class="menu" v-if="user && $vuetify.breakpoint.lgAndUp">
             <v-list style="background: none">
-                <template v-for="item in items">
+                <template v-for="item in menuItems">
                     <div class="menuItem" v-if="item.url && checkUserRolesMatch(item)" :key="item.id">
                         <router-link :to="{ path: item.url }">
                             <v-icon color="inherit">{{ item.icon }}</v-icon><br/>
@@ -85,7 +117,7 @@
                 </router-link>
             </div>
         </div>
-        <div class="mainContent" >
+        <div class="mainContent" v-bind:style="{ 'margin-left': $vuetify.breakpoint.lgAndUp ? '85px' : '0' }" >
             <router-view :socket="ws" style="min-height: 100%"></router-view>
             <div class="gallery" v-if="photosGalleryDisplayed">
                 <div style="position: relative; padding: 50px; height: 100%;" @click="photosGalleryAuto()">
@@ -201,12 +233,13 @@ export default {
         PhotoMetadataEditor
     },
     data: () => ({
+        drawerOpen: false, // flag pour savoir si le menu-tiroir (écran mobile)
         notifDialog: false,
         errDialog: false,
         darkMode: false,
         drawer: null,
         ws: null,
-        items: MODULES,
+        menuItems: MODULES,
 
         // Galerie photo editor
         photoDisplayedDateMenu: false,
@@ -387,7 +420,6 @@ export default {
 
 .mainContent {
     position: relative;
-    margin-left: 85px;
 }
 .theme--light.v-icon {
     color: rgba(0,0,0,0.54);

@@ -15,7 +15,6 @@ export class VoyagController {
      */
     @Get("/")
     welcom(@CurrentUser() user: User) {
-        console.log("COOUOUOUOUOUOU")
         return voyagService.getInitData(user);
     }
 }
