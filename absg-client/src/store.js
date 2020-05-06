@@ -47,7 +47,7 @@ export default new Vuex.Store({
             if (user) {
                 // Get user avatar url
                 const idAsStr = `${user.id}`;
-                user.avatarUrl = `http://absolumentg.fr/assets/img/avatars/${idAsStr.padStart(3, '0')}.png`;
+                user.avatarUrl = `/img/avatars/${idAsStr.padStart(3, '0')}.png`;
             } else {
                 state.user = null;
             }
@@ -63,7 +63,7 @@ export default new Vuex.Store({
         },
         updateImmt(state, immt) {
             let day = `${immt.day}`;
-            immt.src = `http://absolumentg.fr/assets/img/immt/${immt.year}_${day.padStart(3,'0')}.jpg`;
+            immt.src = `/files/immt/${immt.year}_${day.padStart(3,'0')}.jpg`;
             state.immt = immt;
             state.photosGallery = [{
                 url: immt.src,

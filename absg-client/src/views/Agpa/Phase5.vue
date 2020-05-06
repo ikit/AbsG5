@@ -43,10 +43,10 @@ export default {
             let url = '';
             if (cat.id > 0) {
                 const photo = this.current.photos[cat.photos[0]];
-                url = `http://absolumentg.fr/assets/img/agpa/${this.current.editionYear}/mini/${photo.filename}`;
+                url = `/files/agpa/${this.current.editionYear}/mini/${photo.filename}`;
 
             } else {
-                url = 'http://absolumentg.fr/assets/img/avatars/016.png';
+                url = '/img/avatars/016.png';
             }
             return url;
         },
@@ -59,7 +59,7 @@ export default {
         },
         saveCitation: function () {
             this.citations.push({
-                authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
+                authorAvatar: '/img/avatars/016.png',
                 authorId: 16,
                 authorName: this.citationEditor.author,
                 citation: this.citationEditor.citation,

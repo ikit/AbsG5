@@ -189,7 +189,7 @@ export default {
                                 users: data.authors.sort(() => Math.random() - 0.5).map(
                                     e => ({
                                         ...e,
-                                        avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(e.userId, 3)}.png`,
+                                        avatar: `/img/avatars/${padNumber(e.userId, 3)}.png`,
                                     }))}
                                 );
                             for (const s of data.categories[-1].nominated.reverse()) {
@@ -197,7 +197,7 @@ export default {
                                     type: "bestAuthorAward",
                                     ...s,
                                     photos:[],
-                                    avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(s.userId, 3)}.png`,
+                                    avatar: `/img/avatars/${padNumber(s.userId, 3)}.png`,
                                     award: `/img/agpa/cupes/cx1-${s.award}.png`});
                             }
                         } else
@@ -206,10 +206,10 @@ export default {
                             this.slides.push({ type: "category", id: catId, title: cat.title});
                             const awards = cat.nominated.map(photo => ({
                                 type: "photoAward",
-                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                url: `/files/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
                                 username: photo.username,
-                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                avatar: `/img/avatars/${padNumber(photo.userId, 3)}.png`,
                                 award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
 
                             }));
@@ -220,19 +220,19 @@ export default {
 
                             this.slides.push({ type: "category", id: catId, title: cat.title});
                             let nominated = cat.nominated.map(photo => ({
-                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                url: `/files/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
                                 username: photo.username,
-                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                avatar: `/img/avatars/${padNumber(photo.userId, 3)}.png`,
                             }));
                             nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
                             this.slides = this.slides.concat(nominated);
                             this.slides.push({ type:"awardWaiting", photos: nominated.map(e => e.url)});
                             const awards = cat.nominated.map(photo => ({
-                                url: `http://absolumentg.fr/assets/img/agpa/${photo.year}/mini/${photo.filename}`,
+                                url: `/files/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
                                 username: photo.username,
-                                avatar: `http://absolumentg.fr/assets/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                avatar: `/img/avatars/${padNumber(photo.userId, 3)}.png`,
                                 award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
 
                             }));

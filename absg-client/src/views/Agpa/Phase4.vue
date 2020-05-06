@@ -22,7 +22,7 @@ export default {
         },
         saveCitation: function () {
             this.citations.push({
-                authorAvatar: 'http://absolumentg.fr/assets/img/avatars/016.png',
+                authorAvatar: '/img/avatars/016.png',
                 authorId: 16,
                 authorName: this.citationEditor.author,
                 citation: this.citationEditor.citation,

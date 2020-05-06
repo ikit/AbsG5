@@ -32,7 +32,7 @@
 
     <div v-bind:class="{ ceremony: current.displayed, hiddenCeremony: !current.displayed }" >
         <video ref="video" style="margin: auto;" width="100%" height="100%" controls>
-            <source src="http://dev.absolumentg.fr/files/agpa/intro.mp4" type="video/mp4" >
+            <source src="/files/agpa/intro.mp4" type="video/mp4" >
             Your browser does not support the video tag.
         </video>
     </div>

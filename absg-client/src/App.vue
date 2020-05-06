@@ -347,7 +347,7 @@ export default {
             if (this.photosGalleryIndex >= 0 && this.photosGalleryIndex < this.photosGallery.length) {
                 return this.photosGallery[this.photosGalleryIndex];
             }
-            return 'http://localhost:8080/img/immt-new.png';
+            return '/img/zaffa-notfound.png';
         },
         // Editeur photos
         photosEditorDisplayed() {
