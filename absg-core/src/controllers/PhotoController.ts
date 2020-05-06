@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Get, Authorized, Post, Body } from "routing-controllers";
+import { JsonController, Get, Authorized, Post, Body, Param } from "routing-controllers";
 import { Photo } from "../entities";
 
 @Authorized()
@@ -15,8 +15,35 @@ export class UserController {
         // On récupère les photos à checker
         const photos = await this.repo
             .createQueryBuilder("p")
-            .where("NOT p.checked")
+            .where("p.date IS NULL OR p.persons IS NULL OR p.place IS NULL")
             .orderBy("p.id")
+            .getMany();
+
+        return photos.map(p => ({
+            ...p,
+            thumb: `${process.env.URL_FILES}photos/${p.folder}/THUMB/${p.id}.jpg`,
+            url: `${process.env.URL_FILES}photos/${p.folder}/WEB/${p.id}.jpg`
+        }));
+    }
+
+    @Get("/checked")
+    allChecked() {
+        console.log("coucou");
+        return this.checked(null);
+    }
+
+    @Get("/checked/:family")
+    async checked(@Param("family") family: string) {
+        // On vérifie le filtre sur la famille
+        let sqlFilter = "";
+        if (family && ["gueudelot", "guyomard", "guibert"].indexOf(family) > -1) {
+            sqlFilter = ` AND p.family = '${family}'`;
+        }
+        // On récupère les photos triées
+        const photos = await this.repo
+            .createQueryBuilder("p")
+            .where(`p.date IS NOT NULL${sqlFilter}`)
+            .orderBy("p.date")
             .getMany();
 
         return photos.map(p => ({

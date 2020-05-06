@@ -46,7 +46,7 @@ export function getPeopleAvatar(peopleData) {
     const idAsStr = `${id}`;
     return {
         id,
-        url: `http://absolumentg.fr/assets/img/avatars/${idAsStr.padStart(3, '0')}.png`,
+        url: `/img/avatars/${idAsStr.padStart(3, '0')}.png`,
         label: username ? username : peopleData.surname ? peopleData.surname : peopleData.firstname
     };
 }

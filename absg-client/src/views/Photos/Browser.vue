@@ -72,7 +72,6 @@
 
 
 <script>
-import Vue from 'vue';
 import axios from 'axios';
 import store from '../../store';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
@@ -85,7 +84,7 @@ export default {
         filter: {
             search: null, // recherche multicritère
             collection: "Toutes",
-            collections: ["Toutes", "A trier", "Triées"],
+            collections: ["Toutes", "A trier (en vrac)", "Triées"],
             pageIndex: 1, // page courante affichée
             pageSize: 24, // nombre de photos affichées par page
         },

@@ -9,6 +9,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
+        isInitialized: false, // est-ce que le store a été initialisé ou pas
         citation: null, // la citation aléatoire
         user: null, // les infos sur l'utilisateur connecté
         notifications: [], // les notifications affichées dans la bar d'application

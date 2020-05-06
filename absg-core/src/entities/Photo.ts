@@ -26,6 +26,9 @@ export class Photo {
     @Column({ comment: "Indique si la photo a été marqué comme étant en double", default: false })
     doublon: boolean;
 
-    @Column({ comment: "Indique si la photo a déjà été trié (true) ou non (false)", default: false })
-    checked: boolean;
+    @Column({
+        comment: "Indique si la photo concerne une famille et est donc 'reserve' aux membres de celle-ci",
+        nullable: true
+    })
+    family: string;
 }
