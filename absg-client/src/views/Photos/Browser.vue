@@ -26,6 +26,7 @@
                         <v-select
                             v-model="filter.collection"
                             :items="filter.collections"
+                            @change="loadCollection($event)"
                             label="Photos"
                             prepend-icon="fas fa-bars"
                             style="max-width: 300px;"
@@ -49,8 +50,8 @@
                             <v-icon>fa-chevron-right</v-icon>
                         </v-btn>
                     </v-row>
+                    <div class="grey--text" style="font-size: 0.9em; display: block; position: absolute; right: 15px; bottom: 0;">{{photos.length}} photos</div>
                 </div>
-                <div class="grey--text" style="font-size: 0.9em; display: block; position: absolute; right: 15px; top: 110px;">{{photos.length}} photos</div>
             </template>
 
             <template v-slot:default="props">
@@ -79,12 +80,13 @@ import { parseAxiosResponse } from '../../middleware/CommonHelper';
 export default {
     store,
     data: () => ({
+        isLoading: false,
         photos: [], // La liste des photos à trier
         expandedPhotos: [],
         filter: {
             search: null, // recherche multicritère
-            collection: "Toutes",
-            collections: ["Toutes", "A trier (en vrac)", "Triées"],
+            collection: "A trier",
+            collections: ["A trier", "Date manquante", "Personnes manquantes", "Lieu manquant"],
             pageIndex: 1, // page courante affichée
             pageSize: 24, // nombre de photos affichées par page
         },
@@ -104,13 +106,7 @@ export default {
         }
     }),
     mounted() {
-        axios.get(`/api/photos/to-check`).then(response => {
-            let idx = 0;
-            this.photos = parseAxiosResponse(response).map(e => ({ ...e, index: idx++ }));
-            store.commit('photosGalleryReset', this.photos);
-        }).catch( err => {
-            store.commit('onError', err);
-        });
+        this.loadCollection()
     },
     computed: {
         numberOfPages () {
@@ -118,6 +114,27 @@ export default {
         }
     },
     methods: {
+        loadCollection(collection = null) {
+            this.isLoading = true;
+            let url = `/api/photos/to-check`;
+            if (collection === this.filter.collections[1]) {
+                url += "?collection=date"
+            } else if (collection === this.filter.collections[2]) {
+                url += "?collection=person"
+            } else if (collection === this.filter.collections[3]) {
+                url += "?collection=place"
+            }
+
+            axios.get(url).then(response => {
+                let idx = 0;
+                this.photos = parseAxiosResponse(response).map(e => ({ ...e, index: idx++ }));
+                store.commit('photosGalleryReset', this.photos);
+                this.isLoading = false;
+            }).catch( err => {
+                store.commit('onError', err);
+                this.isLoading = false;
+            });
+        },
         photosGalleryDisplay(index) {
             console.log(this.expandedPhotos);
             store.commit('photosGallerySetIndex', index);

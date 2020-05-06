@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Get, Authorized, Post, Body, Param } from "routing-controllers";
+import { JsonController, Get, Authorized, Post, Body, Param, QueryParam } from "routing-controllers";
 import { Photo } from "../entities";
 
 @Authorized()
@@ -11,11 +11,31 @@ export class UserController {
      * Récupère la liste des photos à trier
      */
     @Get("/to-check")
-    async toCheck() {
+    async toCheck(@QueryParam("collection") collection: string) {
+        // On gère le filtre en fonction de la collection demandé:
+        // - date: toutes les photos dont la date est manquante
+        // - person: toutes les photos où personnes n'est indiqué
+        // - place: toutes les photos où le lieux n'est pas indiqué
+        // => par défaut: renvoie toutes les photos où aucunes des 3 infos n'est pas renseigné
+        let filter = null;
+        switch (collection) {
+            case "date":
+                filter = "p.date IS NULL";
+                break;
+            case "person":
+                filter = "p.persons IS NULL";
+                break;
+            case "place":
+                filter = "p.place IS NULL";
+                break;
+            default:
+                filter = "p.date IS NULL AND p.persons IS NULL AND p.place IS NULL";
+        }
+
         // On récupère les photos à checker
         const photos = await this.repo
             .createQueryBuilder("p")
-            .where("p.date IS NULL OR p.persons IS NULL OR p.place IS NULL")
+            .where(filter)
             .orderBy("p.id")
             .getMany();
 
