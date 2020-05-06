@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Get, Authorized } from "routing-controllers";
+import { JsonController, Get, Authorized, CurrentUser } from "routing-controllers";
 import { User } from "../entities";
 
 import { voyagService } from "../services";
@@ -14,8 +14,8 @@ export class VoyagController {
      *  - Dernière position en date pour chaque utilisateur actif
      */
     @Get("/")
-    async welcom() {
-        const result = await voyagService.getInitData();
-        return result;
+    welcom(@CurrentUser() user: User) {
+        console.log("COOUOUOUOUOUOU")
+        return voyagService.getInitData(user);
     }
 }

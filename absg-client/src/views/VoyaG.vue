@@ -56,7 +56,7 @@
             </v-tooltip>
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <v-btn color="primary" fab small dark v-on="on" style="margin-right: 10px">
+                    <v-btn color="primary" fab small dark v-on="on" style="margin-right: 10px" @click="centerUpdate(myPosition)">
                         <v-icon>fas fa-crosshairs</v-icon>
                     </v-btn>
                 </template>
@@ -87,25 +87,24 @@ export default {
         'l-marker-cluster': Vue2LeafletMarkerCluster
     },
     data: () => ({
-        zoom: 13,
-        center: latLng(47.41322, -1.219482),
+        zoom: 11,
+        center: latLng(57.41322, 1.219482),
         url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
-        currentCenter: latLng(47.41322, -1.219482),
         showParagraph: false,
         mapOptions: {
             zoomSnap: 0.5
         },
         persons: [],
+        myPosition: [],
         iconSize: 64
     }),
     mounted () {
         //console.log(this.$refs.theMap);
         axios.get(`/api/voyag`).then(response => {
             const data = parseAxiosResponse(response);
-            this.persons = data;
-            console.log(data);
-            const list = data.filter(e => Array.isArray(e.lastLocation));
-            this.persons = list.map(i => ({
+            this.myPosition = data.myPosition;
+            this.centerUpdate(this.myPosition);
+            this.persons = data.persons.filter(e => Array.isArray(e.lastLocation)).map(i => ({
                 id: i.id,
                 personId: i.personId,
                 avatar: getPeopleAvatar(i),
@@ -132,8 +131,8 @@ export default {
         zoomUpdate(zoom) {
             this.zoom = zoom;
         },
-        centerUpdate(center) {
-            this.currentCenter = center;
+        centerUpdate(position) {
+            this.$refs.theMap.setCenter(latLng(position), this.center);
         },
         showLongText() {
             this.showParagraph = !this.showParagraph;
@@ -150,8 +149,6 @@ export default {
             }
         },
         showPosition:function (position) {
-            this.lat = position.coords.latitude;
-            this.lon = position.coords.longitude;
         }
     }
 };
