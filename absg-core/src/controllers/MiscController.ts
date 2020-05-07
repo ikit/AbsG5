@@ -22,9 +22,6 @@ export class UserController {
             notifications: await userService.getLastNotifications(),
             settings: await this.getSettings()
         };
-
-        console.log(result);
-
         return result;
     }
 
