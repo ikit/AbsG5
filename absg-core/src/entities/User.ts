@@ -25,8 +25,8 @@ export class User {
     @Column("json", { comment: "users authorisations", nullable: true })
     roles: any;
 
-    @Column({ comment: "use to compute notifications for the user", nullable: true })
-    lastActivity: Date;
+    @Column("json", { comment: "Keep trace of the last action of the user on the server", nullable: true })
+    lastActivity: any;
 
     @Column({ comment: "Authentication token", nullable: true })
     rootFamily: string;

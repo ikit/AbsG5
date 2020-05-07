@@ -2,13 +2,14 @@ import { Action } from "routing-controllers";
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag } from "../entities";
 import { authService } from "../services";
-import { differenceInHours } from "date-fns";
+import { differenceInSeconds } from "date-fns";
 
 /**
  * Met à jour les log de passage concernant l'utilisateur
  * @param user l'utilisateur concerné
+ * @param url l'url requêté par l'utilisateur
  */
-export async function checkUserPassag(user: User) {
+export async function checkUserPassag(user: User, url: string) {
     // On met à jours les stats de passage de l'utilisateur
     if (user) {
         const sql = `SELECT l.*, u.username
@@ -17,7 +18,7 @@ export async function checkUserPassag(user: User) {
             WHERE l."userId" = ${user.id}
             ORDER BY l.datetime DESC
             LIMIT 1`;
-        // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
+        // On récupère le dernier passage de l'utilisateur
         let lastLog = await getRepository(LogPassag).query(sql);
         lastLog = lastLog.length > 0 ? lastLog[0] : null;
 
@@ -29,12 +30,16 @@ export async function checkUserPassag(user: User) {
             await getRepository(LogPassag).save(log);
         } else {
             const lastDate = new Date(lastLog.datetime);
-            lastDate.setMinutes(0);
-            if (differenceInHours(new Date(), lastDate) > 0) {
+            if (differenceInSeconds(new Date(), lastDate) > 3600) {
                 await getRepository(LogPassag).save(log);
             }
         }
+
+        // On met à jour l'info dans de l'utilisateur
+        user.lastActivity = { date: new Date(), url };
+        await getRepository(User).save(user);
     }
+    return user;
 }
 
 export async function getUserFromHeader(request) {
@@ -48,12 +53,12 @@ export async function getUserFromHeader(request) {
     const token = authorization.substring(7);
 
     // on vérifie que le token existe en base
-    const user = await getRepository(User).findOne({
+    let user = await getRepository(User).findOne({
         where: { token: Equal(token) }
     });
 
     // On met à jours les stats de passage de l'utilisateur
-    await checkUserPassag(user);
+    user = await checkUserPassag(user, request.url);
 
     return user;
 }
@@ -77,7 +82,7 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
         const isAuthorized = !!user && user.id && authService.checkRoles([], roles);
 
         // On met à jours les stats de passage de l'utilisateur
-        checkUserPassag(user);
+        checkUserPassag(user, action.request.url);
 
         return isAuthorized;
     } catch (e) {

@@ -16,11 +16,12 @@ export class UserController {
      */
     @Authorized()
     @Get("/welcom")
-    async welcom() {
+    async welcom(@CurrentUser() user: User) {
         const result = {
             citation: await citationService.random(),
             notifications: await userService.getLastNotifications(),
             settings: await this.getSettings()
+            //formerPassag: await userService.getFormerPass
         };
         return result;
     }
