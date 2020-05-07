@@ -111,7 +111,6 @@ export async function getMetaData(year = null): Promise<any> {
         if (row.id > 0) {
             data.categoriesOrders.push(row.id);
         }
-        
         data.categories[row.id] = {
             id: row.id,
             title: row.vTitle ? row.vTitle : row.title,

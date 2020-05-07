@@ -14,6 +14,7 @@ export default new Vuex.Store({
         citation: null, // la citation aléatoire
         user: null, // les infos sur l'utilisateur connecté
         notifications: [], // les notifications affichées dans la bar d'application
+        unreadNotifications: 0, // le nombre de notification non lu par
         settings: null, // les paramètres actuels du site
 
         // Galerie photos
@@ -56,20 +57,41 @@ export default new Vuex.Store({
             state.settings = settings;
             // TODO: déterminer en fonction de la dernière visite du user si il faut lui afficher l'annonce ou pas (1x par jour pas plus)
         },
+
+        // ========
+        // Notification methods
         updateNotifications(state, notifications) {
-            state.notifications = notifications.map(e => {
+            state.notifications = state.notifications.concat(notifications.map(e => {
                 const m = getModuleInfo(e.module);
                 return {
                     module: m,
                     message: e.message,
                     datetime: new Date(e.datetime),
                     dateLabel: format(new Date(e.datetime), "dd MMM h'h'mm", {locale: fr}),
-                    url: getPeopleAvatar(e).url
-                    // TODO: read: e.datetime > user.lastRead
+                    url: getPeopleAvatar(e).url,
+                    read: new Date(e.datetime).getTime() < new Date(2020, 4, 5).getTime(), // TODO: state.user.lastActivity
                 };
-            });
+            }));
+            state.unreadNotifications = state.notifications.filter(e => !e.read ).length;
+        },
+        readAllNotification(state) {
+            for (const n of state.notifications) {
+                n.read = true;
+            }
+            state.unreadNotifications = 0;
+        },
+        readNotification(state, notification) {
+            //const t = notification.datetime.getTime();
+            const idx = state.notifications.findIndex( e => e.datetime === notification.datetime)
+            if (idx > -1) {
+
+                state.notifications[idx].read = true;
+                state.unreadNotifications -= 1;
+            }
         },
 
+        // ========
+        // Photo gallery methods
         photosGalleryReset(state, galery) {
             state.photosGallery = galery;
             state.photosGalleryIndex = 0;

@@ -54,12 +54,15 @@
         </v-spacer >
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-badge color="accent" style="margin-right: 15px" overlap v-if="user">
-                    <span v-if="notifications.length > 0" slot="badge">{{ notifications.length }}</span>
+                <v-badge color="accent" style="margin-right: 15px" overlap :value="unreadNotifications">
+                    <span slot="badge" >{{ unreadNotifications }}</span>
                     <v-btn icon v-on="on" @click.stop="notifDialog = !notifDialog">
                         <v-icon>far fa-bell</v-icon>
                     </v-btn>
                 </v-badge>
+                <!-- <v-btn icon v-on="on" @click.stop="notifDialog = !notifDialog">
+                    <v-icon>far fa-bell</v-icon>
+                </v-btn> -->
             </template>
             <span>Voir l'historique des événements</span>
         </v-tooltip>
@@ -165,29 +168,33 @@
             <v-card-title class="grey lighten-4">
             Historiques des événements
             </v-card-title>
-            <v-container fluid  grid-list-md style="padding:0; height: 60vh; overflow: hidden; overflow-y: scroll;">
-                <v-list dense>
-                    <template v-for="(item, index) in notifications">
-                        <v-list-item
-                            class="citationRow"
-                            :key="index">
-                            <v-list-item-avatar>
-                                <img :src="item.url"/>
-                            </v-list-item-avatar>
-                            <v-list-item-content>
-                                <div style="display: flex;">
-                                    <v-icon style="flex">{{item.module.icon}}</v-icon>
-                                    <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.dateLabel }} - {{item.message}}</span>
-                                </div>
-
-                            </v-list-item-content>
-                        </v-list-item>
-                    </template>
-                </v-list>
-            </v-container>
-            <v-card-actions>
+            <v-data-table
+                :headers="notificationsHeaders"
+                :items="notifications"
+                itemsPerPage="500"
+                loading-text="Récupération des notifications..."
+                hide-default-footer
+                height="60vh"
+                class="notifications"
+            >
+                <template v-slot:item="{item}">
+                    <tr v-bind:class="{ 'unreadNotification': !item.read }" @click="onNotificationClicked(item)">
+                        <td><img :src="item.url" height="40px"/></td>
+                        <td>
+                            <div style="display: flex;">
+                                <v-icon style="flex">{{ item.module.icon }}</v-icon>
+                                <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.message }}</span>
+                            </div>
+                        </td>
+                        <td>{{ item.dateLabel }}</td>
+                        <td><v-simple-checkbox v-model="item.read" disabled></v-simple-checkbox></td>
+                    </tr>
+                </template>
+            </v-data-table>
+            <v-card-actions style="padding-top: 20px">
                 <v-spacer></v-spacer>
-                <v-btn text @click="closeNotifications()">Fermer</v-btn>
+                <v-btn @click="closeNotifications(true)">Marquer tout comme vu</v-btn>
+                <v-btn @click="closeNotifications()">Fermer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -239,6 +246,12 @@ export default {
         drawer: null,
         ws: null,
         menuItems: MODULES,
+        notificationsHeaders: [
+            { text: 'Qui', value: 'who' },
+            { text: 'Quoi', value: 'what' },
+            { text: 'Quand', value: 'when' },
+            { text: '', value: 'read' },
+        ],
 
         // Galerie photo editor
         photoDisplayedDateMenu: false,
@@ -285,28 +298,19 @@ export default {
         photosGalleryAuto() {
             console.log('photosGalleryAuto');
         },
-        closeNotifications() {
+        onNotificationClicked(notification) {
+            console.log("onNotificationClicked", notification);
+            if (notification) {
+                store.commit("readNotification", notification);
+                this.$router.push(notification.module.url);
+                this.notifDialog = false;
+            }
+        },
+        closeNotifications(readAll = false) {
             this.notifDialog = false;
-            // axios.get(`/api/users/checkNotifications`).then(response => {
-            //     const data = parseAxiosResponse(response);
-            //     if (data) {
-            //         this.isLoading = false;
-
-            //         // On crée la listes des logs de passaG (les 24 dernières heures)
-            //         this.passage = []
-            //         const now = new Date();
-            //         for (let hDelta = 0; hDelta<24; hDelta++) {
-            //             let h = ((now.getHours() - hDelta) + 24) % 24;  // On simule le modulo
-            //             this.passage.unshift({
-            //                 time: `${h}h`,
-            //                 passage: data.passag
-            //                     .filter(e => new Date(e.datetime).getHours() === h)
-            //                     .map(e => ({ username: `${e.username}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
-            //             })
-
-            //         }
-            //     }
-            // });
+            if (readAll) {
+                store.commit("readAllNotification");
+            }
         }
     },
     computed: {
@@ -314,6 +318,7 @@ export default {
             'citation',
             'user',
             'notifications',
+            'unreadNotifications',
             'error'
         ]),
         // Gallerie photos
@@ -403,6 +408,11 @@ export default {
     background: rgba(255,255,255, 0.2);
 }
 
+.unreadNotification {
+    font-weight: bold;
+    color: $accent;
+    cursor: pointer;
+}
 
 .mainContent {
     position: relative;

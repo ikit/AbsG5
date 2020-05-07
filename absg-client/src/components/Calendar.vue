@@ -180,7 +180,6 @@ export default {
             return this.colors[event.type];
         },
         headerDay(d) {
-            console.log(d);
             return ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'][d.weekday];
         },
         setToday () {

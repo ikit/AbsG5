@@ -15,13 +15,9 @@ export async function ceremonyData(year: number) {
     edition.authors = [];
     edition.stats = { totalPhotos: 0, totalAuthors: 0 };
 
-    console.log(edition.categories)
-    console.log("===========================")
     for (const catId in edition.categories) {
-        console.log(catId)
         edition.categories[catId].nominated = [];
     }
-    console.log("===========================")
 
     // On récupère les photos de chaque catégories
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 

@@ -23,13 +23,11 @@ export function parseAxiosResponse(response) {
     if (!response) {
         return null;
     }
-
     if (response.status !== 200) {
         console.log('NETWORK ERROR', response);
         return null;
     }
 
-    // console.log('parseAxiosResponse', response);
     return response.data
 }
 

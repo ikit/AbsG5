@@ -97,7 +97,6 @@ import axios from 'axios';
 import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { padNumber } from '../middleware/CommonHelper';
-import * as image3D from '3d-image';
 import Calendar from '../components/Calendar';
 import {Chart} from 'highcharts-vue';
 
@@ -154,9 +153,6 @@ export default {
     }),
     mounted() {
         this.getWelcomData();
-        var coke = document.getElementById("coke");
-        console.log(image3D)
-        //image3D.process(coke);
     },
     watch: {
         menu (val) {
