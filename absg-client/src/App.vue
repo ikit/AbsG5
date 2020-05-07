@@ -248,6 +248,7 @@ export default {
         source: String
     },
     mounted() {
+        store.dispatch('initStore');
     },
     methods: {
         logout() {

@@ -9,42 +9,19 @@ import { getMetaData } from "./agpaCommonHelpers";
 export async function ceremonyData(year: number) {
     // On récupère les photos
     const repo = getRepository(AgpaPhoto);
-    const meta = await getMetaData(year);
+    const edition = await getMetaData(year);
 
     // Init data
-    const edition = {
-        stats: { totalPhotos: 0, totalAuthors: 0 },
-        categories:
-            year < 2012
-                ? {
-                      "1": { nominated: [] },
-                      "2": { nominated: [] },
-                      "3": { nominated: [] },
-                      "4": { nominated: [] },
-                      "5": { nominated: [] },
-                      "6": { nominated: [] },
-                      "-2": { nominated: [] },
-                      "-1": { nominated: [] }
-                  }
-                : {
-                      "1": { nominated: [] },
-                      "2": { nominated: [] },
-                      "3": { nominated: [] },
-                      "4": { nominated: [] },
-                      "5": { nominated: [] },
-                      "6": { nominated: [] },
-                      "7": { nominated: [] },
-                      "8": { nominated: [] },
-                      "-4": { nominated: [] },
-                      "-3": { nominated: [] },
-                      "-2": { nominated: [] },
-                      "-1": { nominated: [] }
-                  },
-        authors: []
-    };
+    edition.authors = [];
+    edition.stats = { totalPhotos: 0, totalAuthors: 0 };
+
+    console.log(edition.categories)
+    console.log("===========================")
     for (const catId in edition.categories) {
-        edition.categories[catId].title = meta.categories[catId].title;
+        console.log(catId)
+        edition.categories[catId].nominated = [];
     }
+    console.log("===========================")
 
     // On récupère les photos de chaque catégories
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", u.username 
@@ -57,6 +34,9 @@ export async function ceremonyData(year: number) {
     const result = await repo.query(sql);
     for (const p of result) {
         if (p.award === "honor") {
+            if (!edition.categories.hasOwnProperty("-4")) {
+                edition.categories[-4] = {}
+            }
             edition.categories[-4].nominated.push(p);
         } else {
             edition.categories[p.awardCategory].nominated.push(p);

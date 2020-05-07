@@ -10,7 +10,7 @@
     </v-card>
 
 
-    <p style="text-align: center; font-size: 1em; font-weight: bold; font-family: serif; opacity: 0.3">
+    <p style="text-align: center; font-size: 1em; font-weight: bold; font-family: serif; opacity: 0.5">
         Vous avez encore le temps... en attendant vous pouvez revoir les anciennes cérémonies:
     </p>
 
@@ -42,13 +42,17 @@
 
 <script>
 import axios from 'axios';
+import store from '../../store';
+import { mapState } from 'vuex';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
+import { addDays, addSeconds, format } from 'date-fns';
 import Timer from '../../components/Timer';
 
 export default {
     name: 'CeremonyMenu',
+    store,
     components: {
         Timer,
     },
@@ -63,12 +67,14 @@ export default {
         }
 
     }),
+    computed: {
+        ...mapState([ 'settings' ])
+    },
     mounted() {
         this.isLoading = true;
 
-        // TODO: récupérer la date de la cérémonie depuis le back et initialiser le compte à rebours
-        this.current.ceremonyDate = new Date( new Date().getTime() + 1000000);
-        this.current.year = 2020
+        // On récupère la date de la cérémonie depuis les settings du site
+        setTimeout(() => this.resetTimer());
 
 
         axios.get(`/api/agpa/archives`).then(response => {
@@ -77,10 +83,21 @@ export default {
         });
 
 
-        this.$refs.timer.init(this.current.ceremonyDate);
-        console.log( this.current.ceremonyDate);
     },
     methods: {
+        resetTimer() {
+            const p1 = new Date(new Date().getFullYear(), 9, 1) // le 1er octobre à minuit
+            const p2 = addDays(p1, this.settings.agpaPhase1Duration);
+            const p3 = addDays(p2, this.settings.agpaPhase2Duration);
+            const p4 = addDays(p3, this.settings.agpaPhase3Duration);
+            let p5 = addDays(p4, this.settings.agpaPhase4Duration);
+            p5 = addSeconds(p5, this.settings.agpaCeremonyStartTime);
+
+            this.current.ceremonyDate = p5; // new Date( new Date().getTime() + 1000000);
+            this.current.year = new Date().getFullYear();
+            this.$refs.timer.init(this.current.ceremonyDate);
+        },
+
         startCeremony() {
             console.log("TIMER DONE !");
             this.current.displayed = true;

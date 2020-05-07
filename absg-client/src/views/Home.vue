@@ -153,7 +153,6 @@ export default {
         }
     }),
     mounted() {
-        store.dispatch('initStore');
         this.getWelcomData();
         var coke = document.getElementById("coke");
         console.log(image3D)

@@ -104,7 +104,7 @@ export async function getMetaData(year = null): Promise<any> {
     const sql = `SELECT c.* , v.title as "vTitle", v.description as "vDescription"
         FROM agpa_category c
         LEFT JOIN agpa_category_variation v ON v.id = c.id AND v.year = ${year}
-        WHERE (c.to IS NULL OR c.to >= ${year}) AND c.from <= ${year} AND c.id <> -4
+        WHERE (c.to IS NULL OR c.to >= ${year}) AND c.from <= ${year}
         ORDER BY c."order"`;
     const result = await repo.query(sql);
     for (const row of result) {
