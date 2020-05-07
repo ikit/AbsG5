@@ -111,6 +111,7 @@ export default {
     store,
     data: () => ({
         menu: false,
+        immt: null,
         passagHistoryDialogDisplayed: false,
         historyData: {
             chart: {
@@ -152,6 +153,7 @@ export default {
         }
     }),
     mounted() {
+        store.commit('initStore');
         this.getWelcomData();
         var coke = document.getElementById("coke");
         console.log(image3D)
@@ -164,13 +166,23 @@ export default {
     },
     methods: {
         getWelcomData() {
-            axios.get(`/api/users/welcom`).then(response => {
+            axios.get(`/api/homePage`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
-                    store.commit('updateCitation', data.citation);
-                    store.commit('updateImmt', data.immt);
-                    store.commit('updateNotifications', data.notifications);
+
+                    // La photo du moment
+                    if (data.immt) {
+                        let day = `${data.immt.day}`;
+                        data.immt.src = `/files/immt/${data.immt.year}_${day.padStart(3,'0')}.jpg`;
+                        this.immt = data.immt;
+
+                        store.commit('photosGalleryReset', [{
+                            url: this.immt.src,
+                            title: this.immt.title
+                        }]);
+                        store.commit('photosGallerySetIndex', 0);
+                    }
 
                     // On crée la listes des logs de passaG (les 24 dernières heures)
                     this.passage = []
@@ -181,7 +193,7 @@ export default {
                             time: `${h}h`,
                             passage: data.passag
                                 .filter(e => new Date(e.datetime).getHours() === h)
-                                .map(e => ({ username: `${e.username}`, avatar: `./img/avatars/${padNumber(e.userId, 3)}.png` })),
+                                .map(e => ({ username: `${e.username}`, avatar: `/img/avatars/${padNumber(e.userId, 3)}.png` })),
                         })
 
                     }
@@ -190,7 +202,7 @@ export default {
         },
         displayPassagHistoryDialog() {
             this.passagHistoryDialogDisplayed = true;
-            axios.get(`/api/users/passagHistory`).then(response => {
+            axios.get(`/api/passagHistory`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
@@ -212,12 +224,6 @@ export default {
         }
     },
     computed: {
-        // Méthode pour le store
-        immt () {
-          return this.$store.state.immt;
-        },
-
-
         // Méthode pour la calendrier
         title () {
             const { start, end } = this

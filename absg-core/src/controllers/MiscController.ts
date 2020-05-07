@@ -1,10 +1,8 @@
-import { getRepository, Equal } from "typeorm";
-import { JsonController, Post, Body, BadRequestError, Get, Authorized } from "routing-controllers";
-import { User } from "../entities";
-
-import { authService, citationService, eventService, immtService, userService } from "../services";
+import { getRepository } from "typeorm";
+import { JsonController, Post, Body, Get, Authorized, CurrentUser, UnauthorizedError } from "routing-controllers";
+import { citationService, eventService, immtService, userService } from "../services";
 import { subDays } from "date-fns";
-import { Parameter } from "../entities";
+import { Parameter, User } from "../entities";
 
 @JsonController("")
 export class UserController {
@@ -13,26 +11,53 @@ export class UserController {
     /**
      * Récupère l'ensemble des informations de la page d'accueil:
      *  - Une citation aléatoire
-     *  - La dernière image du moment
-     *  - Les événements du mois en cours
-     *  - L'historique des passages de la journée
-     *  - Les dernières notifications non lues
+     *  - Les 50 dernières notifications
+     *  - Les paramètres de configuration du site (notament si il y a une annonce à afficher)
      */
+    @Authorized()
     @Get("/welcom")
     async welcom() {
-        const current = new Date();
         const result = {
-            immt: await immtService.last(),
             citation: await citationService.random(),
-            events: await eventService.getForMonth(current.getFullYear(), current.getMonth()),
-            passag: await userService.getPassag(subDays(new Date(), 1)),
             notifications: await userService.getLastNotifications(),
-            user: {}
+            settings: await this.getSettings()
         };
+
+        console.log(result);
 
         return result;
     }
 
+    /**
+     * Récupère l'ensemble des éléments nécessaire pour construire la page d'accueil
+     *  - La dernière image du moment
+     *  - Les événements du mois en cours
+     *  - L'historique des passages de la journée
+     */
+    @Authorized()
+    @Get("/homePage")
+    async home() {
+        const current = new Date();
+        const result = {
+            immt: await immtService.last(),
+            events: await eventService.getForMonth(current.getFullYear(), current.getMonth()),
+            passag: await userService.getPassag(subDays(new Date(), 1))
+        };
+        return result;
+    }
+
+    /**
+     * Récupère l'historique des passage sur le site des membres sur toute une année
+     */
+    @Authorized()
+    @Get("/passagHistory")
+    async passagHistory() {
+        return await userService.getPassagHistory();
+    }
+
+    /**
+     * Récupère la liste de tout les paramètres du site
+     */
     @Authorized()
     @Get("/settings")
     async getSettings() {
@@ -56,18 +81,25 @@ export class UserController {
         return settings;
     }
 
+    /**
+     * Met à jour les paramètres du site
+     * @param settings
+     */
     @Authorized()
     @Post("/settings")
-    async saveSettings(@Body() settings: any) {
-        let sql = "";
-        for (const key in settings) {
-            if (key == "agpaSpecialEdition") {
-
-            } else {
-                sql += `UPDATE agpa_category_variation SET value=${settings[key]} WHERE key = '${key}';`;
+    async saveSettings(@Body() settings: any, @CurrentUser() user: User) {
+        if (user && Array.isArray(user.roles) && user.roles.indexOf("admin") > -1) {
+            let sql = "";
+            for (const key in settings) {
+                if (key == "agpaSpecialEdition") {
+                    // TODO: INSERT OR UPDATE current edition special category
+                } else {
+                    sql += `UPDATE agpa_category_variation SET value=${settings[key]} WHERE key = '${key}';`;
+                }
             }
+            await this.repo.query(sql);
+            return await this.getSettings();
         }
-        await this.repo.query(sql);
-        return await this.getSettings();
+        return new UnauthorizedError("Vous n'avez pas les droits suffisant pour modifier les paramètres du site");
     }
 }

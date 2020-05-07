@@ -113,7 +113,7 @@ class UserService {
             FROM log_system l
             INNER JOIN "user" u ON u.id = l."userId" 
             WHERE severity = 'notice'
-            ORDER BY l.datetime ASC
+            ORDER BY l.datetime DESC
             LIMIT 50`;
         return getRepository(LogPassag).query(sql);
     }

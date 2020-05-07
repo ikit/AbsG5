@@ -33,16 +33,35 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        initStore(state) {
+            if (!state.isInitialized) {
+                axios.get(`/api/welcom`).then(response => {
+                    const data = parseAxiosResponse(response);
+                    // Paramètres du site et annonces
+                    state.settings = data.settings;
+                    // TODO: déterminer en fonction de la dernière visite du user si il faut lui afficher l'annonce ou pas (1x par jour pas plus)
 
-        onError(state, axiosError) {
-            console.log("ERR SERVER", axiosError);
-            state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
-            state.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`;
-            state.error.msg =  axiosError;
-            state.error.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
-            state.error.displayed = true;
+                    // La citation aléatoire
+                    if (data.citation) {
+                        data.citation.author = data.citation.author.surname ? data.citation.author.surname : data.citation.author.firstname;
+                    }
+                    state.citation = data.citation;
+
+                    // Les notifications
+                    state.notifications = data.notifications
+
+                    // On indique que le modèle est initialisé, pour éviter de le refaire
+                    state.isInitialized = true;
+                });
+            }
         },
-
+        initAGPA(state) {
+            if (!state.agpaMeta) {
+                axios.get(`/api/agpa`).then(response => {
+                    state.agpaMeta = parseAxiosResponse(response);
+                });
+            }
+        },
         setCurrentUser(state, user) {
             if (user) {
                 // Get user avatar url
@@ -57,20 +76,7 @@ export default new Vuex.Store({
         updateUser(state, user) {
             state.user = user;
         },
-        updateCitation(state, citation) {
-            citation.author = citation.authorSurname ? citation.authorSurname : citation.authorFirstname;
-            state.citation = citation;
-        },
-        updateImmt(state, immt) {
-            let day = `${immt.day}`;
-            immt.src = `/files/immt/${immt.year}_${day.padStart(3,'0')}.jpg`;
-            state.immt = immt;
-            state.photosGallery = [{
-                url: immt.src,
-                title: immt.title
-            }];
-            state.photosGalleryIndex = 0;
-        },
+
         updateNotifications(state, notifications) {
             state.notifications = notifications.map(e => {
                 const m = getModuleInfo(e.module);
@@ -80,6 +86,7 @@ export default new Vuex.Store({
                     datetime: new Date(e.datetime),
                     dateLabel: format(new Date(e.datetime), "dd MMM h'h'mm", {locale: fr}),
                     user: getPeopleAvatar(e)
+                    // TODO: read: e.datetime > user.lastRead
                 };
             });
         },
@@ -96,10 +103,12 @@ export default new Vuex.Store({
         },
         photosGalleryDisplay(state) {
             state.photosGalleryDisplayed = true;
+            // TODO: bind keyboard event
         },
         photosGalleryHide(state) {
             state.photosGalleryDisplayed = false;
             state.photoMetadataEditorDisplayed = false;
+            // TODO: unbind keyboard event
         },
         photosGalleryNext(state) {
             if (state.photosGallery.length > 1) {
@@ -119,17 +128,19 @@ export default new Vuex.Store({
         photosGallerySetIndex(state, index) {
             state.photosGalleryIndex = index;
         },
-        initAGPA(state) {
-            if (!state.agpaMeta) {
-                axios.get(`/api/agpa`).then(response => {
-                    state.agpaMeta = parseAxiosResponse(response);
-                });
-            }
-        }
+
+        onError(state, axiosError) {
+            console.log("ERR SERVER", axiosError);
+            state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
+            state.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`;
+            state.error.msg =  axiosError;
+            state.error.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
+            state.error.displayed = true;
+        },
     },
-    actions: {
-        photosGalleryNext(state) {
-            state.photosGalleryIndex = 0;
-        }
-    }
+    // actions: {
+    //     photosGalleryNext(state) {
+    //         state.photosGalleryIndex = 0;
+    //     }
+    // }
 });
