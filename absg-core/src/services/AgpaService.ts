@@ -1,6 +1,5 @@
-import { getRepository } from "typeorm";
-import { AgpaPhoto, User } from "../entities";
-import { initAGPAContext, getMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
+import { User } from "../entities";
+import { getMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
