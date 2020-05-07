@@ -172,7 +172,7 @@
                             class="citationRow"
                             :key="index">
                             <v-list-item-avatar>
-                                <img :src="item.user.url"/>
+                                <img :src="item.url"/>
                             </v-list-item-avatar>
                             <v-list-item-content>
                                 <div style="display: flex;">
@@ -221,7 +221,6 @@ import store from './store';
 import axios from 'axios';
 import { mapState } from 'vuex';
 import { MODULES, parseAxiosResponse } from  './middleware/CommonHelper';
-import { webSocket } from "rxjs/webSocket";
 import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
 import PhotoMetadataEditor from './components/PhotoMetadataEditor.vue';
 
@@ -249,25 +248,11 @@ export default {
         source: String
     },
     mounted() {
-        // On initialise le websocket
-        const host = process.env.NODE_ENV === "production" ? `wss://${window.location.hostname}/ws` : `ws://localhost:5011`;
-        this.ws = webSocket(host);
-        this.ws.subscribe(
-            msg => this.processWebsocketMessage(msg),
-            err => this.processWebsocketError("Problème de mise à jour temps réel", err),
-            () => console.log("complete") // Called when connection is closed (for whatever reason).
-        );
     },
     methods: {
         logout() {
             logoutUser(store);
             this.$router.push('/login');
-        },
-        processWebsocketMessage(msg) {
-            console.log("processWebsocketMessage", msg);
-        },
-        processWebsocketError(msg, err) {
-            console.log("processWebsocketError", msg, err);
         },
         copyError() {
             navigator.clipboard.writeText(`Erreur Absolument G\nDate: ${this.error.log}\nRequête: ${this.error.query}\nStatus: ${this.error.htmlError}\nError: ${this.error.msg}`);;

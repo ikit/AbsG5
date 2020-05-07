@@ -26,7 +26,7 @@ export default {
         currentEditionYear: null
     }),
     mounted() {
-        store.commit('initAGPA');
+        store.dispatch('initAGPA');
     },
     props: ['darkMode'],
     methods: {

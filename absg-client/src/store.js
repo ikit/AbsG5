@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+import { webSocket } from "rxjs/webSocket";
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from './middleware/CommonHelper';
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -13,10 +14,8 @@ export default new Vuex.Store({
         citation: null, // la citation aléatoire
         user: null, // les infos sur l'utilisateur connecté
         notifications: [], // les notifications affichées dans la bar d'application
+        settings: null, // les paramètres actuels du site
 
-        immt: null,
-        currentMonthEvents: [], // les événements du mois en cours
-        passag: [],
         // Galerie photos
         photosGallery: [],
         photosGalleryIndex: 0,
@@ -33,35 +32,6 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        initStore(state) {
-            if (!state.isInitialized) {
-                axios.get(`/api/welcom`).then(response => {
-                    const data = parseAxiosResponse(response);
-                    // Paramètres du site et annonces
-                    state.settings = data.settings;
-                    // TODO: déterminer en fonction de la dernière visite du user si il faut lui afficher l'annonce ou pas (1x par jour pas plus)
-
-                    // La citation aléatoire
-                    if (data.citation) {
-                        data.citation.author = data.citation.author.surname ? data.citation.author.surname : data.citation.author.firstname;
-                    }
-                    state.citation = data.citation;
-
-                    // Les notifications
-                    state.notifications = data.notifications
-
-                    // On indique que le modèle est initialisé, pour éviter de le refaire
-                    state.isInitialized = true;
-                });
-            }
-        },
-        initAGPA(state) {
-            if (!state.agpaMeta) {
-                axios.get(`/api/agpa`).then(response => {
-                    state.agpaMeta = parseAxiosResponse(response);
-                });
-            }
-        },
         setCurrentUser(state, user) {
             if (user) {
                 // Get user avatar url
@@ -76,7 +46,16 @@ export default new Vuex.Store({
         updateUser(state, user) {
             state.user = user;
         },
-
+        updateCitation(state, citation) {
+            if (citation) {
+                citation.author = citation.author.surname ? citation.author.surname : citation.author.firstname;
+            }
+            state.citation = citation;
+        },
+        updateSettings(state, settings) {
+            state.settings = settings;
+            // TODO: déterminer en fonction de la dernière visite du user si il faut lui afficher l'annonce ou pas (1x par jour pas plus)
+        },
         updateNotifications(state, notifications) {
             state.notifications = notifications.map(e => {
                 const m = getModuleInfo(e.module);
@@ -85,7 +64,7 @@ export default new Vuex.Store({
                     message: e.message,
                     datetime: new Date(e.datetime),
                     dateLabel: format(new Date(e.datetime), "dd MMM h'h'mm", {locale: fr}),
-                    user: getPeopleAvatar(e)
+                    url: getPeopleAvatar(e).url
                     // TODO: read: e.datetime > user.lastRead
                 };
             });
@@ -129,6 +108,16 @@ export default new Vuex.Store({
             state.photosGalleryIndex = index;
         },
 
+        onWsMessage(msg) {
+            console.log("TODO: processWebsocketMessage", msg);
+        },
+        onWsError(err) {
+            console.log("TODO: processWebsocketError", err);
+        },
+        onWsCompleted() {
+            console.log("TODO: WS closed. ");
+        },
+
         onError(state, axiosError) {
             console.log("ERR SERVER", axiosError);
             state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
@@ -138,9 +127,39 @@ export default new Vuex.Store({
             state.error.displayed = true;
         },
     },
-    // actions: {
-    //     photosGalleryNext(state) {
-    //         state.photosGalleryIndex = 0;
-    //     }
-    // }
+    actions: {
+        initStore(state) {
+
+            if (!state.isInitialized) {
+                // On initialise le websocket
+                const host = process.env.NODE_ENV === "production" ? `wss://${window.location.hostname}/ws` : `ws://localhost:5011`;
+                this.ws = webSocket(host);
+                this.ws.subscribe(
+                    msg => this.commit("onWsMessage", msg),
+                    err => this.commit("onWsError", err),
+                    ()  => this.commit("onWsCompleted", err)
+                );
+
+                // On récupère les infos de base
+                axios.get(`/api/welcom`).then(response => {
+                    const data = parseAxiosResponse(response);
+                    // On met à jour le modèle
+                    this.commit("updateSettings", data.settings);
+                    this.commit("updateCitation", data.citation);
+                    this.commit("updateNotifications", data.notifications);
+
+                    // On indique que le modèle est initialisé, pour éviter de le refaire
+                    state.isInitialized = true;
+                    console.log("initStore", state);
+                });
+            }
+        },
+        initAGPA(state) {
+            if (!state.agpaMeta) {
+                axios.get(`/api/agpa`).then(response => {
+                    state.agpaMeta = parseAxiosResponse(response);
+                });
+            }
+        },
+    }
 });
