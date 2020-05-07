@@ -166,7 +166,7 @@ export default {
     },
     methods: {
         getWelcomData() {
-            axios.get(`/api/homePage`).then(response => {
+            axios.get(`/api/homepage`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
@@ -202,7 +202,7 @@ export default {
         },
         displayPassagHistoryDialog() {
             this.passagHistoryDialogDisplayed = true;
-            axios.get(`/api/passagHistory`).then(response => {
+            axios.get(`/api/passag`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;

@@ -35,7 +35,7 @@ export class UserController {
      *  - L'historique des passages de la journée
      */
     @Authorized()
-    @Get("/homePage")
+    @Get("/homepage")
     async home() {
         const current = new Date();
         const result = {
@@ -50,7 +50,7 @@ export class UserController {
      * Récupère l'historique des passage sur le site des membres sur toute une année
      */
     @Authorized()
-    @Get("/passagHistory")
+    @Get("/passag")
     async passagHistory() {
         return await userService.getPassagHistory();
     }
