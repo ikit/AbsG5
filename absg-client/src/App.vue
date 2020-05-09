@@ -76,22 +76,18 @@
             </template>
 
             <v-list nav>
-                <v-list-item href="/me/informations">
+                <v-list-item :to="{path: `/myprofile` }">
                     <v-list-item-title :key="0">
                         <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations
-                    </v-list-item-title>
-                </v-list-item>
-                <v-list-item href="/me/stats">
-                    <v-list-item-title :key="1">
-                        <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-chart-bar</v-icon>Mes statistiques
                     </v-list-item-title>
                 </v-list-item>
                 <v-list-item :to="{path: `/resetpwd` }">
                     <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
                 </v-list-item>
+                <!-- TODO: DarkMode
                 <v-list-item>
                     <v-switch label="Mode nuit" v-model="darkMode"></v-switch>
-                </v-list-item>
+                </v-list-item> -->
                 <v-divider></v-divider>
                 <v-list-item @click="logout()">
                     <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Déconnexion</v-list-item-title>

@@ -3,9 +3,10 @@ import VueRouter from "vue-router"
 import Home from "./views/Home.vue";
 import E404 from "./views/E404.vue";
 import Changelog from "./views/Changelog.vue";
-import Login from "./views/Login.vue";
+import Login from "./views/User/Login.vue";
 import NewPassword from "./views/User/NewPassword.vue";
 import AskNewPassword from "./views/User/AskNewPassword.vue";
+import Profile from "./views/User/Profile.vue";
 import axios from "axios";
 import store from "./store";
 import { checkAutentication, logoutUser, logUser } from "./middleware/AuthHelper";
@@ -186,6 +187,10 @@ export const router = new VueRouter({
         {
             path: "/forgotten",
             component: AskNewPassword,
+        },
+        {
+            path: "/myprofile",
+            component: Profile,
         },
         {
             path: "/voyag",

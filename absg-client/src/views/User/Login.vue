@@ -47,9 +47,9 @@
 <script>
 import Vue from "vue";
 import axios from "axios";
-import store from "../store";
-import { parseAxiosResponse, getPeopleAvatar } from "../middleware/CommonHelper";
-import { logUser } from "../middleware/AuthHelper";
+import store from "../../store";
+import { parseAxiosResponse, getPeopleAvatar } from "../../middleware/CommonHelper";
+import { logUser } from "../../middleware/AuthHelper";
 
 export default {
     name: "Login",
@@ -85,7 +85,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../themes/global.scss';
+@import '../../themes/global.scss';
 
 .errorMsg {
     position: absolute;

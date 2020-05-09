@@ -28,8 +28,7 @@
                     <v-chip
                         v-for="r in item.roles"
                         :key="r"
-                        :color="getRoleColor(r)"
-                        dark>
+                        :color="getRoleColor(r)">
                         {{ getRoleLabel(r) }}
                     </v-chip>
                 </template>

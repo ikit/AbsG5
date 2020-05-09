@@ -137,7 +137,6 @@ export default {
     computed: { ...mapState([
         'agpaMeta'
     ])},
-    props: ['darkMode'],
     mounted () {
         this.initView();
     },

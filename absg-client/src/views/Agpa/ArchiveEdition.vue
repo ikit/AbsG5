@@ -172,7 +172,6 @@ export default {
         'agpaMeta',
         'photosGallery',
     ])},
-    props: ['darkMode'],
     mounted () {
         this.initView();
     },

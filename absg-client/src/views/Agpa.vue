@@ -28,7 +28,6 @@ export default {
     mounted() {
         store.dispatch('initAGPA');
     },
-    props: ['darkMode'],
     methods: {
     },
     computed: {
