@@ -1,22 +1,29 @@
 <template>
 <div>
     <v-tabs centered>
-        <v-tab v-for="t in topics" :key="t.id" :to="{path: `/forum/read/${t.id}`}">
-            <template v-if="t.newMessages">
-                <v-badge right color="accent">
+        <v-tab  :to="{path: `/forum/tbz`}">
+            <template >
+                <v-badge right color="accent" :value="tbzNnewMessages">
                     <template v-slot:badge>
-                        <span>3</span>
+                        <span>{{ tbzNnewMessages }}</span>
                     </template>
-                    <v-icon>fas fa-comment-dots</v-icon> &nbsp; {{ t.name }}
+                    <v-icon>far fa-comment-dots</v-icon> &nbsp; T.B.Z.
                 </v-badge>
             </template>
-            <template v-else>
-                <v-icon>far fa-comment-dots</v-icon> &nbsp; {{ t.name }}
+        </v-tab>
+        <v-tab v-for="t in topics" :key="t.forumId" :to="{path: `/forum/read/${t.forumId}`}">
+            <template >
+                <v-badge right color="accent" :value="t.newMessages">
+                    <template v-slot:badge>
+                        <span>{{ t.newMessages}}</span>
+                    </template>
+                    <v-icon>far fa-comment-dots</v-icon> &nbsp; {{ t.name }}
+                </v-badge>
             </template>
 
         </v-tab>
         <v-tab :to="{path: `/forum/archives`}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
-        <v-tab :to="{path: `/forum/newTopic`}"> <v-icon>fas fa-plus</v-icon> &nbsp; Nouvelle discussion</v-tab>
+        <!-- <v-tab :to="{path: `/forum/newTopic`}"> <v-icon>fas fa-plus</v-icon> &nbsp; Nouvelle discussion</v-tab> -->
     </v-tabs>
 
     <router-view></router-view>
@@ -27,30 +34,26 @@
 export default {
     data: () => ({
         topics: [],
+        tbzNnewMessages: 0
     }),
     mounted () {
         // récupèrer la liste des sujets principaux
         this.topics = [
-            {
-                id: 1,
-                name: "T.B.Z.",
-                newMessages: 3,
-            },
-            {
-                id: 2,
-                name: "Lanslevillard",
-                newMessages: 0,
-            },
-            {
-                id: 3,
-                name: "Malaucène",
-                newMessages: 1,
-            },
-            {
-                id: 4,
-                name: "A.G.P.A.",
-                newMessages: 0,
-            }
+            // {
+            //     id: 2,
+            //     name: "Lanslevillard",
+            //     newMessages: 0,
+            // },
+            // {
+            //     id: 3,
+            //     name: "Malaucène",
+            //     newMessages: 1,
+            // },
+            // {
+            //     id: 4,
+            //     name: "A.G.P.A.",
+            //     newMessages: 0,
+            // }
         ];
 
         // On charge le premier onglet

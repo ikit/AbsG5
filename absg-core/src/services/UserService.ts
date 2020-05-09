@@ -1,9 +1,9 @@
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag, Person } from "../entities";
 import { format, differenceInDays } from "date-fns";
-import { cleanString } from "../middleware/commonHelper";
-import { authService } from ".";
+import { cleanString, sendEmail } from "../middleware/commonHelper";
 import { logger } from "../middleware/logger";
+import { hashPassword, createToken } from "../middleware";
 
 class UserService {
     private usersRepo = null;
@@ -62,7 +62,7 @@ class UserService {
             userData.person = person;
 
             // On chiffre le mot de passe
-            userData.passwordHash = await authService.hashPassword(userData.password);
+            userData.passwordHash = await hashPassword(userData.password);
 
             // On stock le nouvel utilisateur en base
             userData.id = null;
@@ -90,7 +90,7 @@ class UserService {
         // On gère le cas du password
         if (userData.password) {
             // on met à jour avec le nouveau mot de passe
-            user.passwordHash = await authService.hashPassword(userData.password);
+            user.passwordHash = await hashPassword(userData.password);
         } else {
             // On garde l'ancien mot de passe
             user.passwordHash = currentPwdHash;
@@ -105,7 +105,60 @@ class UserService {
     }
 
     /**
-     * Retourne les infos nécessaire à l'initialisation de l'écran "citation" du site
+     * Met à jour le mot de l'utilisateur
+     * @param user l'utilisateur qui fait la demande
+     * @param pwd le nouveau mot de passe
+     */
+    async changePassword(user: User, pwd: any) {
+        // On sauvegarde le nouveau mot de passe
+        user.passwordHash = await hashPassword(pwd);
+
+        // On régénère la session de l'utilisateur
+        user.token = await createToken(user);
+
+        await this.usersRepo.save(user);
+        return user;
+    }
+
+    /**
+     * Crée un lien pour réinitialiser son mot de passe
+     */
+    async resetPassword(email: string) {
+        // On regarde si on trouve un utilisateur qui correspond à l'adresse email
+        const users = await this.usersRepo
+            .createQueryBuilder("u")
+            .leftJoinAndSelect("u.person", "p")
+            .where(`p.email = '${email}'`)
+            .getMany();
+        
+        if (users.length > 1) {
+            throw new Error(
+                "Plusieurs comptes possèdent cet email. Veuillez voir avec un administrateur du site pour réinitialiser votre mot de passe"
+            );
+        } else if (users.length === 1) {
+            // On crée une session de 10 minutes avec acccès restreind pour laisser le temps à l'utilisateur de changer son mdp
+            users[0].token = await createToken(users[0], true);
+            await this.usersRepo.save(users[0]);
+            // On envoie un email à l'utilisateur avec le lien
+            sendEmail(
+                "Absolument G - demande de réinitialisation d'email",
+                `Bonjour ${users[0].username},
+
+Une demande de réinitialisation de votre mot de passe viens d'être faite sur le site absolumentg.fr.
+Le liens ci-dessous est valide 10 minutes et vous permettra de modifier votre mot de passe.
+
+${process.env.URL_CLIENT}resetpwd?session=${encodeURI(users[0].token)}.
+
+L'équipe système`,
+                users[0].person.email
+            );
+        }
+        // On ignore la demande
+        return null;
+    }
+
+    /**
+     * Retourne les dernières notifications à afficher pour l'utilisateur
      */
     public async getLastNotifications() {
         // On récupère les 50 dernières notifications sur les 7 derniers jours

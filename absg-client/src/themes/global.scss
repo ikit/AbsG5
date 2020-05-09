@@ -83,7 +83,19 @@ h1 {
     background: #eee;
 }
 
-
+.msgDiallog {
+    min-width: 300px;
+    max-width: 80vh;
+    width: auto;
+}
+.annonce {
+    color: white;
+    background-color: $info;
+}
+.warning {
+    color: white;
+    background-color: $warning;
+}
 .error {
     color: white;
     background-color: $error;

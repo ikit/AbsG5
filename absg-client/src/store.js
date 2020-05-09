@@ -24,6 +24,12 @@ export default new Vuex.Store({
         // Editeur photo
         photoMetadataEditorDisplayed: false,
         agpaMeta: null,
+        // Warning
+        warning: {
+            displayed: false,
+            msg: "",
+            log: ""
+        },
         // Erreur
         error: {
             displayed: false,
@@ -140,8 +146,14 @@ export default new Vuex.Store({
             console.log("TODO: WS closed. ");
         },
 
+        onWarning(state, message) {
+            console.log("WARNING", message);
+            state.warning.msg =  message;
+            state.warning.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
+            state.warning.displayed = true;
+        },
         onError(state, axiosError) {
-            console.log("ERR SERVER", axiosError);
+            console.log("ERROR", axiosError);
             state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
             state.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`;
             state.error.msg =  axiosError;

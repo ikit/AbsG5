@@ -1,6 +1,6 @@
 <template>
 <v-app id="inspire" :dark="darkMode">
-    <v-navigation-drawer v-if="user && !$vuetify.breakpoint.lgAndUp" v-model="drawerOpen" app style="height: 100%; z-index: 1000">
+    <v-navigation-drawer v-if="user && user.id > 0 && !$vuetify.breakpoint.lgAndUp" v-model="drawerOpen" app style="height: 100%; z-index: 1000">
         <v-list nav dense>
             <v-list-item to="/" style="margin-top: 60px">
                 <v-list-item-action>
@@ -28,7 +28,7 @@
     </v-navigation-drawer>
 
     <v-app-bar
-        v-if="user"
+        v-if="user && user.id > 0"
         color="primary"
         dark
         app
@@ -66,7 +66,7 @@
             </template>
             <span>Voir l'historique des événements</span>
         </v-tooltip>
-        <v-menu offset-y bottom left v-if="user">
+        <v-menu offset-y bottom left>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn depressed color="primary" v-bind="attrs" v-on="on">
                     {{ user.username }}
@@ -86,7 +86,7 @@
                         <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-chart-bar</v-icon>Mes statistiques
                     </v-list-item-title>
                 </v-list-item>
-                <v-list-item href="/me/password">
+                <v-list-item :to="{path: `/resetpwd` }">
                     <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
                 </v-list-item>
                 <v-list-item>
@@ -101,7 +101,7 @@
     </v-app-bar>
 
     <v-content id="bgcontent" style="background: #f9f9f9">
-        <div class="menu" v-if="user && $vuetify.breakpoint.lgAndUp">
+        <div class="menu" v-if="user && user.id > 0 && $vuetify.breakpoint.lgAndUp">
             <v-list style="background: none">
                 <template v-for="item in menuItems">
                     <div class="menuItem" v-if="item.url && checkUserRolesMatch(item)" :key="item.id">
@@ -200,7 +200,22 @@
     </v-dialog>
 
 
-    <v-dialog v-model="error.displayed" width="80vw">
+    <v-dialog v-model="warning.displayed" class="msgDiallog">
+        <v-card>
+            <v-card-title class="warning">
+                <v-icon color="#fff">fas fa-exclamation-triangle</v-icon> &nbsp; Attention
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+               {{ warning.msg }}
+            </v-container>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text @click="warning.displayed=false">OK</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="error.displayed" class="msgDiallog">
         <v-card>
             <v-card-title class="error">
                 <v-icon color="#fff">fas fa-exclamation-circle</v-icon> &nbsp; Une erreur s'est produite
@@ -222,18 +237,16 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import Vuex from 'vuex';
-import store from './store';
-import axios from 'axios';
-import { mapState } from 'vuex';
-import { MODULES, parseAxiosResponse } from  './middleware/CommonHelper';
+import store from "./store";
+import axios from "axios";
+import { mapState } from "vuex";
+import { MODULES, parseAxiosResponse } from  "./middleware/CommonHelper";
 import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
-import PhotoMetadataEditor from './components/PhotoMetadataEditor.vue';
+import PhotoMetadataEditor from "./components/PhotoMetadataEditor.vue";
 
 
 export default {
-    name: 'App',
+    name: "App",
     store,
     components: {
         PhotoMetadataEditor
@@ -247,10 +260,10 @@ export default {
         ws: null,
         menuItems: MODULES,
         notificationsHeaders: [
-            { text: 'Qui', value: 'who' },
-            { text: 'Quoi', value: 'what' },
-            { text: 'Quand', value: 'when' },
-            { text: '', value: 'read' },
+            { text: "Qui", value: "who" },
+            { text: "Quoi", value: "what" },
+            { text: "Quand", value: "when" },
+            { text: "", value: "read" },
         ],
 
         // Galerie photo editor
@@ -261,12 +274,12 @@ export default {
         source: String
     },
     mounted() {
-        store.dispatch('initStore');
+        store.dispatch("initStore");
     },
     methods: {
         logout() {
             logoutUser(store);
-            this.$router.push('/login');
+            this.$router.push("/login");
         },
         copyError() {
             navigator.clipboard.writeText(`Erreur Absolument G\nDate: ${this.error.log}\nRequête: ${this.error.query}\nStatus: ${this.error.htmlError}\nError: ${this.error.msg}`);;
@@ -284,19 +297,19 @@ export default {
             return result;
         },
         photosGalleryHide() {
-            store.commit('photosGalleryHide');
+            store.commit("photosGalleryHide");
         },
         photosGalleryPrev() {
-            store.commit('photosGalleryPrev');
+            store.commit("photosGalleryPrev");
         },
         photosGalleryNext() {
-            store.commit('photosGalleryNext');
+            store.commit("photosGalleryNext");
         },
         photosGalleryPlayPause() {
-            console.log('photosGalleryPlayPause');
+            console.log("photosGalleryPlayPause");
         },
         photosGalleryAuto() {
-            console.log('photosGalleryAuto');
+            console.log("photosGalleryAuto");
         },
         onNotificationClicked(notification) {
             console.log("onNotificationClicked", notification);
@@ -315,11 +328,12 @@ export default {
     },
     computed: {
         ...mapState([
-            'citation',
-            'user',
-            'notifications',
-            'unreadNotifications',
-            'error'
+            "citation",
+            "user",
+            "notifications",
+            "unreadNotifications",
+            "error",
+            "warning"
         ]),
         // Gallerie photos
         photosGalleryDisplayed() {
@@ -338,7 +352,7 @@ export default {
             if (this.photosGalleryIndex >= 0 && this.photosGalleryIndex < this.photosGallery.length) {
                 return this.photosGallery[this.photosGalleryIndex];
             }
-            return '/img/zaffa-notfound.png';
+            return "/img/zaffa-notfound.png";
         },
         // Editeur photos
         photosEditorDisplayed() {
@@ -350,7 +364,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import './themes/global.scss';
+@import "./themes/global.scss";
 .absg {
     font-size: 1.5em;
     line-height: 1.5em;
@@ -363,7 +377,7 @@ export default {
 #bgcontent {
     width: 100%;
     height: 100%;
-    // background-image: url('/img/background/r00.png');
+    // background-image: url("/img/background/r00.png");
     // background-position: center;
     // background-size: cover;
     // background-attachment: fixed;

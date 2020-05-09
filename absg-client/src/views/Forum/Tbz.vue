@@ -107,6 +107,10 @@ import VueCkeditor from 'vue-ckeditor5';
 import VueSplitter from "@rmp135/vue-splitter"
 
 
+import axios from 'axios';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
+
+
 export default {
     components: {
         'vue-ckeditor': VueCkeditor.component,
@@ -214,7 +218,16 @@ export default {
             username: 'Olivier'
         }
     }),
-    mounted: () => {
+    mounted() {
+        // On récupère les paramètres de filtrage/pagination en query paramter
+        const year = Number.isInteger(this.$route.query.y) ? this.$route.query.y : new Date().getFullYear();
+        const month = Number.isInteger(this.$route.query.m) ? this.$route.query.m : new Date().getMonth();
+        console.log("RETRIEVE ", year, month);
+
+        axios.get(`/api/forum/2/read?y${year}&m=${month}`).then(response => {
+                const data = parseAxiosResponse(response);
+                console.log("Read", data);
+        });
 
     },
     methods: {

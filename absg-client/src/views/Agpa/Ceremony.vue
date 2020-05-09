@@ -92,6 +92,7 @@
 
 <script>
 import axios from 'axios';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
 import {Chart} from 'highcharts-vue';
@@ -159,8 +160,7 @@ export default {
             this.photosGalleryIndex = 0;
             console.log("PREZ call", this.year)
             axios.get(`/api/agpa/ceremony/${this.year}`).then(response => {
-                const data = response.status === 200 ? response.data : null;
-                this.error = response.status !== 200 ? response : null;
+                const data = parseAxiosResponse(response);
                 console.log("PREZ init", data)
                 if (data) {
                     // Participations

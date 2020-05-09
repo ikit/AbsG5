@@ -1,9 +1,10 @@
-import { getRepository, Equal } from "typeorm";
-import { JsonController, Post, Body, BadRequestError, Delete, CurrentUser, Get } from "routing-controllers";
+import { getRepository } from "typeorm";
+import { JsonController, Post, Body, BadRequestError, Delete, CurrentUser, Get, Authorized } from "routing-controllers";
 import { User } from "../entities";
-import { authService } from "../services";
 import { logger } from "../middleware/logger";
 import { cleanString } from "../middleware/commonHelper";
+import { checkPassword, createToken } from "../middleware";
+import { userService } from "../services";
 
 @JsonController("/auth")
 export class AuthController {
@@ -32,7 +33,7 @@ export class AuthController {
 
         // On vérifie le mot de passe envoyé
         try {
-            const isPasswordCorrect = await authService.checkPassword(payload.password, user.passwordHash);
+            const isPasswordCorrect = await checkPassword(payload.password, user.passwordHash);
 
             if (!isPasswordCorrect) {
                 logger.warning(`Tentative de connection avec identifiant inconnu: ${payload.username}`);
@@ -40,7 +41,7 @@ export class AuthController {
             }
 
             // On génère puis stocke un token
-            user.token = authService.createToken(user);
+            user.token = createToken(user);
             this.userRepo.save({
                 id: user.id,
                 token: user.token
@@ -60,7 +61,8 @@ export class AuthController {
     check(@CurrentUser() user: User): User {
         return user;
     }
-
+    
+    @Authorized()
     @Delete("/logout")
     async logout(@CurrentUser() user) {
         if (!user) {
@@ -73,5 +75,10 @@ export class AuthController {
         });
 
         return { success: true };
+    }
+
+    @Post("/ask-new-pwd")
+    newPwd(@Body() body: any) {
+        return userService.resetPassword(body.email);
     }
 }

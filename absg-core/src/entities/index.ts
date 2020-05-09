@@ -4,7 +4,7 @@ export * from "./AgpaCategoryVariation";
 export * from "./AgpaPhoto";
 export * from "./AgpaVote";
 export * from "./Citation";
-export * from "./Discussion";
+export * from "./ForumTopic";
 export * from "./EventG";
 export * from "./Forum";
 export * from "./Immt";

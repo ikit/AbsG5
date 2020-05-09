@@ -40,6 +40,7 @@ export function logUser(store, user) {
  * Déconnecte l'utilisateur en supprimant sa session
  */
 export function logoutUser(store) {
+    console.log("logout")
     // On supprime les infos sur l'utilisateurs dans le store
     store.commit('setCurrentUser', null);
     // On supprime les infos de session dans le navigateur

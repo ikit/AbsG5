@@ -1,8 +1,72 @@
+import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
 import { Action } from "routing-controllers";
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag } from "../entities";
-import { authService } from "../services";
 import { differenceInSeconds } from "date-fns";
+
+/**
+ * Chiffre un mot de passe
+ *
+ * @param password le mot de passe en clair
+ */
+export function hashPassword(password: string) {
+    return bcrypt.hash(password, 10);
+}
+
+/**
+ * Retourne true si le mot de passe est correct
+ *
+ * @param cleanPassword le mot de passe en clair
+ * @param encryptedPassword le mot de passe chiffré
+ */
+export async function  checkPassword(cleanPassword: string, encryptedPassword: string) {
+    return await bcrypt.compare(cleanPassword, encryptedPassword);
+}
+
+/**
+ * Génère un token
+ *
+ * @param user les données de l'utilisateur
+ * @param newPwdSession indique si oui ou non il faut créer une "vrai" session ou bien une session de secour de 10 min pour changer son pwd
+ */
+export function createToken(user: User, newPwdSession = false): string {
+    if (!user) {
+        return null;
+    }
+
+    const sessionDuration = newPwdSession ? 600000 : +process.env.AUTH_SESSION_DURATION_MS;
+
+    const payload = {
+        id: user.id,
+        username: user.username,
+        rescue: newPwdSession,
+        expiresAt: new Date().getTime() + sessionDuration
+    };
+
+    return jwt.sign(payload, process.env.AUTH_SESSION_SALT, {
+        expiresIn: sessionDuration / 1000
+    });
+}
+
+/**
+ * Vérifie le contenu du token JWT
+ *
+ * @param token
+ */
+export function checkToken(token: string) {
+    return jwt.verify(token, process.env.AUTH_SESSION_SALT);
+}
+
+/**
+ * Vérifie que l'utilisateur dispose bien des rôles necessaires
+ *
+ * @param userRoles
+ * @param authorizedRoles
+ */
+export function checkRoles(userRoles: string[], authorizedRoles: string[]) {
+    return !authorizedRoles.length || !authorizedRoles.some(role => !userRoles.includes(role));
+}
 
 /**
  * Met à jour les log de passage concernant l'utilisateur
@@ -76,10 +140,10 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 
     try {
         // on vérifie que le token est valide
-        user = authService.checkToken(user.token);
+        user = checkToken(user.token);
 
         // on vérifie les droits
-        const isAuthorized = !!user && user.id && authService.checkRoles([], roles);
+        const isAuthorized = !!user && user.id && checkRoles([], roles);
 
         // On met à jours les stats de passage de l'utilisateur
         checkUserPassag(user, action.request.url);
@@ -92,5 +156,5 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 
 export async function currentUserChecker(action: Action) {
     // on retourn le user si il est défini dans le header
-    return await getUserFromHeader(action.request);;
+    return await getUserFromHeader(action.request);
 }

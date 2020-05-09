@@ -1,21 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn, Column, ManyToOne } from "typeorm";
-import { Discussion } from "./Discussion";
+import { Entity, PrimaryGeneratedColumn, JoinColumn, Column, ManyToOne } from "typeorm";
+import { ForumTopic } from "./ForumTopic";
+import { Forum } from "./Forum";
+import { User } from "./User";
 
-// fait le lien entre une mission et un vehicule
 @Entity()
-export class Message {
+export class ForumMessage {
     @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
-
-    @OneToOne(type => Discussion)
+    
+    @ManyToOne(() => Forum)
     @JoinColumn()
-    discussion: Discussion;
+    forum: Forum;
 
-    @Column({ comment: "Contenu du message", type: "text" })
-    message: string;
+    @ManyToOne(() => ForumTopic)
+    @JoinColumn()
+    topic: ForumTopic;
+    
+    @ManyToOne(() => User)
+    @JoinColumn()
+    poster: User;
 
     @Column({ comment: "Date du message" })
     datetime: Date;
 
-    // TODO: attachment ? (file, pool, agpa photo, calendar, etc...)
+    @Column({ comment: "Contenu du message", type: "text" })
+    text: string;
 }

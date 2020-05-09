@@ -6,7 +6,7 @@ export class User {
     @PrimaryGeneratedColumn({ comment: "user_id" })
     id: number;
 
-    @OneToOne(type => Person)
+    @OneToOne(() => Person)
     @JoinColumn()
     person: Person;
 
