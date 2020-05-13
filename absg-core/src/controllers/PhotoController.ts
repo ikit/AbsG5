@@ -48,7 +48,6 @@ export class UserController {
 
     @Get("/checked")
     allChecked() {
-        console.log("coucou");
         return this.checked(null);
     }
 

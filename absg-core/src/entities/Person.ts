@@ -123,10 +123,6 @@ export class Person {
                     filename = `${this.id}_${t}.jpg`;
                 }
             }
-            
-            if (this.id == 2) {
-                console.log(folder, filename);
-            }
         }
 
         if (!filename) {

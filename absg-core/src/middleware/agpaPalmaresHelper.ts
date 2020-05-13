@@ -136,7 +136,5 @@ export async function palmaresData(from: number = null, to: number = null) {
         }
     }
 
-    console.log(result)
-
     return result;
 }

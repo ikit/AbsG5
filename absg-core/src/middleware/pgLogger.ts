@@ -34,7 +34,7 @@ export class PgLogger extends Transport {
             logRepo.save(log);
 
             if (info.level === LogSeverity.notice) {
-                console.log("=> brodcasr")
+                console.log("=> brodcast")
                 this.wsService.broadcast({
                     message: "notification",
                     payload: log

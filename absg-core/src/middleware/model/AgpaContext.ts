@@ -40,7 +40,6 @@ export class AgpaContext {
      * @param date
      */
     async reset(date: Date): Promise<AgpaContext> {
-        console.log("reset AGPA contexte");
         this.categories = new Map<number, AgpaCategory>();
         this.photos = new Map<number, AgpaPhoto>();
         this.authors = new Map<number, string>();

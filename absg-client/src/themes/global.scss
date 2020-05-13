@@ -64,13 +64,13 @@ h1 {
 }
 
 
-.stickyHeader, .stickyHeaderSmall {
+.stickyHeaderSmall {
     position: sticky;
-    top: 64px;
+    top: 56px;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 2px;
     margin: 0px;
     padding: 0px 20px;
-    // z-index: 100;
+    z-index: 100;
     background: #eee;
 }
 .stickyHeader {
@@ -79,7 +79,7 @@ h1 {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 2px;
     margin: 0px;
     padding: 0px 20px;
-    // z-index: 100;
+    z-index: 100;
     background: #eee;
 }
 

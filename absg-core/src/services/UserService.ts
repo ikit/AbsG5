@@ -179,7 +179,6 @@ L'équipe système`,
         if (user) {
             user.lastActivity = new Date();
             this.usersRepo.save(user);
-            console.log("checkNotifications", user);
         }
         return new Date();
     }

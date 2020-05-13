@@ -1,7 +1,7 @@
 <template>
     <section id="content">
 
-        <div class="stickyHeader">
+        <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
             <v-row style="padding: 15px">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">

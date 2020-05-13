@@ -6,7 +6,7 @@
             hide-default-footer>
 
             <template v-slot:header>
-                <div class="stickyHeader" >
+                <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
                     <v-row style="padding: 15px" align="center" justify="center">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">

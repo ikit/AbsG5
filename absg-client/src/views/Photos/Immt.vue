@@ -9,7 +9,7 @@
             hide-default-footer>
 
             <template v-slot:header>
-                <div class="stickyHeader">
+                <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
                     <v-row style="" align="center" justify="center">
                         <v-text-field
                             v-model="filter.request"
