@@ -25,7 +25,7 @@ export default {
 @import '../themes/global.scss';
 h1 {
     font-size: 200px;
-    line-height: 400px;;
+    line-height: 400px;
 }
 hr {
     width: 200px;

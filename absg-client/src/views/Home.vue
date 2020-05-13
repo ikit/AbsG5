@@ -94,13 +94,13 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import store from '../store';
 import axios from 'axios';
-import VueSilentbox from 'vue-silentbox';
+//import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { padNumber } from '../middleware/CommonHelper';
 import Calendar from '../components/Calendar';
 import {Chart} from 'highcharts-vue';
 
-Vue.use(VueSilentbox);
+//Vue.use(VueSilentbox);
 
 export default {
     components: {

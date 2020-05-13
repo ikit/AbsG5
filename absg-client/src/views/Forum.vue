@@ -20,7 +20,6 @@
                     <v-icon>far fa-comment-dots</v-icon> &nbsp; {{ t.name }}
                 </v-badge>
             </template>
-
         </v-tab>
         <v-tab :to="{path: `/forum/archives`}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
         <!-- <v-tab :to="{path: `/forum/newTopic`}"> <v-icon>fas fa-plus</v-icon> &nbsp; Nouvelle discussion</v-tab> -->
@@ -31,6 +30,8 @@
 </template>
 
 <script>
+import 'vue-trix';
+
 export default {
     data: () => ({
         topics: [],
@@ -56,8 +57,8 @@ export default {
             // }
         ];
 
-        // On charge le premier onglet
-        this.activeTab = `/forum/read/${this.topics[0].id}`;
+        // On charge la discussion TBZ à la date du jour par défaut
+        this.activeTab = `/forum/tbz#last`;
     },
     methods: {
     }

@@ -25,4 +25,10 @@ export class ForumMessage {
 
     @Column({ comment: "Contenu du message", type: "text" })
     text: string;
+
+    public constructor(data: any = null) {
+        if (data) {
+            Object.assign(this, data);
+        }
+    }
 }

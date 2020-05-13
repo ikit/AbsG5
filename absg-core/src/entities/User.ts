@@ -25,6 +25,9 @@ export class User {
     @Column("json", { comment: "users authorisations", nullable: true })
     roles: any;
 
+    @Column("json", { comment: "Le dernier message en cours d'édition du forum", nullable: true })
+    draft: any;
+
     @Column("json", { comment: "Keep trace of the last action of the user on the server", nullable: true })
     lastActivity: any;
 

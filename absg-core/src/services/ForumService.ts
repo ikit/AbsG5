@@ -1,15 +1,23 @@
 import { getRepository, Between } from "typeorm";
-import { ForumMessage, ForumTopic } from "../entities";
+import { ForumMessage, ForumTopic, User, Forum } from "../entities";
 import { addMonths, format } from "date-fns";
 import * as fr from "date-fns/locale/fr";
+import * as path from "path";
+import * as fs from "fs";
+import { NotFoundError, UnauthorizedError } from "routing-controllers";
+import { saveImage } from "../middleware/commonHelper";
 
 class ForumService {
+    private forumRepo = null;
     private topicRepo = null;
     private msgRepo = null;
+    private userRepo = null;
 
     public initService() {
-        this.msgRepo = getRepository(ForumMessage);
+        this.forumRepo = getRepository(Forum);
         this.topicRepo = getRepository(ForumTopic);
+        this.msgRepo = getRepository(ForumMessage);
+        this.userRepo = getRepository(User);
     }
 
     /**
@@ -62,6 +70,123 @@ class ForumService {
         }));
     }
 
+    /**
+     * Enregistre une pièce jointe sur le serveur
+     * @param data les infos sur le message à poster
+     * @param user l'utilisateur qui fait la demande
+     */
+    async savePost(data: any, user: any) {
+        let msg = null;
+        if (data.id) {
+            // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
+            msg = await this.msgRepo.findOne({ where: { id: data.id } });
+        }
+        if (!msg) {
+            msg = new ForumMessage();
+        }
+        // On met à jour le message
+        Object.assign(msg, data);
+        msg.datetime = new Date();
+        msg.poster = user;
+        msg.forum = await this.forumRepo.findOne({ where: { id: data.forumId } });
+
+        await this.msgRepo.save(msg);
+        return msg;
+    }
+
+    /**
+     * Supprime un message du forum
+     * @param id l'identifiant du message
+     * @param user 
+     */
+    async deletePost(id: number, user: User) {
+        let msg = null;
+        if (id) {
+            // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
+            msg = await this.msgRepo.findOne({ where: { id: id } });
+        }
+        if (!msg) {
+            throw new NotFoundError(`Le message avec l'identifiant n°${id} n'existe pas.`);
+        }
+
+        if (user.roles.contains("Admin") || user.id === msg.poster.id) {
+            return this.msgRepo.remove(msg);
+        }
+        throw new UnauthorizedError(`Vous n'avez pas les droits nécessaire pour supprimer ce message.`);
+    }
+
+    /**
+     * Enregistre une pièce jointe sur le serveur
+     * @param file la pièce jointe
+     * @param userId l'utilisateur qui fait la demande
+     */
+    async saveFile(file: any, userId: any) {
+        const currentYear = new Date().getFullYear();
+        const fileName = `${userId}_${new Date().getTime()}`;
+        const fileExt = file.originalname.substr(file.originalname.lastIndexOf("."));
+        const filePath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}${fileExt}`);
+        const fileUrl = `${process.env.URL_FILES}/attachments/${currentYear}/${fileName}${fileExt}`;
+
+        if (file.mimetype === "image/jpeg") {
+            const thumb = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}_mini${fileExt}`);
+            await saveImage(file.buffer, thumb, filePath, null);
+            return {
+                url: fileUrl,
+                href: `${process.env.URL_FILES}/attachments/${currentYear}/${fileName}_mini${fileExt}`
+            };
+        } else {
+            fs.writeFileSync(filePath, file);
+            return { url: fileUrl, href: null };
+        }
+    }
+
+    /**
+     * Supprime une pièce jointe du serveur
+     * @param fileURI 
+     * @param user 
+     */
+    deleteFile(fileURI: string, user: User) {
+        // On analyse l'url pour retrouver le fichier sur le serveur
+        const filePath = fileURI.replace(process.env.URL_FILES, process.env.PATH_FILES);
+        if (fs.existsSync(filePath)) {
+            if (user.roles.contains("Admin") || filePath.indexOf(`/${user.id}_`) > -1) {
+                return fs.unlinkSync(filePath);
+            } else {
+                throw new UnauthorizedError(`Vous n'avez pas les droits nécessaire pour supprimer ce fichier.`);
+            }
+        }
+        throw new NotFoundError(`Le fichier ${fileURI} n'existe pas.`);
+    }
+    
+    /**
+     * Sauvegarde un message en cours d'édition pour l'utilisateur courrant
+     * @param draft 
+     * @param user 
+     */
+    async saveDraft(draft: any, id: any) {
+        const user = await this.userRepo.findOne({ where: { id } });
+        if (user) {
+            user.draft = draft;
+            this.userRepo.save(user);
+        }
+    }
+
+    /**
+     * Récupère le brouillon en cours d'édition de l'utilisateur si il existe
+     * @param id l'identifiant de l'utilisateur
+     */
+    async getDraft(id: any) {
+        const user = await this.userRepo.findOne({ where: { id } });
+        if (user) {
+            return user.draft;
+        }
+        return null;
+    }
+
+    /**
+     * TO REMOVE AND FIX PROBLEMS DIRECTLY IN DATABASE
+     * @param text 
+     */
     parseMessageText(text: string) {
         text = text.replace(/\{SMILIES_PATH\}/g, `${process.env.URL_FILES}/smilies`);
         text = text.replace(/\\r\\n/g, "<br/>");

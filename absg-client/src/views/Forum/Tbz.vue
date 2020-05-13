@@ -90,13 +90,47 @@
                                     text
                                     v-on="on"
                                     @click="go(todayYear, todayMonth, true)"
-                                    :disabled="isLoading">
+                                    :disabled="isLoading || (currentYear === todayYear && currentMonth === todayMonth)">
                                     Aujourd'hui
                                 </v-btn>
                             </template>
                             <span>Dernier message</span>
                         </v-tooltip>
                     </v-row>
+                </div>
+            </template>
+
+            <template v-slot:no-data>
+                <div v-if="currentYear === todayYear && currentMonth === todayMonth" style="text-align: center; margin-top: 50px">
+                    <img src="/img/zaffa-notfound.png"/>
+                    <h1>Aucun message pour l'instant.</h1>
+                    <p style="font-style: italic; opacity: 0.5">Soyez le premier à lancer la discussion en listant les événements majeures à ne pas louper ce mois-ci !</p>
+                    <div style="max-width:700px; width: 100%; margin: auto; text-align: left;">
+                        <VueTrix
+                            v-model="editorText"
+                            style="width: 100%; min-height: 200px; max-height: calc(100vh - 150px); overflow: auto"
+                            localStorage
+                            @trix-file-accept="checkAttachment"
+                            @trix-attachment-add="onAddAttachment"
+                            @trix-attachment-remove="onRemoveAttachment">
+                        </VueTrix>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    text
+                                    v-on="on"
+                                    @click="post()">
+                                    Envoyer ma réponse
+                                </v-btn>
+                            </template>
+                            <span>Poster votre message sur le forum</span>
+                        </v-tooltip>
+                    </div>
+                </div>
+                <div v-else style="text-align: center; margin-top: 50px">
+                    <img src="/img/zaffa-notfound.png"/>
+                    <h1>Il n'y a eu aucun message pour ce mois-ci.</h1>
                 </div>
             </template>
 
@@ -136,12 +170,7 @@
 </template>
 
 <script>
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import '@ckeditor/ckeditor5-build-classic/build/translations/fr';
-import VueCkeditor from 'vue-ckeditor5';
-import VueSplitter from "@rmp135/vue-splitter"
-
-
+import VueTrix from "vue-trix";
 import axios from 'axios';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { addMonths, addYears } from 'date-fns';
@@ -149,8 +178,7 @@ import { addMonths, addYears } from 'date-fns';
 
 export default {
     components: {
-        'vue-ckeditor': VueCkeditor.component,
-        VueSplitter
+        VueTrix
     },
     data: () => ({
         monthLabels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
@@ -158,7 +186,8 @@ export default {
         todayMonth: 0,
         currentYear: 0,
         currentMonth: 0,
-        messages: []
+        messages: [],
+        editorText: "<h1>coucou</h1>"
     }),
     mounted() {
         const today = new Date();
@@ -166,16 +195,19 @@ export default {
         this.todayMonth = today.getMonth();
 
         // On récupère les paramètres de filtrage/pagination en query paramter
-        console.log("---", this.$route.query.y, this.$route.query.m)
         this.currentYear = Number.parseInt(this.$route.query.y); // ? this.$route.query.y : this.todayYear;
         this.currentMonth = Number.parseInt(this.$route.query.m); // ? this.$route.query.m : this.todayMonth;
         this.currentYear = Number.isSafeInteger(this.currentYear) ? this.currentYear :  this.todayYear;
         this.currentMonth = Number.isSafeInteger(this.currentMonth) && this.currentMonth >= 0 && this.currentMonth <= 11 ? this.currentMonth : this.todayMonth;
-        console.log("---", this.currentYear, this.currentMonth)
         this.go(this.currentYear, this.currentMonth);
 
 
 
+    },
+    watch: {
+        editorText: {
+            handler: "onEditorTextChange"
+        }
     },
     methods: {
         // Récupère les messages de la période demandé et les affiches
@@ -185,7 +217,6 @@ export default {
             this.currentMonth = month;
             axios.get(`/api/forum/tbz/${year}/${month}`).then(response => {
                 const data = parseAxiosResponse(response);
-                console.log("GET ", year, month, data)
                 this.messages = data;
             });
         },
@@ -195,12 +226,96 @@ export default {
             const date = addMonths(new Date(this.currentYear, this.currentMonth), months);
             this.go(date.getFullYear(), date.getMonth());
         },
+
+        // Quand le texte change, on sauvegarde le brouillon ()
+        onEditorTextChange(event) {
+            // TODO: save draft every 10s
+            // console.log("onEditorTextChange", event);
+        },
+
+        // Décide si le fichier peut être attaché au message (et uploadé sur le serveur)
+        // On accepte tout, mais taille  de 200Mo max
+        checkAttachment(attachment) {
+            return attachment && attachment.file && attachment.file.size / 1024  <= 200000;
+        },
+
+        // Si la pièce jointe a été accepté, on la télécharge sur le serveur avant de l'insérer dans le message
+        onAddAttachment(event) {
+            if (event && event.attachment && event.attachment.file) {
+                // On récupère la pièce jointe poussé par l'utilisateur
+                const file = event.attachment.file;
+
+                // On cré le form data qui va permettre d'uploader le fichier sur le serveur
+                const formData = new FormData()
+                formData.append("file", file)
+
+                axios.post(`/api/forum/uploadFile`, formData, {
+                    headers: {
+                        "Content-Type" : "multipart/form-data",
+                    },
+                    onUploadProgress: progressEvent => {
+                        event.attachment.setUploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
+                    }
+                })
+                .then( response => {
+                    const uploadedFile = parseAxiosResponse(response);
+                    // on indique à l'éditur que l'upload de l'image a réussi en lui donnant l'adresse du fichier sur le serveur
+                    event.attachment.setAttributes({
+                        url: uploadedFile.url,
+                        href: `${uploadedFile.url}?content-disposition=attachment`
+                    });
+
+                })
+                .catch( err => {
+                    store.commit('onError', err);
+                });
+            }
+
+
+        },
+
+        // Si on retire la pièce jointe, on prévient le serveur de la supprimer aussi pour libérer la place
+        onRemoveAttachment(event) {
+            axios.delete(`/api/forum/uploadFile/${encodeURI(event.attachment.attributes.values.url)}`)
+                .catch( err => {
+                    store.commit('onError', err);
+                });
+        },
+
+        // On enregistre le message
+        post() {
+            axios.post(`/api/forum/post`, {
+                forumId: 2,
+                topicId: null,
+                text: this.editorText,
+            })
+            .then( response => {
+                console.log("Message sauvegardé !");
+            })
+            .catch( err => {
+                store.commit('onError', err);
+            });
+        }
+
     }
 };
 </script>
 
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
+
+
+h1 {
+    font-size: 2em;
+    line-height: 50px;
+    margin-bottom: 50px;
+}
+
+.trix-content {
+        overflow: auto;
+    margin-bottom: 15px;
+    max-height: calc(100vh - 200px);
+}
 
 .msgDetails {
     position: absolute;
