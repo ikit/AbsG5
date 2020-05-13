@@ -382,6 +382,7 @@ export default {
 
 .menu {
     position: fixed;
+    font-family: "Comfortaa", sans-serif;
     top: 48px;
     bottom: 0;
     left: 0;

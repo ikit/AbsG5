@@ -1,7 +1,7 @@
 import { getRepository, Between } from "typeorm";
 import { ForumMessage, ForumTopic } from "../entities";
 import { addMonths, format } from "date-fns";
-import { parse } from "querystring";
+import * as fr from "date-fns/locale/fr";
 
 class ForumService {
     private topicRepo = null;
@@ -31,11 +31,13 @@ class ForumService {
      */
     public async getTbzPosts(year: number = null, month: number = null) {
         // controle sur les paramètres
-        year = Number.isInteger(year) ? year : new Date().getFullYear();
-        month = Number.isInteger(month) ? month : new Date().getMonth();
+        year = year ? year : new Date().getFullYear();
+        month = month !== null && month >= 0 && month <= 11 ? month : new Date().getMonth();
 
-        const from = new Date(year, 3);
-        const to = addMonths(from, 1);
+        const from = new Date(year, month, 1, 1, 0, 0);
+        let to = addMonths(from, 1);
+        to = new Date(to.getFullYear(), to.getMonth(), 1, 1, 0, 0);
+        console.log("GET:", from, to);
 
         // on récupère les messages sur la période demandée
         const data = await this.msgRepo
@@ -46,26 +48,26 @@ class ForumService {
             .andWhere({ datetime: Between(from, to) })
             .orderBy("m.datetime", "ASC")
             .getMany();
-        console.log(data[0].text);
-            return data.map(e => ({
-                ...e,
-                text: this.parseMessageText(e.text),
-                dateLabel: format(new Date(e.datetime), "le D à HH:mm"),
-                poster: {
-                    id: e.poster.id,
-                    rootFamily: e.poster.rootFamily,
-                    username: e.poster.username,
-                    avatar: `/img/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
-                }
-            }));
+
+        return data.map(e => ({
+            ...e,
+            text: this.parseMessageText(e.text),
+            dateLabel: format(new Date(e.datetime), "le dddd D à HH:mm", { locale: fr }),
+            poster: {
+                id: e.poster.id,
+                rootFamily: e.poster.rootFamily,
+                username: e.poster.username,
+                avatar: `/img/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
+            }
+        }));
     }
 
     parseMessageText(text: string) {
         text = text.replace(/\{SMILIES_PATH\}/g, `${process.env.URL_FILES}/smilies`);
-        text = text.replace(/\\n/g, " ");
+        text = text.replace(/\\r\\n/g, "<br/>");
+        text = text.replace(/\\n/g, "<br/>");
         return text;
     }
-    
 }
 
 export const forumService = new ForumService();

@@ -8,12 +8,27 @@
             <template v-slot:header>
                 <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
                     <v-row style="padding: 15px" align="center" justify="center">
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    text
+                                    v-on="on"
+                                    :disabled="isLoading || (currentYear == 2004 && currentMonth == 0)"
+                                    @click="go(2004, 0)">
+                                    Janvier 2004
+                                </v-btn>
+                            </template>
+                            <span>Premier message</span>
+                        </v-tooltip>
+
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
                                 <v-btn
                                     icon small
                                     v-on="on"
-                                    :disabled="isLoading">
+                                    @click="goByMonths(-12)"
+                                    :disabled="isLoading || currentYear < 2015">
                                     <v-icon>fas fa-angle-double-left</v-icon>
                                 </v-btn>
                             </template>
@@ -24,21 +39,33 @@
                                 <v-btn
                                     icon small
                                     v-on="on"
-                                    :disabled="isLoading">
+                                    @click="goByMonths(-1)"
+                                    :disabled="isLoading || currentYear < 2004 || (currentYear == 2004 && currentMonth == 0)">
                                     <v-icon>fa-chevron-left</v-icon>
                                 </v-btn>
                             </template>
                             <span>Revenir un mois en arrière</span>
                         </v-tooltip>
-                        <span class="grey--text" >
-                            Avril 2020
-                        </span>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    text
+                                    v-on="on"
+                                    width="200px"
+                                    :disabled="isLoading">
+                                    {{ monthLabels[currentMonth] }} {{ currentYear }}
+                                </v-btn>
+                            </template>
+                            <span>Modifier directement la date en cours</span>
+                        </v-tooltip>
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
                                 <v-btn
                                     icon small
                                     v-on="on"
-                                    :disabled="isLoading">
+                                    @click="goByMonths(1)"
+                                    :disabled="isLoading || currentYear > todayYear || (currentYear == todayYear && currentMonth == todayMonth)">
                                     <v-icon>fa-chevron-right</v-icon>
                                 </v-btn>
                             </template>
@@ -49,11 +76,25 @@
                                 <v-btn
                                     icon small
                                     v-on="on"
-                                    :disabled="!isLoading">
+                                    @click="goByMonths(12)"
+                                    :disabled="isLoading || currentYear >= todayYear || (currentYear == todayYear -1 && currentMonth > todayMonth)">
                                     <v-icon>fas fa-angle-double-right</v-icon>
                                 </v-btn>
                             </template>
                             <span>Aller à l'année suivante</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    text
+                                    v-on="on"
+                                    @click="go(todayYear, todayMonth, true)"
+                                    :disabled="isLoading">
+                                    Aujourd'hui
+                                </v-btn>
+                            </template>
+                            <span>Dernier message</span>
                         </v-tooltip>
                     </v-row>
                 </div>
@@ -103,6 +144,7 @@ import VueSplitter from "@rmp135/vue-splitter"
 
 import axios from 'axios';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
+import { addMonths, addYears } from 'date-fns';
 
 
 export default {
@@ -111,50 +153,48 @@ export default {
         VueSplitter
     },
     data: () => ({
-
-        users: {
-            2: {
-                id: 2,
-                avatar: `/img/avatars/002.png`,
-                username: 'Olive',
-                rootFamily: 'gueudelot',
-            },
-            13: {
-                id: 13,
-                avatar: `/img/avatars/013.png`,
-                username: 'Poupette',
-                rootFamily: 'guyomard'
-            },
-            15: {
-                id: 15,
-                avatar: `/img/avatars/015.png`,
-                username: 'Sylve',
-                rootFamily: 'guibert',
-            }
-        },
-        messages: [],
-        currentUser: {
-            id: 2,
-            username: 'Olivier'
-        }
+        monthLabels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
+        todayYear: 0,
+        todayMonth: 0,
+        currentYear: 0,
+        currentMonth: 0,
+        messages: []
     }),
     mounted() {
-        // On récupère les paramètres de filtrage/pagination en query paramter
-        const year = Number.isInteger(this.$route.query.y) ? this.$route.query.y : new Date().getFullYear();
-        const month = Number.isInteger(this.$route.query.m) ? this.$route.query.m : new Date().getMonth();
-        console.log("RETRIEVE ", year, month);
+        const today = new Date();
+        this.todayYear = today.getFullYear();
+        this.todayMonth = today.getMonth();
 
-        axios.get(`/api/forum/tbz/${year}/${month}`).then(response => {
-                const data = parseAxiosResponse(response);
-                this.messages = data;
-                console.log("Read", this.messages);
-        });
+        // On récupère les paramètres de filtrage/pagination en query paramter
+        console.log("---", this.$route.query.y, this.$route.query.m)
+        this.currentYear = Number.parseInt(this.$route.query.y); // ? this.$route.query.y : this.todayYear;
+        this.currentMonth = Number.parseInt(this.$route.query.m); // ? this.$route.query.m : this.todayMonth;
+        this.currentYear = Number.isSafeInteger(this.currentYear) ? this.currentYear :  this.todayYear;
+        this.currentMonth = Number.isSafeInteger(this.currentMonth) && this.currentMonth >= 0 && this.currentMonth <= 11 ? this.currentMonth : this.todayMonth;
+        console.log("---", this.currentYear, this.currentMonth)
+        this.go(this.currentYear, this.currentMonth);
+
+
 
     },
     methods: {
-        ckInput(newValue, instance, eventInfo, batch) {
-            console.log("ckInput", newValue, instance, eventInfo, batch)
-        }
+        // Récupère les messages de la période demandé et les affiches
+        go(year, month) {
+
+            this.currentYear = year;
+            this.currentMonth = month;
+            axios.get(`/api/forum/tbz/${year}/${month}`).then(response => {
+                const data = parseAxiosResponse(response);
+                console.log("GET ", year, month, data)
+                this.messages = data;
+            });
+        },
+
+        // Additionne (ou soustrait) le nombre de mois demandé et affiche les messages
+        goByMonths(months) {
+            const date = addMonths(new Date(this.currentYear, this.currentMonth), months);
+            this.go(date.getFullYear(), date.getMonth());
+        },
     }
 };
 </script>
@@ -167,7 +207,7 @@ export default {
     text-align: right;
     top: 0;
     right: 80px;
-    width: 100%;
+    width: 200px;
     font-size: 0.9em;
     font-family: "Comfortaa", sans-serif;
 
