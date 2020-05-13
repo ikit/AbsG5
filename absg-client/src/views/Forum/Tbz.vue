@@ -2,7 +2,7 @@
 <div>
     <v-container fluid  grid-list-md style="padding:0">
         <v-data-iterator
-            :items="discussion.messages"
+            :items="messages"
             hide-default-footer>
 
             <template v-slot:header>
@@ -61,41 +61,35 @@
 
 
             <template v-slot:default="props">
-                <vue-splitter :margin="0" defaultPercent="100">
-                    <div slot="left-pane">
-                        <v-list dense style="background: none">
-                        <template v-for="msg in discussion.messages">
-                            <v-list-item :key="msg.id">
-                                <v-card style="margin: auto; margin-top: 15px; width: 600px; padding: 15px">
-                                    <v-list-item-avatar>
-                                        <img :src="users[msg.userId].avatar"/>
-                                    </v-list-item-avatar>
-                                    <v-list-item-content>
-                                        <div class="citation" v-html="msg.message"></div>
-                                    </v-list-item-content>
-                                </v-card>
-                            </v-list-item>
-                        </template>
-                        </v-list>
-                    </div>
-                    <div slot="right-pane">
-                        <div style="position: relative; height: calc(100vh-113px)">
-                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom:100px">
-                                <vue-ckeditor
-                                    type="classic"
-                                    height="300px"
-                                    v-model="newMessage"
-                                    :editors="editors"
-                                    :config="config"
-                                    @input="ckInput">
-                                </vue-ckeditor>
+                <v-timeline align-top dense style="background: none; margin: auto; max-width: 700px; width: 100%;">
+                    <v-timeline-item fill-dot color="#fff" v-for="msg in messages" :key="msg.id">
+                        <template v-slot:icon>
+                            <div>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <img :src="msg.poster.avatar" v-on="on" style="width: 50px;" />
+                                    </template>
+                                    <span>{{ msg.poster.username }} {{ msg.dateLabel }}</span>
+                                </v-tooltip>
+
+                                <div class="msgDetails" v-bind:style="{ display: $vuetify.breakpoint.lgAndUp ? 'block' : 'none' }">
+                                    <span class="name">{{ msg.poster.username }}</span>
+                                    <span class="date">{{ msg.dateLabel }}</span>
+                                </div>
                             </div>
-                            <v-btn style="margin-top: 15px" :disabled="!newMessage">Envoyer ma réponse</v-btn>
-                        </div>
-                    </div>
-                </vue-splitter>
+
+                        </template>
+
+                        <v-card style="padding: 0 15px">
+                            <v-list-item-content>
+                                <div class="citation" v-html="msg.text"></div>
+                            </v-list-item-content>
+                        </v-card>
+                    </v-timeline-item>
+                </v-timeline>
             </template>
         </v-data-iterator>
+        <a name="last"></a>
     </v-container>
 </div>
 </template>
@@ -118,18 +112,6 @@ export default {
     },
     data: () => ({
 
-        newMessage: "",
-        editors: {
-            classic: ClassicEditor,
-        },
-        config: {
-            language: "fr",
-            // plugins: [ Base64UploadAdapter],
-            // toolbar: [ 'bold', 'italic', 'link'  ]
-        },
-
-        filter: { search: null },
-        newDiscussionDialog: false,
         users: {
             2: {
                 id: 2,
@@ -150,69 +132,7 @@ export default {
                 rootFamily: 'guibert',
             }
         },
-        discussion: { // model: Discussion.js
-            title: "T.B.Z.",
-            creationDate: new Date(2016, 5, 24),
-            endDate: new Date(),
-            fromDate: new Date(2019, 11, 1),
-            toDate: new Date(),
-            messages: [
-                {
-                    id: 1,
-                    userId: 2,
-                    message: 'Perso, j\'aime pas trop la syntaxe mais bon... :/',
-                    date: new Date(2019, 3, 6, 21, 29),
-                },
-                {
-                    id: 2,
-                    userId: 13,
-                    message: 'Bonjour les G! Les températures claviculaires font rêver à la blanche neige...',
-                    date: new Date(2019, 3, 6, 22, 37),
-                },
-                {
-                    id: 3,
-                    userId: 15,
-                    message: 'Coté Guibert, il y aura très très certainement des amateurs: on affine et on vous dit "quoi"! ...',
-                    date: new Date(2019, 11, 10, 16, 14),
-                },
-                {
-                    id: 4,
-                    userId: 2,
-                    message: 'Perso, j\'aime pas trop la syntaxe mais bon... :/',
-                    date: new Date(2019, 3, 6, 21, 29),
-                },
-                {
-                    id: 5,
-                    userId: 13,
-                    message: 'Bonjour les G! Les températures claviculaires font rêver à la blanche neige...',
-                    date: new Date(2019, 3, 6, 22, 37),
-                },
-                {
-                    id: 6,
-                    userId: 15,
-                    message: 'Coté Guibert, il y aura très très certainement des amateurs: on affine et on vous dit "quoi"! ...',
-                    date: new Date(2019, 11, 10, 16, 14),
-                },
-                {
-                    id: 7,
-                    userId: 2,
-                    message: 'Perso, j\'aime pas trop la syntaxe mais bon... :/',
-                    date: new Date(2019, 3, 6, 21, 29),
-                },
-                {
-                    id: 8,
-                    userId: 13,
-                    message: 'Bonjour les G! Les températures claviculaires font rêver à la blanche neige...',
-                    date: new Date(2019, 3, 6, 22, 37),
-                },
-                {
-                    id: 9,
-                    userId: 15,
-                    message: 'Coté Guibert, il y aura très très certainement des amateurs: on affine et on vous dit "quoi"! ...',
-                    date: new Date(2019, 11, 10, 16, 14),
-                }
-            ]
-        },
+        messages: [],
         currentUser: {
             id: 2,
             username: 'Olivier'
@@ -224,9 +144,10 @@ export default {
         const month = Number.isInteger(this.$route.query.m) ? this.$route.query.m : new Date().getMonth();
         console.log("RETRIEVE ", year, month);
 
-        axios.get(`/api/forum/2/read?y${year}&m=${month}`).then(response => {
+        axios.get(`/api/forum/tbz/${year}/${month}`).then(response => {
                 const data = parseAxiosResponse(response);
-                console.log("Read", data);
+                this.messages = data;
+                console.log("Read", this.messages);
         });
 
     },
@@ -241,54 +162,25 @@ export default {
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
 
-.box {
-    //margin: 14px;
-    background-position: right 10px top 10px;
-    padding: 10px;
-    //padding-left: 200px;
-    min-height: 100%;
-}
-.tbz {
-    background-image: url('/img/tbz.png');
-}
-
-
-h2 {
-    display: inline-block;
-    font-size: 1.5em;
-    font-weight: bold;
-    text-align: left;
-    color: $primary;
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
+.msgDetails {
+    position: absolute;
+    text-align: right;
+    top: 0;
+    right: 80px;
+    width: 100%;
+    font-size: 0.9em;
     font-family: "Comfortaa", sans-serif;
-}
-h2 a {
-    text-decoration: none;
+
+    span {
+        display: block;
+    }
+    .name {
+        font-weight: bold;
+    }
+    .date {
+        opacity: 0.5;
+    }
 }
 
-.notif {
-    background-color: $accent;
-    color: #fff;
-    font-size: 0.8em;
-    padding: 2px 10px;
-    border-radius: 25px;
-}
 
-.date {
-    color: #000;
-}
-.gueudelot {
-    color: $group1;
-}
-.guibert {
-    color: $group2;
-}
-.guyomard {
-    color: $group3;
-}
-
-.ck-content {
-    max-height: 267px;
-}
 </style>

@@ -90,11 +90,15 @@ export const router = new VueRouter({
                 },
             ]
         },
-        // Discussions
+        // Forum
         {
             path: "/forum",
             component: () => import("./views/Forum.vue"),
             children: [
+                {
+                    path: "",
+                    redirect: "/forum/tbz#last"
+                },
                 {
                     path: "tbz",
                     component: () => import("./views/Forum/Tbz.vue"),

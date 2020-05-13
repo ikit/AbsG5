@@ -15,7 +15,8 @@ import {
     agendaService,
     voyagService,
     eventService,
-    userService
+    userService,
+    forumService
 } from "./services";
 import * as ormconfig from "../ormconfig";
 import { initWS } from "./wss";
@@ -25,12 +26,13 @@ createConnections(ormconfig)
         logger.info("ORM connection created");
 
         // Une fois la connection créé, on peut initialialiser les services
+        agendaService.initService();
         agpaService.initService();
         citationService.initService();
-        immtService.initService();
-        agendaService.initService();
-        voyagService.initService();
         eventService.initService();
+        forumService.initService();
+        immtService.initService();
+        voyagService.initService();
         userService.initService();
         logger.info("AbsG services initialized");
 
