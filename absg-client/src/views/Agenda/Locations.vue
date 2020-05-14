@@ -5,7 +5,7 @@
             <v-card-title>
                 <v-text-field
                     v-model="filter.search"
-                    append-icon="fas fa-search"
+                    prepend-icon="fas fa-search"
                     label="Rechercher"
                     single-line
                     hide-details

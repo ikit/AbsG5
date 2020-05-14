@@ -134,7 +134,6 @@
                 </div>
             </template>
 
-
             <template v-slot:default="props">
                 <v-timeline align-top dense style="background: none; margin: auto; max-width: 700px; width: 100%;">
                     <v-timeline-item fill-dot color="#fff" v-for="msg in messages" :key="msg.id">
@@ -201,8 +200,6 @@ export default {
         this.currentMonth = Number.isSafeInteger(this.currentMonth) && this.currentMonth >= 0 && this.currentMonth <= 11 ? this.currentMonth : this.todayMonth;
         this.go(this.currentYear, this.currentMonth);
 
-
-
     },
     watch: {
         editorText: {
@@ -218,6 +215,11 @@ export default {
             axios.get(`/api/forum/tbz/${year}/${month}`).then(response => {
                 const data = parseAxiosResponse(response);
                 this.messages = data;
+
+                // Si dernière discussion en cours, on scroll à la fin
+                if (this.currentYear === this.todayYear && this.currentMonth === this.todayMonth) {
+                    document.querySelector("last").scrollIntoView();
+                }
             });
         },
 

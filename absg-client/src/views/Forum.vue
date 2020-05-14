@@ -1,7 +1,7 @@
 <template>
 <div>
-    <v-tabs centered>
-        <v-tab  :to="{path: `/forum/tbz`}">
+    <v-tabs centered v-model="activeTab">
+        <v-tab :to="{path: `/forum/tbz`}">
             <template >
                 <v-badge right color="accent" :value="tbzNnewMessages">
                     <template v-slot:badge>
@@ -21,8 +21,7 @@
                 </v-badge>
             </template>
         </v-tab>
-        <v-tab :to="{path: `/forum/archives`}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
-        <!-- <v-tab :to="{path: `/forum/newTopic`}"> <v-icon>fas fa-plus</v-icon> &nbsp; Nouvelle discussion</v-tab> -->
+        <v-tab :to="{path: `/forum/browse`}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
     </v-tabs>
 
     <router-view></router-view>
@@ -34,31 +33,11 @@ import 'vue-trix';
 
 export default {
     data: () => ({
+        activeTab: `/forum/tbz#last`, // On charge la discussion TBZ à la date du jour par défaut
         topics: [],
         tbzNnewMessages: 0
     }),
     mounted () {
-        // récupèrer la liste des sujets principaux
-        this.topics = [
-            // {
-            //     id: 2,
-            //     name: "Lanslevillard",
-            //     newMessages: 0,
-            // },
-            // {
-            //     id: 3,
-            //     name: "Malaucène",
-            //     newMessages: 1,
-            // },
-            // {
-            //     id: 4,
-            //     name: "A.G.P.A.",
-            //     newMessages: 0,
-            // }
-        ];
-
-        // On charge la discussion TBZ à la date du jour par défaut
-        this.activeTab = `/forum/tbz#last`;
     },
     methods: {
     }
@@ -67,56 +46,4 @@ export default {
 
 <style lang="scss" scoped>
 @import '../themes/global.scss';
-
-.box {
-    //margin: 14px;
-    background-position: right 10px top 10px;
-    padding: 10px;
-    //padding-left: 200px;
-}
-.tbz {
-    background-image: url('/img/tbz.png');
-}
-// .blabla {
-//     background-image: url('/img/forum-new.png');
-// }
-// .archives {
-//     background-image: url('/img/forum-archives.png');
-// }
-
-h2 {
-    display: inline-block;
-    font-size: 1.5em;
-    font-weight: bold;
-    text-align: left;
-    color: $primary;
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
-    font-family: "Comfortaa", sans-serif;
-}
-h2 a {
-    text-decoration: none;
-}
-
-.notif {
-    background-color: $accent;
-    color: #fff;
-    font-size: 0.8em;
-    padding: 2px 10px;
-    border-radius: 25px;
-}
-
-.date {
-    color: #000;
-}
-.gueudelot {
-    color: $group1;
-}
-.guibert {
-    color: $group2;
-}
-.guyomard {
-    color: $group3;
-}
-
 </style>

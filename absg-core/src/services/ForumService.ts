@@ -33,6 +33,107 @@ class ForumService {
     }
 
     /**
+     * Renvoie la liste des forums
+     */
+    async getForums() {
+        const forums = await this.forumRepo
+            .createQueryBuilder("f")
+            .leftJoinAndSelect("f.lastMessage", "m")
+            .leftJoinAndSelect("m.poster", "p")
+            .orderBy("f.id")
+            .getMany();
+
+        return forums.map(f => ({
+            id: f.id,
+            name: f.name,
+            description: f.description,
+            last: {
+                username: f.lastMessage.poster.username,
+                dateLabel: format(new Date(f.lastMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr }),
+                avatar: `/img/avatars/${f.lastMessage.poster.id.toString().padStart(3, "0")}.png`
+            }
+        }));
+    }
+
+    /**
+     * Renvoie la liste des sujets d'un forum
+     */
+    async getTopics(forumId: number) {
+        const forum = await this.forumRepo
+            .createQueryBuilder("f")
+            .where(`f.id = ${forumId}`)
+            .getOne();
+
+        const topics = await this.topicRepo
+            .createQueryBuilder("c")
+            .leftJoin("c.forum", "f")
+            .leftJoinAndSelect("c.firstMessage", "m1")
+            .leftJoinAndSelect("m1.poster", "p1")
+            .leftJoinAndSelect("c.lastMessage", "m2")
+            .leftJoinAndSelect("m2.poster", "p2")
+            .where(`c."forumId" = ${forumId}`)
+            .orderBy("m2.datetime", "DESC")
+            .getMany();
+
+        return {
+            forum,
+            topics: topics.map(t => ({
+                id: t.id,
+                name: t.name,
+                first: {
+                    username: t.firstMessage.poster.username,
+                    dateLabel: format(new Date(t.firstMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr }),
+                },
+                last: {
+                    username: t.lastMessage.poster.username,
+                    dateLabel: format(new Date(t.lastMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr }),
+                    avatar: `/img/avatars/${t.lastMessage.poster.id.toString().padStart(3, "0")}.png`
+                }
+            }))
+        };
+    }
+
+    /**
+     * Renvoie la liste des messages d'une discussion
+     */
+    async getPosts(topicId: number) {
+        // On récupère les infos sur le sujet
+        const topic = await this.topicRepo
+            .createQueryBuilder("c")
+            .leftJoinAndSelect("c.forum", "f")
+            .leftJoinAndSelect("c.firstMessage", "m1")
+            .leftJoinAndSelect("c.lastMessage", "m2")
+            .where(`c.id = ${topicId}`)
+            .getOne();
+
+        // On récupère les messages
+        const posts = await this.msgRepo
+            .createQueryBuilder("m")
+            .leftJoin("m.topic", "t")
+            .leftJoinAndSelect("m.poster", "p")
+            .where(`t.id = ${topicId}`)
+            .orderBy("m.datetime", "ASC")
+            .getMany();
+
+        return {
+            topic,
+            posts: posts.map(e => ({
+                ...e,
+                text: this.parseMessageText(e.text),
+                dateLabel: format(new Date(e.datetime), "dddd D MMM YYYY", { locale: fr }),
+                timeLabel: format(new Date(e.datetime), "HH:mm", { locale: fr }),
+                shortLabel: format(new Date(e.datetime), "le D MMM YYYY à HH:mm", { locale: fr }),
+                poster: {
+                    id: e.poster.id,
+                    rootFamily: e.poster.rootFamily,
+                    username: e.poster.username,
+                    avatar: `/img/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
+                }
+            }))
+        };
+    }
+
+    /**
      * Renvoie les messages TBZ en fonction de l'année et du mois
      * @param year par défaut l'année courrante
      * @param month par défaut le mois courrant (de 0 à 11)

@@ -14,10 +14,6 @@ export class Forum {
 
     @OneToOne(() => ForumMessage)
     @JoinColumn()
-    firstMessage: ForumMessage;
-
-    @OneToOne(() => ForumMessage)
-    @JoinColumn()
     lastMessage: ForumMessage;
 
     @Column({ comment: "Est-ce que le forum est archivé", default: false })

@@ -47,25 +47,25 @@ export const router = new VueRouter({
         // Citations
         {
             path: "/citations",
-            component: () => import("./views/Citations.vue"),
-            children: [
-                {
-                    path: "",
-                    redirect: "/citations/browser"
-                },
-                {
-                    path: "browser",
-                    component: () => import("./views/Citations/Browser.vue"),
-                },
-                {
-                    path: "play",
-                    component: () => import("./views/Citations/Game.vue"),
-                },
-                {
-                    path: "stats",
-                    component: () => import("./views/Citations/Stats.vue"),
-                }
-            ]
+            component: () => import("./views/Citations/Browser.vue"), // import("./views/Citations.vue"),
+            // children: [
+            //     {
+            //         path: "",
+            //         redirect: "/citations/browser"
+            //     },
+            //     {
+            //         path: "browser",
+            //         component: () => import("./views/Citations/Browser.vue"),
+            //     },
+            //     {
+            //         path: "play",
+            //         component: () => import("./views/Citations/Game.vue"),
+            //     },
+            //     {
+            //         path: "stats",
+            //         component: () => import("./views/Citations/Stats.vue"),
+            //     }
+            // ]
         },
         // Photos
         {
@@ -97,11 +97,23 @@ export const router = new VueRouter({
             children: [
                 {
                     path: "",
-                    redirect: "/forum/tbz#last"
+                    redirect: "/forum/tbz"
                 },
                 {
                     path: "tbz",
                     component: () => import("./views/Forum/Tbz.vue"),
+                },
+                {
+                    path: "browse",
+                    component: () => import("./views/Forum/Browser.vue"),
+                },
+                {
+                    path: "browse/:forumId",
+                    component: () => import("./views/Forum/Browser.vue"),
+                },
+                {
+                    path: "read/:topicId",
+                    component: () => import("./views/Forum/Read.vue"),
                 }
             ]
         },
@@ -218,6 +230,7 @@ export const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+    console.log("TEST", to.path);
     // Si la page nécessite une authent ou non
     const publicPages = ["/login", "/forgotten"];
     if (publicPages.includes(to.path)) {

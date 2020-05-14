@@ -16,6 +16,30 @@ import { forumService } from "../services";
 @JsonController("/forum")
 export class ForumController {
     /**
+     * Renvoie la liste des forums
+     */
+    @Get("/browse")
+    getForums() {
+        return forumService.getForums();
+    }
+
+    /**
+     * Renvoie la liste des sujets d'un forum
+     */
+    @Get("/browse/:forumId")
+    getTopics(@Param("forumId") forumId: number) {
+        return forumService.getTopics(forumId);
+    }
+
+    /**
+     * Renvoie la liste des messages d'une discussion
+     */
+    @Get("/read/:topicId/")
+    getPosts(@Param("topicId") topicId: number) {
+        return forumService.getPosts(topicId);
+    }
+
+    /**
      * Récupère les messages TBZ en fonction des paramètres année et mois fournis
      * @param year l'année
      * @param day  le mois de 1 à 12
