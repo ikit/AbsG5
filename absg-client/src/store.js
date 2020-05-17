@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
-import { webSocket } from "rxjs/webSocket";
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from './middleware/CommonHelper';
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -16,7 +15,12 @@ export default new Vuex.Store({
         notifications: [], // les notifications affichées dans la bar d'application
         unreadNotifications: 0, // le nombre de notification non lu par
         settings: null, // les paramètres actuels du site
-
+        // Websocket connection
+        socket: {
+            isConnected: false,
+            message: '',
+            reconnectError: false,
+        },
         // Galerie photos
         photosGallery: [],
         photosGalleryIndex: 0,
@@ -136,16 +140,36 @@ export default new Vuex.Store({
             state.photosGalleryIndex = index;
         },
 
-        onWsMessage(msg) {
-            console.log("TODO: processWebsocketMessage", msg);
+        // ========
+        // WEBSOCKETS methods
+        SOCKET_ONOPEN (state, event)  {
+            Vue.prototype.$socket = event.currentTarget
+            state.socket.isConnected = true
+            console.log("WS ready");
         },
-        onWsError(err) {
-            console.log("TODO: processWebsocketError", err);
-        },
-        onWsCompleted() {
+        SOCKET_ONCLOSE (state, event)  {
+            state.socket.isConnected = false
             console.log("TODO: WS closed. ");
         },
+        SOCKET_ONERROR (state, event)  {
+            console.log("TODO: processWebsocketError", event);
+        },
+        // default handler called for all methods
+        SOCKET_ONMESSAGE (state, message)  {
+            state.socket.message = message;
+            console.log("TODO: processWebsocketMessage", message);
+        },
+        // mutations for reconnect methods
+        SOCKET_RECONNECT(state, count) {
+            console.log("WS reconnect");
+        },
+        SOCKET_RECONNECT_ERROR(state) {
+            state.socket.reconnectError = true;
+            console.log("WS reaconnect error", state);
+        },
 
+        // ========
+        // NOTIF methods
         onWarning(state, message) {
             console.log("WARNING", message);
             state.warning.msg =  message;
@@ -163,17 +187,7 @@ export default new Vuex.Store({
     },
     actions: {
         initStore(state) {
-
             if (!state.isInitialized) {
-                // On initialise le websocket
-                const host = process.env.NODE_ENV === "production" ? `wss://${window.location.hostname}/ws` : `ws://localhost:5011`;
-                this.ws = webSocket(host);
-                this.ws.subscribe(
-                    msg => this.commit("onWsMessage", msg),
-                    err => this.commit("onWsError", err),
-                    ()  => this.commit("onWsCompleted", err)
-                );
-
                 // On récupère les infos de base
                 axios.get(`/api/welcom`).then(response => {
                     const data = parseAxiosResponse(response);
@@ -195,5 +209,9 @@ export default new Vuex.Store({
                 });
             }
         },
+        sendWsMessage: function(context, message) {
+            console.log("WS send", message);
+            Vue.prototype.$socket.sendObj(message)
+          }
     }
 });

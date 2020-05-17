@@ -9,6 +9,8 @@ import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import 'vue-orgchart/dist/style.min.css';
 
+import VueNativeSock from 'vue-native-websocket';
+
 Vue.config.productionTip = false;
 
 // On supprime le warning du Calendar Vuetify
@@ -28,3 +30,21 @@ new Vue({
     vuetify,
     render: h => h(App)
 }).$mount('#app');
+
+
+// On initialise le websocket
+const host = process.env.NODE_ENV === "production" ? `wss://${window.location.hostname}/ws` : `ws://localhost:5011`;
+// this.ws = webSocket(host);
+// this.ws.subscribe(
+//     msg => this.dispatch("onWsMessage", msg),
+//     err => this.dispatch("onWsError", err),
+//     ()  => this.dispatch("onWsCompleted", err)
+// );
+
+Vue.use(VueNativeSock, host, {
+    store: store,
+    format: 'json',
+    reconnection: true,
+    // reconnectionAttempts: 5,
+    reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
+})

@@ -70,6 +70,23 @@ export class ForumController {
     }
 
     /**
+     * Retourne la liste des sujets mis en avant
+     */
+    @Get("/pinnedTopics")
+    pinnedTopics() {
+        return forumService.pinnedTopics();
+    }
+
+    /**
+     * Met en avant un sujet ou le retire
+     * @param id l'identifiant du sujet
+     */
+    @Get("/topic/:id/switchPin")
+    switchPin(@Param("id") id: number) {
+        return forumService.switchPin(id);
+    }
+
+    /**
      * Enregistre une pièce jointe sur le serveur
      * @param file la pièce jointe
      * @param user l'utilisateur qui fait la demande

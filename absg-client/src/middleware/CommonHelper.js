@@ -31,6 +31,19 @@ export function parseAxiosResponse(response) {
     return response.data
 }
 
+/**
+ * Analyse la réponse retourné par le websocket, afin de gérer les cas d'erreur
+ * et retourne le message décodé si tout se passe bien
+ * @param {any} message
+ */
+export function parseWsMessage(message) {
+    try {
+        return JSON.parse(message.data);
+    } catch (err) {
+        throw new Error("Problème de communication temps réel", err);
+    }
+}
+
 
 /**
  * Analyse les informations fourni et retourne l'url de l'image à utiliser pour l'avatar, ainsi

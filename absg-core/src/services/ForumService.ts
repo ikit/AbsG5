@@ -6,14 +6,18 @@ import * as path from "path";
 import * as fs from "fs";
 import { NotFoundError, UnauthorizedError } from "routing-controllers";
 import { saveImage } from "../middleware/commonHelper";
+import { WebsocketService } from "./WebsocketService";
 
 class ForumService {
     private forumRepo = null;
     private topicRepo = null;
     private msgRepo = null;
     private userRepo = null;
+    private wsService = null;
 
     public initService() {
+        this.wsService = new WebsocketService();
+
         this.forumRepo = getRepository(Forum);
         this.topicRepo = getRepository(ForumTopic);
         this.msgRepo = getRepository(ForumMessage);
@@ -214,6 +218,40 @@ class ForumService {
             return this.msgRepo.remove(msg);
         }
         throw new UnauthorizedError(`Vous n'avez pas les droits nécessaire pour supprimer ce message.`);
+    }
+
+    /**
+     * Retourne la liste des sujets mis en avant
+     */
+    pinnedTopics() {
+        return this.topicRepo
+            .createQueryBuilder("t")
+            .where(`t.pinned IS TRUE`)
+            .getMany();
+    }
+
+    /**
+     * Met en avant un sujet ou le retire
+     * @param topicId l'identifiant du sujet
+     */
+    async switchPin(topicId: number) {
+        // On récupère les infos sur le sujet
+        const topic = await this.topicRepo
+            .createQueryBuilder("t")
+            .where(`t.id = ${topicId}`)
+            .getOne();
+
+        if (topic) {
+            topic.pinned = !topic.pinned;
+            await this.topicRepo.save(topic);
+
+            this.wsService.broadcast({
+                message: "pinnedTopicsChanged",
+                payload: await this.pinnedTopics()
+            });
+            return topic;
+        }
+        throw new Error(`Le sujet n°${topicId} n'existe pas`);
     }
 
     /**

@@ -13,6 +13,17 @@
             </router-link>
         </div>
 
+
+        <v-tooltip bottom v-if="messages.length > 0">
+            <template v-slot:activator="{ on }">
+                <v-btn icon small v-on="on" :color="pinned ? 'accent' : 'default'" @click.stop="switchPin()" style="margin-left: 20px">
+                    <v-icon>fas fa-thumbtack</v-icon>
+                </v-btn>
+            </template>
+            <span v-if="!pinned">Mettre le sujet en accès direct</span>
+            <span v-if="pinned">Retirer le sujet des accès direct</span>
+        </v-tooltip>
+
         <v-btn
             style="position: absolute; right: 15px; top: 10px"
             @click.stop="newTopic()">
@@ -21,7 +32,7 @@
     </div>
 
 
-    <v-timeline align-top dense style="background: none; margin: auto; max-width: 700px; width: 100%;">
+    <v-timeline v-if="messages.length > 0" align-top dense style="background: none; margin: auto; max-width: 700px; width: 100%;">
         <v-timeline-item fill-dot color="#fff" v-for="msg in messages" :key="msg.id">
             <template v-slot:icon>
                 <div>
@@ -63,6 +74,7 @@ export default {
         breadcrumb: [],
         filter: { search: "" }, // un filtre par recherche de mot clés multichamps
         messages: [],
+        pinned: false,
         editorText: "<h1>coucou</h1>"
     }),
     mounted() {
@@ -73,6 +85,7 @@ export default {
             this.messages = data.posts;
             this.breadcrumb.push({ label: data.topic.forum.name, url: `/forum/browse/${data.topic.forum.id}` });
             this.breadcrumb.push({ label: data.topic.name, url: `/forum/read/${data.topic.id}` });
+            this.pinned = data.topic.pinned;
 
             // Si dernière discussion en cours, on scroll à la fin
             // if (this.currentYear === this.todayYear && this.currentMonth === this.todayMonth) {
@@ -81,6 +94,12 @@ export default {
         });
     },
     methods: {
+        switchPin() {
+            axios.get(`/api/forum/topic/${this.topicId}/switchPin`).then(response => {
+                const topic = parseAxiosResponse(response);
+                this.pinned = topic.pinned;
+            });
+        }
     }
 };
 </script>

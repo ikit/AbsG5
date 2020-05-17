@@ -1,16 +1,13 @@
 import * as WebSocket from "ws";
 import { logger } from "./middleware/logger";
 
-let wss = null;
+const port = process.env.WS_PORT;
+const wss = new WebSocket.Server({ port });
 
-export function initWS() {
-    const port = process.env.WS_PORT;
-    wss = new WebSocket.Server({ port });
-    wss.on("connection", () => {
-        logger.info("WS client connection established");
-    });
+wss.on("connection", () => {
+    logger.info("WS client connection established");
+});
 
-    logger.info(`WS Server has started on port ${port}.`);
-}
+//logger.info(`WS Server has started on port ${port}.`);
 
 export default wss;

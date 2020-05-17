@@ -11,9 +11,9 @@
                 </v-badge>
             </template>
         </v-tab>
-        <v-tab v-for="t in topics" :key="t.forumId" :to="{path: `/forum/read/${t.forumId}`}">
+        <v-tab v-for="t in topics" :key="t.forumId" :to="{path: `/forum/read/${t.id}`}">
             <template >
-                <v-badge right color="accent" :value="t.newMessages">
+                <v-badge right color="accent" :value="t.newMessages ? t.newMessages : 0">
                     <template v-slot:badge>
                         <span>{{ t.newMessages}}</span>
                     </template>
@@ -21,7 +21,7 @@
                 </v-badge>
             </template>
         </v-tab>
-        <v-tab :to="{path: `/forum/browse`}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
+        <v-tab :to="{path: `/forum/browse`}"> <v-icon>fas fa-archive</v-icon> &nbsp; Forums</v-tab>
     </v-tabs>
 
     <router-view></router-view>
@@ -30,16 +30,38 @@
 
 <script>
 import 'vue-trix';
+import axios from 'axios';
+import store from '../store';
+import { parseAxiosResponse, parseWsMessage } from '../middleware/CommonHelper';
 
 export default {
+    store,
     data: () => ({
         activeTab: `/forum/tbz#last`, // On charge la discussion TBZ à la date du jour par défaut
         topics: [],
         tbzNnewMessages: 0
     }),
     mounted () {
+        // On s'abonne aux notifications temps réels pour mettre à jours les notifications
+        this.$options.sockets.onmessage = (wsMsg) => {
+            const data = parseWsMessage(wsMsg);
+            if (data.message === "pinnedTopicsChanged") {
+                this.topics = data.payload;
+            }
+        };
+
+        this.updatePinnedTopics();
+    },
+    unmounted() {
+        console.log("REMOVE FORUM LISTENER", this.$options.sockets.onmessage)
+        delete this.$options.sockets.onmessage;
     },
     methods: {
+        updatePinnedTopics() {
+            axios.get(`/api/forum/pinnedTopics`).then(response => {
+                this.topics = parseAxiosResponse(response);
+            });
+        },
     }
 };
 </script>

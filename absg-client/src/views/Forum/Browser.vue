@@ -1,9 +1,11 @@
 <template>
 <div>
     <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }" style="padding: 15px">
-        <v-btn icon small :to="{ path: `/forum/browse` }" style="background: none">
+
+        <router-link :to="{ path: `/forum/browse` }" tag="button">
             <v-icon>fas fa-home</v-icon>
-        </v-btn>
+            <span v-if="$vuetify.breakpoint.lgAndUp" style="margin-left: 15px">Liste des forums</span>
+        </router-link>
 
         <div style="display: inline-block; margin-left: 15px" v-for="(path, idx) in breadcrumb" :key="idx">
             <router-link :to="{ path: path.url }" tag="button">
@@ -129,6 +131,7 @@ export default {
                 });
             } else {
                 // On récupère la liste des forums
+                this.breadcrumb = [];
                 axios.get(`/api/forum/browse`).then(response => {
                     this.items = parseAxiosResponse(response);
                     this.isLoading = false;

@@ -1,3 +1,4 @@
+require("dotenv").config();
 import "reflect-metadata";
 import { createConnections } from "typeorm";
 import { createExpressServer } from "routing-controllers";
@@ -6,8 +7,6 @@ import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import * as express from "express";
 import * as fileUpload from "express-fileupload";
-import * as os from "os";
-
 import {
     agpaService,
     citationService,
@@ -19,7 +18,6 @@ import {
     forumService
 } from "./services";
 import * as ormconfig from "../ormconfig";
-import { initWS } from "./wss";
 
 createConnections(ormconfig)
     .then(() => {
@@ -63,9 +61,6 @@ createConnections(ormconfig)
         // start express server
         app.listen(process.env.API_PORT);
         logger.info(`Server has started on port ${process.env.API_PORT}.`);
-
-        // start websocket server
-        initWS();
     })
     .catch(error => {
         console.error(error);

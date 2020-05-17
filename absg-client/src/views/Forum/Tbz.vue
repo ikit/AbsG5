@@ -163,7 +163,7 @@
                 </v-timeline>
             </template>
         </v-data-iterator>
-        <a name="last"></a>
+        <a id="last" name="last"></a>
     </v-container>
 </div>
 </template>
@@ -217,9 +217,9 @@ export default {
                 this.messages = data;
 
                 // Si dernière discussion en cours, on scroll à la fin
-                if (this.currentYear === this.todayYear && this.currentMonth === this.todayMonth) {
-                    document.querySelector("last").scrollIntoView();
-                }
+                // if (this.currentYear === this.todayYear && this.currentMonth === this.todayMonth) {
+                //     document.querySelector("last").scrollIntoView();
+                // }
             });
         },
 
