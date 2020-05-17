@@ -87,14 +87,19 @@ export class UserController {
     @Post("/settings")
     async saveSettings(@Body() settings: any, @CurrentUser() user: User) {
         if (user && Array.isArray(user.roles) && user.roles.indexOf("admin") > -1) {
+            console.log(settings);
             let sql = "";
             for (const key in settings) {
                 if (key == "agpaSpecialEdition") {
-                    // TODO: INSERT OR UPDATE current edition special category
+                    sql += `INSERT INTO agpa_category_variation (id, year, title, description)
+                            VALUES (8,  ${settings.agpaSpecialEdition.year}, '${settings.agpaSpecialEdition.title}', '${settings.agpaSpecialEdition.description}') 
+                            ON CONFLICT (id, year) DO UPDATE
+                            SET title='${settings.agpaSpecialEdition.title}', description='${settings.agpaSpecialEdition.description}';`;
                 } else {
-                    sql += `UPDATE agpa_category_variation SET value=${settings[key]} WHERE key = '${key}';`;
+                    sql += `UPDATE parameter SET value='${JSON.stringify(settings[key])}' WHERE key = '${key}';`;
                 }
             }
+            console.log(sql);
             await this.repo.query(sql);
             return await this.getSettings();
         }

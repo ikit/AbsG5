@@ -1,117 +1,113 @@
 <template>
     <v-container fluid v-if="settings">
-        <v-row>
-            <v-col>
-                <h1>Site</h1>
-                <v-card style="padding: 10px">
-                    <div>
-                        <v-switch v-model="settings.siteDisabled" label="Site en maintenance"></v-switch>
-                        <p>
-                            <span class="details">
-                                Mettre le site en maintenance empèche les utilisateurs d'y accéder et de soliciter le serveur ou la base de donnée.
-                            </span>
-                            <v-text-field
-                                label="Message d'explication"
-                                v-model="settings.siteDisabledMessage">
-                            </v-text-field>
-                        </p>
-                    </div>
+        <v-expansion-panels style="padding: 10px; max-width: 500px; margin: auto">
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i class="fas fa-bullhorn" style="display: inline-block; width: 40px"></i> Mettre une annonce</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>
+                        <span class="details">
+                            Met en avant sur le site une annonce visible par tous.
+                            En cliquand sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (html autorisé)
+                        </span>
+                        <v-text-field
+                            label="Accroche de l'annonce"
+                            v-model="settings.announcementTitle">
+                        </v-text-field>
+                        <v-textarea
+                            label="Corps de l'annonce"
+                            v-model="settings.announcementBody"
+                            hint="HTML autorisé"
+                        ></v-textarea>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-                    <div>
-                        <v-switch v-model="settings.announcementDisplayed" label="Mettre une annonce"></v-switch>
-                        <p>
-                            <span class="details">
-                                Met en avant sur le site une annonce visible par tous.
-                                En cliquand sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (html autorisé)
-                            </span>
-                            <v-text-field
-                                label="Accroche de l'annonce"
-                                v-model="settings.announcementTitle">
-                            </v-text-field>
-                            <v-textarea
-                                label="Corps de l'annonce"
-                                v-model="settings.announcementBody"
-                                hint="HTML autorisé"
-                            ></v-textarea>
-                        </p>
-                    </div>
-                </v-card>
-            </v-col>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i class="fas fa-star" style="display: inline-block; width: 40px"></i> Edition spéciale des AGPA {{settings.agpaSpecialEdition ? settings.agpaSpecialEdition.year : ''}}</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>
+                        <span class="details">
+                            Configurer la catégorie spéciale de l'année en cours.
+                        </span>
+                        <v-text-field
+                            label="Thème de la catégorie spéciale"
+                            v-model="settings.agpaSpecialEdition.title">
+                        </v-text-field>
+                        <v-text-field
+                            label="Description"
+                            v-model="settings.agpaSpecialEdition.description">
+                        </v-text-field>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-            <v-col>
-                <h1>AGPA</h1>
-                <v-card style="padding: 10px">
-                    <div>
-                        <v-switch v-model="agpaSpecialEnabled" :label="`Edition spéciale ${settings.agpaSpecialEdition ? settings.agpaSpecialEdition.year : ''}`"></v-switch>
-                        <p>
-                            <span class="details">
-                                Configurer la catégorie spéciale de l'année en cours.
-                            </span>
-                            <v-text-field
-                                label="Thème de la catégorie spéciale"
-                                v-model="settings.agpaSpecialEdition.title">
-                            </v-text-field>
-                            <v-text-field
-                                label="Description"
-                                v-model="settings.agpaSpecialEdition.description">
-                            </v-text-field>
-                        </p>
-                    </div>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i class="far fa-calendar-alt" style="display: inline-block; width: 40px"></i> Durées des phases des AGPA</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>
+                        <span class="details">
+                            Configurer les durées en jours des différentes phases. La phase n°1 commence obligatoirement le 1er octobre.
+                        </span>
+                        <v-text-field
+                            :label="`Durée de la phase 1 => Débute le ${this.agpaPhase1Start}`"
+                            :rules="agpaPhaseRules"
+                            v-model="settings.agpaPhase1Duration"
+                            @change="updateAgpaPhasesBoundaries()">
+                        </v-text-field>
+                        <v-text-field
+                            :label="`Durée de la phase 2 => Débute le ${this.agpaPhase2Start}`"
+                            :rules="agpaPhaseRules"
+                            v-model="settings.agpaPhase2Duration"
+                            @change="updateAgpaPhasesBoundaries()">
+                        </v-text-field>
+                        <v-text-field
+                            :label="`Durée de la phase 3 => Débute le ${this.agpaPhase3Start}`"
+                            :rules="agpaPhaseRules"
+                            v-model="settings.agpaPhase3Duration"
+                            @change="updateAgpaPhasesBoundaries()">
+                        </v-text-field>
+                        <v-text-field
+                            :label="`Durée de la phase 4 => Débute le ${this.agpaPhase4Start}`"
+                            :rules="agpaPhaseRules"
+                            v-model="settings.agpaPhase4Duration"
+                            @change="updateAgpaPhasesBoundaries()">
+                        </v-text-field>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-                    <div>
-                        <v-switch input-value="true" disabled label="Durées des phases"></v-switch>
-                        <p>
-                            <span class="details">
-                                Configurer les durées en jours des différentes phases. La phase n°1 commence obligatoirement le 1er octobre.
-                            </span>
-                            <v-text-field
-                                :label="`Durée de la phase 1 => Débute le ${this.agpaPhase1Start}`"
-                                :rules="agpaPhaseRules"
-                                v-model="settings.agpaPhase1Duration"
-                                @change="updateAgpaPhasesBoundaries()">
-                            </v-text-field>
-                            <v-text-field
-                                :label="`Durée de la phase 2 => Débute le ${this.agpaPhase2Start}`"
-                                :rules="agpaPhaseRules"
-                                v-model="settings.agpaPhase2Duration"
-                                @change="updateAgpaPhasesBoundaries()">
-                            </v-text-field>
-                            <v-text-field
-                                :label="`Durée de la phase 3 => Débute le ${this.agpaPhase3Start}`"
-                                :rules="agpaPhaseRules"
-                                v-model="settings.agpaPhase3Duration"
-                                @change="updateAgpaPhasesBoundaries()">
-                            </v-text-field>
-                            <v-text-field
-                                :label="`Durée de la phase 4 => Débute le ${this.agpaPhase4Start}`"
-                                :rules="agpaPhaseRules"
-                                v-model="settings.agpaPhase4Duration"
-                                @change="updateAgpaPhasesBoundaries()">
-                            </v-text-field>
-                        </p>
-
-                        <v-switch input-value="true" disabled label="Début de la cérémonie"></v-switch>
-                        <p>
-                            <span class="details">
-                                La cérémonie sera accessible et démarrera automatiquement à partir de l'heure indiqué, en nombre de seconde, à partir de minuit une fois la phase 4 terminée.
-                            </span>
-                            <v-text-field
-                                :label="`Heure d'ouverture de la cérémonie => Débute le ${this.agpaPhase5Start}`"
-                                v-model="settings.agpaCeremonyStartTime"
-                                @change="updateAgpaPhasesBoundaries()">
-                            </v-text-field>
-                        </p>
-                    </div>
-                </v-card>
-            </v-col>
-        </v-row>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i class="fas fa-desktop" style="display: inline-block; width: 40px"></i> Début de la cérémonie</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>
+                        <span class="details">
+                            La cérémonie sera accessible et démarrera automatiquement à partir de l'heure indiqué, en nombre de seconde, à partir de minuit une fois la phase 4 terminée.
+                        </span>
+                        <v-text-field
+                            :label="`Heure d'ouverture de la cérémonie => Débute le ${this.agpaPhase5Start}`"
+                            v-model="settings.agpaCeremonyStartTime"
+                            @change="updateAgpaPhasesBoundaries()">
+                        </v-text-field>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+        </v-expansion-panels>
 
         <v-btn
-            style="width: 100%; margin: 10px"
+            style="margin: 10px auto; display: block;"
             color="accent"
             @click="save()">
             Sauvegarder les paramètres
         </v-btn>
+
     </v-container>
 </template>
 
@@ -186,10 +182,14 @@ export default {
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
 
-h1 {
+h2 {
     line-height: initial;
     text-align: left;
     margin-bottom: 10px;
+    display: inline-block;
+    margin-left: 17px;
+    font-family: "Comfortaa", sans-serif;
+
 }
 
 p {

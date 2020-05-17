@@ -52,10 +52,11 @@ export default {
 
         this.updatePinnedTopics();
     },
-    unmounted() {
-        console.log("REMOVE FORUM LISTENER", this.$options.sockets.onmessage)
+    beforeDestroy() {
+        // On se désabonne aux notifications temps réels quand on quitte la section forum
         delete this.$options.sockets.onmessage;
     },
+
     methods: {
         updatePinnedTopics() {
             axios.get(`/api/forum/pinnedTopics`).then(response => {

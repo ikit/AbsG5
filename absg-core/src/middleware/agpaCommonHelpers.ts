@@ -113,8 +113,8 @@ export async function getMetaData(year = null): Promise<any> {
         }
         data.categories[row.id] = {
             id: row.id,
-            title: row.vTitle ? row.vTitle : row.title,
-            description: row.vDescription ? row.vDescription : row.description,
+            title: row.id === 8 ? row.vTitle : row.title,
+            description: row.id === 8 ? row.vDescription : row.description,
             color: row.color
         };
     }

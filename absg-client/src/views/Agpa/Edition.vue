@@ -2,7 +2,7 @@
 <v-container>
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
     <v-card v-if="currentMonth > 0 && currentMonth < 9" style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;">
-        <img src="/img/agpa/cupesMaxi/c1.png" height="100px" style="position: absolute; top: -50px; left: 244px"/>
+        <img src="/img/agpa/cupesMaxi/c1.png" height="100px" style="position: absolute; top: -50px; left: calc(50% - 56px)"/>
         <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
             L'édition <span style="font-size: 2em; font-weight: normal; padding-right: 3px;"> {{ currentYear }}</span> des A.G.P.A. n'a pas encore démarrée.
         </p>
@@ -14,18 +14,18 @@
                 {{ item.label }}
             </v-timeline-item>
         </v-timeline>
-        <v-card v-if="!special" style="margin: 15px; font-weight: bold; color: #ff8f00; padding: 15px">
+        <v-card v-if="current && current.categories[8] && current.categories[8].title" style="margin: 15px; text-align: center; padding: 15px">
+            <p style="opacity: 0.5; ">Thème de l'année</p>
+            <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">{{ current.categories[8].title }}</p>
+            <p style="font-style: italic">{{ current.categories[8].description }}</p>
+        </v-card>
+        <v-card v-else style="margin: 15px; font-weight: bold; color: #ff8f00; padding: 15px">
             <v-icon color="warning" style="width: 50px">fas fa-exclamation-triangle</v-icon>
             Aucun thème pour la catégorie spéciale n'a été décidé
         </v-card>
-        <v-card v-if="special" style="margin: 15px; text-align: center; padding: 15px">
-            <p style="opacity: 0.5; ">Thème de l'année</p>
-            <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">{{ special.title }}</p>
-            <p style="font-style: italic">{{ special.description }}</p>
-        </v-card>
         <v-card style="margin: 15px; padding: 15px">
             <v-icon style="width: 50px">fas fa-info</v-icon>
-            N'hésitez pas à discuter de l'organisation sur <a href="/forum/noel">le forum</a>.
+            N'hésitez pas à discuter de l'organisation sur <router-link :to="{ path: '/forum/' }" tag="a">le forum</router-link>.
         </v-card>
     </v-card>
 
@@ -61,8 +61,6 @@ import Phase3 from './Phase3';
 import Phase4 from './Phase4';
 import Phase5 from './Phase5';
 
-console.log("Edition !!!");
-
 export default {
     components: {
         Phase1,
@@ -73,7 +71,7 @@ export default {
     },
     data: () => ({
         isLoading: true,
-        current: null,
+        agpaMeta: null,
         currentMonth: null,
         currentYear: null,
         error: null,
@@ -84,25 +82,15 @@ export default {
             { number: 4, label: "Dépouillement", start: format(new Date(2020, 11, 24, 15), "dd MMM 'à' HH'h'mm", {locale: fr}) },
             { number: 5, label: "Cérémonie des AGPA", start: format(new Date(2020, 11, 24, 20, 30), "dd MMM 'à' HH'h'mm", {locale: fr}) },
         ],
-        special: { title: "Confinés", description: "#RestezChezVous #AvecDuSavon" },
     }),
     mounted () {
-        this.currentMonth = new Date().getMonth();
-        this.currentYear = new Date().getFullYear();
-        if (this.currentMonth === 0) {
-            // Si mois janvier, on affiche toujours l'édition de l'année précédence
-
-        } else if (this.currentMonth >= 9) {
-            // Si mois >= octobre, on affiche l'édition en cours
-            axios.get('/api/agpa').then(response => {
-                this.current = parseAxiosResponse(response);
-                this.isLoading = false;
-            });
-        } else {
-            // Sinon, on a affiche message d'attente avant début de la phase 1
-
-                console.log(this.agpaMeta);
-        }
+        axios.get('/api/agpa').then(response => {
+            this.currentMonth = new Date().getMonth();
+            this.currentYear = new Date().getFullYear();
+            this.current = parseAxiosResponse(response);
+            console.log(this.current);
+            this.isLoading = false;
+        });
 
     },
     methods: {
