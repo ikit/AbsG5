@@ -1,231 +1,412 @@
 <template>
-    <div class="reglement">
+    <v-container fluid>
 
-        <v-card class="version" >Règlement officiel des AGPA – Version du 28 décembre 2019</v-card>
+        <div class="version" >Règlement officiel des AGPA – Version du 28 décembre 2019</div>
 
-        <a name="chap1"></a>
-        <h2><span class="number">I.</span> Présentation des AGPA</h2>
-        <p>Ouvert à tous les membres du forum Absolument G, le concours des Absolument G Photos Awards (AGPA) récompense les meilleures photos parmi celles proposées par les participants pour six catégories.</p>
+        <v-expansion-panels style="padding: 10px; max-width: 800px; margin: auto">
+            <!-- I.1. Présentation des AGPA -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">I.1.</i> Présentation des AGPA</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Ouvert à tous les membres du forum Absolument G, le concours des Absolument G Photos Awards (AGPA)
+                        récompense les meilleures photos parmi celles proposées par les participants pour huit catégories.
+                    </p>
+                    <p>Liste et description des catégories retenues :</p>
 
-        <p>Liste et description des catégories retenues :
-        <ul>
-            <li><b>Portrait :</b> Photos mettant en évidence un personnage unique d'au moins douze ans au moment de la prise de vue;</li>
-            <li><b>Groupe et événement :</b> Toutes photos avec au moins un personnage (enfants comme adulte) sont acceptés dans cette catégorie;</li>
-            <li><b>Portrait d'enfant :</b> Photos mettant en évidence un enfant de moins de douze ans au moment de la prise de vue;</li>
-            <li><b>Nature :</b> Photos mettant en évidence un sujet principal floristique, faunistique ou naturel;</li>
-            <li><b>Grand angle :</b> Tous types de paysages et panoramas;</li>
-            <li><b>Manus Hominum :</b> Photos dont le sujet principal est marqué par l'empreinte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme ...);</li>
-            <li><b>Spéciale :</b> Chaque année, un thème particulier est choisi;</li>
-            <li><b>Autre regard :</b> Photos humoristiques, artistiques, décalées ou retouchées, ainsi que toutes celles n’entrant pas dans les autres catégories.</li>
-        </ul></p>
+                    <v-card style="width: 100%;">
+                        <v-simple-table class="categories" style="width: 100%; text-align: left;">
+                            <tr><th>Portrait</th><td>Photos mettant en évidence un personnage unique d'au moins douze ans au moment de la prise de vue</td></tr>
+                            <tr><th>Groupe et événement</th><td>Toutes photos avec au moins un personnage (enfants comme adulte) sont acceptés dans cette catégorie</td></tr>
+                            <tr><th>Enfant</th><td>Photos mettant en évidence un enfant de moins de douze ans au moment de la prise de vue</td></tr>
+                            <tr><th>Nature</th><td>Photos mettant en évidence un sujet principal floristique, faunistique ou naturel</td></tr>
+                            <tr><th>Grand angle</th><td>Tous types de paysages et panoramas</td></tr>
+                            <tr><th>Manus Hominum</th><td>Photos dont le sujet principal est marqué par l'empreinte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme ...)</td></tr>
+                            <tr><th>Spéciale</th><td>Chaque année, un thème particulier est choisi</td></tr>
+                            <tr><th>Autre regard</th><td>Photos humoristiques, artistiques, décalées ou retouchées, ainsi que toutes celles n’entrant pas dans les autres catégories</td></tr>
+                        </v-simple-table>
+                    </v-card>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>Historique et organisation du concours :</p>
-        <dl>
-            <dt>2006</dt>
-            <dd><ul>
-                <li>La première édition des AGPA a eu lieu en décembre 2006, sur une idée originale d’Emmanuel Gueudelot;</li>
-                <li>L’organisation du concours et de la cérémonie de remise des récompenses sont assurées depuis 2006 par Olivier Gueudelot, webmaster du site Absolument G, lui-même assisté par d’autres membres du forum;</li>
-                <li>Les principes fondamentaux des AGPA ont été définis collectivement par de nombreux membres du forum Absolument G entre septembre et décembre 2006.</li>
-                </ul>
-            </dd>
-            <dt>2007</dt>
-            <dd>La version 2007 du règlement reprend ces principes en y intégrant les évolutions suggérées par les participants à l’issue de la première édition des AGPA;</dd>
-            <dt>2008</dt>
-            <dd>Suite à de nouvelles suggestions des participants, la version 2008 du règlement a également évolué sur certains points (affichage du titre des photos, règles de comparaison des photos de catégories différentes, critères d’attribution de l’AGPA d’Or du meilleur photographe);</dd>
-            <dt>2012</dt>
-            <dd>Ajout catégorie enfants et spéciale</dd>
-            <dt>2013</dt>
-            <dd>Modification des catégories historiques, mise en place nouvelle version du site des AGPA (V4) + systeme de vote du meilleur titre intégré</dd>
-            <dt>2016</dt>
-            <dd>Précision concernant les votes des enfants</dd>
-            <dt>2019</dt>
-            <dd><ul>
-                <li>Précision concernant les catégories Groupe et événement et Enfant;</li>
-                <li>L'attribution des points pour le palmarès et revue (avec application rétroactive).</li>
-                </ul>
-            </dd>
-        </dl>
+            <!-- I.2. Historique -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">I.2.</i> Historique</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <dl>
+                        <dt>2006</dt>
+                        <dd>
+                            <ul>
+                                <li>La première édition des AGPA a eu lieu en décembre 2006, sur une idée originale d’Emmanuel Gueudelot;</li>
+                                <li>L’organisation du concours et de la cérémonie de remise des récompenses sont assurées depuis 2006 par Olivier Gueudelot, webmaster du site Absolument G, lui-même assisté par d’autres membres du forum;</li>
+                                <li>Les principes fondamentaux des AGPA ont été définis collectivement par de nombreux membres du forum Absolument G entre septembre et décembre 2006.</li>
+                            </ul>
+                        </dd>
+                        <dt>2007</dt>
+                        <dd>La version 2007 du règlement reprend ces principes en y intégrant les évolutions suggérées par les participants à l’issue de la première édition des AGPA;</dd>
+                        <dt>2008</dt>
+                        <dd>Suite à de nouvelles suggestions des participants, la version 2008 du règlement a également évolué sur certains points (affichage du titre des photos, règles de comparaison des photos de catégories différentes, critères d’attribution de l’AGPA d’Or du meilleur photographe);</dd>
+                        <dt>2012</dt>
+                        <dd>Ajout des catégories Enfants et Spéciale (dont le thème sera choisi chaque année par les participants).</dd>
+                        <dt>2013</dt>
+                        <dd>
+                            <ul>
+                                <li>Modification des catégories historiques, mise en place nouvelle version du site des AGPA (V4);</li>
+                                <li>Systeme de vote du meilleur titre intégré.</li>
+                            </ul>
+                        </dd>
+                        <dt>2016</dt>
+                        <dd>Précision concernant les votes des enfants, qui désormais ont le droit de voter, mais dont les votes ne sont pas pris en compte pour le calcul des récompenses.</dd>
+                        <dt>2019</dt>
+                        <dd>
+                            <ul>
+                                <li>Précision concernant les catégories Groupe et événement et Enfant;</li>
+                                <li>L'attribution des points pour le palmarès et revue (avec application rétroactive).</li>
+                            </ul>
+                        </dd>
+                    </dl>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>Le déroulement de l’édition des AGPA est détaillé ci-dessous. Les dates et heures indiquées ne sont pas immuables ; elles pourront être modifiées si les circonstances l’exigent (les candidats seront alors prévenus sur le forum Absolument G).</p>
-        <br/>
-        <a name="chap2"></a>
-        <h2><span class="number">II.</span> Candidature et enregistrement des photos</h2>
-        <a name="chap2.1"></a>
-        <h3><span class="number">II.1.</span> Conditions générales</h3>
+            <!-- I.3. Organisation du concours -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">I.3.</i> Organisation du concours</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>L’édition des AGPA se déroule en 5 phases qui sont détaillées ci-dessous dans les sections II.2. à II.6.
+                        Les dates et heures indiquées ne sont pas immuables ; elles pourront être modifiées si les circonstances l’exigent.
+                        Les candidats seront alors prévenus sur le forum Absolument G, et par le site des AGPA lui même.
+                    </p>
 
-        <p>Le concours est ouvert à tous les membres du forum Absolument G. </p>
+                    <v-card style="width: 100%; padding: 15px">
+                        <table style="width: 100%; text-align: left;">
+                            <tr><td>Phase n°1</td><td>1er oct. à 00h00</td><td>Enregistrement des photos</td></tr>
+                            <tr><td>Phase n°2</td><td>19 déc. à 00h00</td><td>Validation des photos</td></tr>
+                            <tr><td>Phase n°3</td><td>20 déc. à 00h00</td><td>Votes</td></tr>
+                            <tr><td>Phase n°4</td><td>24 déc. à 15h00</td><td>Dépouillement</td></tr>
+                            <tr><td>Phase n°5</td><td>24 déc. à 20h30</td><td>Cérémonie des AGPA</td></tr>
+                        </table>
+                    </v-card>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>Chaque candidat peut présenter une ou deux photo(s) par catégorie, pour autant de catégories qu’il le souhaite. </p>
+            <!-- II.1. Participation et conditions générales -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.1.</i> Participation et conditions générales</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Le concours est ouvert à tous les membres du forum Absolument G. Il n'y a aucune limite d'âge,
+                        les enfants comme les adultes peuvent aussi participer au concours.</p>
+                    <p>Chaque candidat peut présenter une ou deux photo(s) par catégorie, pour autant de catégories qu’il le souhaite. </p>
+                    <p>Pour pouvoir être prise en compte, chaque photo doit remplir les conditions suivantes :
+                    <ul>
+                        <li>Avoir été prise par le candidat au cours de l'année. Les photos du mois de décembre de l'année précédente sont acceptées;
+                        <li>Les photos prises au retardateur sont admises, si le candidat a préparé l’appareil et cadré la photo lui-même;</li>
+                        <li>Ne pas être un photo-montage, sauf pour la catégorie &laquo; Autre regard &raquo; où ils sont autorisés.</li>
+                    </ul></p>
 
-        <p>Pour pouvoir être prise en compte, chaque photo doit remplir les conditions suivantes :
-        <ul>
-            <li>Peser moins de 5 Mo et ne pas avoir une largeur ou une hauteur qui dépassent les 5 000 pixels;</li>
-            <li>Avoir été prise par le candidat au cours de l'année. Les photos du mois de décembre de l'année précédente sont acceptées;
-            <li>Les photos prises au retardateur sont admises, si le candidat a préparé l’appareil et cadré la photo lui-même;</li>
-            <li>Ne pas être un photo-montage, sauf pour la catégorie &laquo; Autre regard &raquo; où ils sont autorisés.</li>
-        </ul></p>
+                    <p>Les effets suivants ne sont pas considérés comme effets de montage et sont acceptés pour toutes les catégories :
+                    <ul>
+                        <li>Le redimensionnement ou le recadrage ;</li>
+                        <li>Les rotations ou la symétrie ;</li>
+                        <li>Les réglages de saturation, de luminosité ou de contraste ;</li>
+                        <li>L’effet noir et blanc, sépia ou négatif ;</li>
+                        <li>La correction des yeux rouges ou l’effacement de poussières.</li>
+                    </ul></p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <br/>
-        <p>Les effets suivants ne sont pas considérés comme effets de montage et sont acceptés pour toutes les catégories :
-        <ul>
-            <li>Le redimensionnement ou le recadrage ;</li>
-            <li>Les rotations ou la symétrie ;</li>
-            <li>Les réglages de saturation, de luminosité ou de contraste ;</li>
-            <li>L’effet noir et blanc, sépia ou négatif ;</li>
-            <li>La correction des yeux rouges ou l’effacement de poussières.</li>
-        </ul></p>
+            <!-- II.2. Phase 1: Enregistrement des photos -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.2.</i> Phase 1: Enregistrement des photos</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>L’enregistrement des photos se fait sur Internet, dans la section du site Absolument G consacrée aux AGPA.
+                        Seules les photos numériques ou numérisées sont acceptées (les diapositives et photos argentiques doivent être scannées).
+                    </p>
+                    <p>Lors de l’enregistrement des photos, il est demandé au candidat d’attribuer un titre à chacune de ses œuvres.
+                        Le titre donné est visible lors de l'évaluation des jurés, ils pourront donc en tenir compte s' ils le souhaitent.
+                    </p>
+                    <p>Durant cette phase, le candidat peut :
+                        <ul>
+                            <li>Envoyer et nommer de nouvelles photos (dans la limite de deux par catégorie) ;</li>
+                            <li>Supprimer, remplacer ou renommer les photos déjà envoyées.</li>
+                        </ul>
+                    </p>
+                    <p>Techniquement, les photos doivent être au format jpg. Il n'y a pas d'autres contraintes techniques, si ce n'est qu'une photo, comme toutes
+                        les fichiers enregistrés sur le site, doit faire moins de 200Mo.
+                        Lors de l'enregistrement, les photos trop grosses seront redimmensionnées automatiquement par le site Absolument G. Si toutefois vous voulez gérer
+                        vous-mêmes le redimmensionnement, il est conseillé de fournis des photos en haute résolution, c'est à dire à minima <b>FULL HD</b> (1920 x 1080).
+                        Mais du <b>4K</b> (3840 x 2160) serait préférable afin de permettre à ceux qui le souhaiterais de profiter d'une projection des photos en hautes qualités.
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <a name="chap2.2"></a>
-        <h3><span class="number">II.2.</span> Enregistrement des photos</h3>
-        <p>L’enregistrement des photos se fait sur Internet, dans la section du site Absolument G consacrée aux AGPA. Seules les photos numériques ou numérisées sont acceptées (les diapositives et photos argentiques doivent être scannées). </p>
-        <p>Lors de l’enregistrement des photos, il est demandé au candidat d’attribuer un titre à chacune de ses œuvres. Le titre donné est visible lors de l'évaluation des jurés, ils pourront donc en tenir compte s' ils le souhaitent.</p>
-        <p>La date limite d’enregistrement des photos est fixée au 19 décembre à 23h59. Avant cette date, le candidat peut :
-        <ul>
-            <li>Envoyer et nommer de nouvelles photos (dans la limite de deux par catégorie) ;</li>
-            <li>Supprimer, remplacer ou renommer les photos déjà envoyées.</li>
-        </ul></p>
-        <br/>
+            <!-- II.3. Phase 2: Validation des photos -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.3.</i> Phase 2: Validation des photos</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Une fois la phase d'enregistrement terminée, la phase de vérification des photos débute.
+                        Durant cette phase d'une journée en général, les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
+                    <p>Pendant cette période, les membres du forum peuvent :
+                        <ul>
+                            <li>Visualiser toutes les photos de tous les candidats ;</li>
+                            <li>Contacter l’organisation pour signaler une erreur ou une photo ne correspondant pas aux critères définis.</li>
+                        </ul>
+                    </p>
+                    <p>Si une photo est jugée non conforme aux critères définis, le candidat concerné sera prévenu et aura la possibilité de remplacer son œuvre.
+                        S’il ne le fait pas, la photo en cause sera exclues de la phase de vote et ne pourra pas obtenir de point pour le classement final. </p>
+                    <p>Il n’est pas possible de voter pendant la phase de vérification.</p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <a name="chap3"></a>
-        <h2><span class="number">III.</span> Visualisions et vérification des photos proposées</h2>
-        <p>Une fois la phase d'enregistrement terminée, la phase de vérification des photos débute. Durant cette phase d'une journée en général, les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
-        <p>Pendant cette période, les membres du forum peuvent :
-        <ul>
-            <li>Visualiser toutes les photos de tous les candidats ;</li>
-            <li>Contacter l’organisation pour signaler une erreur ou une photo ne correspondant pas aux critères définis.</li>
-        </ul></p>
-        <p>Si une photo est jugée non conforme aux critères définis, le candidat concerné sera prévenu et aura la possibilité de remplacer son œuvre. S’il ne le fait pas, la photo en cause sera exclues de la phase de vote et ne pourra pas obtenir de point pour le classement final. </p>
-        <p>Il n’est pas possible de voter pendant la phase de vérification.</p>
+            <!-- II.4. Phase 3: Votes -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.4.</i> Phase 3: Votes</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants de moins de 12 ans
+                        peuvent voter, cependant seuls les votes des jurés ayant 12 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
+                    <p>La phase de vote dure en général 3 jours. </p>
+                    <p>Pendant cette période, les membres du forum peuvent :
+                        <ul>
+                            <li>Visualiser les photos de tous les candidats. A noter que les photos refusées lors de la phase 2 seront visibles, mais il ne sera pas possible
+                                de voter pour elles;
+                            </li>
+                            <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie :
+                            <ul>
+                                <li>1 ou 2 étoiles aux meilleures photos;</li>
+                                <li>1 plume pour les meilleurs titres de photo.</li>
+                            </ul></li>
+                            <li>Corriger leurs votes</li>
+                            <li>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables</li>
+                            <li>Corriger leurs votes</li>
+                        </ul>
+                    </p>
+                    <p>Les candidats qui votent, doivent attribuer un minimum de points dans chaque catégorie.
+                        S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.
+                        Un indicateur dans le formulaire de vote permet de savoir le nombre de points que l'on peut attribuer pour chaque catégorie
+                        Ainsi que le nombre de point que l'on a déjà attribué. Cet indicateur passe du rouge au vert quand un nombre suffisant de points
+                        a été attribués.
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <br/>
-        <a name="chap4"></a>
-        <h2><span class="number">IV.</span> Votes</h2>
-        <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants peuvent voter, cependant seuls les votes des jurés ayant 10 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
-        <p>La phase de vote dure en général 3 jours. </p>
-        <p>Pendant cette période, les membres du forum peuvent :
-        <ul>
-            <li>Visualiser les photos de tous les candidats</li>
-            <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie :
-            <ul>
-                <li>1 à 3 étoiles aux meilleures photos;</li>
-                <li>2 étoiles à la deuxième meilleure photo ;</li>
-                <li>1 point à la troisième meilleure photo.</li>
-            </ul></li>
-            <li>Corriger leurs votes</li>
-        </ul></p>
-        <p>Les candidats doivent attribuer tous leurs points. S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.</p>
-        <p>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables.</p>
-        <p>Les candidats ne peuvent pas voter pour leurs propres œuvres et les votes sont anonymes.</p>
+            <!-- II.5. Phase 4: Dépouillement -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.5.</i> Phase 4: Dépouillement</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Le dépouillement va compter les votes reçues par chaque photo et établir un classement à la
+                        fois au sein de la catégorie de la photo mais aussi globalement (toutes catégories confondues).
+                        En cas d'égalité, le nombre total de votes reçus fait la différence (les photos ayant reçu le plus de votes passant devant en ayant reçu le moins).
+                    </p>
 
-        <br/>
-        <a name="chap5"></a>
-        <h2><span class="number">V.</span> Palmarès et récompenses</h2>
-        <a name="chap5.1"></a>
-        <h3><span class="number">V.1.</span> Généralités</h3>
-        <p>Le palmarès sera dévoilé au public lors d'une cérémonie organisé pour l'occasion. En dehors de l’honorifique attribution des AGPA d’or, aucune récompense n’est assurée. Les photos gagnantes seront cependant durablement mises en ligne sur le site Absolument G. </p>
+                    <p>A partir de l'édition 2008 des AGPA, une note unique est calculée pour chaque photo.
+                        Cette note dépend des deux critères de choix précédemment définis (nombre de points et nombre de votes),
+                        mais également du nombre de photos de la catégorie à laquelle elle appartient et du nombre de jurés de l'édition du concours.
+                        Cette variable a été créée pour permettre de comparer les photos entre elles à partir d’un chiffre unique,
+                        quelques soient la catégorie ou l'édition pour lesquelles elles concourent.
+                    </p>
 
-        <p>Le total des points gagnés détermine le classement d’une photo dans sa catégorie (la photo gagnante est celle qui a obtenu le plus de points). Les cas particuliers (ex-æquo, comparaisons inter catégories) sont détaillés dans le paragraphe <a href="#chap5.2" class="number" title="Aller au paragraphe V.2">V.2</a>.</p>
+                    <p>Remarques :
+                        <ul>
+                            <li>Si cette note technique n'a pas vocation à être diffusée lors de la cérémonie des AGPA,
+                                elle pourra être communiquée à chaque participant en faisant la demande ;</li>
+                            <li>Le palmarès des deux premières éditions ne sera pas modifié, même s’il aurait été différent avec ce mode d’évaluation,
+                                qui tient compte des nombres différents de photos entre les catégories.</li>
+                        </ul>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>Les quatre meilleures photos de chaque catégorie seront nominées à la cérémonie du 24 décembre. La meilleure d’entre elle sera récompensée d’un AGPA d’or. Le classement des trois autres photos ne sera détaillé que sur le site Absolument G, après la cérémonie du 24 décembre.</p>
+            <!-- II.5.a. Calcul des points -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.5.a.</i> Calcul des notes</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Le calcul des notes pour les photographies et le suivant :</p>
+                    <img src="/img/agpa/f1.gif" alt="Note = NotePts + NoteVts"/><br/>
+                    <img src="/img/agpa/f2.gif" alt="NotePts = PtsPhoto x NbPhotos/PtsCatégorie x 10^7/1001"/><br/>
+                    <img src="/img/agpa/f3.gif" alt="NoteVts = VtsPhoto x NbPhotos /VtsCatégorie x 10^4/1001 "/><br/>
 
-        <p>En plus des AGPA d’or remis pour chacune des six catégories, deux autres récompenses seront décernées (il y a donc huit récompenses au total) :
-        <ul>
-            <li>L’AGPA d’or de la meilleure photo <b>toutes catégories</b> (récompense la photo ayant obtenu le plus grand score parmi l'ensemble des photos postées) ;</li>
-            <li>L’AGPA d’or du meilleur <b>photographe</b> (récompense le photographe dont les six meilleures photos totalisent le plus grand score).</li>
-        </ul></p>
+                    <table style="width: 100%; text-align: left; margin: 15px 0">
+                        <tr><td><i>PtsPhoto</i></td><td>nombre total de points recueillis par la photo</td></tr>
+                        <tr><td><i>PtsCatégorie</i></td><td>nombre total de points recueillis par l’ensemble des photos de la catégorie</td></tr>
+                        <tr><td><i>VtsPhotos</i></td><td>nombre total de votes recueillis par la photo</td></tr>
+                        <tr><td><i>PtsCatégorie</i></td><td>nombre total de votes recueillis par l’ensemble des photos de la catégorie</td></tr>
+                        <tr><td><i>Nbphotos</i></td><td>nombre de photos de la catégorie</td></tr>
+                    </table>
 
-        <br/>
-        <a name="chap5.2"></a>
-        <h3><span class="number">V.2.</span> Palmarès et récompenses</h3>
-        <p>Au sein de chaque catégorie, les photos sont classées en fonction de leur nombre total de points (classement décroissant). En cas d'égalité, le nombre total de votes reçus fait la différence (classement décroissant).</p>
 
-        <p>A partir de l'édition 2008 des AGPA, une note unique est calculée pour chaque photo. Cette note dépend des deux critères de choix précédemment définis (nombre de points et nombre de votes), mais également du nombre de photos de la catégorie à laquelle elle appartient et du nombre de jurés de l'édition du concours. Cette variable a été créée pour permettre de comparer les photos entre elles à partir d’un chiffre unique, quelques soient la catégorie ou l'édition pour lesquelles elles concourent.</p>
+                    <p>Remarques :<ul>
+                            <li>Les coefficients servent à départager les photos et rendre la note globale plus lisible qu’un chiffre à virgule ;</li>
+                            <li>La note des points (<i>NotePts</i>), affectée du plus fort coefficient, est la note déterminante, la note des votes (<i>NoteVts</i>) ne servant qu’à départager les photos à égalité avec le premier critère ;</li>
+                            <li>La fusion des deux notes <i>NotePts</i> et <i>NoteVts</i> en  une variable unique permet de simplifier les calculs et les comparaisons, sans remettre en cause des critères historiques de classement.</li>
+                            <li>La note moyenne de chaque catégorie est de 10 000 points.</li>
+                        </ul>
+                    </p>
 
-        <p>Remarques :
-        <ul>
-            <li>Si cette note n'a pas vocation à être diffusée lors de la cérémonie des AGPA, elle pourra être communiquée à chaque participant en faisant la demande ;</li>
-            <li>Le palmarès des deux premières éditions ne sera pas modifié, même s’il aurait été différent avec ce mode d’évaluation, qui tient compte des nombres différents de photos entre les catégories.</li>
-        </ul></p>
+                    <p>En cas de notes équivalentes, deux photos sont départagées par les critères suivants (par ordre d’application) :<ul>
+                            <li>Présence ou non de titre (avantage à la photo titrée) ;</li>
+                            <li>Nombre total de photos de la catégorie (avantage à la photo provenant de la plus grande catégorie) ;</li>
+                            <li>Palmarès des auteurs des photos avant l’édition en cours (avantage à la photo dont l’auteur présente le plus faible palmarès ; cf. paragraphe III.) ;</li>
+                            <li>Edition (pour les comparaisons entre éditions ; avantage à la photo de l’édition la plus récente) ;</li>
+                            <li>Tirage au sort.</li>
+                        </ul>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>Son mode de calcul est le suivant :<br/>
-        <img src="" alt="Note = NotePts + NoteVts"/><br/><br/>
-        <img src="" alt="NotePts = PtsPhoto x NbPhotos/PtsCatégorie x 10^7/1001"/><br/><br/>
-        <img src="" alt="NoteVts = VtsPhoto x NbPhotos /VtsCatégorie x 10^4/1001 "/><br/><br/>
+            <!-- II.5.b. AGPA du meilleur titre -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.5.b.</i> AGPA du meilleur titre</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>TODO</p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        Variables :<ul>
-            <li><code>PtsPhoto</code> : nombre total de points recueillis par la photo ;</li>
-            <li><code>PtsCatégorie</code> : nombre total de points recueillis par l’ensemble des photos de la catégorie ;</li>
-            <li><code>VtsPhotos</code> : nombre total de votes recueillis par la photo ;</li>
-            <li><code>PtsCatégorie</code> : nombre total de votes recueillis par l’ensemble des photos de la catégorie ;</li>
-            <li><code>Nbphotos</code> : nombre de photos de la catégorie.</li>
-        </ul></p>
+            <!-- II.5.c. AGPA de la meilleure photographie -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.5.c.</i> AGPA de la meilleure photographie</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>TODO</p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>Remarques :<ul>
-            <li>Les coefficients servent à départager les photos et rendre la note globale plus lisible qu’un chiffre à virgule ;</li>
-            <li>La note ‘points’, affectée du plus fort coefficient, est la note déterminante, la note ‘votes’ ne servant qu’à départager les photos à égalité avec le premier critère ;</li>
-            <li>La fusion des deux notes « Points » et « Votes » en  une variable unique permet de simplifier les calculs et les comparaisons, sans remettre en cause des critères historiques de classement.</li>
-            <li>La note moyenne de chaque catégorie est de 10 000 points.</li>
-        </ul>
-        </p>
+            <!-- II.5.d. AGPA du meilleur photographe -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.5.d.</i> AGPA du meilleur photographe</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Le classement du meilleur photographe est calculé à partir de la somme des notes des six meilleures photos de chaque participant,
+                        ou de toutes les photos des participants ayant proposés six photos ou moins.
+                    </p>
+                    <p>En cas de notes équivalentes, deux photographes sont départagés par les critères suivants (par ordre d’application) :<ul>
+                            <li>Moyenne des photos du photographe pour l’édition en cours (avantage à la meilleure moyenne) ;</li>
+                            <li>Note de la moins bonne photo (avantage à la meilleure note) ;</li>
+                            <li>Palmarès de l’édition actuelle (hors catégorie « meilleur photographe, avantage au photographe possédant le meilleur palmarès ; cf. paragraphe III.) ;</li>
+                            <li>Palmarès cumulé des éditions précédentes (avantage au candidat présentant le plus faible palmarès ; cf. paragraphe III.) ;</li>
+                            <li>Tirage au sort.</li>
+                        </ul>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>En cas de notes équivalentes, deux photos sont départagées par les critères suivants (par ordre d’application) :<ul>
-            <li>Présence ou non de titre (avantage à la photo titrée) ;</li>
-            <li>Nombre total de photos de la catégorie (avantage à la photo provenant de la plus grande catégorie) ;</li>
-            <li>Palmarès des auteurs des photos avant l’édition en cours (avantage à la photo dont l’auteur présente le plus faible palmarès ; cf. paragraphe <a href="#chap5.3" class="number" title="Aller au paragraphe V.3">V.3</a>.) ;</li>
-            <li>Edition (pour les comparaisons entre éditions ; avantage à la photo de l’édition la plus récente) ;</li>
-            <li>Tirage au sort.</li>
-        </ul></p>
+            <!-- II.5.e. AGPA d'honneur -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.5.e.</i> AGPA d'honneur</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Les enfants de moins de 12 ans qui participent à une édition en proposant des photos
+                        gagneront un AGPA d'honneur pour leur participation si jamais leurs photos ne remportent aucune récompense.
+                        Cet AGPA est attribué à la photo ayant reçu le plus de vote, ou bien est tirée au hasard parmi ses photos.</p>
+                    <p>Un AGPA d'honneur de donne aucun point de palmarès (c'est à dire aucun points pour le classement général, cf paragraphe III.).</p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>Le classement du meilleur photographe est calculé à partir de la somme des notes des six meilleures photos de chaque participant, ou de toutes les photos des participants ayant proposés six photos ou moins.</p>
+            <!-- II.5.f. AGPA de diamant -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.5.f.</i> AGPA de diamant</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Dans certains cas bien précis, les AGPA d’or peuvent se transformer en AGPA de diamant : <ul>
+                        <li>AGPA de diamant de la meilleure photo de sa catégorie attribué à la première photo si : <ul>
+                            <li>La photo totalise 50 000 points ou plus;</li>
+                            <li><b>ET</b> la note de la photo est strictement supérieure au double de la note de la deuxième meilleure photo de la catégorie.</li></ul></li>
+                        <li>AGPA de diamant de la meilleure photo toutes catégories attribué à la meilleure photo si : <ul>
+                            <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés moins un).</li></ul></li>
+                        <li>AGPA de diamant du meilleur photographe attribué au premier photographe si :<ul>
+                            <li>Il est l’auteur des trois meilleures photos et ses quatre meilleures photos totalisent 100 000 points ou plus ;</li>
+                            <li><b>OU</b> il totalise 33 points ou plus au palmarès de l’édition actuelle (avant transformation de l’AGPA d’or du meilleur photographe en AGPA de diamant).</li></ul></li>
+                        </ul>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
 
-        <p>En cas de notes équivalentes, deux photographes sont départagés par les critères suivants (par ordre d’application) :<ul>
-            <li>Moyenne des photos du photographe pour l’édition en cours (avantage à la meilleure moyenne) ;</li>
-            <li>Note de la moins bonne photo (avantage à la meilleure note) ;</li>
-            <li>Palmarès de l’édition actuelle (hors catégorie « meilleur photographe, avantage au photographe possédant le meilleur palmarès ; cf. paragraphe <a href="#chap5.3" class="number" title="Aller au paragraphe V.3">V.3</a>.) ;</li>
-            <li>Palmarès cumulé des éditions précédentes (avantage au candidat présentant le plus faible palmarès ; cf. paragraphe <a href="#chap5.3" class="number" title="Aller au paragraphe V.3">V.3</a>.) ;</li>
-            <li>Tirage au sort.</li>
-        </ul></p>
+            <!-- II.6. Phase 5: Cérémonie des AGPA -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">II.6.</i> Phase 5: Cérémonie des AGPA</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Le palmarès sera dévoilé au public lors d'une cérémonie organisé pour l'occasion. En dehors de l’honorifique attribution des AGPA d’or,
+                        aucune récompense n’est assurée. Les photos gagnantes seront cependant durablement mises en ligne sur le site Absolument G.
+                    </p>
 
-        <p>Les photos situées au-delà de la première place ne sont pas départagées lors de la cérémonie des résultats, aucun AGPA d’argent ou de bronze n’étant décerné en cette occasion. </p>
+                    <p>Depuis 2019, la cérémonie est générée automatiquement en ligne. De ce fait:
+                        <ul>
+                            <li>Les personnes non présentes lors de la cérémonie peuvent la suivre en ligne, en direct ou en différé;</li>
+                            <li>Moins de travail pour Olivier qui n'a plus à créer à la main la présentation de la cérémonie;</li>
+                            <li>Il est possible de revoir les anciennes cérémonie dans la séction du site Absolument G dédiée à celà.</li>
+                        </ul>
+                    </p>
 
-        <p>Dans certains cas bien précis, les AGPA d’or peuvent se transformer en AGPA de diamant : <ul>
-            <li>AGPA de diamant de la meilleure photo de sa catégorie attribué à la première photo si : <ul>
-                <li>La photo totalise 50 000 points ou plus;</li>
-                <li><b>ET</b> la note de la photo est strictement supérieure au double de la note de la deuxième meilleure photo de la catégorie.</li></ul></li>
-            <li>AGPA de diamant de la meilleure photo toutes catégories attribué à la meilleure photo si : <ul>
-                <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés moins un).</li></ul></li>
-            <li>AGPA de diamant du meilleur photographe attribué au premier photographe si :<ul>
-                <li>Il est l’auteur des trois meilleures photos et ses quatre meilleures photos totalisent 100 000 points ou plus ;</li>
-                <li><b>OU</b> il totalise 33 points ou plus au palmarès de l’édition actuelle (avant transformation de l’AGPA d’or du meilleur photographe en AGPA de diamant).</li></ul></li>
-            </ul>
-        </p>
 
-        <br/>
-        <a name="chap5.3"></a>
-        <h3><span class="number">V.3.</span> Palmarès des photographes</h3>
+                    <p>Le total des points gagnés détermine le classement d’une photo dans sa catégorie (la photo gagnante est celle qui a obtenu le plus de points).
+                        Les cas particuliers (ex-æquo, comparaisons inter catégories) sont détaillés dans le paragraphe <i>II.5</i>.</p>
 
-        <p>Un système de points permet de représenter en un chiffre le palmarès accumulé par chaque participant.
-            Ce système permet notamment de départager les ex-æquo (en favorisant le palmarès cumulé le plus faible) ou d’établir un palmarès général,
-            toutes éditions confondues. Ces points sont attribués à chaque candidat en fonction des récompenses reçues, selon le barème suivant :
-        <v-card style="width: 100%;">
-            <table style="width: 100%; text-align: center;"><tbody>
-                <tr><th>AGPA de diamant</th><th>AGPA d’or</th><th>AGPA d’argent</th><th>AGPA de bronze</th><th>Nominé</th></tr>
-                <tr><td>6</td><td>4</td><td>3</td><td>2</td><td>1</td></tr>
-            </tbody></table>
-        </v-card>
-        </p>
+                    <p>Les quatre meilleures photos de chaque catégorie seront nominées à la cérémonie.
+                        La meilleure d’entre elle sera récompensée d’un AGPA d’or ou de diamant, puis un AGPA d'argent et bronze pour la deuxième et troisième.
+                    </p>
 
-        <v-card class="version" >Règlement officiel des AGPA – Version du 28 décembre 2019</v-card>
-        <div class="clear">&nbsp;</div>
-    </div>
+                    <p>En plus des AGPA d’or, d'argent et de bronze remient pour chacuneq des huit catégories, trois autres AGPA sont décernées :
+                    <ul>
+                        <li>Les AGPA du meilleur titre <b>toutes catégories</b> (récompense les photos dont le titre à le plus eu de succès) ;</li>
+                        <li>Les AGPA de la meilleure photo <b>toutes catégories</b> (récompense les photos ayant obtenues les plus grands scores parmi l'ensemble des photos postées) ;</li>
+                        <li>Les AGPA du meilleur <b>photographe</b> (récompense les photographes dont les six meilleures photos totalisent le plus grand score).</li>
+                    </ul></p>
+
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+
+
+            <!-- III. Palmarès -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <span><i style="display: inline-block; width: 40px">III.</i> Palmarès</span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p>Un système de points permet de représenter en un chiffre le palmarès accumulé par chaque participant.
+                        Ce système permet notamment de départager les ex-æquo (en favorisant le palmarès cumulé le plus faible) ou d’établir un palmarès général,
+                        toutes éditions confondues. Ces points sont attribués à chaque candidat en fonction des récompenses reçues, selon le barème suivant :
+                    </p>
+                    <v-card style="width: 100%;">
+                        <table style="width: 100%; text-align: center;">
+                            <tr><th>AGPA de diamant</th><th>AGPA d’or</th><th>AGPA d’argent</th><th>AGPA de bronze</th><th>Nominé</th></tr>
+                            <tr><td>6</td><td>4</td><td>3</td><td>2</td><td>1</td></tr>
+                        </table>
+                    </v-card>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+        </v-expansion-panels>
+    </v-container>
 </template>
-
 
 
 <script>
 export default  {
     data: () => ({
-    }),
+
+    })
 };
 </script>
 
@@ -249,6 +430,49 @@ h1 {
     margin: 20px 0 60px 0;
 }
 
+dt {
+    font-weight: bold;
+}
+dd {
+    margin-left: 20px;
+    border-left: 3px solid #ddd;
+    padding-left: 10px;
+
+    li {
+        margin-left: -23px;
+        padding-left: 0;
+        list-style-image: url('/img/agpa/puce.png');
+    }
+}
+
+
+.categories {
+    th {
+        min-width: 150px;
+        vertical-align: top;
+        text-align: right;
+        padding: 5px 0;
+    }
+    td {
+        font-style: italic;
+        vertical-align: top;
+        padding: 5px 16px;
+    }
+}
+
+
+li {
+    list-style-image: url('/img/agpa/puce.png');
+}
+
+.version {
+        font-family: 'Courier New', Courier, monospace!important;
+        padding: 10px;
+        font-size: 15px;
+        text-align: center;
+    }
+
+
 .reglement {
     // font-family: "Tangerine", serif;
     // font-size: 30px;
@@ -256,16 +480,7 @@ h1 {
     max-width: 800px;
     margin: auto;
 
-    .version {
-        font-family: 'Courier New', Courier, monospace!important;
-        margin: 50px 0;
-        padding: 10px;
-        font-size: 15px;
-    }
 
-    li {
-        list-style-image: url('/img/agpa/puce.png');
-    }
 
     .number {
         font-family: 'Times New Roman', Times, serif!important;
