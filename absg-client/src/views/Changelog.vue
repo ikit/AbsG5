@@ -4,16 +4,24 @@
         <h1>Absolument G - V6 alpha</h1>
         <a style="display: block; text-align: center" href="https://trello.com/b/LDvwctf7/absg-5" target="_blank"> Voir la feuille de route </a>
 
-        <h2>Alpha 6 - mar 2020</h2>
+        <h2>Alpha 6 - mai 2020</h2>
         <v-card>
             <p>Evolutions</p>
             <ul>
+                <li>Menu principale responsive</li>
                 <li>AGPA: prise en compte de l'évolution des catégories au fils des éditions</li>
+                <li>AGPA: refonte du palmarès</li>
+                <li>Photos: album automatique - Chronologie - </li>
+                <li>Forum: Browser/Lecture des Forums/Sujets</li>
+                <li>Forum: T.B.Z.</li>
+                <li>Admin: Paramètrage du site et des AGPA</li>
             </ul>
             <p>Bug corrigés</p>
             <ul>
                 <li>Authentification: fin de session, reconnection/déconnection, redirection écran login</li>
                 <li>Agenda: fix formulaire d'édition/création des ficher personne et lieux de l'agenda</li>
+                <li>Forum: fix id association forum/topic des anciens messages</li>
+                <li>AGPA: fix routes</li>
             </ul>
         </v-card>
 
