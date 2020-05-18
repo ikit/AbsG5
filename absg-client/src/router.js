@@ -155,6 +155,10 @@ export const router = new VueRouter({
             children: [
                 {
                     path: "",
+                    redirect: "/agpa/edition"
+                },
+                {
+                    path: "edition",
                     component: () => import("./views/Agpa/Edition.vue"),
                 },
                 {
@@ -176,10 +180,6 @@ export const router = new VueRouter({
                 {
                     path: "palmares",
                     component: () => import("./views/Agpa/Palmares.vue"),
-                },
-                {
-                    path: "stats",
-                    component: () => import("./views/Agpa/Stats.vue"),
                 },
                 {
                     path: "ceremony",

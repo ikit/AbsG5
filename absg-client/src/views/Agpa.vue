@@ -5,7 +5,6 @@
         <v-tab :to="{path:'/agpa/rules'}"> <v-icon>fas fa-scroll</v-icon> &nbsp; Réglement</v-tab>
         <v-tab :to="{path:'/agpa/archives'}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
         <v-tab :to="{path:'/agpa/palmares'}"> <v-icon>fas fa-trophy</v-icon> &nbsp; Palmarès</v-tab>
-        <v-tab :to="{path:'/agpa/stats'}"> <v-icon>fas fa-chart-bar</v-icon> &nbsp; Statistiques</v-tab>
         <v-tab :to="{path:'/agpa/ceremony'}"> <v-icon>fas fa-tv</v-icon> &nbsp; Cérémonies</v-tab>
     </v-tabs>
 
