@@ -53,10 +53,12 @@ createConnections(ormconfig)
             })
         );
 
-        app.use(bodyParser.json()); // parse request as JSON
-        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(express.json({ limit: "50mb" }));
+        app.use(express.urlencoded({ extended: true, limit: "50mb" }));
         app.use(accessLogHandler()); // access logs
         app.use(errorLogHandler()); // error logs
+
+        
 
         // start express server
         app.listen(process.env.API_PORT);

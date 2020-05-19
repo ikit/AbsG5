@@ -5,7 +5,7 @@ import * as fr from "date-fns/locale/fr";
 import * as path from "path";
 import * as fs from "fs";
 import { NotFoundError, UnauthorizedError } from "routing-controllers";
-import { saveImage } from "../middleware/commonHelper";
+import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { WebsocketService } from "./WebsocketService";
 
 class ForumService {
@@ -86,7 +86,7 @@ class ForumService {
                 name: t.name,
                 first: {
                     username: t.firstMessage.poster.username,
-                    dateLabel: format(new Date(t.firstMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr }),
+                    dateLabel: format(new Date(t.firstMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr })
                 },
                 last: {
                     username: t.lastMessage.poster.username,
@@ -190,10 +190,30 @@ class ForumService {
             msg = new ForumMessage();
         }
         // On met à jour le message
-        Object.assign(msg, data);
+        msg.text = data.text;
         msg.datetime = new Date();
         msg.poster = user;
         msg.forum = await this.forumRepo.findOne({ where: { id: data.forumId } });
+
+        // On extrait du message les images transmise encodé en base64 afin de les enregistré en
+        // tant que fichier et économiser la taille de la base de donnée
+        const bases64data = msg.text.match(/src="(data:image\/[^;]+;base64[^"]+)"/g);
+        if (bases64data.length > 0) {
+            const currentYear = new Date().getFullYear();
+            for (const img64 of bases64data) {
+                const imageBuffer = decodeBase64Image(img64.substr(5, img64.length - 1));
+                const fileName = new Date().getTime();
+                const fileExt = imageBuffer.type.substr(imageBuffer.type.indexOf("/") + 1);
+
+                const thumbPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}_mini.${fileExt}`);
+                const webPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}.${fileExt}`);
+                const webUrl = `${process.env.URL_FILES}/attachments/${currentYear}/${fileName}.${fileExt}`;
+
+                await saveImage(imageBuffer.buffer, thumbPath, webPath, null);
+                msg.text = msg.text.replace(img64, `src="${webUrl}"`);
+            }
+        }
+
 
         await this.msgRepo.save(msg);
         return {

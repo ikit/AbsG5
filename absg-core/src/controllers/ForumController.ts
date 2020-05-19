@@ -53,9 +53,11 @@ export class ForumController {
      * Enregistre une pièce jointe sur le serveur
      * @param body les infos sur le message à poster
      * @param user l'utilisateur qui fait la demande
+     * /!\ Note: je force l'usage du multipart/form-data avec @UploadedFile car
+     *     sinon la limite en taille des body/json empeche de poster des messages avec image encodé
      */
     @Post("/post")
-    savePost(@Body() body: any, @CurrentUser() user: any) {
+    savePost(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() user: any) {
         return forumService.savePost(body, user);
     }
 

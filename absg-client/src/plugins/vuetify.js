@@ -6,10 +6,10 @@ import 'vuetify/dist/vuetify.min.css';
 Vue.use(Vuetify);
 
 const opts = {
-    lang: {
-        locales: { fr },
-        current: 'fr',
-    },
+    // lang: {
+    //     locales: { fr },
+    //     current: 'fr',
+    // },
     icons: {
         iconfont: 'fa',
     },

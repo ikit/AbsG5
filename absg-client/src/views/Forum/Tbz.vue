@@ -163,7 +163,20 @@
     padding: 15px;
     margin: auto;
     background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, #00000020 5px, #00000020 10px);">
-            <tiptap-vuetify v-model="editorText" :extensions="extensions" placeholder="Rédigez ici votre nouveau message"/>
+            <!-- <tiptap-vuetify v-model="editorText" :extensions="extensions" placeholder="Rédigez ici votre nouveau message"/>
+
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        style="margin: 5px 0 -5px 0;"
+                        v-on="on"
+                        @click="post()">
+                        Envoyer
+                    </v-btn>
+                </template>
+                <span>Poster votre nouveau message sur le forum</span>
+            </v-tooltip> -->
+            <TextEditor ref="textEditor" v-model="editorText"></TextEditor>
 
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -176,7 +189,6 @@
                 </template>
                 <span>Poster votre nouveau message sur le forum</span>
             </v-tooltip>
-
         </v-card>
 
         <!-- <div>
@@ -201,14 +213,15 @@ import axios from 'axios';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { addMonths, addYears } from 'date-fns';
 import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Code, Paragraph, BulletList, OrderedList,
-ListItem, Link, Blockquote, HardBreak } from 'tiptap-vuetify'
+ListItem, Link, Blockquote, HardBreak, Image } from 'tiptap-vuetify'
 
+import TextEditor from '../../components/TextEditor.vue';
 
 
 
 export default {
     components: {
-        TiptapVuetify
+        TextEditor
     },
     data: () => ({
         monthLabels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
@@ -335,10 +348,16 @@ export default {
 
         // On enregistre le message
         post() {
-            axios.post(`/api/forum/post`, {
-                forumId: 2,
-                topicId: null,
-                text: this.editorText,
+            const formData = new FormData();
+            formData.append("forumId", 2);
+            formData.append("topicId", null);
+            formData.append("text", this.editorText);
+            console.log(this.editorText);
+            console.log(formData.get("text"))
+            axios.post(`/api/forum/post`, formData, {
+                headers: {
+                    "Content-Type" : "multipart/form-data",
+                }
             })
             .then( response => {
                 this.messages.push(parseAxiosResponse(response));
