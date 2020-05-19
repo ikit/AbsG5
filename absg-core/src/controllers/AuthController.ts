@@ -52,7 +52,7 @@ export class AuthController {
             logger.info(`Connection de l'utilisateur ${user.username}`);
             return user;
         } catch (err) {
-            logger.error(`Tentative de connection: ${err.message}`);
+            logger.warning(`Tentative de connection: ${err.message}`);
             throw err;
         }
     }

@@ -196,7 +196,17 @@ class ForumService {
         msg.forum = await this.forumRepo.findOne({ where: { id: data.forumId } });
 
         await this.msgRepo.save(msg);
-        return msg;
+        return {
+            ...msg,
+            text: this.parseMessageText(msg.text),
+            dateLabel: format(new Date(msg.datetime), "le dddd D à HH:mm", { locale: fr }),
+            poster: {
+                id: msg.poster.id,
+                rootFamily: msg.poster.rootFamily,
+                username: msg.poster.username,
+                avatar: `/img/avatars/${msg.poster.id.toString().padStart(3, "0")}.png`
+            }
+        };
     }
 
     /**

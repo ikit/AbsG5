@@ -38,6 +38,7 @@ export const logger = createLogger({
             )
         }),
         new transports.File({
+            level: "info",
             filename: "log",
             format: combine(
                 timestamp(),
@@ -56,6 +57,7 @@ export const logger = createLogger({
             )
         }),
         new PgLogger({
+            level: "info",
             format: combine(timestamp(), metadata({ fillExcept: ["message", "level", "timestamp"] }))
         })
     ]

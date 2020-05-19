@@ -29,7 +29,6 @@
 </template>
 
 <script>
-import 'vue-trix';
 import axios from 'axios';
 import store from '../store';
 import { parseAxiosResponse, parseWsMessage } from '../middleware/CommonHelper';

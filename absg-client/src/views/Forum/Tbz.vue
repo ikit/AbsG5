@@ -106,15 +106,8 @@
                     <h1>Aucun message pour l'instant.</h1>
                     <p style="font-style: italic; opacity: 0.5">Soyez le premier à lancer la discussion en listant les événements majeures à ne pas louper ce mois-ci !</p>
                     <div style="max-width:700px; width: 100%; margin: auto; text-align: left;">
-                        <VueTrix
-                            v-model="editorText"
-                            style="width: 100%; min-height: 200px; max-height: calc(100vh - 150px); overflow: auto"
-                            localStorage
-                            @trix-file-accept="checkAttachment"
-                            @trix-attachment-add="onAddAttachment"
-                            @trix-attachment-remove="onRemoveAttachment">
-                        </VueTrix>
-
+                        <tiptap-vuetify v-model="editorText" :extensions="extensions" placeholder="Rédigez ici votre nouveau message"
+                            style="width: 100%; min-height: 200px; max-height: calc(100vh - 150px); overflow: auto"/>
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -156,28 +149,66 @@
 
                         <v-card style="padding: 0 15px">
                             <v-list-item-content>
-                                <div class="citation" v-html="msg.text"></div>
+                                <div v-html="msg.text"></div>
                             </v-list-item-content>
                         </v-card>
                     </v-timeline-item>
                 </v-timeline>
+
             </template>
         </v-data-iterator>
         <a id="last" name="last"></a>
+
+        <v-card style="padding: 0 15px; max-width: 700px;
+    padding: 15px;
+    margin: auto;
+    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, #00000020 5px, #00000020 10px);">
+            <tiptap-vuetify v-model="editorText" :extensions="extensions" placeholder="Rédigez ici votre nouveau message"/>
+
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        style="margin: 5px 0 -5px 0;"
+                        v-on="on"
+                        @click="post()">
+                        Envoyer
+                    </v-btn>
+                </template>
+                <span>Poster votre nouveau message sur le forum</span>
+            </v-tooltip>
+
+        </v-card>
+
+        <!-- <div>
+            <div>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn fab small v-on="on" @click.stop="notifDialog = !notifDialog">
+                            <v-icon>fas fa-plus</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Nouveau message</span>
+                </v-tooltip>
+            </div>
+
+        </div> -->
     </v-container>
 </div>
 </template>
 
 <script>
-import VueTrix from "vue-trix";
 import axios from 'axios';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { addMonths, addYears } from 'date-fns';
+import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Code, Paragraph, BulletList, OrderedList,
+ListItem, Link, Blockquote, HardBreak } from 'tiptap-vuetify'
+
+
 
 
 export default {
     components: {
-        VueTrix
+        TiptapVuetify
     },
     data: () => ({
         monthLabels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
@@ -186,7 +217,25 @@ export default {
         currentYear: 0,
         currentMonth: 0,
         messages: [],
-        editorText: "<h1>coucou</h1>"
+        editorText: "",
+
+        extensions: [
+            Bold,
+            Underline,
+            Strike,
+            Blockquote,
+            Link,
+            ListItem,
+            BulletList,
+            OrderedList,
+            [
+                Heading, {
+                options: {
+                    levels: [1, 2, 3]
+                }
+            }],
+            HardBreak
+        ]
     }),
     mounted() {
         const today = new Date();
@@ -292,7 +341,7 @@ export default {
                 text: this.editorText,
             })
             .then( response => {
-                console.log("Message sauvegardé !");
+                this.messages.push(parseAxiosResponse(response));
             })
             .catch( err => {
                 store.commit('onError', err);
@@ -313,11 +362,6 @@ h1 {
     margin-bottom: 50px;
 }
 
-.trix-content {
-        overflow: auto;
-    margin-bottom: 15px;
-    max-height: calc(100vh - 200px);
-}
 
 .msgDetails {
     position: absolute;
@@ -337,6 +381,13 @@ h1 {
     .date {
         opacity: 0.5;
     }
+}
+
+blockquote {
+    border-left: .25em solid #dfe2e5;
+    color: #6a737d;
+    padding-left: 1em;
+    margin: 20px 0 10px 20px!important;
 }
 
 

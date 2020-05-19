@@ -1,10 +1,15 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify';
+import * as fr from 'vuetify/lib/locale/fr'
 import 'vuetify/dist/vuetify.min.css';
 
 Vue.use(Vuetify);
 
 const opts = {
+    lang: {
+        locales: { fr },
+        current: 'fr',
+    },
     icons: {
         iconfont: 'fa',
     },

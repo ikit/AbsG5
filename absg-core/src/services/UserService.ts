@@ -33,7 +33,6 @@ class UserService {
      * @param userData les données du nouveau compte utilisateur
      */
     public async createUser(userData: any) {
-        logger.debug("createUser", userData);
         // On vérifie qu'on a bien reçu tous les champs nécessaires
         const hasMissingField =
             !userData || ["id", "username", "password", "roles"].some(field => !userData.hasOwnProperty(field));
@@ -66,8 +65,13 @@ class UserService {
 
             // On stock le nouvel utilisateur en base
             userData.id = null;
-            return this.usersRepo.save(userData);
+            await this.usersRepo.save(userData);
+            
+            logger.notice(`Nouvel utilisateur créé: ${userData.username}`);
+
+            return userData;
         } catch (err) {
+            logger.error(`Erreur lors de la création du compte utilisateur: ${err.message}`, err);
             throw new Error(`Erreur lors de la création du compte utilisateur: ${err.message}`);
         }
     }
@@ -77,7 +81,6 @@ class UserService {
      * @param userData les données du nouveau compte utilisateur
      */
     public async saveUser(userData: any) {
-        logger.debug("edit user", userData);
         // On commence par récupérer les infos en base de l'utilisateurs à modifier
         const user = await this.usersRepo.findOne({ where: { id: Equal(userData.id) }, relations: ["person"] });
 
