@@ -22,67 +22,69 @@
                             <span>Premier message</span>
                         </v-tooltip>
 
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    icon small
-                                    v-on="on"
-                                    @click="goByMonths(-12)"
-                                    :disabled="isLoading || currentYear < 2015">
-                                    <v-icon>fas fa-angle-double-left</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Revenir un an en arrière</span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    icon small
-                                    v-on="on"
-                                    @click="goByMonths(-1)"
-                                    :disabled="isLoading || currentYear < 2004 || (currentYear == 2004 && currentMonth == 0)">
-                                    <v-icon>fa-chevron-left</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Revenir un mois en arrière</span>
-                        </v-tooltip>
+                        <div>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        icon small
+                                        v-on="on"
+                                        @click="goByMonths(-12)"
+                                        :disabled="isLoading || currentYear < 2015">
+                                        <v-icon>fas fa-angle-double-left</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Revenir un an en arrière</span>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        icon small
+                                        v-on="on"
+                                        @click="goByMonths(-1)"
+                                        :disabled="isLoading || currentYear < 2004 || (currentYear == 2004 && currentMonth == 0)">
+                                        <v-icon>fa-chevron-left</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Revenir un mois en arrière</span>
+                            </v-tooltip>
 
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    text
-                                    v-on="on"
-                                    width="200px"
-                                    :disabled="isLoading">
-                                    {{ monthLabels[currentMonth] }} {{ currentYear }}
-                                </v-btn>
-                            </template>
-                            <span>Modifier directement la date en cours</span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    icon small
-                                    v-on="on"
-                                    @click="goByMonths(1)"
-                                    :disabled="isLoading || currentYear > todayYear || (currentYear == todayYear && currentMonth == todayMonth)">
-                                    <v-icon>fa-chevron-right</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Aller au mois suivant</span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    icon small
-                                    v-on="on"
-                                    @click="goByMonths(12)"
-                                    :disabled="isLoading || currentYear >= todayYear || (currentYear == todayYear -1 && currentMonth > todayMonth)">
-                                    <v-icon>fas fa-angle-double-right</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Aller à l'année suivante</span>
-                        </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        text
+                                        v-on="on"
+                                        width="200px"
+                                        :disabled="isLoading">
+                                        {{ monthLabels[currentMonth] }} {{ currentYear }}
+                                    </v-btn>
+                                </template>
+                                <span>Modifier directement la date en cours</span>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        icon small
+                                        v-on="on"
+                                        @click="goByMonths(1)"
+                                        :disabled="isLoading || currentYear > todayYear || (currentYear == todayYear && currentMonth == todayMonth)">
+                                        <v-icon>fa-chevron-right</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Aller au mois suivant</span>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        icon small
+                                        v-on="on"
+                                        @click="goByMonths(12)"
+                                        :disabled="isLoading || currentYear >= todayYear || (currentYear == todayYear -1 && currentMonth > todayMonth)">
+                                        <v-icon>fas fa-angle-double-right</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Aller à l'année suivante</span>
+                            </v-tooltip>
+                        </div>
 
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
@@ -147,7 +149,23 @@
 
                         </template>
 
-                        <v-card style="padding: 0 15px">
+                        <v-card class="msg" style="padding: 0 15px">
+                            <div class="msgControls">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <a v-on="on" @click="edit(msg)">Editer</a>
+                                    </template>
+                                    <span>Modifier le message</span>
+                                </v-tooltip>
+                                -
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <a v-on="on" @click="supr(msg)">Supprimer</a>
+                                    </template>
+                                    <span>Supprimer le message</span>
+                                </v-tooltip>
+
+                            </div>
                             <v-list-item-content>
                                 <div v-html="msg.text"></div>
                             </v-list-item-content>
@@ -159,23 +177,7 @@
         </v-data-iterator>
         <a id="last" name="last"></a>
 
-        <v-card style="padding: 0 15px; max-width: 700px;
-    padding: 15px;
-    margin: auto;
-    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, #00000020 5px, #00000020 10px);">
-            <!-- <tiptap-vuetify v-model="editorText" :extensions="extensions" placeholder="Rédigez ici votre nouveau message"/>
-
-            <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        style="margin: 5px 0 -5px 0;"
-                        v-on="on"
-                        @click="post()">
-                        Envoyer
-                    </v-btn>
-                </template>
-                <span>Poster votre nouveau message sur le forum</span>
-            </v-tooltip> -->
+        <v-card v-bind:class="{ largeEditor: $vuetify.breakpoint.lgAndUp, compactEditor: !$vuetify.breakpoint.lgAndUp }">
             <TextEditor ref="textEditor" v-model="editorText"></TextEditor>
 
             <v-tooltip bottom>
@@ -190,20 +192,6 @@
                 <span>Poster votre nouveau message sur le forum</span>
             </v-tooltip>
         </v-card>
-
-        <!-- <div>
-            <div>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn fab small v-on="on" @click.stop="notifDialog = !notifDialog">
-                            <v-icon>fas fa-plus</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Nouveau message</span>
-                </v-tooltip>
-            </div>
-
-        </div> -->
     </v-container>
 </div>
 </template>
@@ -365,6 +353,14 @@ export default {
             .catch( err => {
                 store.commit('onError', err);
             });
+        },
+
+        edit(msg) {
+            console.log("Edition du message", msg.id);
+        },
+
+        supr(msg) {
+            console.log("Suppression du message", msg.id);
         }
 
     }
@@ -379,6 +375,25 @@ h1 {
     font-size: 2em;
     line-height: 50px;
     margin-bottom: 50px;
+}
+
+.msg {
+    position: relative;
+    margin-right: 5px;
+}
+.msgControls {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-size: 0.8em;
+    background: #eee;
+    padding-right: 5px;
+    text-align: right;
+}
+.msg:hover .msgControls {
+    display: block;
 }
 
 
@@ -409,5 +424,19 @@ blockquote {
     margin: 20px 0 10px 20px!important;
 }
 
+.largeEditor {
+    max-width: 700px;
+    padding: 15px;
+    margin: auto;
+    margin-bottom: 25px;
+    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, #00000020 5px, #00000020 10px);
+}
+
+.compactEditor {
+    max-width: 700px;
+    padding: 5px;
+    margin: auto;
+    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, #00000020 5px, #00000020 10px);
+}
 
 </style>
