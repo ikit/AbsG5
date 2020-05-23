@@ -21,6 +21,7 @@ install:
   - npm install
   - cd ../absg-client
   - npm install
+  - npm install --save reveal/css/reveal.css?vue&type=style&index=0&lang=css&
   - cd ..
 
 script:
