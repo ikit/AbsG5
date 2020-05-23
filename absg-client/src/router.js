@@ -280,8 +280,8 @@ axios.interceptors.response.use(
             return router.push("/");
         }
         // Erreur du serveur
-        if (error.response.status === 500) {
-            store.commit(store, error);
+        if (error.response.status === 400 || error.response.status === 500) {
+            store.commit("onError", error);
             return;
         }
 

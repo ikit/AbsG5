@@ -1,10 +1,10 @@
 import { getRepository } from "typeorm";
 import { getDayOfYear } from "date-fns";
 import { Immt, User, LogModule } from "../entities";
-import { NotFoundError } from "routing-controllers";
 import * as path from "path";
 import { logger } from "../middleware/logger";
 import { saveImage } from "../middleware/commonHelper";
+import { BadRequestError } from "routing-controllers";
 
 class ImmtService {
     private immtsRepo = null;
@@ -104,7 +104,7 @@ class ImmtService {
 
         const immt = await this.immtsRepo.find({ where: { year, day }, take: 1 });
         if (!immt) {
-            throw new NotFoundError(`Immt was not found.`);
+            throw new BadRequestError(`Immt was not found.`);
         }
         return this.immtsRepo.remove(immt);
     }

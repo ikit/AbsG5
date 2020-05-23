@@ -4,9 +4,9 @@ import { addMonths, format } from "date-fns";
 import * as fr from "date-fns/locale/fr";
 import * as path from "path";
 import * as fs from "fs";
-import { NotFoundError, UnauthorizedError } from "routing-controllers";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { WebsocketService } from "./WebsocketService";
+import { BadRequestError } from "routing-controllers";
 
 class ForumService {
     private forumRepo = null;
@@ -53,7 +53,7 @@ class ForumService {
             description: f.description,
             last: {
                 username: f.lastMessage.poster.username,
-                dateLabel: format(new Date(f.lastMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr }),
+                dateLabel: format(new Date(f.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
                 avatar: `/img/avatars/${f.lastMessage.poster.id.toString().padStart(3, "0")}.png`
             }
         }));
@@ -86,11 +86,11 @@ class ForumService {
                 name: t.name,
                 first: {
                     username: t.firstMessage.poster.username,
-                    dateLabel: format(new Date(t.firstMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr })
+                    dateLabel: format(new Date(t.firstMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr })
                 },
                 last: {
                     username: t.lastMessage.poster.username,
-                    dateLabel: format(new Date(t.lastMessage.datetime), "le dddd D MMM YYYY à HH:mm", { locale: fr }),
+                    dateLabel: format(new Date(t.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
                     avatar: `/img/avatars/${t.lastMessage.poster.id.toString().padStart(3, "0")}.png`
                 }
             }))
@@ -165,7 +165,7 @@ class ForumService {
         return data.map(e => ({
             ...e,
             text: this.parseMessageText(e.text),
-            dateLabel: format(new Date(e.datetime), "le dddd D à HH:mm", { locale: fr }),
+            dateLabel: format(new Date(e.datetime), "dddd D à HH:mm", { locale: fr }),
             poster: {
                 id: e.poster.id,
                 rootFamily: e.poster.rootFamily,
@@ -214,12 +214,11 @@ class ForumService {
             }
         }
 
-
         await this.msgRepo.save(msg);
         return {
             ...msg,
             text: this.parseMessageText(msg.text),
-            dateLabel: format(new Date(msg.datetime), "le dddd D à HH:mm", { locale: fr }),
+            dateLabel: format(new Date(msg.datetime), "dddd D à HH:mm", { locale: fr }),
             poster: {
                 id: msg.poster.id,
                 rootFamily: msg.poster.rootFamily,
@@ -232,7 +231,7 @@ class ForumService {
     /**
      * Supprime un message du forum
      * @param id l'identifiant du message
-     * @param user 
+     * @param user
      */
     async deletePost(id: number, user: User) {
         let msg = null;
@@ -241,13 +240,13 @@ class ForumService {
             msg = await this.msgRepo.findOne({ where: { id: id } });
         }
         if (!msg) {
-            throw new NotFoundError(`Le message avec l'identifiant n°${id} n'existe pas.`);
+            throw new BadRequestError(`Le message avec l'identifiant n°${id} n'existe pas.`);
         }
 
-        if (user.roles.contains("Admin") || user.id === msg.poster.id) {
+        if (user.roles.indexOf("admin") > -1 || user.id === msg.poster.id) {
             return this.msgRepo.remove(msg);
         }
-        throw new UnauthorizedError(`Vous n'avez pas les droits nécessaire pour supprimer ce message.`);
+        throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer ce message.`);
     }
 
     /**
@@ -281,7 +280,7 @@ class ForumService {
             });
             return topic;
         }
-        throw new Error(`Le sujet n°${topicId} n'existe pas`);
+        throw new BadRequestError(`Le sujet n°${topicId} n'existe pas`);
     }
 
     /**
@@ -321,10 +320,10 @@ class ForumService {
             if (user.roles.contains("Admin") || filePath.indexOf(`/${user.id}_`) > -1) {
                 return fs.unlinkSync(filePath);
             } else {
-                throw new UnauthorizedError(`Vous n'avez pas les droits nécessaire pour supprimer ce fichier.`);
+                throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer ce fichier.`);
             }
         }
-        throw new NotFoundError(`Le fichier ${fileURI} n'existe pas.`);
+        throw new BadRequestError(`Le fichier ${fileURI} n'existe pas.`);
     }
     
     /**

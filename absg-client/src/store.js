@@ -171,18 +171,22 @@ export default new Vuex.Store({
         // ========
         // NOTIF methods
         onWarning(state, message) {
-            console.log("WARNING", message);
             state.warning.msg =  message;
             state.warning.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
             state.warning.displayed = true;
         },
         onError(state, axiosError) {
-            console.log("ERROR", axiosError);
             state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
-            state.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`;
-            state.error.msg =  axiosError;
             state.error.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
             state.error.displayed = true;
+
+            if (axiosError.response) {
+                state.error.htmlError = `${axiosError.response.status} ${axiosError.response.statusText}`;
+                state.error.msg =  axiosError.response.data ? axiosError.response.data.message : axiosError;
+            } else {
+                state.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`;
+                state.error.msg =  axiosError;
+            }
         },
     },
     actions: {

@@ -4,6 +4,7 @@ import { format, differenceInDays } from "date-fns";
 import { cleanString, sendEmail } from "../middleware/commonHelper";
 import { logger } from "../middleware/logger";
 import { hashPassword, createToken } from "../middleware";
+import { BadRequestError } from "routing-controllers";
 
 class UserService {
     private usersRepo = null;
@@ -38,7 +39,7 @@ class UserService {
             !userData || ["id", "username", "password", "roles"].some(field => !userData.hasOwnProperty(field));
 
         if (hasMissingField) {
-            throw new Error(
+            throw new BadRequestError(
                 `Impossible de créer ou d'éditer le compte utilisateur. Certaines informations obligatoires sont manquantes`
             );
         }
@@ -50,7 +51,7 @@ class UserService {
             relations: ["person"]
         });
         if (usernameExists) {
-            throw new Error(`Le pseudo est déjà pris`);
+            throw new BadRequestError(`Le pseudo est déjà pris`);
         }
         userData.usernameClean = usernameClean;
 
@@ -72,7 +73,7 @@ class UserService {
             return userData;
         } catch (err) {
             logger.error(`Erreur lors de la création du compte utilisateur: ${err.message}`, err);
-            throw new Error(`Erreur lors de la création du compte utilisateur: ${err.message}`);
+            throw new BadRequestError(`Erreur lors de la création du compte utilisateur: ${err.message}`);
         }
     }
 
@@ -103,7 +104,7 @@ class UserService {
             await this.personsRepo.save(user.person);
             return this.usersRepo.save(user);
         } catch (err) {
-            throw new Error(`Erreur lors de l'édition du compte utilisateur: ${err.message}`);
+            throw new BadRequestError(`Erreur lors de l'édition du compte utilisateur: ${err.message}`);
         }
     }
 
@@ -135,7 +136,7 @@ class UserService {
             .getMany();
         
         if (users.length > 1) {
-            throw new Error(
+            throw new BadRequestError(
                 "Plusieurs comptes possèdent cet email. Veuillez voir avec un administrateur du site pour réinitialiser votre mot de passe"
             );
         } else if (users.length === 1) {

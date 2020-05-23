@@ -149,7 +149,7 @@ export default {
             year: new Date().getFullYear(), // l'année de référence (où la citation à été prononcée)
         },
         citationDeletion: {
-            open: false, // si oui ou non la boite de dialogue pour confirmer la suppression d'un citation est affichée
+            open: false, // si oui ou non la boite de dialogue pour confirmer la suppression d'une citation est affichée
             citation: null, // la citation à supprimer
         }
     }),

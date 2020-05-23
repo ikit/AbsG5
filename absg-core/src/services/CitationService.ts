@@ -1,8 +1,8 @@
 import { getRepository } from "typeorm";
 import { Citation, User, Person, LogModule } from "../entities";
-import { NotFoundError } from "routing-controllers";
 import { isNumber, isString } from "util";
 import { logger } from "../middleware/logger";
+import { BadRequestError } from "routing-controllers";
 
 class CitationService {
     private citationsRepo = null;
@@ -77,29 +77,29 @@ class CitationService {
      */
     public async save(user: User, citation: any) {
         if (!citation) {
-            throw new Error("Merci de renseigner la citation");
+            throw new BadRequestError("Merci de renseigner la citation");
         }
 
         // On vérifie que l'auteur est renseigné
         if (!isNumber(citation.author) || citation.author < 1) {
-            throw new Error("Merci de renseigner l'auteur");
+            throw new BadRequestError("Merci de renseigner l'auteur");
         }
         // On vérifie qu'on connait bien l'auteur
         const author = await this.personsRepo.findOne(citation.author);
         if (!author) {
-            throw new Error("L'auteur de la citation doit être de la famille (enregistré dans l'annuaire)");
+            throw new BadRequestError("L'auteur de la citation doit être de la famille (enregistré dans l'annuaire)");
         }
 
         // On vérifie que l'auteur est renseignée
         if (!isString(citation.citation)) {
-            throw new Error("Merci de renseigner correctement la citation");
+            throw new BadRequestError("Merci de renseigner correctement la citation");
         }
 
         // On vérifie que l'année est correctement renseignée
         const minYear = author.dateOfBirth ? new Date(author.dateOfBirth).getFullYear() : 1700;
         citation.year = Number.parseInt(citation.year);
         if (!citation.year || citation.year < minYear || citation.year > new Date().getFullYear()) {
-            throw new Error("L'année est optionnel mais doit forcement être une année valide");
+            throw new BadRequestError("L'année est optionnel mais doit forcement être une année valide");
         }
 
         // On enregistre la citation
@@ -127,7 +127,7 @@ class CitationService {
         console.log("DELETE", id);
         const citation = await this.citationsRepo.findOne(id);
         if (!citation) {
-            throw new NotFoundError(`La citation n°${id} n'existe pas.`);
+            throw new BadRequestError(`La citation n°${id} n'existe pas.`);
         }
 
         logger.notice(`Citation n°${id} supprimée par ${user.username}`, {

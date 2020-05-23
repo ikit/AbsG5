@@ -1,5 +1,6 @@
 import wss from "../wss";
 import { logger } from "../middleware/logger";
+import { BadRequestError } from "routing-controllers";
 
 export interface WSMessage {
     message: string;
@@ -20,7 +21,7 @@ export class WebsocketService {
     sendTo(id: string, message: WSMessage) {
         const client = this.getClients().find(client => client.id === id);
         if (!client) {
-            throw new Error(`Client ID not found`);
+            throw new BadRequestError(`Client ID not found`);
         }
         this.send(client, message);
     }

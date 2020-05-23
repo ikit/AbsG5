@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Code, Paragraph, BulletList, OrderedList, ListItem, Link, Blockquote, HardBreak, Image } from 'tiptap-vuetify';
+import { TiptapVuetify, History, Heading, Bold, Italic, Strike, Underline, Code, Paragraph, BulletList, OrderedList, ListItem, Link, Blockquote, HardBreak, Image } from 'tiptap-vuetify';
 import FileSelector from './TextEditor/FileSelector';
 // import {MyCustomExtension} from './TextEditor/MyCustomExtension'
 
@@ -44,6 +44,7 @@ export default {
                 imageSources: [{ component: FileSelector, name: 'File Selector' }]
                 }
             }],
+            History
         ],
     }),
     methods: {

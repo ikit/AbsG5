@@ -58,8 +58,6 @@ createConnections(ormconfig)
         app.use(accessLogHandler()); // access logs
         app.use(errorLogHandler()); // error logs
 
-        
-
         // start express server
         app.listen(process.env.API_PORT);
         logger.info(`Server has started on port ${process.env.API_PORT}.`);

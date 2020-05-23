@@ -138,12 +138,12 @@
                                     <template v-slot:activator="{ on }">
                                         <img :src="msg.poster.avatar" v-on="on" style="width: 50px;" />
                                     </template>
-                                    <span>{{ msg.poster.username }} {{ msg.dateLabel }}</span>
+                                    <span>{{ msg.poster.username }} le {{ msg.dateLabel }}</span>
                                 </v-tooltip>
 
                                 <div class="msgDetails" v-bind:style="{ display: $vuetify.breakpoint.lgAndUp ? 'block' : 'none' }">
                                     <span class="name">{{ msg.poster.username }}</span>
-                                    <span class="date">{{ msg.dateLabel }}</span>
+                                    <span class="date">le {{ msg.dateLabel }}</span>
                                 </div>
                             </div>
 
@@ -193,11 +193,27 @@
             </v-tooltip>
         </v-card>
     </v-container>
+
+
+    <v-dialog v-model="msgDeletion.open" width="800px">
+        <v-card v-if="msgDeletion.post">
+            <v-card-title>
+                Supprimer le message
+            </v-card-title>
+            <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer ce message écrit par {{ msgDeletion.post.poster.username }} le {{ msgDeletion.post.dateLabel }}?</p>
+            <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text color="primary" @click="msgDeletion.open = false">Annuler</v-btn>
+            <v-btn color="accent" @click="suprMsg()">Supprimer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </div>
 </template>
 
 <script>
 import axios from 'axios';
+import store from '../../store';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { addMonths, addYears } from 'date-fns';
 import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Code, Paragraph, BulletList, OrderedList,
@@ -236,7 +252,17 @@ export default {
                 }
             }],
             HardBreak
-        ]
+        ],
+
+        msgEdition: {
+            open: false, // si oui ou non la boite de dialogue pour éditer un message est affichée
+            id: null, // l'ID du message
+            text: null, // le texte du message
+        },
+        msgDeletion: {
+            open: false, // si oui ou non la boite de dialogue pour confirmer la suppression d'un message est affichée
+            post: null, // le message à supprimer
+        }
     }),
     mounted() {
         const today = new Date();
@@ -360,8 +386,23 @@ export default {
         },
 
         supr(msg) {
-            console.log("Suppression du message", msg.id);
-        }
+            this.msgDeletion.open = true;
+            this.msgDeletion.post = msg;
+            console.log(msg)
+        },
+        suprMsg() {
+            axios.delete(`/api/forum/post/${this.msgDeletion.post.id}`)
+            .then( response => {
+                const idx = this.messages.findIndex(e => e.id === this.msgDeletion.post.id);
+                if (idx > -1) {
+                    // Maj citation existante
+                    this.messages.splice(idx, 1)
+                }
+                // On met à jour l'IHM
+                this.msgDeletion.post = null;
+                this.msgDeletion.open = false;
+            })
+        },
 
     }
 };
