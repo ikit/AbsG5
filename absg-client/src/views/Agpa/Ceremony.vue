@@ -158,10 +158,8 @@ export default {
             // Reset photos list
             this.photosGalery = [];
             this.photosGalleryIndex = 0;
-            console.log("PREZ call", this.year)
             axios.get(`/api/agpa/ceremony/${this.year}`).then(response => {
                 const data = parseAxiosResponse(response);
-                console.log("PREZ init", data)
                 if (data) {
                     // Participations
                     this.stats.diag1.series = [
@@ -244,7 +242,6 @@ export default {
                 }
                 this.isLoading = false;
                 Reveal.initialize({transition: "fade", progress: false, controls: false });
-                console.log("PREZ ready", this.slides)
             });
         },
 

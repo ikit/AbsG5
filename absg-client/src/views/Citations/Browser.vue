@@ -189,7 +189,6 @@ export default {
             this.citationEditor.citation = citation.citation;
             this.citationEditor.author = citation.author.id;
             this.citationEditor.year = citation.year;
-            console.log(this.citationEditor);
         },
         saveCitation: function () {
             // On vérifie si tout est bien renseigné
@@ -200,8 +199,6 @@ export default {
                 citation => {
                     // on ferme la boite de dialogue
                     this.resetDialog();
-
-                    console.log("UPDATE", citation)
 
                     // On met à jour l'IHM
                     const idx = this.citations.findIndex(e => e.id === citation.id);

@@ -124,7 +124,6 @@ class CitationService {
      */
     public async remove(user: User, id: number) {
         // TODO: retrieve user info to check permission to delete
-        console.log("DELETE", id);
         const citation = await this.citationsRepo.findOne(id);
         if (!citation) {
             throw new BadRequestError(`La citation n°${id} n'existe pas.`);

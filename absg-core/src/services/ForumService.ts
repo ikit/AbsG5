@@ -150,7 +150,6 @@ class ForumService {
         const from = new Date(year, month, 1, 1, 0, 0);
         let to = addMonths(from, 1);
         to = new Date(to.getFullYear(), to.getMonth(), 1, 1, 0, 0);
-        console.log("GET:", from, to);
 
         // on récupère les messages sur la période demandée
         const data = await this.msgRepo

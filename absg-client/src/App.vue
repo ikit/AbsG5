@@ -302,13 +302,13 @@ export default {
             store.commit("photosGalleryNext");
         },
         photosGalleryPlayPause() {
-            console.log("photosGalleryPlayPause");
+            console.debug("TODO: photosGalleryPlayPause");
         },
         photosGalleryAuto() {
-            console.log("photosGalleryAuto");
+            console.debug("TODO: photosGalleryAuto");
         },
         onNotificationClicked(notification) {
-            console.log("onNotificationClicked", notification);
+            console.debug("onNotificationClicked", notification);
             if (notification) {
                 store.commit("readNotification", notification);
                 this.$router.push(notification.module.url);

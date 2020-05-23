@@ -87,7 +87,6 @@ export class UserController {
     @Post("/settings")
     async saveSettings(@Body() settings: any, @CurrentUser() user: User) {
         if (user && Array.isArray(user.roles) && user.roles.indexOf("admin") > -1) {
-            console.log(settings);
             let sql = "";
             for (const key in settings) {
                 if (key == "agpaSpecialEdition") {
@@ -99,7 +98,6 @@ export class UserController {
                     sql += `UPDATE parameter SET value='${JSON.stringify(settings[key])}' WHERE key = '${key}';`;
                 }
             }
-            console.log(sql);
             await this.repo.query(sql);
             return await this.getSettings();
         }

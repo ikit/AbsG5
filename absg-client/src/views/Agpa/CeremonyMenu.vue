@@ -76,7 +76,6 @@ export default {
         // On récupère la date de la cérémonie depuis les settings du site
         setTimeout(() => this.resetTimer());
 
-
         axios.get(`/api/agpa/archives`).then(response => {
             this.formerEditions = parseAxiosResponse(response);
             this.isLoading = false;
@@ -99,10 +98,7 @@ export default {
         },
 
         startCeremony() {
-            console.log("TIMER DONE !");
             this.current.displayed = true;
-
-            console.log(this.$refs.video);
             this.$refs.video.play();
         }
     }

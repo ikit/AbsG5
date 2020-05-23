@@ -308,7 +308,6 @@ export default {
         // Quand le texte change, on sauvegarde le brouillon ()
         onEditorTextChange(event) {
             // TODO: save draft every 10s
-            // console.log("onEditorTextChange", event);
         },
 
         // Décide si le fichier peut être attaché au message (et uploadé sur le serveur)
@@ -366,8 +365,6 @@ export default {
             formData.append("forumId", 2);
             formData.append("topicId", null);
             formData.append("text", this.editorText);
-            console.log(this.editorText);
-            console.log(formData.get("text"))
             axios.post(`/api/forum/post`, formData, {
                 headers: {
                     "Content-Type" : "multipart/form-data",
@@ -382,13 +379,12 @@ export default {
         },
 
         edit(msg) {
-            console.log("Edition du message", msg.id);
+            console.debug("TODO: Edition du message", msg.id);
         },
 
         supr(msg) {
             this.msgDeletion.open = true;
             this.msgDeletion.post = msg;
-            console.log(msg)
         },
         suprMsg() {
             axios.delete(`/api/forum/post/${this.msgDeletion.post.id}`)

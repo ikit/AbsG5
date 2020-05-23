@@ -214,7 +214,6 @@ export default {
             this.$refs.menu.save(date);
         },
         zoomOnImmt(event) {
-            console.log('zoomOnImmt');
             store.commit('photosGalleryDisplay');
         }
     },

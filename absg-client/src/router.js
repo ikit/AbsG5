@@ -230,7 +230,6 @@ export const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    console.log("TEST", to.path);
     // Si la page nécessite une authent ou non
     const publicPages = ["/login", "/forgotten"];
     if (publicPages.includes(to.path)) {
@@ -251,8 +250,9 @@ router.beforeEach((to, from, next) => {
     }
 
 
-    // Si session marquée comme rescue
-    console.log("TODO RESCUE", user);
+    // TODO: Si session marquée comme rescue
+    //       On l'emepche de faire autre chose que d'aller changer son mot de passe
+
 
     // // Si accès restreint et pas le role, on redirige vers l"accueil
     if (rescueSession) {

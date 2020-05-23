@@ -99,7 +99,6 @@ export default {
         iconSize: 64
     }),
     mounted () {
-        //console.log(this.$refs.theMap);
         axios.get(`/api/voyag`).then(response => {
             const data = parseAxiosResponse(response);
             this.myPosition = data.myPosition;
@@ -112,8 +111,6 @@ export default {
             }));
 
             this.isLoading = false;
-            console.log(this.$refs.markersLayer);
-            console.log(this.$refs.theMap);
             var group = new L.featureGroup(this.persons);
             this.$refs.theMap.fitBounds(group.getBounds());
         });

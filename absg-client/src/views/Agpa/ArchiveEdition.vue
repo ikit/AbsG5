@@ -210,7 +210,6 @@ export default {
                             }
                         }
                     }
-                    console.log(this.current)
                     store.commit('photosGalleryReset', photosGalery);
                 }
                 this.isLoading = false;

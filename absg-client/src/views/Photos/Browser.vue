@@ -136,7 +136,6 @@ export default {
             });
         },
         photosGalleryDisplay(index) {
-            console.log(this.expandedPhotos);
             store.commit('photosGallerySetIndex', index);
             store.commit('photoMetadataEditorDisplay');
             store.commit('photosGalleryDisplay');

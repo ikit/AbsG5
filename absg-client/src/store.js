@@ -202,7 +202,6 @@ export default new Vuex.Store({
 
                     // On indique que le modèle est initialisé, pour éviter de le refaire
                     state.isInitialized = true;
-                    console.log("initStore", state);
                 });
             }
         },

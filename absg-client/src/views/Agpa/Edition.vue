@@ -88,7 +88,6 @@ export default {
             this.currentMonth = new Date().getMonth();
             this.currentYear = new Date().getFullYear();
             this.current = parseAxiosResponse(response);
-            console.log(this.current);
             this.isLoading = false;
         });
 
