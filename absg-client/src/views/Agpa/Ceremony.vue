@@ -96,7 +96,7 @@ import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
 import {Chart} from 'highcharts-vue';
-import * as Reveal from 'reveal';
+import Reveal from 'reveal.js';
 
 export default {
     name: 'Ceremony',
@@ -255,7 +255,8 @@ export default {
 };
 </script>
 
-<style src='reveal/css/reveal.css'></style>
+
+<style src='reveal.js/dist/reveal.css'></style>
 <style src='../../themes/agpa-highchart-theme.css'></style>
 
 <style lang="scss" scoped>
