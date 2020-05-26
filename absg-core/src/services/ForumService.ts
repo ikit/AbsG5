@@ -161,17 +161,19 @@ class ForumService {
             .orderBy("m.datetime", "ASC")
             .getMany();
 
-        return data.map(e => ({
-            ...e,
-            text: this.parseMessageText(e.text),
-            dateLabel: format(new Date(e.datetime), "dddd D à HH:mm", { locale: fr }),
-            poster: {
-                id: e.poster.id,
-                rootFamily: e.poster.rootFamily,
-                username: e.poster.username,
-                avatar: `/img/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
-            }
-        }));
+        return {
+            posts: data.map(e => ({
+                ...e,
+                text: this.parseMessageText(e.text),
+                dateLabel: format(new Date(e.datetime), "dddd D à HH:mm", { locale: fr }),
+                poster: {
+                    id: e.poster.id,
+                    rootFamily: e.poster.rootFamily,
+                    username: e.poster.username,
+                    avatar: `/img/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
+                }
+            }))
+        };
     }
 
     /**
@@ -197,7 +199,7 @@ class ForumService {
         // On extrait du message les images transmise encodé en base64 afin de les enregistré en
         // tant que fichier et économiser la taille de la base de donnée
         const bases64data = msg.text.match(/src="(data:image\/[^;]+;base64[^"]+)"/g);
-        if (bases64data.length > 0) {
+        if (Array.isArray(bases64data) && bases64data.length > 0) {
             const currentYear = new Date().getFullYear();
             for (const img64 of bases64data) {
                 const imageBuffer = decodeBase64Image(img64.substr(5, img64.length - 1));
