@@ -45,8 +45,7 @@
     <v-card
         v-if="topicId && !isLoading && !readOnly"
         v-bind:class="{ largeEditor: $vuetify.breakpoint.lgAndUp, compactEditor: !$vuetify.breakpoint.lgAndUp }">
-        <TextEditor ref="textEditor" v-model="editorText"></TextEditor>
-
+        <TextEditor v-model="editorText"></TextEditor>
         <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-btn
@@ -67,9 +66,22 @@
             </v-card-title>
             <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer ce message écrit par {{ msgDeletion.post.poster.username }} le {{ msgDeletion.post.dateLabel }}?</p>
             <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="msgDeletion.open = false">Annuler</v-btn>
-            <v-btn color="accent" @click="suprMsg()">Supprimer</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="msgDeletion.open = false">Annuler</v-btn>
+                <v-btn color="accent" @click="suprMsg()">Supprimer</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="msgEdition.open" persistent width="800px">
+        <v-card v-if="msgEdition.post">
+            <TextEditor v-mdoel="msgEdition.text" style="max-height: 80vh" v-model="msgEdition.text">
+            </TextEditor>
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="msgEdition.open = false">Annuler</v-btn>
+                <v-btn color="accent" @click="saveMsg()">Sauvegarder</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -127,7 +139,7 @@ export default {
         msgEdition: {
             open: false, // si oui ou non la boite de dialogue pour éditer un message est affichée
             id: null, // l'ID du message
-            text: null, // le texte du message
+            text: "", // le texte du message
         },
         msgDeletion: {
             open: false, // si oui ou non la boite de dialogue pour confirmer la suppression d'un message est affichée
@@ -141,7 +153,6 @@ export default {
     },
     methods: {
         loadTopic(id) {
-            console.log("INIT TOPIC", id);
             this.isLoading = true;
             this.topicId = id;
             axios.get(`/api/forum/read/${this.topicId}`).then(response => {
@@ -189,8 +200,34 @@ export default {
             });
         },
 
+        saveMsg() {
+            const formData = new FormData();
+            formData.append("forumId", this.topicId ? null : 2);
+            formData.append("topicId", this.topicId ? this.topicId : null);
+            formData.append("postId", this.msgEdition.post.id);
+            formData.append("text", this.msgEdition.post.text);
+            axios.post(`/api/forum/post`, formData, {
+                headers: {
+                    "Content-Type" : "multipart/form-data",
+                }
+            })
+            .then( response => {
+                const editedPost = parseAxiosResponse(response);
+                const idx = this.messages.findIndex(e => e.id === editedPost.id)
+                if (idx >= 0) {
+                this.messages[idx] = editedPost;
+                }
+            })
+            .catch( err => {
+                store.commit('onError', err);
+            });
+        },
+
         edit(msg) {
-            console.debug("TODO: Edition du message", msg.id);
+            this.msgEdition.post = msg;
+            this.msgEdition.text = "";
+            this.msgEdition.open = true;
+            setTimeout(() => this.msgEdition.text = msg.text);
         },
 
         supr(msg) {

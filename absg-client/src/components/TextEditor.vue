@@ -1,6 +1,6 @@
 <template>
     <tiptap-vuetify
-        v-model="text"
+        v-model="value"
         :extensions="extensions"
         placeholder="Rédigez ici votre nouveau message"
         @keydown="onKeyDown"
@@ -18,7 +18,7 @@ export default {
     },
     name: 'TextEditor',
     model: {
-        prop: 'text',
+        prop: 'value',
         event: 'change'
     },
     data: () => ({
@@ -49,7 +49,7 @@ export default {
     }),
     methods: {
         onKeyDown (event) {
-            this.$emit('change', this.text);
+            this.$emit('change', this.value);
         }
     }
 }
