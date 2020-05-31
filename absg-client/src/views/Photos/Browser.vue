@@ -13,12 +13,12 @@
 
             <template v-slot:header>
                 <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-                    <v-row style="" align="center" justify="center">
+                    <v-row style="margin: 0" align="center" justify="center">
 
                         <v-text-field
-                            label="Rechercher"
-                            prepend-icon="fas fa-search"
                             v-model="filter.search"
+                            prepend-icon="fa-search"
+                            placeholder="Rechercher"
                             style="max-width: 300px;">
                         </v-text-field>
                         <v-spacer></v-spacer>

@@ -46,17 +46,18 @@
                         <ul><li><b>Pas d'informations personnelles</b> ou tirées de votre environnement proche ou professionnel.
                                 Un mot de passe basé sur vos données personnelles va être vite trouvé par les 2 méthodes;</li>
                             <li><b>Ne vous compliquez pas la vie</b> avec des codes aléatoires impossibles à mémoriser du genre <span class="code">tTh9pVFH9q6N2ZQ</span>.
-                                Un mot de passe compliqué va être trop dur pour vous à retenir et généralement sera vite trouvé par la force brute; </li>
+                                Un mot de passe compliqué va vous posez plus de problème à vous pour le retenir que pour un ordinateur à le trouver; </li>
                             <li><b>La longueur du mot de passe est importante</b>. Ni trop long (trop compliqué à retenir), ni trop court (trop facile à casser).
                                 Ce <a href="https://howsecureismypassword.net/" target="_blank">site</a> permet de tester des mots mots de passe
                                 et d'avoir un ordre d'idée de la durée qu'il faut à un ordinateur pour le trouver, et quels sont ses défauts.</li>
                             <li><b>Evitez les classiques et les suites logiques.</b> Choisissez un mot de passe plus original (et surtout plus fiable)
                                 que les <a href="https://blog.httpcs.com/les-mots-de-passe-les-plus-utilises-en-france/" target="_blank">traditionnels</a> "motdepasse", "password", "cocuou", etc.
-                                Et les mots de passe tels que "1234", "azerty" ou "abcde' ne sont hélas d’aucune utilité.
+                                Et les mots de passe tels que "1234", "azerty" ou "abcde" ne sont d’aucune utilité.
                             <li><b>Utilisez différents mots de passe.</b> l'idéal c'est d'en avoir un par accès (site/compte) différent. Mais au minimum,
                                 identifiez les sites stratégiques pour lesquels avoir un mot de passe unique. Le plus important est celui de votre boite mail.
                                 Car il contient toute votre vie. Pour absolument G, ce n'est pas aussi critique (pas d'information bancaire ou proféssionelle par exemple),
-                                mais il y a beaucoup choses privés quand même (noms, prénoms, adresses, emails, téléphones, photos, ...)</li>
+                                et bien qu'il y ait beaucoup choses d'ordre privés (noms, prénoms, adresses, emails, téléphones, photos, ...), le site n'es pas publiquement/largement exposé.
+                                Le risque de se faire pirater est donc faible.</li>
                         </ul>
                     </p>
                     <p>
@@ -65,7 +66,7 @@
                             <li>Composez votre mot de passe avec deux ou plusieurs mots pris au pif, par exemple <span class="code">cheval ibiscus</span>...
                                 En plus vous trouverez vite une petite histoire pour associer et vous souvenir facilement de ces mots;</li>
                             <li>Inventez vous une petite moulinette pour altérer l'orthographe: par exemple remplacer le premier "a" par "@",
-                                mettre des "-" autour du deuxième mot et une majuscule à la dernière lettre => <span class="code">Chev@l -ibiscuS-</span></li>
+                                mettre des "-" autour du deuxième mot et une majuscule à la première et dernière lettre => <span class="code">Chev@l -ibiscuS-</span></li>
                         </ul>
                     </p>
                 </v-expansion-panel-content>
@@ -74,15 +75,15 @@
                 <v-expansion-panel-header>Olivier connaît-il tous les mots de passe ?</v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <p>
-                        Il le pourrait si il avait explicitement programmer le site pour stocker en clair cette information sensible.
+                        Il le pourrait si il avait volontairement programmé le site pour stocker en clair cette information sensible.
                         Mais ça n'est pas le cas. Pour ceux qui veulent s'en convaincre, tout le code source du site est accessible sur
-                        Internet ainsi que la partie concernant <a href="https://github.com/ikit/AbsG5/blob/master/absg-core/src/services/AuthService.ts"
+                        Internet ainsi que la partie concernant <a href="https://github.com/ikit/AbsG5/blob/master/absg-core/src/middleware/userSessionHelpers.ts"
                         target="_blank">l'authentification et la gestion des mots de passe</a>.
                     </p>
                     <p>
                         Pour résumer, on va utiliser une fonction mathématique trés complexe qui se base sur l'aléatoire et le temps pour obtenir une version
                         chiffrée de votre mot de passe. Cette méthode étant basée sur le temps, pour un même mot de passe, elle renvera une version
-                        chiffrée différente à chaque essai. C'est la méthode <a class="code" href="https://www.bcrypt.fr/" target="_blank">bcrypt.hash</a> qui se charge de ça.
+                        chiffrée différente à chaque essai. Vous pouvez tester la méthode <a class="code" href="https://www.bcrypt.fr/" target="_blank">bcrypt.hash</a> qui implémente l'algorithme directement en ligne.
                     </p>
                     <p>
                         Ensuite il n'est plus possible de retrouver la version originale du mot de passe à partir de la version chiffrée. Mais par contre il est possible

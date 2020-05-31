@@ -10,11 +10,12 @@
 
             <template v-slot:header>
                 <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-                    <v-row style="" align="center" justify="center">
+                    <v-row style="margin: 0" align="center" justify="center">
                         <v-text-field
                             v-model="filter.request"
-                            prepend-inner-icon="fa-search"
-                            label="Rechercher">
+                            prepend-icon="fa-search"
+                            placeholder="Rechercher"
+                            style="max-width: 300px;">
                         </v-text-field>
                         <!-- <span class="grey--text">{{immts.length}} images</span> -->
                         <v-spacer></v-spacer>

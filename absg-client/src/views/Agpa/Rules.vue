@@ -63,8 +63,9 @@
                         <dt>2019</dt>
                         <dd>
                             <ul>
-                                <li>Précision concernant les catégories Groupe et événement et Enfant;</li>
-                                <li>L'attribution des points pour le palmarès et revue (avec application rétroactive).</li>
+                                <li>Précision concernant les catégories Groupe et événements et Enfant.
+                                    Désormais les enfants et groupes d'enfants sont autorisés dans la catégorie Groupe et événements, et la catégorie Enfants concerne plutôt les portraits d'enfants de moins de 12 ans;</li>
+                                <li>Changement du barême d'attribution des points pour le palmarès (avec application rétroactive), afin de récompenser aussi les photos nominées (1 point). </li>
                             </ul>
                         </dd>
                     </dl>
