@@ -10,7 +10,7 @@ export const MODULES = [
     { id:"voyag", icon: 'fas fa-map-marked-alt', name: 'Voya G', url: '/voyag', roles: ["member"] },
     { id:"agpa", icon: 'fas fa-camera', name: 'A.G.P.A', url: '/agpa', roles: ["member"] },
     { id:"stats", icon: 'fas fa-chart-pie', name: 'Statistiques', url: '/stats', roles: ["member"] },
-    { id:"admin", icon: 'fas fa-cog', name: 'Admin', url: '/admin', roles: ["admin"]  }];
+    { id:"admin", icon: 'fas fa-cog', name: 'Admin', url: '/admin', roles: ["member"]  }];
 
 
 

@@ -67,34 +67,17 @@
             <span>Voir l'historique des événements</span>
         </v-tooltip>
 
-            <v-btn @click="getOnline()">online</v-btn>
+        <v-btn @click="getOnline()">online</v-btn>
 
         <v-menu offset-y bottom left>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn depressed color="primary" v-bind="attrs" v-on="on">
-                    {{ user.username }}
-                    <!-- <v-icon right>fas fa-user-circle</v-icon> -->
-                    <img :src="user.avatarUrl" style="height: 40px; margin-left: 15px" />
+                <v-btn icon color="primary" v-bind="attrs" v-on="on" style="margin-right: 0">
+                    <img :src="user.avatarUrl" style="height: 40px;" />
                 </v-btn>
             </template>
-
-
             <v-list nav>
-                <v-list-item :to="{path: `/myprofile` }">
-                    <v-list-item-title :key="0">
-                        <v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations
-                    </v-list-item-title>
-                </v-list-item>
-                <v-list-item :to="{path: `/resetpwd` }">
-                    <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
-                </v-list-item>
-                <!-- TODO: DarkMode
-                <v-list-item>
-                    <v-switch label="Mode nuit" v-model="darkMode"></v-switch>
-                </v-list-item> -->
-                <v-divider></v-divider>
                 <v-list-item @click="logout()">
-                    <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Déconnexion</v-list-item-title>
+                    <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Se déconnecter</v-list-item-title>
                 </v-list-item>
             </v-list>
         </v-menu>
