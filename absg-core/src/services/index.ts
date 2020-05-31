@@ -6,3 +6,4 @@ export * from "./ImmtService";
 export * from "./AgendaService";
 export * from "./UserService";
 export * from "./VoyagService";
+export * from "./WebsocketService";

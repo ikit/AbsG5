@@ -28,8 +28,11 @@ export class User {
     @Column("json", { comment: "Le dernier message en cours d'édition du forum", nullable: true })
     draft: any;
 
-    @Column("json", { comment: "Keep trace of the last action of the user on the server", nullable: true })
-    lastActivity: any;
+    @Column({ comment: "Le dernier passage enregistré de l'utilisateur sur le site", nullable: true })
+    lastTime: Date;
+
+    @Column("json", { comment: "Données concernant l'activité de l'utilisateur", nullable: true })
+    activity: any;
 
     @Column({ comment: "Authentication token", nullable: true })
     rootFamily: string;
@@ -43,5 +46,16 @@ export class User {
             this.person = new Person().fromJSON(json.person);
         }
         return this;
+    }
+
+    public setLastActivity(url: string) {
+        if (!this.activity) {
+            this.activity = {
+                lastAction: url,
+                unreadNotifications: []
+            };
+        } else {
+            this.activity.lastActio = url;
+        }
     }
 }

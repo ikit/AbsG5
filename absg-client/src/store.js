@@ -83,6 +83,7 @@ export default new Vuex.Store({
                 };
             }));
             state.unreadNotifications = state.notifications.filter(e => !e.read ).length;
+            console.log(notifications)
         },
         readAllNotification(state) {
             for (const n of state.notifications) {
@@ -145,11 +146,13 @@ export default new Vuex.Store({
         SOCKET_ONOPEN (state, event)  {
             Vue.prototype.$socket = event.currentTarget
             state.socket.isConnected = true
-            console.log("WS ready");
+            console.log(`WS_CONNECTION:${state.user.id}`);
+            Vue.prototype.$socket.sendObj(`WS_CONNECTION:${state.user.id}`);
         },
         SOCKET_ONCLOSE (state, event)  {
             state.socket.isConnected = false
-            console.log("TODO: WS closed. ");
+            console.log(`WS_DISCONNECTION:${state.user.id}`);
+            Vue.prototype.$socket.sendObj(`WS_DISCONNECTION:${state.user.id}`);
         },
         SOCKET_ONERROR (state, event)  {
             console.log("TODO: processWebsocketError", event);

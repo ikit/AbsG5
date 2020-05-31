@@ -66,6 +66,9 @@
             </template>
             <span>Voir l'historique des événements</span>
         </v-tooltip>
+
+            <v-btn @click="getOnline()">online</v-btn>
+
         <v-menu offset-y bottom left>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn depressed color="primary" v-bind="attrs" v-on="on">
@@ -74,6 +77,7 @@
                     <img :src="user.avatarUrl" style="height: 40px; margin-left: 15px" />
                 </v-btn>
             </template>
+
 
             <v-list nav>
                 <v-list-item :to="{path: `/myprofile` }">
@@ -194,7 +198,6 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
-
 
     <v-dialog v-model="warning.displayed" class="msgDiallog">
         <v-card>
@@ -354,6 +357,14 @@ export default {
         photosEditorDisplayed() {
             return this.$store.state.photosEditorDisplayed;
         },
+
+        //
+        getOnline() {
+            axios.get(`/api/online`).then(response => {
+            const data = parseAxiosResponse(response);
+            console.log(data);
+        });
+        }
     }
 };
 </script>

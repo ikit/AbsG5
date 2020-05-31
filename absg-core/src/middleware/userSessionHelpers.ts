@@ -20,7 +20,7 @@ export function hashPassword(password: string) {
  * @param cleanPassword le mot de passe en clair
  * @param encryptedPassword le mot de passe chiffré
  */
-export async function  checkPassword(cleanPassword: string, encryptedPassword: string) {
+export async function checkPassword(cleanPassword: string, encryptedPassword: string) {
     return await bcrypt.compare(cleanPassword, encryptedPassword);
 }
 
@@ -100,7 +100,8 @@ export async function checkUserPassag(user: User, url: string) {
         }
 
         // On met à jour l'info dans de l'utilisateur
-        user.lastActivity = { date: new Date(), url };
+        user.lastTime = new Date();
+        user.setLastActivity(url);
         await getRepository(User).save(user);
     }
     return user;

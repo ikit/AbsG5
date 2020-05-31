@@ -9,7 +9,9 @@ export interface WSMessage {
 
 export class WebsocketService {
     getClients() {
-        return wss ? wss.clients : [];
+        console.log(wss.clients);
+
+        return []; //wss ? wss.clients : [];
     }
 
     private send(client, message: WSMessage) {
@@ -32,3 +34,5 @@ export class WebsocketService {
         });
     }
 }
+
+export const websocketService = new WebsocketService();

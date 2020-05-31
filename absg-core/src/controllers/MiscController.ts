@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { JsonController, Post, Body, Get, Authorized, CurrentUser, UnauthorizedError } from "routing-controllers";
-import { citationService, eventService, immtService, userService } from "../services";
+import { citationService, eventService, immtService, userService, websocketService } from "../services";
 import { subDays } from "date-fns";
 import { Parameter, User } from "../entities";
 
@@ -51,6 +51,15 @@ export class UserController {
     @Get("/passag")
     async passagHistory() {
         return await userService.getPassagHistory();
+    }
+
+    /**
+     * Récupère la liste des utilisateurs actuellement en ligne
+     */
+    @Authorized()
+    @Get("/online")
+    online() {
+        return websocketService.getClients();
     }
 
     /**

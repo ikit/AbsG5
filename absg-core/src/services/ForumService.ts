@@ -5,7 +5,6 @@ import * as fr from "date-fns/locale/fr";
 import * as path from "path";
 import * as fs from "fs";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
-import { WebsocketService } from "./WebsocketService";
 import { BadRequestError } from "routing-controllers";
 
 class ForumService {
@@ -16,8 +15,6 @@ class ForumService {
     private wsService = null;
 
     public initService() {
-        this.wsService = new WebsocketService();
-
         this.forumRepo = getRepository(Forum);
         this.topicRepo = getRepository(ForumTopic);
         this.msgRepo = getRepository(ForumMessage);
@@ -311,8 +308,8 @@ class ForumService {
 
     /**
      * Supprime une pièce jointe du serveur
-     * @param fileURI 
-     * @param user 
+     * @param fileURI
+     * @param user
      */
     deleteFile(fileURI: string, user: User) {
         // On analyse l'url pour retrouver le fichier sur le serveur
@@ -326,11 +323,11 @@ class ForumService {
         }
         throw new BadRequestError(`Le fichier ${fileURI} n'existe pas.`);
     }
-    
+
     /**
      * Sauvegarde un message en cours d'édition pour l'utilisateur courrant
-     * @param draft 
-     * @param user 
+     * @param draft
+     * @param user
      */
     async saveDraft(draft: any, id: any) {
         const user = await this.userRepo.findOne({ where: { id } });
@@ -354,7 +351,7 @@ class ForumService {
 
     /**
      * TO REMOVE AND FIX PROBLEMS DIRECTLY IN DATABASE
-     * @param text 
+     * @param text
      */
     parseMessageText(text: string) {
         text = text.replace(/\{SMILIES_PATH\}/g, `${process.env.URL_FILES}/smilies`);
