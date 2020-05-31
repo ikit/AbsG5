@@ -61,7 +61,7 @@
 
     <v-dialog v-model="msgDeletion.open" width="800px">
         <v-card v-if="msgDeletion.post">
-            <v-card-title>
+            <v-card-title class="grey lighten-4">
                 Supprimer le message
             </v-card-title>
             <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer ce message écrit par {{ msgDeletion.post.poster.username }} le {{ msgDeletion.post.dateLabel }}?</p>
@@ -75,7 +75,10 @@
 
     <v-dialog v-model="msgEdition.open" persistent width="800px">
         <v-card v-if="msgEdition.post">
-            <TextEditor v-mdoel="msgEdition.text" style="max-height: 80vh" v-model="msgEdition.text">
+            <v-card-title class="grey lighten-4">
+                Modifier le message
+            </v-card-title>
+            <TextEditor style="max-height: 80vh" v-model="msgEdition.text">
             </TextEditor>
 
             <v-card-actions>
@@ -94,23 +97,6 @@ import store from '../../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
 import TextEditor from '../../components/TextEditor.vue';
-import {
-    TiptapVuetify,
-    Heading,
-    Bold,
-    Italic,
-    Strike,
-    Underline,
-    Code,
-    Paragraph,
-    BulletList,
-    OrderedList,
-    ListItem,
-    Link,
-    Blockquote,
-    HardBreak,
-    Image
-} from 'tiptap-vuetify'
 
 export default {
     name: 'Reader',
@@ -215,7 +201,7 @@ export default {
                 const editedPost = parseAxiosResponse(response);
                 const idx = this.messages.findIndex(e => e.id === editedPost.id)
                 if (idx >= 0) {
-                this.messages[idx] = editedPost;
+                    this.messages[idx] = editedPost;
                 }
             })
             .catch( err => {

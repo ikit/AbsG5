@@ -107,7 +107,7 @@
 
     <v-dialog v-model="citationDeletion.open" width="800px">
         <v-card>
-            <v-card-title>
+            <v-card-title class="grey lighten-4">
                 Supprimer la citation
             </v-card-title>
             <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette citation ?</p>

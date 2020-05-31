@@ -42,6 +42,8 @@ export class EventG {
     )
     places: Place[];
 
+    editable = true;
+
     fromJSON(json): EventG {
         Object.assign(this, json);
         return this;

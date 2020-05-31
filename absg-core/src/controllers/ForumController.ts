@@ -64,7 +64,7 @@ export class ForumController {
     /**
      * Supprime un message du forum
      * @param id l'identifiant du message
-     * @param user 
+     * @param user
      */
     @Delete("/post/:id")
     deletePost(@Param("id") id: number, @CurrentUser() user: any) {

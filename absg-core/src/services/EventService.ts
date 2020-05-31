@@ -1,6 +1,10 @@
 import { getRepository } from "typeorm";
 import { format, addMonths, addDays } from "date-fns";
-import { EventG, Person } from "../entities";
+import * as path from "path";
+import * as fs from "fs";
+import { EventG, Person, User, Sex } from "../entities";
+import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
+import { BadRequestError } from "routing-controllers";
 
 class EventService {
     private repo = null;
@@ -52,10 +56,10 @@ class EventService {
             { startDate: new Date(year, 10, 1, 10), name: `✝️ La Toussaint`, type: "special" },
             { startDate: new Date(year, 10, 11, 10), name: `🕊️ L’Armistice`, type: "special" },
             { startDate: new Date(year, 11, 24, 10), name: `🎄 Veille de Noël`, type: "special" },
-            { startDate: new Date(year, 11, 25, 10), name: `🎅 Noël`, type: "special" },
+            { startDate: new Date(year, 11, 25, 10), name: `🎅 Noël`, type: "special" }
         ];
 
-        return list.filter(e => e.startDate.getMonth() === month);
+        return list.filter(e => e.startDate.getMonth() === month).map(e => ({ ...e,  editable: false }));
     }
 
     /**
@@ -70,7 +74,7 @@ class EventService {
             FROM public.event_g e
             INNER JOIN "user" u ON e."authorId" = u.id
             WHERE e."startDate" <= '${endDate.toISOString()}' AND (e."endDate" IS NULL OR e."endDate" >= '${startDate.toISOString()}')`;
-        result.push(...(await this.repo.query(q)));
+        result.push(...(await this.repo.query(q)).map(e => ({ ...e, editable: true })));
 
         // On récupères les anniversaires
         q = `SELECT * 
@@ -82,10 +86,14 @@ class EventService {
             result.push(
                 ...qr.map(json => {
                     const p = new Person().fromJSON(json);
+                    console.log(p);
+                    const e = p.sex == Sex.female ? "p'tite mère" : p.sex == Sex.male ? "p'tit père" : "à lui";
                     return {
                         startDate: new Date(year, p.dateOfBirth.getMonth(), p.dateOfBirth.getDate()),
                         name: `🎂 ${p.getQuickName()}`,
-                        type: "birthday"
+                        details: `${p.getQuickName()} fêtes ses ${p.getAge()}!<br/>Bravo ${e}!!`,
+                        type: "birthday",
+                        editable: false
                     };
                 })
             );
@@ -100,11 +108,53 @@ class EventService {
     /**
      * Ajoute ou met à jour (si l'id est fourni) un événement existant
      * avec les nouvelles données.
-     * @param event les informations de l'événement à ajouter ou mettre à jour
+     * @param data les infos sur l'événement
+     * @param user l'utilisateur qui fait la demande
      */
-    public async save(event: EventG) {
-        // Quand on sauvegarde un évémenent, il faut tenir compte de la timezone :)
-        // Pour ça on se base sur start et end qui doivent être obligatoirement renseigné
+    public async save(data: any, user: User) {
+        let evt = null;
+        if (data.id) {
+            // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
+            evt = await this.repo.findOne({ where: { id: data.id } });
+        }
+        if (!evt) {
+            evt = new EventG();
+        }
+        // On met à jour le message
+        evt.name = data.name;
+        evt.details = data.details;
+        evt.type = data.type;
+        evt.startDate = new Date(data.startDate);
+        if (data.endDate && data.endDate !== "null") {
+            evt.endDate = new Date(data.endDate);
+        } else {
+            evt.endDate = null;
+        }
+        evt.author = user;
+
+        console.log(data, evt);
+
+        // On extrait du message les images transmise encodé en base64 afin de les enregistré en
+        // tant que fichier et économiser la taille de la base de donnée
+        const bases64data = evt.details.match(/src="(data:image\/[^;]+;base64[^"]+)"/g);
+        if (Array.isArray(bases64data) && bases64data.length > 0) {
+            const currentYear = new Date().getFullYear();
+            for (const img64 of bases64data) {
+                const imageBuffer = decodeBase64Image(img64.substr(5, img64.length - 1));
+                const fileName = new Date().getTime();
+                const fileExt = imageBuffer.type.substr(imageBuffer.type.indexOf("/") + 1);
+
+                const thumbPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}_mini.${fileExt}`);
+                const webPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}.${fileExt}`);
+                const webUrl = `${process.env.URL_FILES}/attachments/${currentYear}/${fileName}.${fileExt}`;
+
+                await saveImage(imageBuffer.buffer, thumbPath, webPath, null);
+                evt.details = evt.details.replace(img64, `src="${webUrl}"`);
+            }
+        }
+
+        await this.repo.save(evt);
+        return evt;
     }
 
     /**
@@ -112,8 +162,20 @@ class EventService {
      * Une événement ne peut être supprimé que par un admin,
      * ou bien par le poster
      */
-    public async remove(event: EventG) {
-        // TODO: retrieve user info to check permission to delete
+    public async delete(id: number, user: User) {
+        let evt = null;
+        if (id) {
+            // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
+            evt = await this.repo.findOne({ where: { id: id } });
+        }
+        if (!evt) {
+            throw new BadRequestError(`L'événement avec l'identifiant n°${id} n'existe pas.`);
+        }
+
+        if (user.roles.indexOf("admin") > -1 || user.id === evt.author.id) {
+            return this.repo.remove(evt);
+        }
+        throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer cet événement.`);
     }
 }
 

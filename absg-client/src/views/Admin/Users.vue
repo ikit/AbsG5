@@ -147,7 +147,7 @@
 
     <v-dialog v-model="userActivity.open" width="800px">
         <v-card v-if="userActivity.user && userActivity.user.isActive">
-            <v-card-title>
+            <v-card-title class="grey lighten-4">
                 Désactiver le compte {{ userActivity.user.username }}
             </v-card-title>
             <p style="margin: 0 24px;">
@@ -160,7 +160,7 @@
             </v-card-actions>
         </v-card>
         <v-card v-if="userActivity.user && !userActivity.user.isActive">
-            <v-card-title>
+            <v-card-title class="grey lighten-4">
                 Réactiver le compte {{ userActivity.user.username }}
             </v-card-title>
             <p style="margin: 0 24px;">
