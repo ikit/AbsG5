@@ -7,6 +7,7 @@ export const MODULES = [
     { id:"photos", icon: 'fas fa-image', name: 'Photos', url: '/photos', roles: ["member"] },
     { id:"forum", icon: 'fas fa-comment', name: 'Forum', url: '/forum', roles: ["member"] },
     { id:"agenda", icon: 'fas fa-address-book', name: 'Agenda', url: '/agenda', roles: ["member"] },
+    { id:"event", icon: 'fas fa-calendar-alt', name: 'Calendrier', url: null, roles: ["member"] },
     { id:"voyag", icon: 'fas fa-map-marked-alt', name: 'Voya G', url: '/voyag', roles: ["member"] },
     { id:"agpa", icon: 'fas fa-camera', name: 'A.G.P.A', url: '/agpa', roles: ["member"] },
     { id:"stats", icon: 'fas fa-chart-pie', name: 'Statistiques', url: '/stats', roles: ["member"] },
