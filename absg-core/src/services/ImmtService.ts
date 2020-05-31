@@ -98,14 +98,22 @@ class ImmtService {
      * Supprime une image du moment
      * Une immt ne peut être supprimé que par un admin,
      * ou bien par le poster si il s'agit de la dernière immt ajouté
+     * @param year l'année
+     * @param day le numéro du jour dans l'année
+     * @param user l'utilisateur qui fait la demande
      */
-    public async remove(year: number, day: number) {
+    public async remove(year: number, day: number, user: User) {
         // TODO: retrieve user info to check permission to delete
 
         const immt = await this.immtsRepo.find({ where: { year, day }, take: 1 });
         if (!immt) {
             throw new BadRequestError(`Immt was not found.`);
         }
+
+        logger.notice(`Immage immt ${year}_${day} supprimé par ${user.username}`, {
+            userId: user.id,
+            module: LogModule.photos
+        });
         return this.immtsRepo.remove(immt);
     }
 }

@@ -11,6 +11,7 @@ import {
 } from "routing-controllers";
 
 import { immtService } from "../services";
+import { User } from "../entities";
 
 @Authorized()
 @JsonController("/immt")
@@ -47,12 +48,12 @@ export class ImmtController {
      * @param body d'autres informations sur l'image comme l'auteur et le titre
      */
     @Post("/")
-    async save(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() session: any) {
-        return immtService.save(image, body.title, session);
+    async save(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() user: User) {
+        return immtService.save(image, body.title, user);
     }
 
     @Delete("/:year([0-9]{4})/:day([0-9]{1,3})")
-    remove(@Param("year") year: number, @Param("day") day: number) {
-        return immtService.remove(year, day);
+    remove(@Param("year") year: number, @Param("day") day: number, @CurrentUser() user: User) {
+        return immtService.remove(year, day, user);
     }
 }

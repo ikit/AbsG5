@@ -2,9 +2,10 @@ import { getRepository } from "typeorm";
 import { format, addMonths, addDays } from "date-fns";
 import * as path from "path";
 import * as fs from "fs";
-import { EventG, Person, User, Sex } from "../entities";
+import { EventG, Person, User, Sex, LogModule } from "../entities";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { BadRequestError } from "routing-controllers";
+import { logger } from "../middleware/logger";
 
 class EventService {
     private repo = null;
@@ -153,6 +154,20 @@ class EventService {
             }
         }
 
+        logger.notice(
+            evt.id === -1
+                ? `Nouvelle événement ajouté au calendrier par ${user.username} le ${evt.startDate
+                      .toISOString()
+                      .substr(0, 10)}`
+                : `Événement "${evt.name}" du ${evt.startDate.toISOString().substr(0, 10)} a été modifié par ${
+                      user.username
+                  }`,
+            {
+                userId: user.id,
+                module: LogModule.event
+            }
+        );
+
         await this.repo.save(evt);
         return evt;
     }
@@ -161,6 +176,8 @@ class EventService {
      * Supprime un événement
      * Une événement ne peut être supprimé que par un admin,
      * ou bien par le poster
+     * @param id l'identifiant de l'événement à supprimer
+     * @param user l'utilisateur qui fait la demande
      */
     public async delete(id: number, user: User) {
         let evt = null;
@@ -173,6 +190,14 @@ class EventService {
         }
 
         if (user.roles.indexOf("admin") > -1 || user.id === evt.author.id) {
+            logger.notice(`Événement "${evt.name}" du ${evt.startDate.toISOString().substr(0, 10)} a été supprimé par ${
+                    user.username
+                }`,
+                {
+                    userId: user.id,
+                    module: LogModule.event
+                }
+            );
             return this.repo.remove(evt);
         }
         throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer cet événement.`);

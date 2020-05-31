@@ -1,8 +1,20 @@
 <template>
     <div class="container">
 
-        <h1>Absolument G - V6 alpha</h1>
+        <h1>Absolument G - V7 alpha</h1>
         <a style="display: block; text-align: center" href="https://trello.com/b/LDvwctf7/absg-5" target="_blank"> Voir la feuille de route </a>
+
+        <h2>Alpha 7 - juin 2020</h2>
+        <v-card>
+            <p>Evolutions</p>
+            <ul>
+                <li>Calendrier: Calendrier des événements de la famille sur la page d'accueil</li>
+                <li>Calendrier: Ajout, édition, suppression d'événement</li>
+            </ul>
+            <p>Bug corrigés</p>
+            <ul>
+            </ul>
+        </v-card>
 
         <h2>Alpha 6 - mai 2020</h2>
         <v-card>
@@ -28,8 +40,6 @@
                 <li>Forum: fix scrolling automatique dernier message</li>
             </ul>
         </v-card>
-
-
 
         <h2>Alpha 5 - avr 2020</h2>
         <v-card>
