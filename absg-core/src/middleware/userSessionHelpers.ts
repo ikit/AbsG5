@@ -101,7 +101,7 @@ export async function checkUserPassag(user: User, url: string) {
 
         // On met à jour l'info dans de l'utilisateur
         user.lastTime = new Date();
-        user.setLastActivity(url);
+        user = setLastActivity(user, url);
         await getRepository(User).save(user);
     }
     return user;
@@ -158,4 +158,21 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 export async function currentUserChecker(action: Action) {
     // on retourn le user si il est défini dans le header
     return await getUserFromHeader(action.request);
+}
+
+/**
+ * Met à jours les données de l'utilisateur et retourne l'utilisateur modifié
+ * @param url la nouvelle activité à mettre à jour
+ */
+export function setLastActivity(user: User, url: string) {
+    if (!user.activity) {
+        user.activity = {
+            lastAction: url, // lien (route) vers la dernière section du site visité
+            lastAnnounce: 0, // dernière date à laquelle on a affiché l'annonce en cours du site à l'utilisateur (pas plus d'une fois par jour)
+            unreadNotifications: [] // liste des id des notifications non lues de l'utilisateur
+        };
+    } else {
+        user.activity.lastActio = url;
+    }
+    return user;
 }

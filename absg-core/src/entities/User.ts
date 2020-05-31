@@ -47,16 +47,4 @@ export class User {
         }
         return this;
     }
-
-    public setLastActivity(url: string) {
-        if (!this.activity) {
-            this.activity = {
-                lastAction: url, // lien (route) vers la dernière section du site visité
-                lastAnnounce: 0, // dernière date à laquelle on a affiché l'annonce en cours du site à l'utilisateur (pas plus d'une fois par jour)
-                unreadNotifications: [] // liste des id des notifications non lues de l'utilisateur
-            };
-        } else {
-            this.activity.lastActio = url;
-        }
-    }
 }

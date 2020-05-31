@@ -2,42 +2,47 @@
     <v-card style="min-width: 500px;">
         <v-card-title style="border-bottom: 1px solid rgba(0,0,0, 0.1)"> <h2>{{ title }}</h2>
             <div style="position: absolute; right: 15px">
-                <v-btn fab small color="accent" style="margin-right: 15px"
-                    @click="setToday()">
-                    <v-icon>far fa-dot-circle</v-icon>
-                </v-btn>
-                <v-btn fab small color="accent" style="margin-right: 15px"
-                    @click="prev()">
-                    <v-icon>fas fa-angle-left</v-icon>
-                </v-btn>
-                <v-btn fab small color="accent" style="margin-right: 15px"
-                    @click="next()">
-                    <v-icon>fas fa-angle-right</v-icon>
-                </v-btn>
-                <v-menu offset-y :close-on-content-click="false">
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn fab small color="accent" v-bind="attrs" v-on="on">
-                            <v-icon>fas fa-th-list</v-icon>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon small style="margin-right: 15px"
+                            v-on="on"
+                            @click="setToday()">
+                            <v-icon>far fa-dot-circle</v-icon>
                         </v-btn>
                     </template>
+                    <span>Revenir à la date du jour</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon small style="margin-right: 15px"
+                            v-on="on"
+                            @click="prev()">
+                            <v-icon>fas fa-angle-left</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Mois précédent</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon small style="margin-right: 15px"
+                            v-on="on"
+                            @click="next()">
+                            <v-icon>fas fa-angle-right</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Mois suivant</span>
+                </v-tooltip>
 
-                    <v-list>
-                        <v-list-item-group>
-                        <v-list-item v-for="(filter, index) in filters" :key="index">
-                            <template >
-                                <v-list-item-action>
-                                <v-checkbox v-model="filter.selected"
-                                    ></v-checkbox>
-                                </v-list-item-action>
-
-                                <v-list-item-content>
-                                <v-list-item-title>{{ filter.text }}</v-list-item-title>
-                                </v-list-item-content>
-                            </template>
-                        </v-list-item>
-                        </v-list-item-group>
-                    </v-list>
-                </v-menu>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn icon small v-bind="attrs"
+                            v-on="on"
+                            @click="addEvent()">
+                            <v-icon>fas fa-plus</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Ajouter un événement</span>
+                </v-tooltip>
             </div>
 
         </v-card-title>
@@ -66,15 +71,8 @@
                 :activator="selectedElement"
                 offset-x
                 >
-                <v-card
-                    color="grey lighten-4"
-                    min-width="350px"
-                    flat
-                >
-                    <v-toolbar
-                    :color="selectedEvent.color"
-                    dark
-                    >
+                <v-card color="grey lighten-4" min-width="350px" flat>
+                    <v-toolbar :color="selectedEvent.color" dark>
                     <v-btn icon>
                         <v-icon v-if="selectedEvent.type == 'birthday'">fas fa-birthday-cake</v-icon>
                         <v-icon v-else>fas fa-edit</v-icon>
@@ -89,11 +87,7 @@
                     <span v-html="selectedEvent.details"></span>
                     </v-card-text>
                     <v-card-actions>
-                    <v-btn
-                        text
-                        color="secondary"
-                        @click="selectedOpen = false"
-                    >
+                    <v-btn text color="secondary" @click="selectedOpen = false">
                         Fermer
                     </v-btn>
                     </v-card-actions>
@@ -130,12 +124,12 @@ export default {
         ],
         events: [],
         colors: {
-            gueudelot: '#00f', // événement Gueudelot
-            guyomard: '#f00', // événement Guyomard
-            guibert: '#0f0', // événement Guibert
+            gueudelot: '#039be5', // événement Gueudelot
+            guyomard: '#ff7043', // événement Guyomard
+            guibert: '#4caf50', // événement Guibert
             all: '#aaa', // Toute la famille :)
-            birthday: '#fa0', // les anniversaires
-            special: '#0aa' // les fêtes national et autres journées spéciales
+            birthday: '#26a69a', // les anniversaires
+            special: '#ff8f00' // les fêtes national et autres journées spéciales
         },
 
 
@@ -167,8 +161,8 @@ export default {
                     this.isLoading = false;
                     this.events = data;
                     this.events.map(e => {
-                        e.start = new Date(e.start).toISOString().substr(0, 10);
-                        e.end = new Date(e.end).toISOString().substr(0, 10);
+                        e.start = new Date(e.startDate).toISOString().substr(0, 10);
+                        e.end = e.endDate ? new Date(e.endDate).toISOString().substr(0, 10) : null;
                     });
                 }
             });
@@ -206,6 +200,9 @@ export default {
             }
 
             nativeEvent.stopPropagation()
+        },
+        addEvent() {
+
         },
         updateRange ({ start, end }) {
             // You could load events from an outside source (like database) now that we have the start and end dates on the calendar

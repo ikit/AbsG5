@@ -8,29 +8,11 @@ export class EventG {
     @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
 
-    @Column({ comment: "Année du début de l'événement", width: 4, nullable: true })
-    startYear: number;
+    @Column({ comment: "Date de début de l'événement", nullable: false })
+    startDate: Date;
 
-    @Column({ comment: "Mois du début de l'événement", width: 2, nullable: true })
-    startMonth: number;
-
-    @Column({ comment: "Jour du début de l'événement", width: 2, nullable: true })
-    startDay: number;
-
-    @Column({ comment: "Heure de début de l'événement (en heure)", width: 5, nullable: true })
-    startTime: number;
-
-    @Column({ comment: "Année de fin de l'événement", width: 4, nullable: true })
-    endYear: number;
-
-    @Column({ comment: "Mois de fin de l'événement", width: 2, nullable: true })
-    endMonth: number;
-
-    @Column({ comment: "Jour de fin de l'événement", width: 2, nullable: true })
-    endDay: number;
-
-    @Column({ comment: "Heure de fin de l'événement (en heure)", nullable: true })
-    endTime: number;
+    @Column({ comment: "Date de fin de l'événement", nullable: true })
+    endDate: Date;
 
     @Column({ comment: "Titre de l'événement" })
     name: string;
@@ -60,7 +42,8 @@ export class EventG {
     )
     places: Place[];
 
-    start?: Date;
-    end?: Date;
-    username?: string;
+    fromJSON(json): EventG {
+        Object.assign(this, json);
+        return this;
+    }
 }

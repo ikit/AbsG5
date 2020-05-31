@@ -71,6 +71,13 @@ export class Person {
         return this;
     }
 
+    getQuickName(): string {
+        if (this.surname) {
+            return this.surname.trim();
+        }
+        return this.firstname ? this.firstname : `Personne ID ${this.id}`;
+    }
+
     getFullname(): string {
         if (this.surname) {
             return this.surname;
