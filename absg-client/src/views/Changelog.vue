@@ -8,12 +8,15 @@
         <v-card>
             <p>Evolutions</p>
             <ul>
-                <li>Menu principale responsive</li>
+                <li>Menu principal responsive</li>
                 <li>AGPA: prise en compte de l'évolution des catégories au fils des éditions</li>
                 <li>AGPA: refonte du palmarès</li>
                 <li>Photos: album automatique - Chronologie - </li>
+                <li>Ciations: photo de l'auteur tirée du trombinoscope en fonction de la date </li>
                 <li>Forum: Browser/Lecture des Forums/Sujets</li>
                 <li>Forum: T.B.Z.</li>
+                <li>Forum: Editeur de message (version basique)</li>
+                <li>Forum: Possibilité de supprimer un message</li>
                 <li>Admin: Paramètrage du site et des AGPA</li>
             </ul>
             <p>Bug corrigés</p>
@@ -22,6 +25,7 @@
                 <li>Agenda: fix formulaire d'édition/création des ficher personne et lieux de l'agenda</li>
                 <li>Forum: fix id association forum/topic des anciens messages</li>
                 <li>AGPA: fix routes</li>
+                <li>Forum: fix scrolling automatique dernier message</li>
             </ul>
         </v-card>
 
