@@ -80,7 +80,7 @@ class EventService {
         // On récupères les anniversaires
         q = `SELECT * 
             FROM person
-            WHERE date_part('month', "dateOfBirth") = date_part('month', TIMESTAMP '${endDate.toISOString()}')
+            WHERE date_part('month', "dateOfBirth") = date_part('month', TIMESTAMP '${startDate.toISOString()}')
             AND ("dateOfDeath" IS NULL OR date_part('year', "dateOfDeath") >= ${year})`;
         const qr = await this.repo.query(q);
         if (Array.isArray(qr) && qr.length > 0) {
