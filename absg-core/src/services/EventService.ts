@@ -44,23 +44,23 @@ class EventService {
      */
     public getLegalEvents(year: number, month: number) {
         const easter = this.getEaster(year);
-        const easterdate = new Date(year, easter[0], easter[1], 10);
+        const easterdate = new Date(Date.UTC(year, easter[0], easter[1]));
         const list = [
-            { startDate: new Date(year, 0, 1, 10), name: `🎉 Jour de l'an`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 0, 1)), name: `🎉 Jour de l'an`, type: "special" },
             { startDate: easterdate, name: `🥚 Lundi de Pâques`, type: "special" },
-            { startDate: new Date(year, 4, 1, 10), name: `💤 Fête du Travail`, type: "special" },
-            { startDate: new Date(year, 4, 8, 10), name: `✌️ Victoire de 1945`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 4, 1)), name: `💤 Fête du Travail`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 4, 8)), name: `✌️ Victoire de 1945`, type: "special" },
             { startDate: addDays(easterdate, 39), name: `✝️ L’Ascension`, type: "special" },
             { startDate: addDays(easterdate, 49), name: `✝️ Lundi de Pentecôte`, type: "special" },
-            { startDate: new Date(year, 6, 14, 10), name: `🎖️ Fête nationale`, type: "special" },
-            { startDate: new Date(year, 7, 15, 10), name: `✝️ L’Assomption`, type: "special" },
-            { startDate: new Date(year, 10, 1, 10), name: `✝️ La Toussaint`, type: "special" },
-            { startDate: new Date(year, 10, 11, 10), name: `🕊️ L’Armistice`, type: "special" },
-            { startDate: new Date(year, 11, 24, 10), name: `🎄 Veille de Noël`, type: "special" },
-            { startDate: new Date(year, 11, 25, 10), name: `🎅 Noël`, type: "special" }
+            { startDate: new Date(Date.UTC(year, 6, 14)), name: `🎖️ Fête nationale`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 7, 15)), name: `✝️ L’Assomption`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 10, 1)), name: `✝️ La Toussaint`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 10, 11)), name: `🕊️ L’Armistice`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 11, 24)), name: `🎄 Veille de Noël`, type: "special" },
+            { startDate: new Date(Date.UTC(year, 11, 25)), name: `🎅 Noël`, type: "special" }
         ];
 
-        return list.filter(e => e.startDate.getMonth() === month).map(e => ({ ...e,  editable: false }));
+        return list.filter(e => e.startDate.getMonth() === month).map(e => ({ ...e, editable: false }));
     }
 
     /**
@@ -69,7 +69,7 @@ class EventService {
     public async getForMonth(year: number, month: number) {
         const startDate = new Date(year, month);
         const endDate = addMonths(startDate, 1);
-        const result = [];
+        let result = [];
         // On écupère les événements enregistrés par les utilisateurs
         let q = `SELECT e.*, u.username 
             FROM public.event_g e
@@ -77,18 +77,23 @@ class EventService {
             WHERE e."startDate" <= '${endDate.toISOString()}' AND (e."endDate" IS NULL OR e."endDate" >= '${startDate.toISOString()}')`;
         result.push(...(await this.repo.query(q)).map(e => ({ ...e, editable: true })));
 
+        result = result.map(e => {
+            e.startDate = new Date(e.startDate);
+            return e;
+        });
+
         // On récupères les anniversaires
         q = `SELECT * 
             FROM person
-            WHERE date_part('month', "dateOfBirth") = date_part('month', TIMESTAMP '${startDate.toISOString()}')
+            WHERE date_part('month', "dateOfBirth") = ${month + 1}
             AND ("dateOfDeath" IS NULL OR date_part('year', "dateOfDeath") >= ${year})`;
+        console.log(q);
         const qr = await this.repo.query(q);
         if (Array.isArray(qr) && qr.length > 0) {
             result.push(
                 ...qr.map(json => {
                     const p = new Person().fromJSON(json);
-                    console.log(p);
-                    const e = p.sex == Sex.female ? "p'tite mère" : p.sex == Sex.male ? "p'tit père" : "à lui";
+                    const e = p.sex == Sex.female ? "p'tite mère" : p.sex == Sex.male ? "p'tit père" : "";
                     return {
                         startDate: new Date(year, p.dateOfBirth.getMonth(), p.dateOfBirth.getDate()),
                         name: `🎂 ${p.getQuickName()}`,

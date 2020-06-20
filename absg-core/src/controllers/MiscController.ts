@@ -112,4 +112,18 @@ export class UserController {
         }
         return new UnauthorizedError("Vous n'avez pas les droits suffisant pour modifier les paramètres du site");
     }
+
+    @Get("/testA")
+    async testA() {
+        const d0 = new Date();
+        const e0 = new Date(2020, 10, 10);
+        return {
+            d0,
+            d1: d0.toUTCString(),
+            d2: d0.toLocaleString(),
+            e0,
+            e1: e0.toUTCString(),
+            e2: e0.toLocaleString()
+        };
+    }
 }
