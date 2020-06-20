@@ -309,7 +309,7 @@ export default {
                     this.events.map(e => {
                         try {
                             e.start = new Date(e.startDate).toISOString().substr(0, 10);
-                            // e.end = e.endDate ? new Date(e.endDate).toISOString().substr(0, 10) : null;
+                            e.end = e.endDate ? new Date(e.endDate).toISOString().substr(0, 10) : null;
                         } catch (ex) {
                             console.log(" > Failled ", e, ex);
                         }
@@ -362,8 +362,8 @@ export default {
                 this.eventEditor.name = event.name;
                 this.eventEditor.details = event.details;
                 this.eventEditor.type = event.type;
-                this.eventEditor.startDate = event.startDate;
-                this.eventEditor.endDate = event.endDate;
+                this.eventEditor.startDate = event.startDate ? new Date(event.startDate).toISOString().substr(0, 10) : "";
+                this.eventEditor.endDate = event.endDate ? new Date(event.endDate).toISOString().substr(0, 10) : "";
             } else {
                 // Reset form
                 this.eventEditor.id = -1;

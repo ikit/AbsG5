@@ -138,8 +138,6 @@ class EventService {
         }
         evt.author = user;
 
-        console.log(data, evt);
-
         // On extrait du message les images transmise encodé en base64 afin de les enregistré en
         // tant que fichier et économiser la taille de la base de donnée
         const bases64data = evt.details.match(/src="(data:image\/[^;]+;base64[^"]+)"/g);
