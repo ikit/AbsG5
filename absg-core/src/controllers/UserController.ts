@@ -1,6 +1,6 @@
-import { JsonController, Post, Body, BadRequestError, Get, Authorized, CurrentUser } from "routing-controllers";
+import { JsonController, Post, Body, BadRequestError, Get, Authorized, CurrentUser, Param } from "routing-controllers";
 import { User } from "../entities";
-import { userService } from "../services";
+import { userService, agendaService } from "../services";
 
 @Authorized()
 @JsonController("/users")
@@ -24,5 +24,13 @@ export class UserController {
     @Post("/change-pwd")
     changePwd(@Body() body: any, @CurrentUser() user: User) {
         return userService.changePassword(user, body.pwd);
+    }
+
+    @Post("/:id([0-9]+)/updateGPS")
+    updateGPS(@Param("id") id: number, @Body() body: any, @CurrentUser() user: User) {
+        if (user && user.id === id) {
+            return userService.updateGPS(id, body);
+        }
+        throw new BadRequestError("Impossible de mettre à jour les données l'utilisateur");
     }
 }

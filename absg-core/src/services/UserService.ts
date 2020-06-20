@@ -218,6 +218,20 @@ L'équipe système`,
             GROUP BY d.date;`;
         return getRepository(LogPassag).query(sql);
     }
+
+
+    async updateGPS(userId: number, gpsLocation: any) {
+        // on récupère l'utilisateur
+        const user = await this.usersRepo
+            .createQueryBuilder("u")
+            .leftJoinAndSelect("u.person", "person")
+            .where("u.id = " + userId)
+            .getOne();
+
+        user.person.lastLocation = gpsLocation;
+        await this.personsRepo.save(user.person);
+        return user;
+    }
 }
 
 export const userService = new UserService();

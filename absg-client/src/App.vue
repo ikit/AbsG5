@@ -76,8 +76,17 @@
                 </v-btn>
             </template>
             <v-list nav>
+                <v-list-item :to="{ path: 'admin/profile'}">
+                    <v-list-item-title :key="1"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="setGPSPosition()">
+                    <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-crosshairs</v-icon>Ma position</v-list-item-title>
+                </v-list-item>
+                <v-list-item :to="{ path: 'admin/resetpwd'}">
+                    <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
+                </v-list-item>
                 <v-list-item @click="logout()">
-                    <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Se déconnecter</v-list-item-title>
+                    <v-list-item-title :key="4"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-power-off</v-icon>Se déconnecter</v-list-item-title>
                 </v-list-item>
             </v-list>
         </v-menu>
@@ -182,13 +191,28 @@
         </v-card>
     </v-dialog>
 
-    <v-dialog v-model="warning.displayed" class="msgDiallog">
+    <v-dialog v-model="notif.displayed" class="msgDiallog" width="500px">
+        <v-card>
+            <v-card-title class="annonce">
+                <v-icon color="#fff">fas fa-info-circle</v-icon> &nbsp; {{ notif.title }}
+            </v-card-title>
+            <v-container grid-list-sm class="pa-4">
+               <div v-html="notif.msg"></div>
+            </v-container>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text @click="notif.displayed=false">OK</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="warning.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="warning">
                 <v-icon color="#fff">fas fa-exclamation-triangle</v-icon> &nbsp; Attention
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
-               {{ warning.msg }}
+               <div v-html="warning.msg"></div>
             </v-container>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -197,7 +221,7 @@
         </v-card>
     </v-dialog>
 
-    <v-dialog v-model="error.displayed" class="msgDiallog">
+    <v-dialog v-model="error.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="error">
                 <v-icon color="#fff">fas fa-exclamation-circle</v-icon> &nbsp; Une erreur s'est produite
@@ -263,6 +287,35 @@ export default {
             logoutUser(store);
             this.$router.push("/login");
         },
+        setGPSPosition() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // On met à jour les infos de l'utilisateur,
+                        axios.post(`/api/users/${this.user.id}/updateGPS`, [position.coords.latitude, position.coords.longitude]).then(
+                            savedUser => {
+                                store.commit("onNotif", [
+                                    "Localisation mise à jours",
+                                    `Votre position a été mise à jours avec les coordonnées GPS suivantes : <code>[${position.coords.latitude}, ${position.coords.longitude}]</code>`]);
+                                },
+                            err => {
+                                store.commit('onError', err);
+                            }
+                        );
+                    },
+                    () => {
+                        store.commit("onWarning", `
+                            La récupération automatique de votre position est bloquée par votre navigateur.<br/>
+                            Vous pouvez modifier manuellement votre position dans la section '<a href="/admin/profile">Mes informations</a>' du site.`);
+                    }
+                );
+            } else {
+                store.commit("onWarning", `
+                    La récupération automatique de votre position est bloquée par votre navigateur.<br/>
+                    Vous pouvez modifier manuellement votre position dans la section '<a href="/admin/profile">Mes informations</a>' du site.`);
+            }
+        },
+
         copyError() {
             navigator.clipboard.writeText(`Erreur Absolument G\nDate: ${this.error.log}\nRequête: ${this.error.query}\nStatus: ${this.error.htmlError}\nError: ${this.error.msg}`);;
         },
@@ -315,7 +368,8 @@ export default {
             "notifications",
             "unreadNotifications",
             "error",
-            "warning"
+            "warning",
+            "notif"
         ]),
         // Gallerie photos
         photosGalleryDisplayed() {

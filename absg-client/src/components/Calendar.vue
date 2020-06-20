@@ -299,22 +299,19 @@ export default {
             if (!this.start) return;
 
             this.isLoading = true;
-            console.log("loadMonthEvents")
             axios.get( `/api/event/${this.start.year}/${this.start.month-1}`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
                     this.events = data;
-                    console.log("map 1", data);
                     this.events.map(e => {
                         try {
                             e.start = new Date(e.startDate).toISOString().substr(0, 10);
                             e.end = e.endDate ? new Date(e.endDate).toISOString().substr(0, 10) : null;
                         } catch (ex) {
-                            console.log(" > Failled ", e, ex);
+                            console.warn(" > Failled to load calendar event", e, ex);
                         }
                     });
-                    console.log("map 2", this.events);
                 }
                 this.isLoading = false;
             });
@@ -414,6 +411,7 @@ export default {
         updateRange ({ start, end }) {
             // You could load events from an outside source (like database) now that we have the start and end dates on the calendar
             this.start = start;
+            console.log(this.start);
             this.loadMonthEvents();
         },
     }

@@ -28,6 +28,13 @@ export default new Vuex.Store({
         // Editeur photo
         photoMetadataEditorDisplayed: false,
         agpaMeta: null,
+        // Notification
+        notif: {
+            displayed: false,
+            title: "",
+            msg: "",
+            log: ""
+        },
         // Warning
         warning: {
             displayed: false,
@@ -173,6 +180,11 @@ export default new Vuex.Store({
 
         // ========
         // NOTIF methods
+        onNotif(state, info) {
+            state.notif.title = info[0];
+            state.notif.msg = info[1];
+            state.notif.displayed = true;
+        },
         onWarning(state, message) {
             state.warning.msg =  message;
             state.warning.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
