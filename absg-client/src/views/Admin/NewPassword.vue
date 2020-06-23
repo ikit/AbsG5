@@ -34,7 +34,10 @@
                     <p>
                         Les personnes mal intentionnées ont 2 façons de trouver un mot de passe.
                         <ul><li><b>La méthode "force brute":</b> elle repose sur la capacité de calcul des ordinateurs
-                            et va tester toutes les possibilités en testant d'abord les mots les plus courant (dictionnaire, statistiques, ...);</li>
+                            et va tester toutes les possibilités en testant d'abord les mots les plus courant (dictionnaire, statistiques, ...).
+                            Ce qu'il faut comprendre quand on parle de dictionnaire, c'est qu'on ne va pas juste tester les 10 000 définitions du Grand Robert...
+                            On va tester les centaines de millions d'identifiants et mots de passes qui ont déjà fuités et sont listés en accès libre sur certains sites.
+                            Et c'est trés efficaces, car souvent on se croit malin, mais on est rarement le premier ni le seul à avoir une idée;</li>
                             <li><b>La méthode des RG:</b> qui consiste à se renseigner sur la personne et mieux la cerner afin de trouver le mot de passe qu'elle a pu choisir.
                                 Gardez à l'esprit que Facebook ou Twitter n'ont besoin que d'une dizaine d'informations pour vous connaître mieux que vos proches et déduire
                                 vos gouts, intérêts et opinions sur tout un tas de sujets... ça va vite.
@@ -46,7 +49,7 @@
                         <ul><li><b>Pas d'informations personnelles</b> ou tirées de votre environnement proche ou professionnel.
                                 Un mot de passe basé sur vos données personnelles va être vite trouvé par les 2 méthodes;</li>
                             <li><b>Ne vous compliquez pas la vie</b> avec des codes aléatoires impossibles à mémoriser du genre <span class="code">tTh9pVFH9q6N2ZQ</span>.
-                                Un mot de passe compliqué va vous posez plus de problème à vous pour le retenir que pour un ordinateur à le trouver; </li>
+                                Mais bon après si ça vous amuse ça reste un bon mot de passe... mais comptez au moins 10 lettres pour que ça soit assez long à trouver pour un ordinateur; </li>
                             <li><b>La longueur du mot de passe est importante</b>. Ni trop long (trop compliqué à retenir), ni trop court (trop facile à casser).
                                 Ce <a href="https://howsecureismypassword.net/" target="_blank">site</a> permet de tester des mots mots de passe
                                 et d'avoir un ordre d'idée de la durée qu'il faut à un ordinateur pour le trouver, et quels sont ses défauts.</li>
@@ -61,12 +64,14 @@
                         </ul>
                     </p>
                     <p>
-                        <span class="section">La technique du chef:</span>
+                        <span class="section">La recette du chef:</span>
                         <ul>
-                            <li>Composez votre mot de passe avec deux ou plusieurs mots pris au pif, par exemple <span class="code">cheval ibiscus</span>...
-                                En plus vous trouverez vite une petite histoire pour associer et vous souvenir facilement de ces mots;</li>
-                            <li>Inventez vous une petite moulinette pour altérer l'orthographe: par exemple remplacer le premier "a" par "@",
-                                mettre des "-" autour du deuxième mot et une majuscule à la première et dernière lettre => <span class="code">Chev@l -ibiscuS-</span></li>
+                            <li>Composez votre mot de passe avec plusieurs mots pris au pif, par exemple <span class="code">cheval ibiscus poutre</span>...
+                                2 avantages: c'est long et facile à retenir... vous trouverez vite une petite histoire pour associer et vous souvenir facilement de ces mots;</li>
+                            <li>Vous pouriez en rester là si vous utilisez 4-5 mots. Mais sinon l'idée c'est de rendre ce mot passe inexistant lors d'une recherche par dictionnaire.
+                                Pour ça il suffit de vous inventer votre petite combine. Quelques idées, supprimer ou rajouter des lettres, écrire à l'envers,
+                                "décorer" avec des lettres/chiffres de votre choix... Et voilà le travaille !
+                                <span class="code">1lavehc-BSCS+IIU-p__tr_2</span></li>
                         </ul>
                     </p>
                 </v-expansion-panel-content>

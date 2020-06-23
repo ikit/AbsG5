@@ -240,6 +240,7 @@ export default {
         needToReset: false, // mis à vrai quand l'utilisateur parcours le calendrier afin de pouvoir revenir au mois en cours
 
         events: [],
+        title: "",
         colors: {
             gueudelot: '#039be5', // événement Gueudelot
             guyomard: '#ff7043', // événement Guyomard
@@ -283,17 +284,6 @@ export default {
     mounted () {
         this.$refs.calendar.checkChange();
     },
-    computed: {
-        title () {
-            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-            if (!this.start) {
-                const d = new Date();
-                return `${months[d.getMonth()]} ${d.getFullYear()}`;
-            }
-            return `${months[this.start.month - 1]} ${this.start.year}`;
-            // new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' })
-        }
-    },
     methods: {
         loadMonthEvents() {
             if (!this.start) return;
@@ -313,6 +303,7 @@ export default {
                         }
                     });
                 }
+                this.updateTitle();
                 this.isLoading = false;
             });
         },
@@ -414,6 +405,16 @@ export default {
             console.log(this.start);
             this.loadMonthEvents();
         },
+
+        updateTitle () {
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            if (!this.start) {
+                const d = new Date();
+                this.title = `${months[d.getMonth()]} ${d.getFullYear()}`;
+            }
+            this.title = `${months[this.start.month - 1]} ${this.start.year}`;
+            // new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' })
+        }
     }
   }
 </script>

@@ -76,13 +76,13 @@
                 </v-btn>
             </template>
             <v-list nav>
-                <v-list-item :to="{ path: 'admin/profile'}">
+                <v-list-item :to="{ path: '/admin/profile'}">
                     <v-list-item-title :key="1"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="setGPSPosition()">
                     <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-crosshairs</v-icon>Ma position</v-list-item-title>
                 </v-list-item>
-                <v-list-item :to="{ path: 'admin/resetpwd'}">
+                <v-list-item :to="{ path: '/admin/resetpwd'}">
                     <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click="logout()">
