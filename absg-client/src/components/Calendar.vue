@@ -2,16 +2,31 @@
 <div>
     <v-card style="min-width: 500px;">
         <v-card-title >
-            <v-tooltip bottom>
+            <v-menu
+                ref="dateMenu"
+                v-model="selectDateMenu"
+                :close-on-content-click="false"
+                :return-value.sync="date"
+                transition="scale-transition"
+                offset-y
+                min-width="290px"
+            >
                 <template v-slot:activator="{ on }">
                     <v-btn text class="h2"
-                        v-on="on"
-                        @click="setToday()">
+                        v-on="on">
                         {{ title }}
                     </v-btn>
                 </template>
-                <span>Changer le mois en cours</span>
-            </v-tooltip>
+                <v-date-picker
+                    no-title scrollable
+                    v-model="selectedDate"
+                    type="month"
+                    @input="changeDate()">
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="selectDateMenu = false">Annuler</v-btn>
+                    <v-btn text color="primary" @click="$refs.dateMenu.save(date)">OK</v-btn>
+                </v-date-picker>
+            </v-menu>
 
             <div style="position: absolute; right: 15px">
                 <v-tooltip bottom>
@@ -241,6 +256,9 @@ export default {
 
         events: [],
         title: "",
+
+        selectedDate: "",
+        selectDateMenu: false,
         colors: {
             gueudelot: '#039be5', // événement Gueudelot
             guyomard: '#ff7043', // événement Guyomard
@@ -306,6 +324,17 @@ export default {
                 this.updateTitle();
                 this.isLoading = false;
             });
+        },
+        changeDate() {
+            try {
+                this.start.year = this.selectedDate.split("-")[0];
+                this.start.month = this.selectedDate.split("-")[1];
+                this.focus = `${this.selectedDate}-01`;
+                this.selectedDate = null;
+                this.selectDateMenu = false;
+            } catch (ex) {
+                console.log(ex);
+            }
         },
         viewDay ({ date }) {
             this.focus = date;
@@ -402,7 +431,6 @@ export default {
         updateRange ({ start, end }) {
             // You could load events from an outside source (like database) now that we have the start and end dates on the calendar
             this.start = start;
-            console.log(this.start);
             this.loadMonthEvents();
         },
 

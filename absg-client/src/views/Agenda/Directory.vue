@@ -133,7 +133,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="personEditor.dateOfBirth" @input="dateOfBirthMenu = false"></v-date-picker>
+                            <v-date-picker v-model="personEditor.dateOfBirth" @input="personEditor.dateOfBirthMenu = false"></v-date-picker>
                         </v-menu>
 
                         <v-menu
@@ -155,7 +155,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="personEditor.dateOfDeath" @input="dateOfDeathMenu = false"></v-date-picker>
+                            <v-date-picker v-model="personEditor.dateOfDeath" @input="personEditor.dateOfDeathMenu = false"></v-date-picker>
                         </v-menu>
 
                         <v-text-field
