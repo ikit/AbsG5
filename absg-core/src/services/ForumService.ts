@@ -6,6 +6,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { BadRequestError } from "routing-controllers";
+import { websocketService } from "./WebsocketService";
 
 class ForumService {
     private forumRepo = null;
@@ -272,7 +273,7 @@ class ForumService {
             topic.pinned = !topic.pinned;
             await this.topicRepo.save(topic);
 
-            this.wsService.broadcast({
+            websocketService.broadcast({
                 message: "pinnedTopicsChanged",
                 payload: await this.pinnedTopics()
             });
