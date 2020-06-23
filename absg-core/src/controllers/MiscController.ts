@@ -1,7 +1,7 @@
 import { getRepository } from "typeorm";
 import { JsonController, Post, Body, Get, Authorized, CurrentUser, UnauthorizedError } from "routing-controllers";
 import { citationService, eventService, immtService, userService, websocketService } from "../services";
-import { subDays } from "date-fns";
+import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
 
 @JsonController("")
@@ -39,7 +39,7 @@ export class UserController {
         const result = {
             immt: await immtService.last(),
             events: await eventService.getForMonth(current.getFullYear(), current.getMonth()),
-            passag: await userService.getPassag(subDays(new Date(), 1))
+            passag: await userService.getPassag(subDays(addHours(new Date(), 1), 1))
         };
         return result;
     }
@@ -49,8 +49,8 @@ export class UserController {
      */
     @Authorized()
     @Get("/passag")
-    async passagHistory() {
-        return await userService.getPassagHistory();
+    passagHistory() {
+        return userService.getPassagHistory();
     }
 
     /**

@@ -4,6 +4,7 @@ import { Action } from "routing-controllers";
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag } from "../entities";
 import { differenceInSeconds } from "date-fns";
+import { Mutex } from "async-mutex";
 
 /**
  * Chiffre un mot de passe
@@ -69,41 +70,70 @@ export function checkRoles(userRoles: string[], authorizedRoles: string[]) {
 }
 
 /**
+ * Met à jours les données de l'utilisateur et retourne l'utilisateur modifié
+ * @param url la nouvelle activité à mettre à jour
+ */
+export function setLastActivity(user: User, url: string) {
+    if (!user.activity) {
+        user.activity = {
+            lastAction: url, // lien (route) vers la dernière section du site visité
+            lastAnnounce: 0, // dernière date à laquelle on a affiché l'annonce en cours du site à l'utilisateur (pas plus d'une fois par jour)
+            unreadNotifications: [] // liste des id des notifications non lues de l'utilisateur
+        };
+    } else {
+        user.activity.lastActio = url;
+    }
+    return user;
+}
+
+/**
  * Met à jour les log de passage concernant l'utilisateur
  * @param user l'utilisateur concerné
  * @param url l'url requêté par l'utilisateur
  */
+
+export const MUTEX_PASSAG = new Mutex();
 export async function checkUserPassag(user: User, url: string) {
-    // On met à jours les stats de passage de l'utilisateur
-    if (user) {
-        const sql = `SELECT l.*, u.username
-            FROM log_passag l
-            INNER JOIN "user" u ON u.id = l."userId" 
-            WHERE l."userId" = ${user.id}
-            ORDER BY l.datetime DESC
-            LIMIT 1`;
-        // On récupère le dernier passage de l'utilisateur
-        let lastLog = await getRepository(LogPassag).query(sql);
-        lastLog = lastLog.length > 0 ? lastLog[0] : null;
+    const release = await MUTEX_PASSAG.acquire();
 
-        // Si dernier passage noté à plus d'une heure, on en enregistre un autre
-        const log = new LogPassag();
-        log.datetime = new Date();
-        log.userId = user.id;
-        if (!lastLog) {
-            await getRepository(LogPassag).save(log);
-        } else {
-            const lastDate = new Date(lastLog.datetime);
-            if (differenceInSeconds(new Date(), lastDate) > 3600) {
+    // On utilise mutex pour éviter la création en parallèle de plusieurs log identique lorsque
+    // plusieurs requetes sont envoyées en même temps
+    try {
+        // On met à jours les stats de passage de l'utilisateur
+        if (user) {
+            const sql = `SELECT l.*, u.username
+                FROM log_passag l
+                INNER JOIN "user" u ON u.id = l."userId" 
+                WHERE l."userId" = ${user.id}
+                ORDER BY l.datetime DESC
+                LIMIT 1`;
+            // On récupère le dernier passage de l'utilisateur
+            let lastLog = await getRepository(LogPassag).query(sql);
+            lastLog = lastLog.length > 0 ? lastLog[0] : null;
+
+            // Si dernier passage noté à plus d'une heure, on en enregistre un autre
+            const log = new LogPassag();
+            log.datetime = new Date();
+            log.userId = user.id;
+            if (!lastLog) {
                 await getRepository(LogPassag).save(log);
+            } else {
+                const lastDate = new Date(lastLog.datetime);
+                const now = new Date();
+                if (differenceInSeconds(now, lastDate) > 3600 || now.getHours() != lastDate.getHours()) {
+                    await getRepository(LogPassag).save(log);
+                }
             }
-        }
 
-        // On met à jour l'info dans de l'utilisateur
-        user.lastTime = new Date();
-        user = setLastActivity(user, url);
-        await getRepository(User).save(user);
+            // On met à jour l'info dans de l'utilisateur
+            user.lastTime = new Date();
+            user = setLastActivity(user, url);
+            await getRepository(User).save(user);
+        }
+    } finally {
+        release();
     }
+
     return user;
 }
 
@@ -158,21 +188,4 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 export async function currentUserChecker(action: Action) {
     // on retourn le user si il est défini dans le header
     return await getUserFromHeader(action.request);
-}
-
-/**
- * Met à jours les données de l'utilisateur et retourne l'utilisateur modifié
- * @param url la nouvelle activité à mettre à jour
- */
-export function setLastActivity(user: User, url: string) {
-    if (!user.activity) {
-        user.activity = {
-            lastAction: url, // lien (route) vers la dernière section du site visité
-            lastAnnounce: 0, // dernière date à laquelle on a affiché l'annonce en cours du site à l'utilisateur (pas plus d'une fois par jour)
-            unreadNotifications: [] // liste des id des notifications non lues de l'utilisateur
-        };
-    } else {
-        user.activity.lastActio = url;
-    }
-    return user;
 }

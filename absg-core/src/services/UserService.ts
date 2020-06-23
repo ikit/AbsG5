@@ -189,6 +189,8 @@ L'équipe système`,
 
     /**
      * Retourne les logs de passage des membres sur le site entre 2 date
+     * @param from
+     * @param to
      */
     async getPassag(from: Date, to: Date = new Date()) {
         const sql = `SELECT l.*, u.username
@@ -197,16 +199,15 @@ L'équipe système`,
             WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD HH:mm")}:00' 
             AND '${format(to, "YYYY-MM-DD HH:mm")}:00'
             ORDER BY l.datetime ASC`;
-        // On récupère les données, on ne conserve que les 5 meilleures photos par catégories
         return getRepository(LogPassag).query(sql);
     }
 
     /**
-     * 
-     * @param from 
-     * @param to 
+     * Récupère le nombre de visiteurs uniques du site sur la période indiquée
+     * @param from
+     * @param to
      */
-    async getPassagHistory(from: Date = null, to: Date = null) {
+    getPassagHistory(from: Date = null, to: Date = null) {
         to = to ? to : new Date();
         from = from && from < to ? from : new Date(to.getFullYear() - 1, to.getMonth(), 1);
         const deltaDays = differenceInDays(to, from);
@@ -219,7 +220,11 @@ L'équipe système`,
         return getRepository(LogPassag).query(sql);
     }
 
-
+    /**
+     * Met à jour la position GPS d'un utilisateur
+     * @param userId 
+     * @param gpsLocation 
+     */
     async updateGPS(userId: number, gpsLocation: any) {
         // on récupère l'utilisateur
         const user = await this.usersRepo

@@ -71,13 +71,12 @@
     <v-dialog v-model="passagHistoryDialogDisplayed" width="800px">
         <v-card>
             <v-card-title class="grey lighten-4 py-4 title">
-            Statistiques de passa G
+            Statistiques de passa G sur l'année
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                 <highcharts :options="historyData"></highcharts>
             </v-container>
             <v-card-actions>
-            <v-btn text color="primary">Supprimer toutes les notifications</v-btn>
             <v-spacer></v-spacer>
             <v-btn text @click="passagHistoryDialogDisplayed=false">Fermer</v-btn>
             </v-card-actions>
@@ -113,6 +112,7 @@ export default {
         immt: null,
         passagHistoryDialogDisplayed: false,
         historyData: {
+            title: "",
             chart: {
                 type: 'spline'
             },
@@ -200,8 +200,9 @@ export default {
             axios.get(`/api/passag`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
+                    console.log(data);
                     this.isLoading = false;
-                    this.historyData.series[0].data = data.map(e => e.count);
+                    this.historyData.series[0].data = data.map(e => +e.count);
                     this.historyData.xAxis.categories = data.map(e => e.date);
                     this.passagHistoryDialogDisplayed = true;
                 }
@@ -313,6 +314,7 @@ h2 {
 
 
 .passage {
+    margin: 0 15px;
     display: flex;
     div {
         display: flex;
@@ -321,15 +323,20 @@ h2 {
         min-width: 50px;
         padding: 0;
         vertical-align: top;
+        justify-content: center;
+        margin-top: 20px;
 
         .date {
-            display: relative;
-            width: 100%;
+            position: absolute;
+            margin: 0;
+            top: -20px;
             height: 20px;
             line-height: 20px;
-            text-align: center;
+            opacity: 0.5;
         }
-
+    }
+    div:nth-child(2n) {
+        background: #eee;
     }
 }
 
