@@ -87,7 +87,6 @@ class EventService {
             FROM person
             WHERE date_part('month', "dateOfBirth") = ${month + 1}
             AND ("dateOfDeath" IS NULL OR date_part('year', "dateOfDeath") >= ${year})`;
-        console.log(q);
         const qr = await this.repo.query(q);
         if (Array.isArray(qr) && qr.length > 0) {
             result.push(

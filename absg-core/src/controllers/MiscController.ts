@@ -29,16 +29,13 @@ export class UserController {
     /**
      * Récupère l'ensemble des éléments nécessaire pour construire la page d'accueil
      *  - La dernière image du moment
-     *  - Les événements du mois en cours
      *  - L'historique des passages de la journée
      */
     @Authorized()
     @Get("/homepage")
     async home() {
-        const current = new Date();
         const result = {
             immt: await immtService.last(),
-            events: await eventService.getForMonth(current.getFullYear(), current.getMonth()),
             passag: await userService.getPassag(subDays(addHours(new Date(), 1), 1))
         };
         return result;

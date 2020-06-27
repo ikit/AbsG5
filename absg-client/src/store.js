@@ -70,6 +70,9 @@ export default new Vuex.Store({
             }
             state.citation = citation;
         },
+        updateAgpaMeta(state, meta) {
+            state.agpaMeta = meta;
+        },
         updateSettings(state, settings) {
             state.settings = settings;
             // TODO: déterminer en fonction de la dernière visite du user si il faut lui afficher l'annonce ou pas (1x par jour pas plus)
@@ -222,8 +225,9 @@ export default new Vuex.Store({
         },
         initAGPA(state) {
             if (!state.agpaMeta) {
+                console.log("INIT AGPA 3");
                 axios.get(`/api/agpa`).then(response => {
-                    state.agpaMeta = parseAxiosResponse(response);
+                    this.commit("updateAgpaMeta", parseAxiosResponse(response));
                 });
             }
         },

@@ -168,10 +168,12 @@ export default {
         error: null,
         year: 0,
     }),
-    computed: { ...mapState([
-        'agpaMeta',
-        'photosGallery',
-    ])},
+    computed: {
+        ...mapState([
+            'agpaMeta',
+            'photosGallery',
+        ])
+    },
     mounted () {
         this.initView();
     },

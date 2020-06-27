@@ -192,13 +192,14 @@ L'équipe système`,
      * @param from
      * @param to
      */
-    async getPassag(from: Date, to: Date = new Date()) {
+    getPassag(from: Date, to: Date = new Date()) {
         const sql = `SELECT l.*, u.username
             FROM log_passag l
             INNER JOIN "user" u ON u.id = l."userId" 
             WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD HH:mm")}:00' 
             AND '${format(to, "YYYY-MM-DD HH:mm")}:00'
             ORDER BY l.datetime ASC`;
+        console.log("GET PASSAG", sql);
         return getRepository(LogPassag).query(sql);
     }
 

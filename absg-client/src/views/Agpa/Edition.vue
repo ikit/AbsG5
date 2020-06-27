@@ -83,6 +83,11 @@ export default {
             { number: 5, label: "Cérémonie des AGPA", start: format(new Date(2020, 11, 24, 20, 30), "dd MMM 'à' HH'h'mm", {locale: fr}) },
         ],
     }),
+    computed: {
+        ...mapState([
+            'agpaMeta',
+        ]),
+    },
     mounted () {
         axios.get('/api/agpa').then(response => {
             this.currentMonth = new Date().getMonth();
@@ -122,11 +127,6 @@ export default {
             this.resetDialog();
         }
     },
-    computed: {
-        ...mapState([
-            'agpaMeta',
-        ]),
-    }
 };
 </script>
 
