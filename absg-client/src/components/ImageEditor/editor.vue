@@ -31,7 +31,7 @@
             </button>
 
             <!-- Bouttons spéciaux (en bas) -->
-            <div style="position: absolute; bottom:0">
+            <div style="position: absolute; bottom:0; color: white">
                 <button
                     v-if="data.loaded && !data.cropping"
                     data-action="remove"
@@ -209,6 +209,7 @@ export default {
 }
 
 .canvas {
+    margin-left: 30px;
     align-items: center;
     display: flex;
     height: 100%;

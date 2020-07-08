@@ -1,5 +1,7 @@
 <template>
 <v-container>
+    <Phase1></Phase1>
+
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
     <v-card v-if="currentMonth > 0 && currentMonth < 9" style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;">
         <img src="/img/agpa/cupesMaxi/c1.png" height="100px" style="position: absolute; top: -50px; left: calc(50% - 56px)"/>
@@ -14,10 +16,10 @@
                 {{ item.label }}
             </v-timeline-item>
         </v-timeline>
-        <v-card v-if="current && current.categories[8] && current.categories[8].title" style="margin: 15px; text-align: center; padding: 15px">
+        <v-card v-if="agpaMeta && agpaMeta.categories[8] && agpaMeta.categories[8].title" style="margin: 15px; text-align: center; padding: 15px">
             <p style="opacity: 0.5; ">Thème de l'année</p>
-            <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">{{ current.categories[8].title }}</p>
-            <p style="font-style: italic">{{ current.categories[8].description }}</p>
+            <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">{{ agpaMeta.categories[8].title }}</p>
+            <p style="font-style: italic">{{ agpaMeta.categories[8].description }}</p>
         </v-card>
         <v-card v-else style="margin: 15px; font-weight: bold; color: #ff8f00; padding: 15px">
             <v-icon color="warning" style="width: 50px">fas fa-exclamation-triangle</v-icon>
@@ -38,12 +40,12 @@
                 indeterminate>
             </v-progress-circular>
         </div>
-        <div v-if="!isLoading && !current">Une erreur est survenue :( ...<br/>{{ error }}</div>
-        <Phase1 v-if="current && current.phase == 1" :current="current"></Phase1>
-        <Phase2 v-if="current && current.phase == 2" :current="current"></Phase2>
-        <Phase3 v-if="current && current.phase == 3" :current="current"></Phase3>
-        <Phase4 v-if="current && current.phase == 4" :current="current"></Phase4>
-        <Phase5 v-if="current && current.phase == 5" :current="current"></Phase5>
+        <div v-if="!isLoading && !agpaMeta">Une erreur est survenue :( ...<br/>{{ error }}</div>
+        <Phase1 v-if="agpaMeta && agpaMeta.phase == 1"></Phase1>
+        <Phase2 v-if="agpaMeta && agpaMeta.phase == 2"></Phase2>
+        <Phase3 v-if="agpaMeta && agpaMeta.phase == 3"></Phase3>
+        <Phase4 v-if="agpaMeta && agpaMeta.phase == 4"></Phase4>
+        <Phase5 v-if="agpaMeta && agpaMeta.phase == 5"></Phase5>
     </section>
 </v-container>
 </template>
@@ -71,7 +73,6 @@ export default {
     },
     data: () => ({
         isLoading: true,
-        agpaMeta: null,
         currentMonth: null,
         currentYear: null,
         error: null,
@@ -89,13 +90,11 @@ export default {
         ]),
     },
     mounted () {
-        axios.get('/api/agpa').then(response => {
-            this.currentMonth = new Date().getMonth();
-            this.currentYear = new Date().getFullYear();
-            this.current = parseAxiosResponse(response);
-            this.isLoading = false;
-        });
-
+        this.currentMonth = new Date().getMonth();
+        this.currentYear = new Date().getFullYear();
+        console.log(this.agpaMeta)
+        // TODO: calculer phase actuelle en fonction des "boundaries"
+        // TODO: récupérer les phases depuis les settings
     },
     methods: {
 

@@ -225,7 +225,6 @@ export default new Vuex.Store({
         },
         initAGPA(state) {
             if (!state.agpaMeta) {
-                console.log("INIT AGPA 3");
                 axios.get(`/api/agpa`).then(response => {
                     this.commit("updateAgpaMeta", parseAxiosResponse(response));
                 });

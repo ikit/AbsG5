@@ -16,7 +16,8 @@ export enum LogModule {
     citations = "citations",
     photos = "photos",
     agenda = "agenda",
-    event = "event"
+    event = "event",
+    agpa = "agpa"
 }
 
 @Entity()

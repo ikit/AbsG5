@@ -25,22 +25,22 @@ export class AgpaPhoto {
     @Column({ comment: "Titre de la photo" })
     title: string;
 
-    @Column({ comment: "Classement de la photo" })
+    @Column({ comment: "Classement de la photo", nullable: true })
     ranking: number;
 
-    @Column({ comment: "Numéro de la photo" })
+    @Column({ comment: "Numéro de la photo", nullable: true })
     number: number;
 
-    @Column({ comment: "Nombre de votes reçu par la photo" })
+    @Column({ comment: "Nombre de votes reçu par la photo", nullable: true })
     votes: number;
 
-    @Column({ comment: "Nombre de votes reçu par le titre la photo" })
+    @Column({ comment: "Nombre de votes reçu par le titre la photo", nullable: true })
     votesTitle: number;
 
-    @Column({ comment: "Score obtenu par la photo" })
+    @Column({ comment: "Score obtenu par la photo", nullable: true })
     score: number;
 
-    @Column({ comment: "Score homogonéisé obtenu par la photo" })
+    @Column({ comment: "Score homogonéisé obtenu par la photo", nullable: true })
     gscore: number;
 
     @Column("json", { comment: "Erreur disqualifiant la photo", nullable: true })

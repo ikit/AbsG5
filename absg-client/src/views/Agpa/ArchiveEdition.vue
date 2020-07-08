@@ -117,23 +117,21 @@
                                 </tbody>
                             </template>
                         </v-simple-table>
-
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    v-on="on"
-                                    style="margin-top: 20px"
-                                    depressed
-                                    :to="{path: `/agpa/archives/${year}/${catIdx}` }">
-                                    <v-icon left>far fa-images</v-icon>
-                                    <span v-if="$vuetify.breakpoint.mdAndUp">Gallerie</span>
-                                </v-btn>
-                            </template>
-                            <span>Voir les photos de la catégorie {{current.categories[catIdx].title}} </span>
-                        </v-tooltip>
                     </v-list>
 
-
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-btn
+                                v-on="on"
+                                style="margin-top: 20px"
+                                depressed
+                                :to="{path: `/agpa/archives/${year}/${catIdx}` }">
+                                <v-icon left>far fa-images</v-icon>
+                                <span v-if="$vuetify.breakpoint.mdAndUp">Gallerie</span>
+                            </v-btn>
+                        </template>
+                        <span>Voir les photos de la catégorie {{current.categories[catIdx].title}} </span>
+                    </v-tooltip>
                 </v-card>
                 <div style="overflow: hidden; display: flex; width: 100%;">
                     <div v-for="photo of current.categories[catIdx].photos" :key="photo.id" style="display: inline-block; width: 250px; height: 250px; margin: auto;">
