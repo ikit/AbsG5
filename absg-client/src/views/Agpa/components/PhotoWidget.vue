@@ -13,7 +13,7 @@
             <td style="text-align: center; padding-top: 20px">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" fab small>
+                        <v-btn v-on="on" fab small @click="editPhoto()">
                             <v-icon style="font-size: 20px">fas fa-pen</v-icon>
                         </v-btn>
                     </template>
@@ -22,7 +22,7 @@
                 &nbsp;
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" fab small>
+                        <v-btn v-on="on" fab small @click="deletePhoto()">
                             <v-icon style="font-size: 20px">fas fa-times</v-icon>
                         </v-btn>
                     </template>
@@ -76,6 +76,12 @@ export default {
     methods: {
         addNewPhoto() {
             this.$emit("new-photo");
+        },
+        editPhoto() {
+            this.$emit("edit-photo");
+        },
+        deletePhoto() {
+            this.$emit("delete-photo");
         }
     }
 };

@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { JsonController, Post, Body, Get, Authorized, CurrentUser, UnauthorizedError } from "routing-controllers";
-import { citationService, eventService, immtService, userService, websocketService } from "../services";
+import { citationService, immtService, userService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
 
@@ -56,7 +56,7 @@ export class UserController {
     @Authorized()
     @Get("/online")
     online() {
-        return websocketService.getClients();
+        return userService.getOnlineUsers();
     }
 
     /**

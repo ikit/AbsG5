@@ -1,6 +1,6 @@
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag, Person } from "../entities";
-import { format, differenceInDays } from "date-fns";
+import { format, differenceInDays, subMinutes } from "date-fns";
 import { cleanString, sendEmail } from "../middleware/commonHelper";
 import { logger } from "../middleware/logger";
 import { hashPassword, createToken } from "../middleware";
@@ -218,6 +218,17 @@ L'équipe système`,
                 ) d
             LEFT OUTER JOIN log_passag l ON d.date = to_char(date_trunc('day', l.datetime), 'YYYY-MM-DD')
             GROUP BY d.date;`;
+        return getRepository(LogPassag).query(sql);
+    }
+
+    /**
+     * retourne la liste des utilisateurs en ligne (connecté il y a moins de 5 minutes)
+     */
+    getOnlineUsers() {
+        const sql = `SELECT *
+            FROM "user"
+            WHERE "lastTime" > ${subMinutes(new Date(), 5)}
+            ORDER BY "lastTime";`;
         return getRepository(LogPassag).query(sql);
     }
 

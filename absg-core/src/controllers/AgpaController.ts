@@ -99,8 +99,8 @@ export class AgpaController {
      * @param photoId 
      * @param user 
      */
-    @Delete("/:photoId([0-9]+)")
+    @Delete("/photo/:photoId([0-9]+)")
     remove(@Param("photoId") photoId: number, @CurrentUser() user) {
-        return "this.citationsRepo.remove(citation)";
+        return agpaService.deletePhoto(photoId, user);
     }
 }

@@ -32,7 +32,9 @@
                         :key="idx"
                         style="display: inline-block; width: 250px; margin: 0 auto;"
                         :photo="photo"
-                        @new-photo="onNewPhoto(catIdx)">
+                        @new-photo="onNewPhoto(catIdx)"
+                        @edit-photo="onEditPhoto(photo)"
+                        @delete-photo="onDeletePhoto(photo)">
                     </PhotoWidget>
 
                 </template>
@@ -44,7 +46,7 @@
     <v-dialog v-model="photoEditor.open" width="800px">
         <v-card>
             <v-card-title class="grey lighten-4 py-4 title">
-                Nouvelle photo "{{ agpaMeta.categories[photoEditor.categoryId].title }}"
+                Nouvelle photo {{ agpaMeta.categories[photoEditor.categoryId].title }}
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                 <v-text-field
@@ -52,7 +54,7 @@
                     label="Titre"
                     v-model="photoEditor.title">
                 </v-text-field>
-                <ImageEditor ref="imgEditor" icon="fas fa-camera" style="height: 300px;"/>
+                <ImageEditor ref="imgEditor" :formerUrl="photoEditor.photo ? photoEditor.photo.url : ''" icon="fas fa-camera" style="height: 300px;"/>
                 <div v-if="photoEditor.isLoading">
                     Enregistrement en cours : {{ photoEditor.complete }}%
                 </div>
@@ -65,19 +67,23 @@
         </v-card>
     </v-dialog>
 
-    <!-- <v-dialog v-model="photoDeletion.open" width="800px">
-        <v-card>
+    <v-dialog v-model="photoDeletion.open" width="800px">
+        <v-card v-if="photoDeletion.photo">
             <v-card-title class="grey lighten-4">
-                Supprimer une photo
+                Êtes vous sûr de vouloir supprimer cette photo ?
             </v-card-title>
-            <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer cette photo ?</p>
+            <div style="text-align: center; margin-top: 10px">
+
+                <img :src="photoDeletion.photo.thumb" style="margin:auto" class="thumb" />
+                <p style="margin: 10px;"> {{ photoDeletion.photo.title }}</p>
+            </div>
             <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="citationDeletion.open = false">Annuler</v-btn>
-            <v-btn color="accent" @click="deleteCitation()">Supprimer</v-btn>
+            <v-btn text color="primary" @click="photoDeletion.open = false">Annuler</v-btn>
+            <v-btn color="accent" @click="deletePhoto()">Supprimer</v-btn>
             </v-card-actions>
         </v-card>
-    </v-dialog> -->
+    </v-dialog>
 </div>
 </template>
 
@@ -108,6 +114,10 @@ export default {
             categoryId: -1,
             title: "",
             photo: null
+        },
+        photoDeletion: {
+            open: false,
+            photo: null
         }
     }),
     computed: {
@@ -115,8 +125,15 @@ export default {
             'agpaMeta',
         ]),
     },
+    watch: {
+        'agpaMeta': function () {
+            this.refreshGallery();
+        }
+    },
     mounted () {
-        this.refreshGallery();
+        if (agpaMeta) {
+            this.refreshGallery();
+        }
     },
     methods: {
         refreshGallery() {
@@ -131,65 +148,111 @@ export default {
                     }
                     // On insère les photos de l'utilisateurs
                     const data = parseAxiosResponse(response);
-                    for (let p of data) {
+                    for (let p of data.photos) {
                         const idx = this.photos.findIndex(e => e.id === -1 && e.categoryId === p.categoryId);
                         if (idx >= 0) {
                             this.photos[idx] = p;
                         }
                     }
+                    for (let s of data.stats) {
+                        this.agpaMeta.categories[s.categoryId].totalUsers = s.totalUsers;
+                        this.agpaMeta.categories[s.categoryId].totalPhotos = s.totalPhotos;
+                    }
                     console.log(this.photos);
                 })
                 .catch(err => {
+                    debugger;
                     store.commit("onError", err);
                 });
         },
 
-        resetEditor (open = false) {
+        resetEditor (open = false, photo = null) {
             this.photoEditor.open = open;
             this.photoEditor.isLoading = false;
             this.photoEditor.complete = 0;
-            this.photoEditor.categoryId = -1;
-            this.photoEditor.title = "";
+            this.photoEditor.categoryId = photo ? photo.categoryId : -1;
+            this.photoEditor.title = photo ? photo.title : null;
+            this.photoEditor.photo = photo;
+            setTimeout(() => {
+                const { imgEditor } = this.$refs;
+                console.log("reset", photo, imgEditor)
+                imgEditor.reset();
+            });
         },
         savePhoto: function () {
             const { imgEditor } = this.$refs;
             this.photoEditor.isLoading = true;
 
             // On récupère l'image
-            axios.get(imgEditor.imageUrl(), { responseType: 'blob' }).then(
-                response => {
-                    const formData = new FormData();
-                    formData.append("title", this.photoEditor.title);
-                    formData.append("catId", this.photoEditor.categoryId);
-                    formData.append("image", response.data);
+            const imageUrl = imgEditor.imageUrl();
+            console.log(imageUrl);
+            if (imageUrl) {
+                // Nouvelle image enregistrée ou modifiée: on doit d'abord récupérer l'image elle même.
+                axios.get(imageUrl, { responseType: 'blob' }).then(
+                    response => {
+                        const photoId = this.photoEditor.photo ? this.photoEditor.photo.id : null;
+                        this.savePhotoApiCall(this.photoEditor.categoryId, photoId, this.photoEditor.title, response.data);
+                    }
+                );
+            } else {
+                // Edition d'une photo sans modification de l'image
+                this.savePhotoApiCall(this.photoEditor.categoryId, this.photoEditor.photo.id, this.photoEditor.title, null);
+            }
 
+        },
+        savePhotoApiCall(catId, photoId, title, imageData) {
+            const formData = new FormData();
+            formData.append("catId", catId);
+            formData.append("title", title);
+            if (imageData) {
+                formData.append("image", imageData);
+            }
+            if (photoId) {
+                formData.append("id", photoId);
+            }
 
-                    // On envoie tout au serveur pour qu'il enregistre la nouvelle image du moment
-                    axios.post(`/api/agpa/photo`, formData, {
-                        headers: {
-                            "Content-Type" : "multipart/form-data",
-                        },
-                        onUploadProgress: progressEvent => {
-                            this.photoEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
-                        }
-                    })
-                    .then(newPhoto => {
-                        // TODO: ajoute la photo
-                        console.log(newPhoto);
-                        this.resetEditor();
-                    })
-                    .catch(err => {
-                        store.commit("onError", err);
-                    });
+            // On envoie tout au serveur pour qu'il enregistre la nouvelle image du moment
+            axios.post(`/api/agpa/photo`, formData, {
+                headers: {
+                    "Content-Type" : "multipart/form-data",
+                },
+                onUploadProgress: progressEvent => {
+                    this.photoEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
                 }
-            );
+            })
+            .then(newPhoto => {
+                this.resetEditor();
+                this.refreshGallery();
+            })
+            .catch(err => {
+                store.commit("onError", err);
+            });
+        },
+
+        deletePhoto() {
+            console.log("delete photo", this.photoDeletion.photo);
+            axios.delete(`/api/agpa/photo/${this.photoDeletion.photo.id}`)
+                .then(response => {
+                    this.photoDeletion.open = false;
+                    this.photoDeletion.photo = null;
+                    this.refreshGallery();
+                })
+                .catch(err => {
+                    store.commit("onError", err);
+                });
         },
         onNewPhoto(catId, photoId = null) {
             this.resetEditor(true);
-
             this.photoEditor.categoryId = catId;
-            console.log(catId, photoId, this.photoEditor);
+        },
+        onEditPhoto(photo) {
+            this.resetEditor(true, photo);
+        },
+        onDeletePhoto(photo) {
+            this.photoDeletion.open = true;
+            this.photoDeletion.photo = photo;
         }
+
     }
 };
 </script>
@@ -218,5 +281,10 @@ h3 {
 .emptySlot:hover {
     cursor: pointer;
     background-position-y: -200px;
+}
+.thumb {
+    background: white;
+    padding: 1px;
+    box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
 }
 </style>

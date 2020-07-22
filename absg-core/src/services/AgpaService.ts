@@ -4,9 +4,10 @@ import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/a
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { logger } from "../middleware/logger";
-import { getRepository } from "typeorm";
+import { getRepository, Equal } from "typeorm";
 import { saveImage } from "../middleware/commonHelper";
 import * as path from "path";
+import * as fs from "fs";
 
 class AgpaService {
     photoRepo = null;
@@ -78,16 +79,27 @@ class AgpaService {
      */
     async getP1Data(user: User) {
         const year = new Date().getFullYear();
-        const sql = `SELECT p.*
+        let sql = `SELECT p.*
             FROM agpa_photo p
             INNER JOIN agpa_category c ON p."categoryId" = c.id
             WHERE p.year=${year} AND p."userId"=${user.id}
             ORDER BY c."order" ASC, p.id ASC`;
-        return (await this.catRepo.query(sql)).map(e => ({
+        const photos = (await this.catRepo.query(sql)).map(e => ({
             ...e,
             thumb: `${process.env.URL_FILES}agpa/${e.year}/mini/vignette_${e.filename}`,
             url: `${process.env.URL_FILES}agpa/${e.year}/mini/${e.filename}`
         }));
+
+        // Get stats
+        sql = `SELECT "categoryId", count (*) as "totalPhotos", count(distinct("userId")) as "totalUsers"
+            FROM agpa_photo
+            WHERE year=${year} AND "categoryId" > 0
+            GROUP BY "categoryId"`;
+
+        return {
+            photos,
+            stats: await this.catRepo.query(sql)
+        };
     }
 
     /**
@@ -105,6 +117,7 @@ class AgpaService {
      * @param user l'utilisateur qui fait l'action
      */
     async savePhoto(photoData: any, image: any, user: User) {
+        console.log("SAVE PHOTO", photoData)
         const photoId = Number.parseInt(photoData.id);
         let photo = new AgpaPhoto();
         if (photoId) {
@@ -153,8 +166,26 @@ class AgpaService {
      * @param id l'id de la photo à supprimer
      * @param user l'utilisateur qui en fait la demande
      */
-    deletePhoto(id: number, user: User) {
-        return true;
+    async deletePhoto(id: number, user: User) {
+        // On récupère les données en base
+        const photo = await this.photoRepo.findOne({
+            where: { id: Equal(id) },
+            relations: ["user"]
+        });
+
+        // On supprime la photo du server
+        if (photo && photo.user.id === user.id) {
+            const thumb = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/vignette_${photo.filename}`);
+            const web = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/${photo.filename}`);
+            const raw = path.join(process.env.PATH_FILES, `agpa/${photo.year}/${photo.filename}`);
+
+            fs.unlinkSync(thumb);
+            fs.unlinkSync(web);
+            fs.unlinkSync(raw);
+            await this.photoRepo.remove(photo);
+        }
+
+        return photo;
     }
 }
 

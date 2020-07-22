@@ -4,16 +4,20 @@
         @change="change"
         @dragover="dragover"
         @drop="drop"
+        :style="{ 'background-image': `url('${bgUrl}')` }"
     >
-        <p>Déposer la photo ici, ou bien
-        <label class="browse">sélectionnez là...
-            <input
-                id="file"
-                class="sr-only"
-                type="file"
-                accept="image/*"
-            />
-        </label>
+
+        <p>
+            <span v-if="bgUrl">Si vous souhaitez changer de photo;<br/></span>
+            Déposer la nouvelle photo ici, ou bien
+            <label class="browse">sélectionnez là...
+                <input
+                    id="file"
+                    class="sr-only"
+                    type="file"
+                    accept="image/*"
+                />
+            </label>
         </p>
     </div>
 </template>
@@ -28,6 +32,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        bgUrl: {
+            type: String,
+            default: () => ""
+        }
     },
 
     methods: {
@@ -98,8 +106,13 @@ export default {
     overflow: hidden;
     width: 100%;
 
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+
     & > p {
-        color: #999;
+        color: #555;
+        background: rgba(255, 255, 255, 0.7);
         display: table-cell;
         text-align: center;
         vertical-align: middle;

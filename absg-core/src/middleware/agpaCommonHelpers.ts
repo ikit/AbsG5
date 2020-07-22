@@ -101,12 +101,12 @@ export async function getMetaData(year = null): Promise<any> {
     };
 
     // On récupère les données des catégories
-    const sql = `SELECT c.* , v.title as "vTitle", v.description as "vDescription"
+    let sql = `SELECT c.* , v.title as "vTitle", v.description as "vDescription"
         FROM agpa_category c
         LEFT JOIN agpa_category_variation v ON v.id = c.id AND v.year = ${year}
         WHERE (c.to IS NULL OR c.to >= ${year}) AND c.from <= ${year}
         ORDER BY c."order"`;
-    const result = await repo.query(sql);
+    let result = await repo.query(sql);
     for (const row of result) {
         if (row.id > 0) {
             data.categoriesOrders.push(row.id);
@@ -115,10 +115,21 @@ export async function getMetaData(year = null): Promise<any> {
             id: row.id,
             title: row.id === 8 ? row.vTitle : row.title,
             description: row.id === 8 ? row.vDescription : row.description,
-            color: row.color
+            color: row.color,
+            totalUsers: 0,
+            totalPhotos: 0
         };
     }
 
+    sql = `SELECT "categoryId", count (*) as "totalPhotos", count(distinct("userId")) as "totalUsers"
+        FROM agpa_photo
+        WHERE year=${year} AND "categoryId" > 0
+        GROUP BY "categoryId"`;
+    result = await repo.query(sql);
+    for (const row of result) {
+        data.categories[row.categoryId].totalUsers = row.totalUsers;
+        data.categories[row.categoryId].totalPhotos = row.totalPhotos;
+    }
     return data;
 }
 

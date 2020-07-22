@@ -12,6 +12,7 @@
             v-else
             ref="loader"
             :data="data"
+            :bgUrl="formerUrl"
         />
     </main>
   </div>
@@ -43,6 +44,10 @@ export default {
             type: String,
             default: () => "",
         },
+        formerUrl: {
+            type: String,
+            default: () => ""
+        }
     },
     data() {
         return {
