@@ -81,7 +81,10 @@ export default {
             return author.firstname;
         },
         getEditionPhoto (edition) {
-            return `/files/agpa/${edition.year}/mini/${edition.photos[0].filename}`;;
+            if (edition) {
+                return `/files/agpa/${edition.year}/mini/${edition.photos[0].filename}`;
+            }
+            return null
         },
     }
 

@@ -1,6 +1,6 @@
 <template>
-<v-container>
-    <Phase1></Phase1>
+<v-container style="max-width: 100%; margin: 0; padding: 0;">
+    <Phase2></Phase2>
 
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
     <v-card v-if="currentMonth > 0 && currentMonth < 9" style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;">
@@ -92,39 +92,6 @@ export default {
     mounted () {
         this.currentMonth = new Date().getMonth();
         this.currentYear = new Date().getFullYear();
-        console.log(this.agpaMeta)
-        // TODO: calculer phase actuelle en fonction des "boundaries"
-        // TODO: récupérer les phases depuis les settings
-    },
-    methods: {
-
-        getCategoryPhoto (cat) {
-            let url = '';
-            if (cat.id > 0) {
-                const photo = this.current.photos[cat.photos[0]];
-                url = `/files/agpa/${this.current.editionYear}/mini/${photo.filename}`;
-
-            } else {
-                url = '/img/avatars/016.png';
-            }
-            return url;
-        },
-
-        resetDialog (open = false) {
-            this.citationEditor.open = open;
-            this.citationEditor.citationId = null;
-            this.citationEditor.citation = null;
-            this.citationEditor.author = null;
-        },
-        saveCitation: function () {
-            this.citations.push({
-                authorAvatar: '/img/avatars/016.png',
-                authorId: 16,
-                authorName: this.citationEditor.author,
-                citation: this.citationEditor.citation,
-            });
-            this.resetDialog();
-        }
     },
 };
 </script>

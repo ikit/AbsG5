@@ -84,6 +84,15 @@ export class AgpaController {
     }
 
     /**
+     * Récupère les informations de l'utilisateur pour la phase 2
+     * @param user 
+     */
+    @Get("/p2")
+    getP2Data(@CurrentUser() user) {
+        return agpaService.getP2Data(user);
+    }
+
+    /**
      * Enregistre ou modifie une photo
      * @param image la photo si défini
      * @param body les informations sur la photo au format json

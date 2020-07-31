@@ -1,11 +1,11 @@
 import { User, LogModule, AgpaPhoto, AgpaCategory } from "../entities";
-import { getMaxArchiveEdition } from "../middleware/agpaCommonHelpers";
+import { getMaxArchiveEdition, getCurrentEdition } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { logger } from "../middleware/logger";
 import { getRepository, Equal } from "typeorm";
-import { saveImage } from "../middleware/commonHelper";
+import { saveImage, shuffleArray } from "../middleware/commonHelper";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -78,7 +78,7 @@ class AgpaService {
      * @param user l'utilisateur qui en fait la demande
      */
     async getP1Data(user: User) {
-        const year = new Date().getFullYear();
+        const year = getCurrentEdition();
         let sql = `SELECT p.*
             FROM agpa_photo p
             INNER JOIN agpa_category c ON p."categoryId" = c.id
@@ -106,8 +106,55 @@ class AgpaService {
      * Récupère les données concernant la phase 2 des AGPAS
      * @param user l'utilisateur qui en fait la demande
      */
-    getP2Data(user: User) {
-        return [];
+    async getP2Data(user: User) {
+        const year = 2019; // getCurrentEdition();
+        const sql = `SELECT p.*
+            FROM agpa_photo p
+            INNER JOIN agpa_category c ON p."categoryId" = c.id
+            WHERE p.year=${year}
+            ORDER BY c."order" ASC, p.id ASC`;
+        const photos = (await this.catRepo.query(sql)).map(e => ({
+            ...e,
+            thumb: `${process.env.URL_FILES}agpa/${e.year}/mini/vignette_${e.filename}`,
+            url: `${process.env.URL_FILES}agpa/${e.year}/mini/${e.filename}`
+        }));
+
+        const result = {
+            categories: [],
+            warningPhotos: []
+        };
+
+        for (const p of photos) {
+            // On ajoute la photo à la liste de la catégorie concernée
+            if (!result.categories[p.categoryId]) {
+                result.categories[p.categoryId] = {
+                    categoryId: p.categoryId,
+                    photos: [],
+                    userPhotoIds: [],
+                    totalPhotos: 0,
+                    totalUsers: 0
+                };
+            }
+            result.categories[p.categoryId].photos.push(p);
+            if (p.userId === user.id) {
+                result.categories[p.categoryId].userPhotoIds.push(p.id);
+            }
+
+            // Si la photo à un warning, on l'ajoute à la liste
+            if (p.error) {
+                result.warningPhotos.push(p);
+            }
+        }
+
+        // Pour chaque catégories
+        for (const c of result.categories) {
+            if (c) {
+                shuffleArray(c.photos);
+                c.totalPhotos = c.photos.length;
+                c.totalUsers = new Set(c.photos.map(p => p.userId)).size;
+            }
+        }
+        return result;
     }
 
     /**
