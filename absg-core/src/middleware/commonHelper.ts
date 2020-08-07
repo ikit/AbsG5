@@ -67,6 +67,7 @@ export function sendEmail(subject: string, text: string, to, from = "system@abso
     const transport = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
+        secure: true,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS
