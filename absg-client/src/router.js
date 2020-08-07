@@ -4,7 +4,6 @@ import Home from "./views/Home.vue";
 import E404 from "./views/E404.vue";
 import Changelog from "./views/Changelog.vue";
 import Login from "./views/User/Login.vue";
-import AskNewPassword from "./views/User/AskNewPassword.vue";
 import axios from "axios";
 import store from "./store";
 import { checkAutentication, logoutUser, logUser } from "./middleware/AuthHelper";
@@ -213,7 +212,11 @@ export const router = new VueRouter({
         },
         {
             path: "/forgotten",
-            component: AskNewPassword,
+            component: () => import("./views/User/AskNewPassword.vue"),
+        },
+        {
+            path: "/resetpwd",
+            component: () => import("./views/Admin/NewPassword.vue"),
         },
         {
             path: "/voyag",
