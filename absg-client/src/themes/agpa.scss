@@ -100,7 +100,7 @@ h1 {
     width: 270px;
     margin: auto;
     display: table;
-    :first-child {
+    .thumb-title {
         display: table-cell;
         height: 70px;
         vertical-align: middle;

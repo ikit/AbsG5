@@ -92,8 +92,24 @@
 
                         </div>
                         <v-card class="card" style="margin-bottom: 50px" >
-                            <div style="text-align: center">
+                            <div class="thumb-title" style="text-align: center">
                                 {{ photo.title }}
+                            </div>
+                            <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            icon small
+                                            v-on="on"
+                                            :disabled="isLoading"
+                                            @click="displayPhotoDiscussion(photo)"
+                                            style="opacity: 1; background: #fff">
+                                            <v-icon v-if="photo.error && photo.error.status !== 'accepted'" style="color: #d32f2f;">fas fa-exclamation-circle</v-icon>
+                                            <v-icon v-else>fas fa-question-circle</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Discussion sur la photo</span>
+                                </v-tooltip>
                             </div>
                         </v-card>
                     </div>
@@ -101,8 +117,65 @@
             </v-layout>
         </v-container>
 
+        <!-- Aide -->
         <v-dialog v-model="help.displayed" width="800px">
             à l'aide ! {{ help.page }}
+        </v-dialog>
+
+        <!-- Photo discussion -->
+        <v-dialog v-model="photoDiscussion.displayed" width="800px">
+            <v-card v-if="photoDiscussion.photo">
+                <v-card-title class="grey lighten-4">
+                    Commentaires sur la photo
+                    <v-spacer></v-spacer>
+                    <template v-if="!isAdmin">
+                        <span v-if="photoDiscussion.status === 'accepted'" style="color: #2e7d32">Statut: Acceptée</span>
+                        <span v-if="photoDiscussion.status === 'checking'" style="color: #ff8f00">Statut: En cours de vérification</span>
+                        <span v-if="photoDiscussion.status === 'refused'" style="color: #d32f2f">Statut: Refusée</span>
+                    </template>
+                    <template v-else>
+                        <span v-if="photoDiscussion.status === 'accepted'" style="color: #2e7d32">Statut: </span>
+                        <span v-if="photoDiscussion.status === 'checking'" style="color: #ff8f00">Statut: </span>
+                        <span v-if="photoDiscussion.status === 'refused'" style="color: #d32f2f">Statut: </span>
+                        <v-select
+                            :items="status"
+                            :value="photoDiscussion.status"
+                            item-text="text"
+                            item-value="value"
+                            @change="updatePhotoStatus($event)"
+                            solo
+                            style="height: 50px; margin-left: 10px; width: 150px;"
+                        ></v-select>
+                    </template>
+                </v-card-title>
+                <p style="opacity: 0.5; padding: 0 24px">
+                    Utilisez ce formulaire pour signaler un photo ne respectant pas le réglement de sa catégorie, ou bien pour
+                    poser des questions à l'organisation si vous avez des doutes.
+                </p>
+                <div style="display: flex; margin: 0 24px">
+                    <div style="flex: 1 1 auto">
+                        <div style="text-align: center; margin-top: 10px">
+                            <img :src="photoDiscussion.photo.thumb" style="margin:auto" class="thumb" />
+                            <p style="margin: 10px;"> {{ photoDiscussion.photo.title }}</p>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1 1 auto;">
+
+                        <p>Discussion:</p>
+                        <p v-if="photoDiscussion.discussion" v-html="photoDiscussion.discussion"></p>
+                        <v-text-field
+                            label="Votre commentaire"
+                            v-model="photoDiscussion.comment"
+                            @keydown.enter="addCommentaryPhoto()">
+                        </v-text-field>
+                    </div>
+                </div>
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="photoDiscussion.displayed = false">Fermer</v-btn>
+                </v-card-actions>
+            </v-card>
         </v-dialog>
     </section>
 </template>
@@ -123,6 +196,11 @@ export default {
     store,
     data: () => ({
         isLoading: true,
+        isAdmin: false,
+        status: [
+            { value: 'accepted', text: 'Acceptée' },
+            { value: 'checking', text: 'En cours de vérification' },
+            { value: 'refused', text: 'Refusée' }],
         current: null,
         year: 0,
         category: null,
@@ -132,10 +210,18 @@ export default {
         help: {
             displayed: false,
             page: 0
+        },
+        photoDiscussion: {
+            displayed: false,
+            photo: null,
+            status: "accepted",
+            discussion: "",
+            comment: "",
         }
     }),
     computed: { ...mapState([
-        'agpaMeta'
+        'agpaMeta',
+        'user'
     ])},
     watch: {
         $route(to, from) {
@@ -148,6 +234,7 @@ export default {
     mounted () {
         if (this.agpaMeta) {
             this.initView();
+            this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
         }
     },
     methods: {
@@ -189,7 +276,63 @@ export default {
         },
         gotoCat(catId) {
             this.$router.replace({path: `/agpa/edition?catId=${catId}`});
-        }
+        },
+        displayPhotoDiscussion(photo) {
+            this.photoDiscussion.displayed = true;
+            this.photoDiscussion.comment = "";
+            if (!photo.error) {
+                this.photoDiscussion.status = "accepted";
+                this.photoDiscussion.discussion = "";
+            } else {
+                this.photoDiscussion.status = photo.error.status;
+                this.photoDiscussion.discussion = photo.error.messages.map(e => e.msg).join("<br/>");
+            }
+            this.photoDiscussion.photo = photo;
+        },
+        addCommentaryPhoto() {
+            if (this.photoDiscussion.photo.error) {
+                this.photoDiscussion.photo.error.messages.push({ id: this.user.id, msg: this.photoDiscussion.comment });
+            } else {
+                this.photoDiscussion.photo.error = {
+                    status: "checking",
+                    messages: [{ id: this.user.id, msg: this.photoDiscussion.comment }]
+                }
+            }
+            this.savePhotoApiCall(this.photoDiscussion.photo.id, this.photoDiscussion.photo.error);
+        },
+        updatePhotoStatus(status) {
+            if (this.photoDiscussion.photo.error) {
+                this.photoDiscussion.photo.error.status = status;
+            } else {
+                this.photoDiscussion.photo.error = {
+                    status: status,
+                    messages: []
+                }
+            }
+            this.savePhotoApiCall(this.photoDiscussion.photo.id, this.photoDiscussion.photo.error);
+        },
+        savePhotoApiCall(photoId, error) {
+            const formData = new FormData();
+            formData.append("error", JSON.stringify(error));
+            formData.append("id", photoId);
+
+            // On envoie tout au serveur pour qu'il enregistre la nouvelle image du moment
+            axios.post(`/api/agpa/photo`, formData, {
+                headers: { "Content-Type" : "multipart/form-data" }
+            })
+            .then(response => {
+                const updatedPhoto = parseAxiosResponse(response);
+                const idx = this.photosGalery.findIndex(p => p.id === updatedPhoto.id);
+                if (idx) {
+                    this.photosGalery[idx].error = updatedPhoto.error;
+                }
+                this.photoDiscussion.displayed = false;
+            })
+            .catch(err => {
+                store.commit("onError", err);
+            });
+        },
+
     }
 };
 </script>

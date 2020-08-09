@@ -103,7 +103,7 @@
                                 gold: photo.rank == 1,
                                 sylver: photo.rank === 2,
                                 bronze: photo.rank === 3 }" style="margin-bottom: 50px" >
-                                <div>
+                                <div class="thumb-title">
                                     {{ photo.title }}
                                 </div>
                                 <div style="position: absolute; bottom: 5px; left: 5px; right: 5px; opacity:.5"> {{ photo.username }} </div>

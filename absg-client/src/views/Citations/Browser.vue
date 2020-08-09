@@ -11,9 +11,9 @@
                     hide-details
                 ></v-text-field>
                 <v-spacer></v-spacer>
-                <v-btn @click="resetDialog(true)">
-                    <v-icon small>fa-plus</v-icon>
-                    Nouvelle citation
+                <v-btn @click.stop="resetDialog(true)">
+                    <v-icon left>fas fa-plus</v-icon>
+                    <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
                 </v-btn>
             </v-card-title>
 

@@ -1,8 +1,30 @@
 <template>
     <div class="container">
 
-        <h1>Absolument G - V7 alpha</h1>
+        <h1>Absolument G - V8 alpha</h1>
         <a style="display: block; text-align: center" href="https://trello.com/b/LDvwctf7/absg-5" target="_blank"> Voir la feuille de route </a>
+
+
+
+        <!-- <h2>Alpha 8 - août 2020</h2>
+        <v-card>
+            <p>Evolutions</p>
+            <ul>
+                <li>AGPA: Phase 2 - Vérification des photos</li>
+            </ul>
+            <p>Bug corrigés</p>
+            <ul>
+                <li>Admin: email + récupération/changement de mot de passe</li>
+            </ul>
+        </v-card> -->
+
+        <h2>Alpha 8 - juillet 2020</h2>
+        <v-card>
+            <p>Evolutions</p>
+            <ul>
+                <li>AGPA: Phase 1 - Enregistrement des photos</li>
+            </ul>
+        </v-card>
 
         <h2>Alpha 7 - juin 2020</h2>
         <v-card>
@@ -10,9 +32,14 @@
             <ul>
                 <li>Calendrier: Calendrier des événements de la famille sur la page d'accueil</li>
                 <li>Calendrier: Ajout, édition, suppression d'événement</li>
+                <li>Calendrier: Sélection du mois/année directement via formulaire</li>
+                <li>Menu utilisateur: mise à jours de la position GPS</li>
             </ul>
             <p>Bug corrigés</p>
             <ul>
+                <li>DevOps Nginx: Correction du routage dynamique (accès direct lors d'un F5 par exemple)</li>
+                <li>PassaG: utilisateurs affichés plusieurs fois par créneau</li>
+                <li>Calendrier: mise à jour du titre en fonction du mois sélectionné</li>
             </ul>
         </v-card>
 

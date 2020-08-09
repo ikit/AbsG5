@@ -164,21 +164,21 @@ class AgpaService {
      * @param user l'utilisateur qui fait l'action
      */
     async savePhoto(photoData: any, image: any, user: User) {
-        console.log("SAVE PHOTO", photoData)
         const photoId = Number.parseInt(photoData.id);
         let photo = new AgpaPhoto();
         if (photoId) {
-            photo = await this.photoRepo.findOne(photoId);
+            photo = await this.photoRepo.findOne({ where: { id: Equal(photoId) }, relations: ["user", "category"] });
         } else {
             // Ces inbfos ne peuvent pas être modifié une fois que la photo a été "créée"
             photo.year = new Date().getFullYear();
             photo.filename = `${new Date().getTime()}.jpg`;
         }
         photoData.id = photoId ? photoId : null; // pour éviter les problèmes lors du save en DB
-        photo.user = user;
-        photo.title = photoData.title;
-        photo.categoryId = photoData.catId;
-        photo.category = await this.catRepo.findOne(photoData.catId);
+        photo.user = !photo.user ? user : photo.user;
+        photo.title = photoData.title ? photoData.title : photo.title;
+        photo.categoryId = photoData.catId ? photoData.catId : photo.category.id;
+        photo.error = photoData.error ? JSON.parse(photoData.error) : photo.error;
+        photo.category = await this.catRepo.findOne(photo.categoryId);
 
         photo = await this.photoRepo.save(photo);
 
@@ -204,7 +204,8 @@ class AgpaService {
             categoryId: photo.categoryId,
             authorId: photo.user.id,
             thumb: `${process.env.URL_FILES}agpa/${photo.year}/mini/vignette_${photo.filename}`,
-            url: `${process.env.URL_FILES}agpa/${photo.year}/mini/${photo.filename}`
+            url: `${process.env.URL_FILES}agpa/${photo.year}/mini/${photo.filename}`,
+            error: photo.error
         };
     }
 
