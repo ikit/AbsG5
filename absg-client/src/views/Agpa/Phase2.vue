@@ -104,7 +104,9 @@
                                             :disabled="isLoading"
                                             @click="displayPhotoDiscussion(photo)"
                                             style="opacity: 1; background: #fff">
-                                            <v-icon v-if="photo.error && photo.error.status !== 'accepted'" style="color: #d32f2f;">fas fa-exclamation-circle</v-icon>
+                                            <v-icon
+                                                v-if="photo.error && photo.error.status !== 'accepted'"
+                                                v-bind:style="{ color: photo.error.status === 'refused' ? '#d32f2f' : '#ff8f00' }">fas fa-exclamation-circle</v-icon>
                                             <v-icon v-else>fas fa-question-circle</v-icon>
                                         </v-btn>
                                     </template>
@@ -119,7 +121,16 @@
 
         <!-- Aide -->
         <v-dialog v-model="help.displayed" width="800px">
-            à l'aide ! {{ help.page }}
+            <v-card>
+                <v-card-title class="grey lighten-4">
+                    Aide sur le déroulement du concours
+                </v-card-title>
+                <Help :selectedTab="help.page"></Help>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="help.displayed = false">Fermer</v-btn>
+                </v-card-actions>
+            </v-card>
         </v-dialog>
 
         <!-- Photo discussion -->
@@ -172,8 +183,8 @@
                     </div>
                 </div>
                 <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="photoDiscussion.displayed = false">Fermer</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="photoDiscussion.displayed = false">Fermer</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -191,8 +202,12 @@ import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import PhotoWidget from './components/PhotoWidget';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
+import Help from './components/Help';
 
 export default {
+    components: {
+        Help
+    },
     store,
     data: () => ({
         isLoading: true,
@@ -203,6 +218,7 @@ export default {
             { value: 'refused', text: 'Refusée' }],
         current: null,
         year: 0,
+        categories: [],
         category: null,
         photosGalery: [],
         start: format(new Date(2020, 11, 19), "dd MMM 'à' HH'h'mm", {locale: fr}),
@@ -246,6 +262,9 @@ export default {
             this.catId = Number.parseInt(this.$route.query.catId);
             if (!this.catId) {
                 this.catId = this.agpaMeta.categoriesOrders[0];
+            }
+            if (this.categories.length === 0) {
+                this.categories = [-1, ...this.agpaMeta.categoriesOrders];
             }
 
             axios.get(`/api/agpa/p2`).then(response => {

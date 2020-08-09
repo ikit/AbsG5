@@ -36,7 +36,6 @@
                         @edit-photo="onEditPhoto(photo)"
                         @delete-photo="onDeletePhoto(photo)">
                     </PhotoWidget>
-
                 </template>
             </div>
         </v-card>
