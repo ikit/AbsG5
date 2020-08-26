@@ -1,5 +1,5 @@
 <template>
-<v-app id="inspire" :dark="darkMode">
+<v-app id="inspire">
     <v-navigation-drawer v-if="user && user.id > 0 && !$vuetify.breakpoint.lgAndUp" v-model="drawerOpen" app style="height: 100%; z-index: 1000">
         <v-list nav dense>
             <v-list-item to="/" style="margin-top: 60px">
@@ -30,7 +30,6 @@
     <v-app-bar
         v-if="user && user.id > 0"
         color="primary"
-        dark
         app
         fixed
         style="z-index: 2000">
@@ -81,6 +80,9 @@
                 </v-list-item>
                 <v-list-item @click="setGPSPosition()">
                     <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-crosshairs</v-icon>Ma position</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="toggleDarkMode()">
+                    <v-list-item-title :key="5"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-adjust</v-icon>Mode {{ $vuetify.theme.dark ? "sombre" : "clair" }}</v-list-item-title>
                 </v-list-item>
                 <v-list-item :to="{ path: '/admin/resetpwd'}">
                     <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
@@ -261,7 +263,6 @@ export default {
         drawerOpen: false, // flag pour savoir si le menu-tiroir (écran mobile)
         notifDialog: false,
         errDialog: false,
-        darkMode: false,
         drawer: null,
         ws: null,
         menuItems: MODULES,
@@ -280,6 +281,17 @@ export default {
         source: String
     },
     mounted() {
+        // On charge les informations sur le thème à utiliser depuis le localstorage du browser
+        const theme = localStorage.getItem("dark_theme");
+        if (theme) {
+            if (theme == "true") {
+                this.$vuetify.theme.dark = true;
+            } else {
+                this.$vuetify.theme.dark = false;
+            }
+        }
+
+        // On initialise le store
         store.dispatch("initStore");
     },
     methods: {
@@ -359,6 +371,11 @@ export default {
             if (readAll) {
                 store.commit("readAllNotification");
             }
+        },
+
+        toggleDarkMode() {
+            this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+            localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
         }
     },
     computed: {
@@ -398,9 +415,9 @@ export default {
         //
         getOnline() {
             axios.get(`/api/online`).then(response => {
-            const data = parseAxiosResponse(response);
-            console.log(data);
-        });
+                const data = parseAxiosResponse(response);
+                console.log(data);
+            });
         }
     }
 };

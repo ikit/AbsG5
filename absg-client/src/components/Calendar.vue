@@ -98,7 +98,7 @@
                 offset-x
                 >
                 <v-card color="grey lighten-4" min-width="350px" flat>
-                    <v-toolbar :color="selectedEvent.color" dark>
+                    <v-toolbar :color="selectedEvent.color">
                     <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-tooltip bottom v-if="selectedEvent.editable">
