@@ -15,7 +15,7 @@
         "@types/node": "^8.10.61",
         "@types/node-cron": "^2.0.3",
         "apidoc": "^0.17.7",
-        "bestzip": "^2.1.4",
+        "bestzip": "^2.1.7",
         "husky": "^3.0.0",
         "prettier": "^1.18.2",
         "ts-node": "3.3.0",
