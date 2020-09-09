@@ -70,6 +70,11 @@ export default {
     computed: {
         ...mapState([ 'settings' ])
     },
+    watch: {
+        'settings': function () {
+            setTimeout(() => this.resetTimer());
+        }
+    },
     mounted() {
         this.isLoading = true;
 

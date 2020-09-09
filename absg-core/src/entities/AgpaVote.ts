@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, JoinColumn, Index, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { AgpaCategory } from "./AgpaCategory";
 import { AgpaPhoto } from "./AgpaPhoto";
 import { User } from "./User";
@@ -12,15 +12,15 @@ export class AgpaVote {
     @Column({ comment: "Année de la photo", width: 4 })
     year: number;
 
-    @OneToOne(type => AgpaCategory)
+    @ManyToOne(type => AgpaCategory)
     @JoinColumn()
     category: AgpaCategory;
 
-    @OneToOne(type => User)
+    @ManyToOne(type => User)
     @JoinColumn()
     user: User;
 
-    @OneToOne(type => AgpaPhoto)
+    @ManyToOne(type => AgpaPhoto)
     @JoinColumn()
     photo: AgpaPhoto;
 

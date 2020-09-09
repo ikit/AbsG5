@@ -118,9 +118,6 @@ export default {
     props: [
         "selectedTab",
     ],
-    data: () => ({
-        currentPhase
-    }),
     computed: {
         ...mapState([
             'agpaMeta',

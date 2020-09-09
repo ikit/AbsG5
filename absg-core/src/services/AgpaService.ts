@@ -12,7 +12,6 @@ import * as fs from "fs";
 class AgpaService {
     photoRepo = null;
     catRepo = null;
-
     /**
      * Initialisation du service
      */
@@ -158,6 +157,69 @@ class AgpaService {
     }
 
     /**
+     * Récupère les données concernant la phase 3 des AGPAS
+     * @param user l'utilisateur qui en fait la demande
+     */
+    async getP3Data(user: User) {
+        const year = 2019; // getCurrentEdition();
+
+        // On récupère les votes
+        let sql = `SELECT v.*
+            FROM agpa_vote v
+            WHERE v.year=${year} AND v."userId"=${user.id}`;
+        const votes = await this.catRepo.query(sql);
+
+        // On récupère les photos
+        sql = `SELECT p.*
+            FROM agpa_photo p
+            INNER JOIN agpa_category c ON p."categoryId" = c.id
+            WHERE p.year=${year}
+            ORDER BY c."order" ASC, p.id ASC`;
+        const photos = (await this.catRepo.query(sql)).map(e => ({
+            ...e,
+            thumb: `${process.env.URL_FILES}agpa/${e.year}/mini/vignette_${e.filename}`,
+            url: `${process.env.URL_FILES}agpa/${e.year}/mini/${e.filename}`
+        }));
+
+        const result = {
+            categories: [],
+            votes: {
+                votes: votes,
+                totalTitleVotes: votes.filter(v => v.categoryId === -3).length
+            }
+        };
+
+        for (const p of photos) {
+            // On ajoute la photo à la liste de la catégorie concernée
+            if (!result.categories[p.categoryId]) {
+                result.categories[p.categoryId] = {
+                    categoryId: p.categoryId,
+                    photos: [],
+                    userPhotoIds: [],
+                    totalPhotos: 0,
+                    totalUsers: 0,
+                    maxVotes: 0
+                };
+            }
+            result.categories[p.categoryId].photos.push(p);
+            if (p.userId === user.id) {
+                result.categories[p.categoryId].userPhotoIds.push(p.id);
+            }
+        }
+
+        // Pour chaque catégories
+        for (const c of result.categories) {
+            if (c) {
+                c.photos.sort((a, b) => a.number - b.number);
+                c.totalPhotos = c.photos.length;
+                c.totalUsers = new Set(c.photos.map(p => p.userId)).size;
+                c.maxVotes = Math.round(c.photos.length / 2);
+            }
+        }
+        return result;
+    }
+
+    /**
      * 
      * @param photoData l'entrée du répertoire
      * @param image l'image pour illustrer la personne dans le répertoire
@@ -234,6 +296,77 @@ class AgpaService {
         }
 
         return photo;
+    }
+
+    /**
+     * Met à jour le vote d'un utilisateur pour une photo
+     * @param photoId l'identifiant de la photo à modifier (doit être de l'édition en cours)
+     * @param vote le vote de l'utilisateur (1, 2 ou -3)
+     * @param user l'utilisateur qui fait la demande
+     */
+    async vote(photoId, vote, user) {
+        const year = 2019; // getCurrentEdition();
+
+        // On récupère la photo
+        const photo = await this.photoRepo.findOne({ where: { id: Equal(photoId) }, relations: ["user", "category"] });
+        if (!photo) {
+            throw Error(`La photo n°${photoId} n'existe pas`);
+        }
+        if (photo.year != year) {
+            throw Error(`Vous ne pouvez voter que pour les photos de l'édition ${year}`);
+        }
+        if (photo.userId === user.id) {
+            throw Error(`Vous ne pouvez pas voter pour vos propres photos`);
+        }
+
+        // On récupère l'ensemble des votes de l'utilisateur
+        let sql = `SELECT v.*
+            FROM agpa_vote v
+            WHERE v.year=${year} AND v."userId"=${user.id}`;
+        const votes = await this.catRepo.query(sql);
+
+        // On met à jour le vote pour le meilleur titre
+        if (vote === -3) {
+            const v = votes.find(v => v.photoId === photoId && v.categoryId === -3 && v.userId === user.id);
+            if (v) {
+                // Si vote meilleur titre existe déjà, alors on le supprime
+                sql = `DELETE FROM agpa_vote WHERE id=${v.id};`;
+            } else {
+                // Si pas de vote déjà en base, on le crée
+                sql = `INSERT INTO agpa_vote (year, score, "categoryId", "userId", "photoId") VALUES (${year}, 0, -3, ${user.id}, ${photoId});`;
+            }
+        }
+        // On met à jour le vote pour la photo
+        else {
+            const v = votes.find(v => v.photoId === photoId && v.categoryId !== -3 && v.userId === user.id);
+            console.log("UPDATE", v, vote);
+            if (v) {
+                // Si vote existe déjà, alors
+                if (v.score === vote) {
+                    // On le supprime le vote si même valeur => annulation d'un vote existant
+                    sql = `DELETE FROM agpa_vote WHERE id=${v.id};`;
+                } else {
+                    // sinon on met à jours sa valeur
+                    sql = `UPDATE agpa_vote SET score=${v.score === 1 ? 2 : 1} WHERE id=${v.id};`;
+                }
+            } else {
+                // Si pas de vote déjà en base, on le crée
+                sql = `INSERT INTO agpa_vote (year, score, "categoryId", "userId", "photoId") VALUES (${year}, ${vote}, ${photo.category.id}, ${user.id}, ${photoId});`;
+            }
+        }
+        // On sauvegarde
+        console.log(sql);
+        await this.catRepo.query(sql);
+
+        // On récupère l'ensemble des votes de l'utilisateur
+        sql = `SELECT v.*
+            FROM agpa_vote v
+            WHERE v.year=${year} AND v."userId"=${user.id}`;
+        const result = await this.catRepo.query(sql);
+        return {
+            votes: result,
+            totalTitleVotes: result.filter(v => v.categoryId === -3).length
+        };
     }
 }
 

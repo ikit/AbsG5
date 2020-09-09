@@ -76,7 +76,7 @@ export class AgpaController {
 
     /**
      * Récupère les informations de l'utilisateur pour la phase 1
-     * @param user 
+     * @param user l'utilisateur qui effectue la demande
      */
     @Get("/p1")
     getP1Data(@CurrentUser() user) {
@@ -85,11 +85,20 @@ export class AgpaController {
 
     /**
      * Récupère les informations de l'utilisateur pour la phase 2
-     * @param user 
+     * @param user l'utilisateur qui effectue la demande
      */
     @Get("/p2")
     getP2Data(@CurrentUser() user) {
         return agpaService.getP2Data(user);
+    }
+
+    /**
+     * Récupère les informations de l'utilisateur pour la phase 3
+     * @param user l'utilisateur qui effectue la demande
+     */
+    @Get("/p3")
+    getP3Data(@CurrentUser() user) {
+        return agpaService.getP3Data(user);
     }
 
     /**
@@ -106,10 +115,21 @@ export class AgpaController {
     /**
      * Supprime une photo si autorisé
      * @param photoId 
-     * @param user 
+     * @param user l'utilisateur qui effectue la demande
      */
     @Delete("/photo/:photoId([0-9]+)")
     remove(@Param("photoId") photoId: number, @CurrentUser() user) {
         return agpaService.deletePhoto(photoId, user);
+    }
+
+    /**
+     * Met à jour le vote d'un utilisateur pour une photo
+     * @param photoId 
+     * @param vote 
+     * @param user l'utilisateur qui effectue la demande
+     */
+    @Get("/vote/:photoId([0-9]+)/:vote")
+    vote(@Param("photoId") photoId: number, @Param("vote") vote: number, @CurrentUser() user) {
+        return agpaService.vote(photoId, vote, user);
     }
 }
