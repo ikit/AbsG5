@@ -102,6 +102,7 @@
                 hide-default-footer
                 loading-text="Mise à jours des données"
                 style="margin: 25px"
+                @click:row="gotoCat($event.categoryId)"
             >
                 <template v-slot:item.votes="{ item }">
                     <span v-if="item.categoryId > 0" v-bind:style="{ color: item.votes >= item.maxVotes / 2.0  && item.votes <= item.maxVotes ? 'green' : 'red'}">
@@ -129,9 +130,6 @@
                                 <img class="thumb" :src="photo.thumb" @click="photosGalleryDisplay(index)"/>
                             </div>
                         </div>
-                        <div style="">
-
-                        </div>
                         <v-card class="card" style="margin-bottom: 50px" >
                             <div class="thumb-title" style="text-align: center">
                                 {{ photo.title }}
@@ -145,8 +143,7 @@
                                             :disabled="isLoading"
                                             @click="vote(photo, 1)"
                                             style="opacity: 1; background: #fff">
-                                            <v-icon v-if="photo.userVote > 0" style="color: #ecce00">fas fa-star</v-icon>
-                                            <v-icon v-else>fas fa-star</v-icon>
+                                            <v-icon v-bind:style="{ color: photo.userVote > 0 ? '#ecce00' : '' }">fas fa-star</v-icon>
                                         </v-btn>
                                     </template>
                                     <span>{{ photo.userVote != 1 ? "Mettre 1 étoile sur cette photo" : "Annuler le vote 1 étoile pour cette photo" }}</span>
@@ -160,8 +157,7 @@
                                             :disabled="isLoading"
                                             @click="vote(photo, 2)"
                                             style="opacity: 1; background: #fff">
-                                            <v-icon v-if="photo.userVote > 1" style="color: #ecce00">fas fa-star</v-icon>
-                                            <v-icon v-else>fas fa-star</v-icon>
+                                            <v-icon v-bind:style="{ color: photo.userVote > 1 ? '#ecce00' : '' }">fas fa-star</v-icon>
                                         </v-btn>
                                     </template>
                                     <span>{{ photo.userVote != 2 ? "Mettre 2 étoiles sur cette photo" : "Annuler le vote 2 étoiles pour cette photo" }}</span>
@@ -175,8 +171,7 @@
                                             :disabled="isLoading"
                                             @click="vote(photo, -3)"
                                             style="opacity: 1; background: #fff">
-                                            <v-icon v-if="photo.titleVote > 0" style="color: #ecce00">fas fa-feather-alt</v-icon>
-                                            <v-icon v-else>fas fa-feather-alt</v-icon>
+                                            <v-icon v-bind:style="{ color: photo.titleVote > 0 ? '#ecce00' : '' }">fas fa-feather-alt</v-icon>
                                         </v-btn>
                                     </template>
                                     <span>{{ photo.titleVote == 0 ? "Sélectionner la photo pour le meilleur titre" : "Retirer la photo de votre sélection pour le meilleur titre" }}</span>
@@ -331,20 +326,23 @@ export default {
             this.totalTitleVotes = this.votes.totalTitleVotes;
 
             // Maj votes des photos de la gallerie
-            for (const p of this.photosGalery) {
-                p.userVote = 0;
-                p.titleVote = 0;
+            for (let idx = 0; idx < this.photosGalery.length; idx++) {
+                const p = this.photosGalery[idx];
+                let uv = 0;
+                let tv = 0;
 
                 const t = this.votes.votes.filter(e => p.id === e.photoId);
-
                 for (const v of t) {
                     if (v.categoryId === -3) {
-                        p.titleVote = 1;
+                        tv = 1;
                     } else {
-                        p.userVote = v.score;
-                        this.totalVotes += v.score;
+                        uv = v.score;
                     }
                 }
+
+                p.titleVote = tv;
+                p.userVote = uv;
+                this.totalVotes += uv;
             }
 
             // On reset les stats
@@ -389,6 +387,7 @@ export default {
                 status: ""
             });
 
+
             this.waitingScreen = false;
         },
 
@@ -413,6 +412,7 @@ export default {
                 this.waitingScreen = true;
                 axios.get(`/api/agpa/vote/${photo.id}/${vote}`).then(response => {
                     this.refreshVotes(parseAxiosResponse(response));
+                    this.refreshCategory();
                 });
             }
 
