@@ -88,8 +88,8 @@
                             <tr><td>Phase n°1</td><td>1er oct. à 00h00</td><td>Enregistrement des photos</td></tr>
                             <tr><td>Phase n°2</td><td>19 déc. à 00h00</td><td>Validation des photos</td></tr>
                             <tr><td>Phase n°3</td><td>20 déc. à 00h00</td><td>Votes</td></tr>
-                            <tr><td>Phase n°4</td><td>24 déc. à 15h00</td><td>Dépouillement</td></tr>
-                            <tr><td>Phase n°5</td><td>24 déc. à 20h30</td><td>Cérémonie des AGPA</td></tr>
+                            <tr><td>Phase n°4</td><td>24 déc. à 00h00</td><td>Dépouillement</td></tr>
+                            <tr><td>Phase n°5</td><td>25 déc. à 20h30</td><td>Cérémonie des AGPA</td></tr>
                         </table>
                     </v-card>
                 </v-expansion-panel-content>
@@ -163,8 +163,11 @@
                             <li>Contacter l’organisation pour signaler une erreur ou une photo ne correspondant pas aux critères définis.</li>
                         </ul>
                     </p>
-                    <p>Si une photo est jugée non conforme aux critères définis, le candidat concerné sera prévenu et aura la possibilité de remplacer son œuvre.
-                        S’il ne le fait pas, la photo en cause sera exclues de la phase de vote et ne pourra pas obtenir de point pour le classement final. </p>
+                    <p>Si une photo est jugée non conforme aux critères définis, elle sera refusée et exclue du concours.</p>
+                    <p>L'utilisateur pourra demander à remplacer l'œuvre qui pose problème.
+                        Cependant, cette opération étant manuelle et très technique, seul Olivier peut s'en occuper. C'est pourquoi aucune
+                        garanti n'est donnée sur ce point. Celà dépend uniquement de la disponibilité d'Olivier lors de la phase 2.
+                    </p>
                     <p>Il n’est pas possible de voter pendant la phase de vérification.</p>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -180,22 +183,19 @@
                     <p>La phase de vote dure en général 3 jours. </p>
                     <p>Pendant cette période, les membres du forum peuvent :
                         <ul>
-                            <li>Visualiser les photos de tous les candidats. A noter que les photos refusées lors de la phase 2 seront visibles, mais il ne sera pas possible
-                                de voter pour elles;
-                            </li>
+                            <li>Visualiser les photos de tous les candidats. A noter que les photos refusées lors de la phase 2 ne seront pas visibles;</li>
                             <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie :
                             <ul>
                                 <li>1 ou 2 étoiles aux meilleures photos;</li>
                                 <li>1 plume pour les meilleurs titres de photo.</li>
                             </ul></li>
-                            <li>Corriger leurs votes</li>
                             <li>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables</li>
                             <li>Corriger leurs votes</li>
                         </ul>
                     </p>
                     <p>Les candidats qui votent, doivent attribuer un minimum de points dans chaque catégorie.
                         S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.
-                        Un indicateur dans le formulaire de vote permet de savoir le nombre de points que l'on peut attribuer pour chaque catégorie
+                        Un indicateur (en haut à droite) dans le formulaire de vote permet de savoir le nombre de points que l'on peut attribuer pour chaque catégorie
                         Ainsi que le nombre de point que l'on a déjà attribué. Cet indicateur passe du rouge au vert quand un nombre suffisant de points
                         a été attribués.
                     </p>
@@ -369,7 +369,7 @@
                         La meilleure d’entre elle sera récompensée d’un AGPA d’or ou de diamant, puis un AGPA d'argent et bronze pour la deuxième et troisième.
                     </p>
 
-                    <p>En plus des AGPA d’or, d'argent et de bronze remient pour chacuneq des huit catégories, trois autres AGPA sont décernées :
+                    <p>En plus des AGPA d’or, d'argent et de bronze remient pour chacune des huit catégories, trois autres AGPA sont décernées :
                     <ul>
                         <li>Les AGPA du meilleur titre <b>toutes catégories</b> (récompense les photos dont le titre à le plus eu de succès) ;</li>
                         <li>Les AGPA de la meilleure photo <b>toutes catégories</b> (récompense les photos ayant obtenues les plus grands scores parmi l'ensemble des photos postées) ;</li>

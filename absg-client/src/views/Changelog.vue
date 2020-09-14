@@ -1,12 +1,23 @@
 <template>
     <div class="container">
 
-        <h1>Absolument G - V8 alpha</h1>
+        <h1>Absolument G - V9 alpha</h1>
         <a style="display: block; text-align: center" href="https://trello.com/b/LDvwctf7/absg-5" target="_blank"> Voir la feuille de route </a>
 
 
+        <!-- <h2>Alpha 10 - septembre 2020</h2>
+        <v-card>
+            <p>Evolutions</p>
+            <ul>
+                <li>AGPA: Phase 3 - Vote des photos</li>
+            </ul>
+            <p>Bug corrigés</p>
+            <ul>
+                <li></li>
+            </ul>
+        </v-card> -->
 
-        <!-- <h2>Alpha 8 - août 2020</h2>
+        <h2>Alpha 9 - août 2020</h2>
         <v-card>
             <p>Evolutions</p>
             <ul>
@@ -16,7 +27,7 @@
             <ul>
                 <li>Admin: email + récupération/changement de mot de passe</li>
             </ul>
-        </v-card> -->
+        </v-card>
 
         <h2>Alpha 8 - juillet 2020</h2>
         <v-card>
