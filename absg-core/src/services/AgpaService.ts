@@ -1,6 +1,7 @@
 import { User, LogModule, AgpaPhoto, AgpaCategory } from "../entities";
-import { getMaxArchiveEdition, getCurrentEdition } from "../middleware/agpaCommonHelpers";
+import { getMaxArchiveEdition, getCurrentEdition, getMetaData } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
+import { p4CheckVotes, p4ComputeNotes } from "../middleware/agpaAlgorithmsHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { logger } from "../middleware/logger";
@@ -220,7 +221,50 @@ class AgpaService {
     }
 
     /**
-     * 
+     * Dépuillement
+     * Effectue la série d'action nécessaire (étape par étape) pour calculer les points
+     * de chaques de photos et leur attribuer les récompenses en départageant les exaequos
+     * @param step l'étape à laquelle on arrête le processus afin de permettre de le suivre étape par étape
+     * @param user l'utilisateur qui en fait la demande
+     */
+    async getP4Data(year: number, step: number, user: User) {
+        let context = null;
+        if (user.roles.indexOf("admin") > -1) {
+            // On récupère le contexte
+            context = await getMetaData(year);
+
+            // 1- Récupérer les votes et les vérifier
+            context = await p4CheckVotes(context);
+
+            // 2- Comptabiliser les votes correctes et calculer les notes pour chaque photo
+            context = await p4ComputeNotes(context);
+
+            // // Est-ce qu'il faut arrêter là ou continuer ?
+            // if (step == 2) return;
+
+            // // 3- Attributions AGPA et création palmares
+            // // evaluation des notes et classement des photos / photographes
+            // // attribution des AGPA (or,argent,bronze)
+            // const awards = evalNote(categories, step == 3);
+
+            // // Est-ce qu'il faut arrêter là ou continuer ?
+            // if (step === 3) return;
+
+            // // 4- Attribution des AGPA de diamant
+            // $finalResult = p4DiamondAwards($ctx, awards, (($checkStep == 4)? true : false));
+            // //printCategoriesArray($finalResult);
+
+            // // Est-ce qu'il faut arrêter là ou continuer ?
+            // if ($checkStep == 4) return;
+
+            // // 5- Clore les stats pour l'édition actuelle (maj bdd)
+            // p4CloseEdition($ctx, $finalResult);
+        }
+        return context;
+    }
+
+    /**
+     * Met à jour les inforlation d'une photo
      * @param photoData l'entrée du répertoire
      * @param image l'image pour illustrer la personne dans le répertoire
      * @param user l'utilisateur qui fait l'action

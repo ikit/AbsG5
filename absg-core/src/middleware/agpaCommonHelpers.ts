@@ -86,10 +86,10 @@ export async function initAGPAContext(date: Date) {
  *
  * @return
  */
-export async function getMetaData(year = null): Promise<any> {
+export async function getMetaData(year = null, force = false): Promise<any> {
     const repo = getRepository(AgpaPhoto);
     const currentYear = getCurrentEdition();
-    year = checkValidYear(year);
+    year = force ? year : checkValidYear(year);
 
     const data = {
         year, // L'année de l'édition en cours

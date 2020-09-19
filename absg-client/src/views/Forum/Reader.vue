@@ -108,9 +108,13 @@ export default {
             type: Boolean,
             default: () => false,
         },
+        forumId: {
+            type: Number,
+            default: () => null,
+        },
         topicId: {
             type: Number,
-            default: () => -1,
+            default: () => null,
         },
         autoScrollEnd: {
             type: Boolean,
@@ -149,6 +153,7 @@ export default {
         },
 
         initTopic(data) {
+            console.log("INUT READER", data)
             if (data.topic) {
                 this.topicId = data.topic.id;
             }
@@ -170,7 +175,7 @@ export default {
         // On enregistre le message
         post() {
             const formData = new FormData();
-            formData.append("forumId", this.topicId ? null : 2);
+            formData.append("forumId", this.forumId ? null : 2);
             formData.append("topicId", this.topicId ? this.topicId : null);
             formData.append("text", this.editorText);
             axios.post(`/api/forum/post`, formData, {
@@ -188,7 +193,7 @@ export default {
 
         saveMsg() {
             const formData = new FormData();
-            formData.append("forumId", this.topicId ? null : 2);
+            formData.append("forumId", this.forumId ? this.forumId : 2);
             formData.append("topicId", this.topicId ? this.topicId : null);
             formData.append("postId", this.msgEdition.post.id);
             formData.append("text", this.msgEdition.post.text);

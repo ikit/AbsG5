@@ -1,6 +1,6 @@
 <template>
 <v-container style="max-width: 100%; margin: 0; padding: 0;">
-    <Phase3></Phase3>
+    <Phase4></Phase4>
 
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
     <v-card v-if="currentMonth > 0 && currentMonth < 9" style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;">

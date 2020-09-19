@@ -208,7 +208,6 @@ import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import PhotoWidget from './components/PhotoWidget';
-import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
 import Help from './components/Help';
 

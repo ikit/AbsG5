@@ -1,315 +1,213 @@
-// /**
-//  * checkVotes
-//  * vérifie l'intégrité des votes : cohérance aux niveaux des différents identifiants, des années,
-//  * des catégories, des photos, des auteurs, etc
-//  * @param $ctx [array], le contexte des agpa
-//  * @param $display, boolean, true : affichage dans le template du resultat
-//  *
-//  * @return array[mixed], les identifiants des votes acceptés et à prendre en compte pour le calcul des notes
-//  */
-// if ( ! function_exists('checkVotes'))
-// {
-//     function checkVotes(&$ctx, $display)
-//     {
-//         $CI = get_instance();
-//         $votesAccepted = array();
 
-//         // ----------------------------------------------------------------------------
-//         // Récupérer votes, avec les données des photos associées
-//         $sql = "SELECT v.*, p.category_id as 'p_category_id', p.user_id as 'p_user_id', p.year as 'p_year', p.title, a.birthday FROM agpa_votes v, agpa_photos p, absg_users u, agenda_people a WHERE v.`year`={$ctx['current_phase_year']} AND p.photo_id = v.photo_id AND p.error is NULL and v.user_id = u.user_id AND u.people_id = a.people_id ORDER BY p.category_id ASC, v.user_id ASC, v.score ASC";
+import { AgpaPhoto, AgpaVote } from "../entities";
+import { getRepository } from "typeorm";
 
-//         $datas = array();
-//         $result = $CI->db->query($sql)->result();
-//         foreach ($result as $row)
-//         {
-//             $datas[$row->p_category_id][$row->user_id][] = $row;
-//         }
+/**
+ * vérifie l'intégrité des votes : cohérance aux niveaux des différents identifiants, des années,
+ * des catégories, des photos, des auteurs, etc
+ * @param $ctx [array], le contexte des agpa
+ * @param $display, boolean, true : affichage dans le template du resultat
+ *
+ * @return array[mixed], les identifiants des votes acceptés et à prendre en compte pour le calcul des notes
+ */
+export async function p4CheckVotes(context) {
+    // On récupère le contexte sql
+    const repo = getRepository(AgpaVote);
 
-//         // Analyse des votes...
-//         foreach($datas as $categoryId => $category)
-//         {
-//             $maxVotePhoto = round($ctx['categories'][$categoryId]->nbr_photo / 2,0) ;
-//             $minVotePhoto = round($maxVotePhoto / 2,0) ;
+    // Récupérer votes, avec les données des photos associées
+    const sql = `SELECT v.*, p."categoryId" as "pCategoryId", p."userId" as "pUserId", p.year as "pYear", p.title, u.username, a."dateOfBirth" 
+        FROM agpa_vote v, agpa_photo p, "user" u, person a 
+        WHERE v.year=${context.year}
+        AND p.id = v."photoId" 
+        AND p.error IS NULL 
+        AND v."userId" = u.id 
+        AND u."personId" = a.id 
+        ORDER BY p."categoryId" ASC, v."userId" ASC, score ASC`;
 
-//             // Analyse des votes des utilisateurs pour la catégorie en cours
-//             foreach($category as $userId => $votes)
-//             {
-//                 // datas résumé de l'utilisateur
-//                 $votesScore = 0;
-//                 $authorError = false;
-//                 $categoryError = false;
-//                 $yearError = false;
-//                 $votesNumberError = false;
-//                 $voteError = false;
-//                 $childError = false;
+    const raw = await repo.query(sql);
+    const votes = {};
+    for (const v of raw) {
+        if (!votes[v.categoryId]) {
+            votes[v.categoryId] = {};
+        }
+        if (!votes[v.categoryId][v.userId]) {
+            votes[v.categoryId][v.userId] = [];
+        }
+        votes[v.categoryId][v.userId].push(v);
+    }
 
-//                 $content = array();
+    // Analyse des votes...
+    for (const catId in votes) {
+        // On ignore les catégories spéciales meilleur auteur et meilleur photo pour l'instant
+        if (!(+catId > 0 || +catId === -3)) {
+            continue;
+        }
 
-//                 // Pour chacun des votes de l'utilisateur :
-//                 foreach($votes as $vote)
-//                 {
-//                     $votesScore += $vote->score;
-//                     $content_tr = array();
-//                     $content_tr['photo_id'] = $vote->photo_id;
-//                     $content_tr['photo_title'] = $vote->title;
+        const maxVotePhoto = Math.round(context.categories[catId].totalPhotos / 2.0);
+        const minVotePhoto = Math.round(maxVotePhoto / 2.0);
+        context.categories[catId].maxVotePhoto = maxVotePhoto;
+        context.categories[catId].minVotePhoto = minVotePhoto;
+        context.categories[catId].votes = [];
 
-//                 // Vérification note du vote compris entre 1 et 2 (on accepte les vote zéro utilisé pour le meilleur titre)
-//                     if ($vote->score < 0 || $vote->score > 2)
-//                     {
-//                         $voteError = true;
-//                     }
-//                     $content_tr['score'] = $vote->score;
+        // Analyse des votes des utilisateurs pour la catégorie en cours
+        for (const userId in votes[catId]) {
+            // résumé de l'utilisateur
+            const stats = {
+                user: "",
+                age: 0,
+                votesScore: 0,
+                valid: false,
+                errors: {
+                    authorError: false,
+                    categoryError: false,
+                    yearError: false,
+                    votesNumberError: false,
+                    scoreError: false,
+                    childError: false
+                },
+                votes: []
+            };
 
-//                 // vérification auteur de la photo (interdit de voter pour ses propres photos)
-//                     if ($vote->p_user_id == $userId)
-//                     {
-//                         $authorError = true;
-//                     }
-//                     $content_tr['author'] = $vote->p_user_id;
+            // Pour chacun des votes de l'utilisateur :
+            for (const vote of votes[catId][userId]) {
+                stats.votesScore += vote.score;
+                stats.votes.push(vote);
+                stats.user = vote.username;
+                stats.age = context.year - new Date(vote.dateOfBirth).getFullYear();
+                vote.error = false;
 
-//                 // Vérification catégorie de la photo (categorie du vote doit correspondre à la catégorie de la photo concernée par le vote)
-//                     if ($vote->category_id != $vote->p_category_id && $vote->category_id != -3)
-//                     {
-//                         $categoryError = true;
-//                     }
-//                     $content_tr['id_cat_from_photo'] = $categoryId;
-//                     $content_tr['id_cat_from_vote']  = $vote->category_id;
+                // Vérification note du vote compris entre 1 et 2 (on accepte les vote zéro utilisé pour le meilleur titre)
+                if (vote.score < 0 || vote.score > 2) {
+                    vote.error = true;
+                    stats.errors.scoreError = true;
+                }
 
-//                 // Vérification année de la photo
-//                     if ($vote->year != $vote->p_year)
-//                     {
-//                         $yearError = true;
-//                     }
-//                     $content_tr['year_from_photo'] = $vote->p_year;
-//                     $content_tr['year_from_vote'] = $vote->year;
+                // Vérification auteur de la photo (interdit de voter pour ses propres photos)
+                if (vote.pUserId === vote.userId) {
+                    vote.error = true;
+                    stats.errors.authorError = true;
+                }
 
-// 				// Vérification de l'âge du juré (doit avoir 10 ans pour être pris en compte)
-// 					if ($ctx['current_phase_year'] - date("Y", $vote->birthday) < 10)
-// 					{
-// 						$childError = true;
-// 					}
+                // Vérification catégorie de la photo (categorie du vote doit correspondre à la catégorie de la photo concernée par le vote)
+                if (vote.categoryId != vote.pCategoryId && vote.categoryId != -3) {
+                    vote.error = true;
+                    stats.errors.categoryError = true;
+                }
 
-//                     $content[] = $content_tr;
-//                 }
+                // Vérification année de la photo
+                if (vote.year != vote.pYear) {
+                    vote.error = true;
+                    stats.errors.yearError = true;
+                }
 
-//                 // une fois qu'on a analysé tout les vote d'un utilisateur pour une catégorie, on décide si on en tient compte ou pas.
-//                 $error = (!$authorError && !$categoryError && !$yearError && !$votesNumberError && !$voteError && $votesScore >= $minVotePhoto && $votesScore <= $maxVotePhoto && !$childError) ? false : true;
-//                 $error_msg = "";
+                // Vérification de l'âge du juré (doit avoir 10 ans pour être pris en compte)
+                if (stats.age < 10) {
+                    stats.errors.childError = true;
+                }
+            }
 
-//                 if ($error)
-//                 {
-//                     if ($votesScore < $minVotePhoto ) $error_msg .= ' - Manque des vote(s) [pas assez de points attribués : '.$votesScore.'/'.$maxVotePhoto.']<br/>';
-//                     if ($votesScore > $maxVotePhoto ) $error_msg .= ' - Trop de points attribués ['.$votesScore.'/'.$maxVotePhoto.']<br/>';
-//                     if ($authorError)      $error_msg .= ' - A voté pour une de ses photos<br/>';
-//                     if ($categoryError)    $error_msg .= ' - Incohérence entre la catégorie indiquée par le vote et celle indiquée par la photo<br/>';
-//                     if ($yearError)        $error_msg .= ' - Incohérence entre l\'année indiquée par le vote et celle indiquée par la photo<br/>';
-//                     if ($voteError)        $error_msg .= ' - A donné des notes impossible ( 0 < note > 2)<br/>';
-//                     if ($childError)       $error_msg .= ' - Le juré est trop jeune. Votes pris en compte à partir de l\'année des 10 ans<br/>';
-//                 }
-//                 else
-//                 {
-//                     // Si aucune erreur, on tiens compte des votes
-//                     foreach($content as $voteOk)
-//                     {
-//                         $votesAccepted[$categoryId][$userId][] = array(
-//                             'photo_id' => $voteOk['photo_id'],
-//                             'score' => $voteOk['score']
-//                         );
-//                     }
-//                 }
+            // Est-ce que le juré à donné suffisamment de vote pour être pris en compte
+            if (+catId > 0) {
+                stats.errors.votesNumberError = stats.votesScore < minVotePhoto || stats.votesScore > maxVotePhoto;
+            } else {
+                stats.errors.votesNumberError = votes[catId][userId].length < 5 || votes[catId][userId].length > 10;
+            }
 
-//                 // Affichage si demandé
-//                 if ($display)
-//                 {
-//                     $ctx['computeStep'][$categoryId][$userId] =  array(
-//                         'name' => $ctx['members'][$userId]->username,
-//                         'id' => $userId,
-//                         'error' => $error,
-//                         'error_msg' => $error_msg);
+            // une fois qu'on a analysé tout les vote d'un utilisateur pour une catégorie, on décide si on en tient compte ou pas.
+            stats.valid =
+                !stats.errors.authorError &&
+                !stats.errors.categoryError &&
+                !stats.errors.yearError &&
+                !stats.errors.votesNumberError &&
+                !stats.errors.scoreError &&
+                !stats.errors.childError;
 
-//                     foreach($content as $content_row)
-//                     {
-//                         $ctx['computeStep'][$categoryId][$userId]['votes'][] = array(
-//                             'score' => $content_row['score'],
-//                             'photo_id' => $content_row['photo_id'],
-//                             'photo_author' => $ctx['members'][$content_row['author']]->username . ' ('.$content_row['author'].')',
-//                             'photo_cat' => $content_row['id_cat_from_photo'],
-//                             'vote_cat' => $content_row['id_cat_from_vote'],
-//                             'photo_year' => $content_row['year_from_photo']);
-//                     }
-//                 }
-//             }
-//         }
+            context.categories[catId].votes.push(stats);
+        }
+    }
 
-//         return $votesAccepted;
-//     }
-// }
+    return context;
+}
 
-// /**
-//  * computeNotes
-//  * à partir du tableau de votes qu'on lui fournis, calcul les notes de chaques photos suivant
-//  * l'algorithme du réglement 2008 des AGPA
-//  * @param $ctx [array], le contexte des agpa
-//  * @param $votes, le tableau des votes (doit eêtre généré par la fonction checkVotes)
-//  * @param $display, boolean, true : affichage dans le template du resultat
-//  *
-//  * @return array[mixed], les identifiant des votes acceptés et à prendre en compte pour le calcul des notes
-//  */
-// if ( ! function_exists('computeNotes'))
-// {
-//     function computeNotes(&$ctx, $votes, $display)
-//     {
-//         $CI = get_instance();
-//         $votesAccepted = array();
-//         $NEED_TO_UPDATE_SQL = true;
+/**
+ * computeNotes
+ * à partir du tableau de votes qu'on lui fournis, calcul les notes de chaques photos suivant
+ * l'algorithme du réglement 2008 des AGPA
+ * @param ctx, les données retournées lors de l'étape 1 (cf p4CheckVotes)
+ *
+ * @return array[mixed], les identifiant des votes acceptés et à prendre en compte pour le calcul des notes
+ */
+export async function p4ComputeNotes(ctx) {
+    // On récupère le contexte sql
+    const repo = getRepository(AgpaPhoto);
 
-//         // ----------------------------------------------------------------------------
-//         // Récupérer les photos (init votes/notes etc à 0)
-//         $sql = 'SELECT * FROM agpa_photos WHERE year='.$ctx['current_phase_year'].' ORDER BY category_id ASC, user_id ASC';
-//         $photos = array();
-//         $categories = array();
-//         $result = $CI->db->query($sql)->result();
+    // Récupérer les photos (init votes/notes etc à 0)
+    let sql = `SELECT p.*, u.username FROM agpa_photo p INNER JOIN "user" u ON u.id = p."userId" WHERE year=${ctx.year}`;
+    const raw = await repo.query(sql);
+    ctx.photos = {};
+    for (const p of raw) {
+        // On réinitialise les scores calculés par sécurité
+        p.votes = 0;
+        p.votesTitle = 0;
+        p.score = 0;
+        p.gscore = 0;
+        p.awards = null;
+        ctx.photos[p.id] = p;
+    }
 
-//         foreach ($result as $row)
-//         {
-//             $photos[$row->photo_id] = $row;
-//             if ($photos[$row->photo_id]->g_score != 0) $NEED_TO_UPDATE_SQL = false;
+    // Décompte des votes (passe 1 -> calcul note simple)
+    for (const catId in ctx.categories) {
+        // On ignore les catégories spéciales meilleur auteur et meilleur photo pour l'instant
+        if (!(+catId > 0 || +catId === -3)) {
+            continue;
+        }
 
-//             $photos[$row->photo_id]->score = 0;
-//             $photos[$row->photo_id]->scoreTitle = 0;
-//             $photos[$row->photo_id]->votes = 0;
-//             $photos[$row->photo_id]->g_score = 0; // On force la réinitialisation par sécurité
-//             if (!isset($categories[$row->category_id]['photosNumber']))
-//             {
-//                 $categories[$row->category_id]['photosNumber'] = 1;
-//             }
-//             else
-//             {
-//                 ++$categories[$row->category_id]['photosNumber'];
-//             }
-//         }
+        ctx.categories[catId].judgesNumber = ctx.categories[catId].votes.length;
+        ctx.categories[catId].scoresSum = 0;
+        ctx.categories[catId].votesSum = 0;
 
-//         // 1- Décompte des votes (passe 1 -> calcul note simple)
-//         foreach($votes as $idCat => $category)
-//         {
-//             // calculs pour les étoiles
-//             if ($idCat >= 0)
-//             {
-//                 $categories[$idCat]['judgesNumber'] = sizeof($category);
-//                 $categories[$idCat]['scoresSum'] = 0;
-//                 $categories[$idCat]['votesSum'] = 0;
-//                 foreach($category as $idUser => $userVotes)
-//                 {
-//                     foreach($userVotes as $vote)
-//                     {
-//                         // calculs pour les plumes
-//                         if ($vote['score'] == 0)
-//                         {
-//                             $photos[$vote['photo_id']]->scoreTitle ++;
-//                         }
-//                         else
-//                         {
-//                             // Décompte pour la photo concernée
-//                             $photos[$vote['photo_id']]->score += $vote['score'];
-//                             $photos[$vote['photo_id']]->votes ++;
+        for (const userId in ctx.categories[catId].votes) {
+            for (const vote of ctx.categories[catId].votes[userId].votes) {
+                if (+catId === -3) {
+                    // calculs pour les plumes
+                    ctx.photos[vote.photoId].votesTitle += 1;
+                } else {
+                    // calculs des étoiles
 
-//                             // Décompte total pour la catégorie
-//                             $categories[$idCat]['scoresSum'] += $vote['score'];
-//                             $categories[$idCat]['votesSum']++;
-//                         }
-//                     }
-//                 }
-//             }
-//         }
+                    // Décompte pour la photo concernée
+                    ctx.photos[vote.photoId].votes += 1;
+                    ctx.photos[vote.photoId].score += vote.score;
 
-//         // On crée le tableau des photos sélectionnées pour le meilleur titre
-//         foreach ($photos as $id => $photo)
-//         {
-//             if ($photo->scoreTitle > 0)
-//             {
-//                 $categories[-3]['photos'][] = &$photos[$id];
-//             }
-//         }
+                    // Décompte total pour la catégorie
+                    ctx.categories[catId].scoresSum += vote.score;
+                    ctx.categories[catId].votesSum += 1;
+                }
+            }
+        }
+    }
 
-//         // 2- Décompte des votes (passe 2 -> calcul note G)
-//         $scoreCoefficient = 9990.00999001 ; //10000000 / 1001;
-//         $votesCoefficient  = 9.99000999001; //10000 / 1001;
-//         foreach($photos as $idPhoto => $photo)
-//         {
+    // Décompte des votes (passe 2 -> calcul note G)
+    const scoreCoef = 9990.00999001; //10000000 / 1001;
+    const votesCoef = 9.99000999001; //10000 / 1001;
+    sql = "";
+    for (const photoId in ctx.photos) {
+        const photo = ctx.photos[photoId];
+        const cat = ctx.categories[photo.categoryId];
 
-//             $cat = $categories[$photo->category_id];
-//             $notePoints = ($photo->score / $cat['scoresSum']) * $cat['photosNumber'] * $scoreCoefficient;
-//             $noteVotes  = ($photo->votes / $cat['votesSum']) * $cat['photosNumber'] * $votesCoefficient;
-//             $photos[$idPhoto]->g_score = round($notePoints + $noteVotes);
+        const scoreNote = photo.score * (cat.totalPhotos / cat.scoresSum) * scoreCoef;
+        const votesScore = photo.votes * (cat.totalPhotos / cat.votesSum) * votesCoef;
+        ctx.photos[photoId].gScore = Math.round(scoreNote + votesScore);
 
-//             // 6- Maj mySQL
-//             if ($display === false and $NEED_TO_UPDATE_SQL)
-//             {
-//                 $sql = "UPDATE agpa_photos SET g_score={$photos[$idPhoto]->g_score}, votes={$photos[$idPhoto]->votes}, score={$photos[$idPhoto]->score} WHERE photo_id={$idPhoto} LIMIT 1 ;";
-//                 $CI->db->query($sql);
-//             }
-//             $categories[$photos[$idPhoto]->category_id]['photos'][] = $photos[$idPhoto];
-//         }
+        sql += `UPDATE agpa_photos SET g_score=${ctx.photos[photoId].gScore}, votes=${photo.votes}, score=${photo.score} WHERE id=${photo.id};`;
+    }
 
-//         // 3- On trie les photos par ordre decroissant de note globale
-//         function compareScorePhotos($a, $b)
-//         {
-//             // on trie dans l'ordre décroissant
-//             return $b->g_score - $a->g_score;
-//         }
+    // 3- On trie les photos par ordre decroissant de note globale
+    const photos = Object.values(ctx.photos);
+    photos.sort((a: any, b: any) => b.gScore - a.gScore);
+    ctx.photos = photos;
 
-//         foreach($categories as $id => $cat)
-//         {
-//             usort($categories[$id]['photos'], "compareScorePhotos");
-//             $categories[$id]['photos'] = $cat['photos'];
-//         }
-
-//         // 4- Affichage ?
-//         if ($display)
-//         {
-//             $categoryId = -1313213;
-//             $userId = 0;
-
-//             foreach($photos as $photoId => $photo)
-//             {
-//                 if ($photo->category_id != $categoryId)
-//                 {
-//                     $categoryId = $photo->category_id;
-//                     $ctx['computeStep'][$categoryId] = array(
-//                         'id' => $categoryId,
-//                         'judges_number' => $categories[$categoryId]['judgesNumber']
-//                     );
-//                 }
-
-//                 if ($photo->user_id != $userId)
-//                 {
-//                     $userId = $photo->user_id;
-//                     $ctx['computeStep'][$categoryId]['users'][$userId] = array(
-//                         'id' => $photo->user_id,
-//                         'name' => $ctx['members'][$photo->user_id]->username,
-//                         'photos' => array()
-//                     );
-//                 }
-
-//                $ctx['computeStep'][$categoryId]['users'][$userId]['photos'][] = array(
-//                     'photo_id' => $photo->photo_id,
-//                     'score' => $photo->score,
-//                     'votes' => $photo->votes,
-//                     'noteg' => $photo->g_score,
-//                     'scoreTitle' => $photo->scoreTitle
-//                 );
-//             }
-
-//             foreach ($categories[-3]['photos'] as $photoId => $photo)
-//             {
-//                 $ctx['computeStep'][-3]['photos'][] = $photo;
-//             }
-
-//         }
-
-//         return $categories;
-//     }
-// }
+    return ctx;
+}
 
 // /**
 //  * evalNote

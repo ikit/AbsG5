@@ -95,7 +95,7 @@
         </v-row>
     </div>
 
-    <Reader ref="messageReader"></Reader>
+    <Reader ref="messageReader" topicId="-1"></Reader>
 </div>
 </template>
 

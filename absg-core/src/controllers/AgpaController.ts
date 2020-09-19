@@ -102,6 +102,16 @@ export class AgpaController {
     }
 
     /**
+     * Effectue le dépouillement des votes
+     * @param step l'étape à laquelle on arrête le processus afin de permettre de le suivre étape par étape
+     * @param user l'utilisateur qui effectue la demande
+     */
+    @Get("/p4/:step([0-9]+)")
+    getP4Data(@Param("step") step: number, @CurrentUser() user) {
+        return agpaService.getP4Data(2019, step, user);
+    }
+
+    /**
      * Enregistre ou modifie une photo
      * @param image la photo si défini
      * @param body les informations sur la photo au format json

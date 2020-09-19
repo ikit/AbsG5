@@ -160,6 +160,8 @@ class ForumService {
             .getMany();
 
         return {
+            forumId: 2,
+            topicId: -1,
             posts: data.map(e => ({
                 ...e,
                 text: this.parseMessageText(e.text),
@@ -180,6 +182,7 @@ class ForumService {
      * @param user l'utilisateur qui fait la demande
      */
     async savePost(data: any, user: any) {
+        console.log("SAVE POST", data)
         let msg = null;
         if (data.id) {
             // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
