@@ -57,10 +57,12 @@
 
 <script>
 import axios from 'axios';
+import store from '../../store';
 import { getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {
     name: 'Phase5',
+    store,
     data: () => ({
         summary: []
     }),
@@ -68,6 +70,8 @@ export default {
         axios.get(`/api/agpa/archives`).then(response => {
             this.summary = parseAxiosResponse(response);
             this.isLoading = false;
+        }).catch( err => {
+            store.commit("onError", err);
         });
     },
     methods: {

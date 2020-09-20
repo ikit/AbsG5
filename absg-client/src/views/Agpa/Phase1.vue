@@ -192,7 +192,9 @@ export default {
                         const photoId = this.photoEditor.photo ? this.photoEditor.photo.id : null;
                         this.savePhotoApiCall(this.photoEditor.categoryId, photoId, this.photoEditor.title, response.data);
                     }
-                );
+                ).catch( err => {
+                    store.commit("onError", err);
+                });
             } else {
                 // Edition d'une photo sans modification de l'image
                 this.savePhotoApiCall(this.photoEditor.categoryId, this.photoEditor.photo.id, this.photoEditor.title, null);

@@ -278,6 +278,8 @@ export default {
                     store.commit('photosGalleryReset', this.photosGalery);
                 }
                 this.isLoading = false;
+            }).catch( err => {
+                store.commit("onError", err);
             });
         },
         photosGalleryDisplay(index) {

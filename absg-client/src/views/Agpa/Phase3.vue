@@ -279,6 +279,8 @@ export default {
                 this.refreshCategory();
                 this.refreshVotes();
                 this.isLoading = false;
+            }).catch( err => {
+                store.commit("onError", err);
             });
         },
 
@@ -412,6 +414,8 @@ export default {
                 axios.get(`/api/agpa/vote/${photo.id}/${vote}`).then(response => {
                     this.refreshVotes(parseAxiosResponse(response));
                     this.refreshCategory();
+                }).catch( err => {
+                    store.commit("onError", err);
                 });
             }
 

@@ -26,7 +26,6 @@
                 <v-tab><v-icon>fas fa-vote-yea</v-icon> &nbsp; Votes</v-tab>
                 <v-tab><v-icon>fas fa-calculator</v-icon> &nbsp; Notes</v-tab>
                 <v-tab><v-icon>fas fa-trophy</v-icon> &nbsp; Palmarès</v-tab>
-                <v-tab><v-icon>fas fa-gem</v-icon> &nbsp; Diamant</v-tab>
                 <v-tab><v-icon>fas fa-gavel</v-icon> &nbsp; Clôture</v-tab>
 
                 <!-- Vérification des votes -->
@@ -37,20 +36,19 @@
                         <template v-slot:default>
                             <thead>
                                 <tr style="vertical-align: baseline;">
-                                    <template v-for="cat of data.categories">
-                                        <th v-if="cat.id > 0 || cat.id === -3" v-bind:key="cat.id">{{ cat.title }}</th>
-                                    </template>
+                                    <th>Juré</th>
+                                    <th v-for="catId of votesCategories" v-bind:key="catId">{{ data.categories[catId].title }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="vertical-align: baseline;">
-                                    <template v-for="cat of data.categories">
-                                        <td v-if="cat.id > 0 || cat.id === -3" v-bind:key="cat.id">
-                                            <a  v-for="vote of cat.votes" v-bind:key="vote.user"
-                                                @click="displayVotesDetails(vote)"
-                                                style="display: block">
-                                                <i v-if="vote.valid" class="fas fa-check" style="color: #2e7d32"></i>
-                                                <i v-else class="fas fa-exclamation-triangle" style="color: #ff8f00"></i> &nbsp; {{ vote.user }}
+                                <tr v-for="vUser of votes" v-bind:key="vUser.id">
+                                    <template >
+                                        <td>{{ vUser.username }} <span style="opacity: 0.5">- {{ vUser.age }} ans</span></td>
+                                        <td v-for="(cat, idx) of vUser.votes" v-bind:key="idx">
+                                            <a v-if="cat" @click="displayVotesDetails(cat)" style="display: block">
+                                                <i v-if="cat.valid" class="fas fa-check" style="color: #2e7d32"></i>
+                                                <i v-else class="fas fa-exclamation-triangle" style="color: #ff8f00"></i>
+                                                &nbsp; {{ cat.votes.length }}
                                             </a>
                                         </td>
                                     </template>
@@ -60,7 +58,7 @@
                     </v-simple-table>
                 </v-tab-item>
 
-                <!-- Calcul des notes -->
+                <!-- Notes des photos -->
                 <v-tab-item>
                     <div class="row" style="margin: 0 10px 0 0;">
                         <h2>Calcul des notes</h2>
@@ -104,32 +102,52 @@
                         </template>
 
                         <template v-slot:item.votes="{ item }">
-                            {{ item.votes }} <span style="opacity: 0.5">({{ item.score }} pts)</span>
+                            {{ item.votes }} <span style="opacity: 0.5">({{ item.score }} pts)</span><br/>
+                            <span style="color: red;">{{ item.formerStats.votes }} <span style="opacity: 0.5">({{ item.formerStats.score }} pts)</span></span>
                         </template>
 
                         <template v-slot:item.title="{ item }">
-                            {{ item.votesTitle }}
+                            {{ item.votesTitle }}<br/>
+                            <span style="color: red;">{{ item.formerStats.votesTitle }}</span>
                         </template>
 
                         <template v-slot:item.score="{ item }">
-                            {{ item.gScore }}
+                            {{ item.gscore }}<br/>
+                            <span style="color: red;">{{ item.formerStats.gscore }}</span>
+                        </template>
+
+                        <template v-slot:item.awards="{ item }">
+
+                            <template v-if="item.awards">
+                                <span v-for="a of item.awards" v-bind:key="a.categoryId">
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <i v-if="a.award === 5" v-on="on" class="fas fa-circle" style="color: #c3f1ff"></i>
+                                            <i v-if="a.award === 4" v-on="on" class="fas fa-circle" style="color: #c68b00"></i>
+                                            <i v-if="a.award === 3" v-on="on" class="fas fa-circle" style="color: #9b9b9b"></i>
+                                            <i v-if="a.award === 2" v-on="on" class="fas fa-circle" style="color: #964c31"></i>
+                                            <i v-if="a.award === 1" v-on="on" class="far fa-circle"></i>
+                                            <i v-if="a.award === 0" v-on="on" class="far fa-smile"></i>
+                                        </template>
+                                        {{ data.categories[a.categoryId].title }}
+                                 </v-tooltip>
+                                </span>
+                            </template>
                         </template>
                     </v-data-table>
                 </v-tab-item>
 
-                <!-- Calcul du palmarès -->
+                <!-- Palmarès -->
                 <v-tab-item>
                     <h2>Etablissement du palmarès</h2>
-                </v-tab-item>
-
-                <!-- Attribution des AGPA de diamant -->
-                <v-tab-item>
-                    <h2>Attribution des AGPA de diamant</h2>
+                    todo
                 </v-tab-item>
 
                 <!-- Clôture de l'édition des AGPA -->
                 <v-tab-item>
                     <h2>Clôture de l'édition</h2>
+                    <p>Si tout est ok, alors il n'y a plus qu'à sauvegarder les résultat.</p>
+                    <v-btn text color="primary" @click="closeEdition()">Enregistrer les résultats.</v-btn>
                 </v-tab-item>
             </v-tabs>
 
@@ -141,37 +159,72 @@
         </v-card>
 
 
+        <!-- Détails votes -->
+        <v-dialog v-model="voteDetails.displayed" width="800px">
+            <v-card v-if="voteDetails.vote">
+                <v-card-title class="grey lighten-4">
+                    Votes {{ voteDetails.vote.username }}, catégorie {{ voteDetails.vote.categoryTitle }}
+                </v-card-title>
+                <p style="opacity: 0.5; padding: 0 24px">
+                    Le tableau de gauche montre tout les votes du juré pour la catégorie concerné.
+                    Les informations à droite permettent de controler la validité de ces votes pour le calcule des notes ensuite.
+                </p>
+                <div style="display: flex; margin: 0 24px">
+                    <div style="flex: 1 1 auto">
+                        <v-simple-table dense style="text-align: left; font-size: 0.8em; margin: 10px">
+                            <template v-slot:default>
+                                <thead>
+                                    <tr style="vertical-align: baseline;">
+                                        <th>Photo</th>
+                                        <th>Vote</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="vote of voteDetails.vote.votes" v-bind:key="vote.id">
+                                        <td>{{ vote.photoId }} - {{ vote.title }}<br/>
+                                            <span style="opacity: 0.5">uId: {{ vote.pUserId }} | catId: {{ vote.pCategoryId }} | year: {{ vote.pYear }}</span>
+                                        </td>
+                                        <td>
+                                            <i v-if="voteDetails.vote.categoryId === -3" class="fas fa-feather-alt"></i>
+                                            <i v-else class="fas fa-star">{{ vote.score }}</i>
+                                            </td>
+                                    </tr>
+                                </tbody>
+                            </template>
+                        </v-simple-table>
+                    </div>
+
+                    <div style="flex: 1 1 auto;">
+                        <b>Catégorie:</b><ul>
+                            <li>Titre: {{ voteDetails.vote.categoryTitle }} </li>
+                            <li>Id: {{ voteDetails.vote.categoryId }} </li>
+                            <li>Max votes: {{ voteDetails.vote.maxVote }} </li>
+                        </ul>
+
+                        <b>Juré:</b><ul>
+                            <li>Nom: {{voteDetails.vote.username}} </li>
+                            <li>Id: {{ voteDetails.vote.userId }} </li>
+                            <li>Age: {{ voteDetails.vote.age }} </li>
+                        </ul>
+
+                        <b>Erreurs détectées:</b><ul>
+                            <li>authorError: {{voteDetails.vote.errors.authorError }} </li>
+                            <li>categoryError: {{voteDetails.vote.errors.categoryError }} </li>
+                            <li>childError: {{voteDetails.vote.errors.childError }} </li>
+                            <li>scoreError: {{voteDetails.vote.errors.scoreError }} </li>
+                            <li>votesNumberError: {{voteDetails.vote.errors.votesNumberError }} </li>
+                            <li>yearError: {{voteDetails.vote.errors.yearError }} </li>
+                        </ul>
+                    </div>
+                </div>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="voteDetails.displayed = false">Fermer</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
 
-        <div v-if="category && category.categoryId === 0">
-            <h2>Résumé de vos votes par catégorie</h2>
-            <v-data-table
-                :headers="headers"
-                :items="resume"
-                :loading="waitingScreen"
-                disable-filtering
-                disable-sort
-                hide-default-footer
-                loading-text="Mise à jours des données"
-                style="margin: 25px"
-                @click:row="gotoCat($event.categoryId)"
-            >
-                <template v-slot:item.votes="{ item }">
-                    <span v-if="item.categoryId > 0" v-bind:style="{ color: item.votes >= item.maxVotes / 2.0  && item.votes <= item.maxVotes ? 'green' : 'red'}">
-                        {{ item.votes }} / {{ item.maxVotes }}
-                    </span>
-                    <b v-else>{{ item.votes }} / {{ item.maxVotes }}</b>
-                </template>
-
-                <template v-slot:item.tvotes="{ item }">
-                    <span v-if="item.categoryId > 0">
-                        {{ item.tvotes }}
-                    </span>
-                    <b v-else v-bind:style="{ color: item.tvotes >= 5  && item.tvotes <= 10 ? 'green' : 'red'}">{{ item.tvotes }} / 10</b>
-                </template>
-            </v-data-table>
-            <h2>Les photos que vous avez sélectionnées pour le meilleur titre</h2>
-        </div>
     </section>
 </template>
 
@@ -196,20 +249,26 @@ export default {
         isLoading: true,
         waitingScreen: false,
         isAdmin: false,
-        step: 0,
+
+        votes: [],
+        votesCategories: [],
+        voteDetails: {
+            displayed: false,
+            vote: null
+        },
+
         notesHeaders: [
             { text: 'Catégorie', value: 'category' },
             { text: 'Auteur', value: 'author' },
             { text: 'Photo', value: 'photo' },
             { text: 'Votes', value: 'votes' },
             { text: 'Titre', value: 'title' },
-            { text: 'Score Global', value: 'score' }
+            { text: 'Score Global', value: 'score' },
+            { text: 'AGPA', value: 'awards' }
         ],
         notesFilter: {
             quickfilter: null, // un filtre par recherche de mot clés multichamps: cf construction du champs quickfilter dans mounted()
             categoryId: null, // si on filtre une catégorie en particulier
-            pageIndex: 0, // page courante affiché (0 = page 1)
-            pageSize: 20, // nombre de usersList affichées par page
         },
         notesCategories: [{ label: "Toutes", id: null }],
         notes: [],
@@ -237,25 +296,53 @@ export default {
     methods: {
         refresh() {
             this.isLoading = true;
-            // Get step
-            this.step = Number.parseInt(this.$route.query.step);
-            if (!this.step) {
-                this.step = 1;
-            }
 
-            axios.get(`/api/agpa/p4/${this.step}`).then(response => {
+            axios.get(`/api/agpa/p4`).then(response => {
                 this.data = parseAxiosResponse(response);
-                const categories = Object.values(this.data.categories);
-                this.notesCategories = this.notesCategories.concat(categories.filter(c => c.id === -3 || c.id > 0).map(e => ({ label: e.title, id: e.id })));
-                this.notesAll = this.data.photos;
-                this.updateNotesList();
                 console.log(this.data);
+                const categories = Object.values(this.data.categories);
+
+                // On reformate les votes pour les présenter sous forme de tableau "users x catégories"
+                const votes = {};
+                this.votesCategories = [...this.data.categoriesOrders, -3];
+                for (const catIdx in this.data.categories) {
+                    const cat = this.data.categories[catIdx];
+                    if (cat.id !== -3 && cat.id < 0) continue;
+
+                    for (const userIdx in cat.votes) {
+                        const user = cat.votes[userIdx];
+                        if (!votes[user.userId]) {
+                            votes[user.userId] = {
+                                id: user.userId,
+                                username: user.username,
+                                age: user.age,
+                                votes: Array(this.votesCategories.length).fill(null, 0, this.votesCategories.length)
+                            };
+                        }
+                        user.categoryId = cat.id;
+                        user.categoryTitle = cat.title;
+                        user.maxVote = cat.maxVotePhoto;
+                        votes[user.userId].votes[this.votesCategories.findIndex(id => id === cat.id)] = user;
+                    }
+                }
+                this.votes = votes;
+
+                // On reformate les notes
+                this.notesCategories = this.notesCategories.concat(categories.filter(c => c.id === -3 || c.id > 0).map(e => ({ label: e.title, id: e.id })));
+                this.notesAll = this.data.photosOrder.map(id => this.data.photos[id]);
+                this.updateNotesList();
+
+                // On reformate le palmares par catégories
                 this.isLoading = false;
+            }).catch( err => {
+                store.commit("onError", err);
             });
         },
 
         displayVotesDetails(data) {
-            console.log(data)
+            this.voteDetails.vote = data;
+            this.voteDetails.displayed = true;
+            console.log(data);
         },
 
         updateNotesList(catId) {
@@ -264,8 +351,18 @@ export default {
             } else {
                 this.notes = this.notesAll;
             }
-            console.log("updateNotesList ", catId,this.notes);
+        },
 
+        closeEdition() {
+            this.isLoading = true;
+
+            axios.get(`/api/agpa/p4/close`).then(response => {
+                this.closed = parseAxiosResponse(response);
+                console.log(data);
+                this.isLoading = false;
+            }).catch( err => {
+                store.commit("onError", err);
+            });
         }
     }
 };

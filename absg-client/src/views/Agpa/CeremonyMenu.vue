@@ -84,6 +84,8 @@ export default {
         axios.get(`/api/agpa/archives`).then(response => {
             this.formerEditions = parseAxiosResponse(response);
             this.isLoading = false;
+        }).catch( err => {
+            store.commit("onError", err);
         });
 
 

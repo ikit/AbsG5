@@ -205,6 +205,8 @@ export default {
                     ...getPeopleAvatar(e)
                 }));
                 this.isLoading = false;
+            }).catch( err => {
+                store.commit("onError", err);
             });
         },
         displaydetails(palmares) {

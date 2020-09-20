@@ -52,9 +52,8 @@
 
 
 <script>
-import axios from 'axios';
 import { mapState } from 'vuex';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
+import { getModuleInfo, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import Phase1 from './Phase1';

@@ -1,4 +1,4 @@
-import { Entity, OneToOne, Column, JoinColumn, PrimaryColumn, Index, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, Column, JoinColumn, Index, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
 import { AgpaCategory } from "./AgpaCategory";
 import { AgpaPhoto } from "./AgpaPhoto";
 import { User } from "./User";

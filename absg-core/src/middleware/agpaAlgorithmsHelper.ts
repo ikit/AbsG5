@@ -1,23 +1,70 @@
-
-import { AgpaPhoto, AgpaVote } from "../entities";
+import { AgpaPhoto, AgpaVote, AgpaAwardType } from "../entities";
+import { palmaresPoints } from "./agpaPalmaresHelper";
 import { getRepository } from "typeorm";
+
+/**
+ * Attribution des AGPA (or, argent et bronze) pour une liste de photos donnée
+ * La liste des photos doit déjà être triée et ordonnée
+ * Cette première passe ne traite pas les AGPA de diamant
+ * @param pIds liste des photos
+ * @param catId la catégorie concernée
+ * @param ctx le context de donnée à mettre à jours
+ */
+function deliverAwardsPhotos(pIds: number[], catId: number, ctx: any) {
+    // On vérifie si tout est correctement initialisé
+    for (let idx = 0; idx < 4; idx++) {
+        if (!ctx.photos[pIds[idx]].awards) {
+            ctx.photos[pIds[idx]].awards = [];
+        }
+    }
+
+    // On attribut simplement les agpa or, diamant et bronze aux 1ere, deuxième et troisième photos
+    if (
+        ctx.photos[pIds[0]].userId === ctx.photos[pIds[1]].userId &&
+        ctx.photos[pIds[0]].score === ctx.photos[pIds[1]].score
+    ) {
+        // Test du double agpa d'or
+        ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
+        ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
+    } else {
+        ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
+        ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
+        ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.nominated, categoryId: catId });
+    }
+}
+
+/**
+ * Attribution des AGPA (or, argent et bronze) pour une liste de photographes
+ * La liste des photographes doit déjà être triée et ordonnée
+ * Cette première passe ne traite pas les AGPA de diamant
+ * @param pIds liste des photographes
+ * @param ctx le context de donnée à mettre à jours
+ */
+function deliverAwardsPhotographes(pIds: number[], ctx: any) {
+    // On attribut simplement les agpa or, diamant et bronze aux 1er, deuxième et troisième photographes
+    ctx.users[pIds[0]].award = AgpaAwardType.gold;
+    ctx.users[pIds[1]].award = AgpaAwardType.sylver;
+    ctx.users[pIds[2]].award = AgpaAwardType.bronze;
+}
 
 /**
  * vérifie l'intégrité des votes : cohérance aux niveaux des différents identifiants, des années,
  * des catégories, des photos, des auteurs, etc
- * @param $ctx [array], le contexte des agpa
- * @param $display, boolean, true : affichage dans le template du resultat
+ * @param ctx le contexte des agpa
  *
- * @return array[mixed], les identifiants des votes acceptés et à prendre en compte pour le calcul des notes
+ * @return le contexte des agpa avec les données sur les votes pour chaques catégories
  */
-export async function p4CheckVotes(context) {
+export async function p4CheckVotes(ctx) {
     // On récupère le contexte sql
     const repo = getRepository(AgpaVote);
 
     // Récupérer votes, avec les données des photos associées
     const sql = `SELECT v.*, p."categoryId" as "pCategoryId", p."userId" as "pUserId", p.year as "pYear", p.title, u.username, a."dateOfBirth" 
         FROM agpa_vote v, agpa_photo p, "user" u, person a 
-        WHERE v.year=${context.year}
+        WHERE v.year=${ctx.year}
         AND p.id = v."photoId" 
         AND p.error IS NULL 
         AND v."userId" = u.id 
@@ -36,44 +83,47 @@ export async function p4CheckVotes(context) {
         votes[v.categoryId][v.userId].push(v);
     }
 
-    // Analyse des votes...
+    // Vérification des votes
     for (const catId in votes) {
         // On ignore les catégories spéciales meilleur auteur et meilleur photo pour l'instant
         if (!(+catId > 0 || +catId === -3)) {
             continue;
         }
 
-        const maxVotePhoto = Math.round(context.categories[catId].totalPhotos / 2.0);
+        const maxVotePhoto = Math.round(ctx.categories[catId].totalPhotos / 2.0);
         const minVotePhoto = Math.round(maxVotePhoto / 2.0);
-        context.categories[catId].maxVotePhoto = maxVotePhoto;
-        context.categories[catId].minVotePhoto = minVotePhoto;
-        context.categories[catId].votes = [];
+        ctx.categories[catId].maxVotePhoto = maxVotePhoto;
+        ctx.categories[catId].minVotePhoto = minVotePhoto;
+        ctx.categories[catId].votes = [];
 
         // Analyse des votes des utilisateurs pour la catégorie en cours
         for (const userId in votes[catId]) {
             // résumé de l'utilisateur
             const stats = {
-                user: "",
-                age: 0,
-                votesScore: 0,
-                valid: false,
-                errors: {
-                    authorError: false,
-                    categoryError: false,
-                    yearError: false,
-                    votesNumberError: false,
-                    scoreError: false,
-                    childError: false
+                userId: -1,                     // L'id de l'utilisateur
+                username: "",                   // Le nom de l'utilisateur
+                // eslint-disable-next-line prettier/prettier
+                age: 0,                         // Son age
+                votesScore: 0,                  // Le nombre total de points qu'il a attribué dans la catégorie
+                valid: false,                   // Si ses votes sont considérés comme valides pour cette catégorie
+                errors: {                       // La liste des problèmes rencontrés
+                    authorError: false,         // erreur: à voter pour ses propres photos
+                    categoryError: false,       // erreur: des votes comptés pour cette catégorie sont attribués à des photos d'une autre catégorie
+                    yearError: false,           // erreur: des votes comptés pour cette année sont attribués à des photos d'une autre année
+                    votesNumberError: false,    // erreur: a attribué trop ou pas assez de vote
+                    scoreError: false,          // erreur: a attribué trop ou pas assez de points
+                    childError: false           // erreur: trop jeune pour prendre en compte ses votes
                 },
-                votes: []
+                votes: []                       // la liste des votes de l'utilisateur pour la catégorie
             };
 
             // Pour chacun des votes de l'utilisateur :
             for (const vote of votes[catId][userId]) {
                 stats.votesScore += vote.score;
                 stats.votes.push(vote);
-                stats.user = vote.username;
-                stats.age = context.year - new Date(vote.dateOfBirth).getFullYear();
+                stats.userId = vote.userId;
+                stats.username = vote.username;
+                stats.age = ctx.year - new Date(vote.dateOfBirth).getFullYear();
                 vote.error = false;
 
                 // Vérification note du vote compris entre 1 et 2 (on accepte les vote zéro utilisé pour le meilleur titre)
@@ -122,20 +172,18 @@ export async function p4CheckVotes(context) {
                 !stats.errors.scoreError &&
                 !stats.errors.childError;
 
-            context.categories[catId].votes.push(stats);
+            ctx.categories[catId].votes.push(stats);
         }
     }
 
-    return context;
+    return ctx;
 }
 
 /**
- * computeNotes
- * à partir du tableau de votes qu'on lui fournis, calcul les notes de chaques photos suivant
- * l'algorithme du réglement 2008 des AGPA
- * @param ctx, les données retournées lors de l'étape 1 (cf p4CheckVotes)
+ * Calcul les notes de chaques photos suivant l'algorithme du réglement 2008 des AGPA
+ * @param ctx les données retournées lors de l'étape 1 (cf p4CheckVotes)
  *
- * @return array[mixed], les identifiant des votes acceptés et à prendre en compte pour le calcul des notes
+ * @return le contexte des agpa avec les notes calculées pour chaque photos
  */
 export async function p4ComputeNotes(ctx) {
     // On récupère le contexte sql
@@ -146,12 +194,19 @@ export async function p4ComputeNotes(ctx) {
     const raw = await repo.query(sql);
     ctx.photos = {};
     for (const p of raw) {
-        // On réinitialise les scores calculés par sécurité
-        p.votes = 0;
-        p.votesTitle = 0;
-        p.score = 0;
-        p.gscore = 0;
-        p.awards = null;
+        // On garde en mémoire les anciennes valeurs calculées pour comparer si besoin
+        p.formerStats = {
+            votes: p.votes,
+            votesTitle: p.votesTitle,
+            score: p.score,
+            gscore: p.gscore
+        };
+        // On réinitialise les scores
+        p.votes = 0;            // Le nombre de vote "étoile" d'utilisateurs différents obtenu
+        p.votesTitle = 0;       // Le nombre de vote "plume" d'utilisateurs différents obtenu
+        p.score = 0;            // Le score "étoile" total obtenu
+        p.gscore = 0;           // Le score calculé
+        p.awards = null;        // Les récompenses obtenues
         ctx.photos[p.id] = p;
     }
 
@@ -162,11 +217,15 @@ export async function p4ComputeNotes(ctx) {
             continue;
         }
 
-        ctx.categories[catId].judgesNumber = ctx.categories[catId].votes.length;
-        ctx.categories[catId].scoresSum = 0;
-        ctx.categories[catId].votesSum = 0;
+        ctx.categories[catId].judgesNumber = 0;     // Nombre de jurés dont les votes sont pris en compte dans la catégorie
+        ctx.categories[catId].scoresSum = 0;        // Somme total du nombre de points attribués par l'ensemble des jurés dans la catégorie
+        ctx.categories[catId].votesSum = 0;         // Somme total du nombre de vote attribués par l'ensemble des jurés dans la catégorie
 
         for (const userId in ctx.categories[catId].votes) {
+            // Si les votes ne sont pas valides, on les ignores
+            if (!ctx.categories[catId].votes[userId].valid) continue;
+
+            ctx.categories[catId].judgesNumber += 1;
             for (const vote of ctx.categories[catId].votes[userId].votes) {
                 if (+catId === -3) {
                     // calculs pour les plumes
@@ -196,547 +255,185 @@ export async function p4ComputeNotes(ctx) {
 
         const scoreNote = photo.score * (cat.totalPhotos / cat.scoresSum) * scoreCoef;
         const votesScore = photo.votes * (cat.totalPhotos / cat.votesSum) * votesCoef;
-        ctx.photos[photoId].gScore = Math.round(scoreNote + votesScore);
+        ctx.photos[photoId].gscore = Math.round(scoreNote + votesScore);
 
-        sql += `UPDATE agpa_photos SET g_score=${ctx.photos[photoId].gScore}, votes=${photo.votes}, score=${photo.score} WHERE id=${photo.id};`;
+        sql += `UPDATE agpa_photos SET g_score=${ctx.photos[photoId].gscore}, votes=${photo.votes}, score=${photo.score} WHERE id=${photo.id};`;
     }
 
     // 3- On trie les photos par ordre decroissant de note globale
-    const photos = Object.values(ctx.photos);
-    photos.sort((a: any, b: any) => b.gScore - a.gScore);
-    ctx.photos = photos;
+    ctx.photosOrder = Object.values(ctx.photos)
+        .sort((a: any, b: any) => b.gscore - a.gscore)
+        .map(e => (e as any).id);
 
     return ctx;
 }
 
-// /**
-//  * evalNote
-//  * récupère les photos d'une année, et effectue le trie pour toutes les catégories afin d'attribuer les AGPA -> création palmares
-//  * Nécessite les appels aux méthodes checkVotes et computeNotes au préalable
-//  * @param $ctx [array], le contexte des agpa
-//  * @param &$categories, les photos triées par catégories obtenue lors de l'appel à la méthode computeNote
-//  * @param $display, boolean, true : affichage dans le template du resultat
-//  *
-//  * @return array[mixed], par catégorie, les 4 meilleurs photos avec des
-//  *                       indications sur le type d'AGPA et les cas d'ex-aequo
-//  */
-// if ( ! function_exists('evalNote'))
-// {
-//     function evalNote(&$ctx, &$categories, $display)
-//     {
-//         global $AGPA_CTX;
-//         $CI = get_instance();
-//         $awards=array('diamant','or','argent','bronze');
+/**
+ * Classe les photos pour toutes les catégories afin d'attribuer les AGPA et établie le palmares
+ * @param ctx les données retournées lors de l'étape 2 (cf p4ComputeNotes)
+ *
+ * @return le contexte des agpa avec les awards obtenu pour chaque photos et utilisateurs
+ */
+export async function p4AgpaAttribution(ctx: any) {
+    // On récupère le contexte sql
+    const repo = getRepository(AgpaPhoto);
+    const userData = {};
+    const catNumber = Object.values(ctx.categories).filter(c => (c as any).id > 0).length;
 
-//     // 1- Contruction des tableaux pour les Hors-catégories -1 et -2
-//         $photosPerPhotographes = array();
-//         $categories[-2] = array();
+    // Intialisation et calcul de différentes infos pour chaque participants de l'édition
+    for (const pId in ctx.photos) {
+        const p = ctx.photos[pId];
+        if (!(p.userId in userData)) {
+            userData[p.userId] = {
+                id: p.userId,           // Son id
+                username: p.username,   // Son nom
+                photos: [],             // Les photos de l'utilisateurs
+                scoreOf8: 0,            // Score aux votes obtenu par les 8 (8 = nombre de catégorie en jeux pour cette édition) meilleurs photos
+                scoreOf4: 0,            // Score aux votes obtenu par les 4 meilleurs photos (agpa de diamants meilleur photographe)
+                average: 0,             // Score moyen obtenu sur l'ensemble des photos posté de l'utilisateur
+                lower: 0,               // Plus petit score obtenu par les photos de l'utilisateur
+                formerPalmares: 0,      // Palmares cumulés des éditions précédantes
+                palmares: 0,            // total de points obtenu au palmares de l'édition actuelle
+            };
+        }
+        if (userData[p.userId].photos.length < catNumber) {
+            userData[p.userId].photos.push(p);
+            userData[p.userId].scoreOf8 += p.gscore;
 
-//         foreach($categories as $idCat => $category)
-//         {
-//             if ($idCat < 0 ) continue;
-//             foreach($category['photos'] as $i => $photo)
-//             {
-// 				// On rempli le taleau des photos de chaque auteur
-// 				if ($idCat > 0)
-// 				{
-// 					$photosPerPhotographes[$photo->user_id][] = $categories[$idCat]['photos'][$i];
-//                 }
+            if (userData[p.userId].photos.length <= 4) {
+                userData[p.userId].scoreOf4 += p.gscore;
+            }
+        }
+    }
 
-//                 // On donne une référence au tableau principale ds chaque photos (utile plus tard (cf 3- ) lors du tri automatique des photos)
-//                 $categories[$idCat]['photos'][$i]->refRoot = &$categories;
-// 				$categories[-2]['photos'][] = $categories[$idCat]['photos'][$i];
+    for (const uId in userData) {
+        const count = userData[uId].photos.length;
+        userData[uId].lower = userData[uId].photos[count - 1].gscore;
+        userData[uId].average = userData[uId].photos.reduce((e, sum) => e + sum, 0) / count;
+    }
 
-//             }
-//         }
+    ctx.users = userData;
 
-//         function compare($a, $b)
-//         {
-//             // on trie dans l'ordre décroissant
-//             return $b->g_score - $a->g_score;
-//         }
+    // Calcul des palmares des editions précédentes
+    const sql = `SELECT * FROM agpa_award WHERE year < ${ctx.year} ORDER BY "userId" ASC, year ASC`;
+    const raw = await repo.query(sql);
+    for (const p of raw) {
+        // On ne prend en compte que les palmarès des utilisateurs qui ont participés cette année
+        if (p.userId in ctx.users) {
+            ctx.users[p.userId].formerPalmares += palmaresPoints(p.award);
+        }
+    }
 
-//     // 2- Meilleurs photograhes : agregation des données
-//         foreach($photosPerPhotographes as $photoIdgraphe => $photos)
-//         {
-//             // 2.1- Trier les tableaux de photos
-//             usort($photosPerPhotographes[$photoIdgraphe], "compare");
-// 			// pour simplifier la lecture du code, on place le taleau trié sur lequel on travail dans la variable $photos
-// 			$photos = $photosPerPhotographes[$photoIdgraphe];
-//             $photographeDatas = array();
+    // Définition des méthodes pour trier et départager les ex-aequos
+    function sortPhotos(aId, bId) {
+        const a = ctx.photos[aId];
+        const b = ctx.photos[bId];
 
-//             // On ne garde que les 8 (= nbr de catégorie) meilleurs photos
-//             $sumPhotos = 0; $nbrPhotos = 0; $sum4Photos = 0; $sum8Photos = 0; $nbrVotes = 0; $sumScores = 0;
-//             for ($i=0; $i < sizeof($photos); $i++)
-//             {
-//                 if ($i < 4) $sum4Photos += $photos[$i]->g_score;
-//                 if ($i < 8) $sum8Photos += $photos[$i]->g_score;
-//                 $photographeDatas[$i] = $photos[$i];
-//                 $sumPhotos += $photos[$i]->g_score;
-//                 ++$nbrPhotos;
-//                 $nbrVotes += $photos[$i]->votes;
-//                 $sumScores += $photos[$i]->score;
-//             }
-//             // on calcul la moyenne des 6 meilleurs photos ainsi que la plus basse
-//             // note récupérée par l'auteur au cours de l'édition
-//             $photographeDatas['sum8'] = $sum8Photos;
-//             $photographeDatas['sum4'] = $sum4Photos;
-//             $photographeDatas['average'] = $sumPhotos/$nbrPhotos;
-//             $photographeDatas['lower'] = $photos[sizeof($photos)-1]->g_score;
-//             $photographeDatas['sumScores'] = $sumScores;
-//             $photographeDatas['votesNumber'] = $nbrVotes;
-//             $photographeDatas['photosNumber'] = $nbrPhotos;
+        // On trie dans l'ordre décroissant
+        let res = b.gscore - a.gsscore;
+        if (res != 0) return res;
 
-//             // on sauvegarde
-//             foreach($photographeDatas as $k => $row)
-//             {
-//                 if (is_string($k))
-//                 $categories[-1][$photoIdgraphe][$k] = $row;
-//             }
-//         }
+        // Si exaquo, photo ayant titre gagne
+        res = (b.title != "" ? 1 : 0) - (a.title != "" ? 1 : 0);
+        if (res != 0) return res;
 
-//         // 2.2 - Calcul des palmares des editions précédentes
-//         $sql = 'SELECT * FROM agpa_awards WHERE year < '.$ctx['current_phase_year'].' ORDER BY author_id ASC, year ASC';
-//         $datas = array(); // contenaire temporaire
-//         $actualUser = 0;
+        // Si exaequo, avantage à la photo appartenant à la categorie la plus importante (en nombre de photo)
+        res = ctx.categories[b.categoryId].photosNumber - ctx.categories[a.categoryId].photosNumber;
+        if (res != 0) return res;
 
-//         $result = $CI->db->query($sql)->result();
-//         foreach ($result as $row)
-//         {
-//             if ($actualUser != $row->author_id)
-//             {
-//                 $actualUser = $row->author_id;
-//                 $datas[$actualUser] = 0;
-//             }
+        // Si exaequo, avantage à la photo de l'édition la plus récente
+        res = b.year - a.year;
+        if (res != 0) return res;
 
-//             $datas[$actualUser] += getPalmaresPoint($row->category_id, $row->award);
-//         }
+        // Si exaequo, avantage au photographe ayant le moins bon palamarès cumulé sur l'ensemble des éditions précédentes
+        res = ctx.users[a.userId].formerPalmares - ctx.users[b.userId].formerPalmares;
+        if (res != 0) return res;
 
-//         // on garde le palmares des années précédentes dans le contenaires principale $categories
-//         foreach($datas as $photoIdgraphe => $score)
-//         {
-//             $ctx['members'][$photoIdgraphe]->PreviousWinners = $score;
-//         }
+        // Si toujours exaequos, on tire au sort
+        res = Math.random();
+        return res > 0.5 ? 1 : -1;
+    }
 
-//         // On s'assure que l'attribut "PreviousWinners" est bien défini même pour ceux qui n'ont pas de palmares.
-//         foreach( $ctx['members'] as $id => $userData)
-//         {
-//             if (!isset($userData->PreviousWinners))
-//             {
-//                 $ctx['members'][$id]->PreviousWinners = 0;
-//             }
-//         }
+    function sortPhotographes(a, b) {
+        // On trie dans l'ordre décroissant en fonction de la moyenne des 8 meilleurs photos des photographes
+        let res = b.scoreOf8 - a.scoreOf8;
+        if (res != 0) return res;
 
-//         // On met à jour le contexte global avec les dernières données.
-//         $AGPA_CTX = $ctx;
+        // Si exaequo, avantage au photographe dont la note moyenne sur l'ensemble de ses photos est la plus élevée pour l'édition en cours
+        res = b.average - a.average;
+        if (res != 0) return res;
 
-//     // 3- On retrie les photos de chaque catégorie, avec une méthode qui départage les ex-aequos
+        // Si exaequo, avantage au photographe dont la plus mauvaise photo a la meilleur note
+        res = b.lower - a.lower;
+        if (res != 0) return res;
 
-//         function sortPhotos(&$a, &$b)
-//         {
-//             // On récupère le contexte global
-//             global $AGPA_CTX;
+        // Si exaequo, avantage au photograhe ayant le meilleur palmarès sur l'édition en cours
+        res = ctx.users[b.userId].palmares - ctx.users[a.userId].palmares;
+        if (res != 0) return res;
 
-//             // on trie dans l'ordre décroissant
-//             $res = $b->g_score - $a->g_score;
-//             if ( $res != 0) return $res;
+        // Si exaequo, avantage au photographe ayant le moins bon palamarès cumulé sur l'ensemble des éditions précédentes
+        res = ctx.users[a.userId].formerPalmares - ctx.users[b.userId].formerPalmares;
+        if (res != 0) return res;
 
-//             // Si exaquo, photo ayant titre gagne :
-//             $res = ( ($a->title != "")? 1 : 0) - ( ($b->title != "")? 1 : 0);
-//             if ( $res != 0) return $res;
+        // Si toujours exaequos, on tire au sort
+        res = Math.random();
+        return res > 0.5 ? 1 : -1;
+    }
 
-//             // Si exaequo, avantage à la photo appartenant à la categorie la plus importante (en nombre de photo)
-//             $res = $a->refRoot[$a->category_id]['photosNumber'] - $b->refRoot[$b->category_id]['photosNumber'];
-//             if ( $res != 0) return $res;
+    function sortTitles(aId, bId) {
+        const a = ctx.photos[aId];
+        const b = ctx.photos[bId];
 
-//             // Si exaequo, avantage à la photo de l'édition la plus récente
-//             $res = $a->year - $b->year;
-//             if ( $res != 0) return $res;
+        // On trie dans l'ordre décroissant en fonction du nombre de fois où une photo a été sélectionné pour le meilleur titre
+        let res = b.scoreTitle - a.scoreTitle;
+        if (res != 0) return res;
 
-//             // Si exaequo, avantage au photographe ayant le moins bon palamarès cumulé sur l'ensemble des éditions précédentes
-//             $res = $AGPA_CTX['members'][$a->user_id]->PreviousWinners - $AGPA_CTX['members'][$b->user_id]->PreviousWinners;
-//             if ( $res != 0) return $res;
+        // Si exaequo, avantage à la photo ayant le plus petit score
+        res = b.gscore - a.gscore;
+        if (res != 0) return res;
 
-//             // Si toujours exaequos, on tire au sort
-//             $res = rand(0,1);
-//             if ( $res == 0) return -1;
-//             return 1;
-//         }
+        // Si exaequo, avantage au photograhe ayant le moins bon palmarès sur l'édition en cours
+        res = ctx.users[a.userId].palmares - ctx.users[b.userId].palmares;
+        if (res != 0) return res;
 
-//         function sortPhotographes(&$a, &$b)
-//         {
-//             // On trie dans l'ordre décroissant en fonction de la moyenne des 6 meilleurs photos des photographes
-//             $res = $b['sum8'] - $a['sum8'];
-//             if ( $res != 0) return $res;
+        // Si exaequo, avantage au photographe ayant le moins bon palamarès cumulé sur l'ensemble des éditions précédentes
+        res = ctx.users[a.userId].formerPalmares - ctx.users[b.userId].formerPalmares;
+        if (res != 0) return res;
 
-//             // si exaequo, avantage au photographe dont la note moyenne sur l'ensemble de ses photos est la plus élevée pour l'édition en cours
-//             $res = $a['average'] - $b['average'];
-//             if ( $res != 0) return $res;
+        // Si toujours exaequos, on tire au sort
+        res = Math.random();
+        return res > 0.5 ? 1 : -1;
+    }
 
-//             // Si exaequo, avantage au photographe dont la plus mauvaise photo a la meilleur note
-//             $res = $a['lower'] - $b['lower'];
-//             if ( $res != 0) return $res;
+    // Palmarès des catégories "simples"
+    // (afin de calculer un premier palmarès de l'édition en cours utilisé pour départager les ex-aequos des catégories spéciales)
+    for (const catId in ctx.categories) {
+        if (+catId < 0) continue;
 
-//             // Si exaequo, avantage au photograhe ayant le meilleur palmarès sur l'édition en cours
-//             // TODO : PAS FAIT !!!!!!
-//             $res = $a['ActualWinners'] - $b['ActualWinners'];
-//             if ( $res != 0) return $res;
+        ctx.categories[catId].photos = ctx.photosOrder
+            .filter(pId => ctx.photos[pId].categoryId == catId)
+            .sort(sortPhotos);
+        deliverAwardsPhotos(ctx.categories[catId].photos, +catId, ctx);
+    }
 
-//             // Si exaequo, avantage au photographe ayant le moins bon palamarès cumulé sur l'ensemble des éditions précédentes
-//             $res = $ctx['members'][$a['user_id']]['PreviousWinners'] - $ctx['members'][$b['user_id']]['PreviousWinners'];
-//             if ( $res != 0) return $res;
+    // Palmarès "Meilleur titre"
+    ctx.categories[-3].photos = ctx.photosOrder
+        .filter(pId => ctx.photos[pId].votesTitle > 0)
+        .sort(sortTitles);
+    deliverAwardsPhotos(ctx.categories[-3].photos, -3, ctx);
 
-//             // Si toujours exaequos, on tire au sort
-//             $res = rand(0,1);
-//             if ( $res == 0) return -1;
-//             return 1;
-//         }
+    // // Palmarès "Meilleur photographie"
+    ctx.photosOrder.sort(sortPhotos);
+    deliverAwardsPhotos(ctx.photosOrder, -2, ctx);
 
-//         function sortTitles(&$a, &$b)
-//         {
-//             // On trie dans l'ordre décroissant en fonction du nombre de fois où une photo a été sélectionné pour le meilleur titre
-//             $res = $b->scoreTitle - $a->scoreTitle;
-//             if ( $res != 0) return $res;
+    // // Palmarès "Meilleur photographe"
+    ctx.usersOrder = Object.values(ctx.users)
+        .sort(sortPhotographes)
+        .map(u => (u as any).id);
+    deliverAwardsPhotographes(ctx.usersOrder, ctx);
 
-//             // si exaequo, avantage à la photo ayant le plus petit score
-//             $res = $a->g_score - $b->g_score;
-//             if ( $res != 0) return $res;
-
-//             // Si toujours exaequos, on tire au sort
-//             $res = rand(0,1);
-//             if ( $res == 0) return -1;
-//             return 1;
-//         }
-
-//         // 3.1- Déroulement du trie
-//         // 3.1.1- pour les catégories simples
-//         foreach($categories as $idCat => $cat)
-//         {
-//             if ($idCat > 0 || $idCat == -2)
-//             usort($categories[$idCat]['photos'], "sortPhotos"); // NE SURTOUT PAS UTILISER $cat qui est une copie et non une ref !!!
-//         }
-
-//         // 3.1.2- Trie de la catégorie -3 : meilleur titre
-//         usort($categories[-3]['photos'], "sortTitles");
-
-//         // 3.2- Déroulement du trie pour le HC "Meilleur photographe"
-//         // Compter les points palmares pour l'édition en cours.
-//         $datas = array(); // contenaire temporaire
-
-//         // 3.2.1- Effectuer une première passe pour attribuer les AGPA (sans les agpa diamant)
-//         deliverAwardsPasse1($categories);
-
-//         // 3.2.2- Calculer les points-palmares de chaque photographe pour l'edition actuelle
-//         foreach ($categories as $categoryId => $category)
-//         {
-//             if ($categoryId == -1) continue;
-//             foreach($category['photos'] as $positionInLeaderboard => $photo)
-//             {
-//                 if (!isset($datas[$photo->user_id])) $datas[$photo->user_id] = 0;
-//                 if (!isset($photo->award)) break;
-
-//                 $datas[$photo->user_id] += getPalmaresPoint($categoryId, $photo->award);
-//             }
-//         }
-
-//         // 3.2.3- on sauvegarde dans le contenaire principal $categories
-//         foreach($datas as $photoIdgraphe => $score)
-//         {
-//             $categories[-1][$photoIdgraphe]['ActualWinners'] = $score;
-//             $categories[-1][$photoIdgraphe]['IdPhotographe'] = $photoIdgraphe; // on duplique l'id car avec le trie, la clés va changer
-//         }
-
-//         // On s'assure que tout les participants sont créés même si ils n'ont rien récolé
-//         foreach ($ctx['members'] as $id => $memberData)
-//         {
-//             if (isset($categories[-1][$id]))
-//             {
-//                 if (!isset($categories[-1][$id]['IdPhotographe']))
-//                     $categories[-1][$id]['IdPhotographe'] = $id;
-//                 if (!isset($categories[-1][$id]['sum8']))
-//                 {
-//                     $categories[-1][$id]['sum8'] = 0;
-//                     $categories[-1][$id]['sum4'] = 0;
-//                     $categories[-1][$id]['average'] = 0;
-//                     $categories[-1][$id]['lower'] = 0;
-//                     $categories[-1][$id]['sumScores'] = 0;
-//                     $categories[-1][$id]['votesNumber'] = 0;
-//                     $categories[-1][$id]['photosNumber'] = 0;
-//                 }
-//             }
-//         }
-
-//         // 3.2.3- Trie de la catégorie -1 : meilleur photographe
-//         usort($categories[-1], "sortPhotographes");
-
-//         // 3.2.5- On attribue les récompenses aux photographes
-//         deliverAwardsPasse2($categories);
-
-//     // 4- Affichage
-
-//         if ($display)
-//         {
-//             foreach ($categories as $categoryId => $category)
-//             {
-//                 if ($categoryId > 0)
-//                 {
-//                     $ctx['computeStep'][$categoryId] =  array(
-//                         'id' => $categoryId,
-//                         'judges_number' => $category['judgesNumber'],
-//                         'photos_number' => $category['photosNumber'],
-//                         'title' => $ctx['categories'][$categoryId]->title
-//                     );
-//                 }
-//                 else if ($categoryId < -1)
-//                 {
-//                     $ctx['computeStep'][$categoryId] =  array(
-//                         'id' => $categoryId,
-//                         'title' => $ctx['categories'][$categoryId]->title
-//                     );
-//                 }
-
-//                 // affichage categorie simple ou meilleures photos
-//                 if ($categoryId > 0 or $categoryId == -2)
-//                 {
-//                     foreach($category['photos'] as $positionInLeaderboard => $photo)
-//                     {
-//                         $ctx['computeStep'][$categoryId]['photos'][] = array(
-//                             'leaderbord_rank' => $positionInLeaderboard+1,
-//                             'photo' => $photo,
-//                             'author' => $ctx['members'][$photo->user_id]->username
-//                         );
-//                     }
-//                 }
-//                 // Meilleurs titre
-//                 elseif ($categoryId == -3)
-//                 {
-//                     foreach($category['photos'] as $positionInLeaderboard => $photo)
-//                     {
-//                         $ctx['computeStep'][$categoryId]['photos'][] = array(
-//                             'leaderbord_rank' => $positionInLeaderboard +1,
-//                             'author' => $ctx['members'][$photo->user_id]->username,
-//                             'title' => $photo->title,
-//                             'scoreTitle' => $photo->scoreTitle
-//                         );
-//                     }
-//                 }
-//                 // Meilleurs photographes
-//                 elseif ($categoryId == -1)
-//                 {
-//                     foreach($category as $position => $data)
-//                     {
-//                         $ctx['computeStep'][$categoryId]['photos'][] = array(
-//                             'leaderbord_rank' => $position,
-//                             'author' => $ctx['members'][$data['IdPhotographe']]->username,
-//                             'sum8' => $data['sum8'],
-//                             'average' => $data['average'],
-//                             'lower' => $data['lower'],
-//                             'sumpoints' => $data['sumScores'],
-//                             'votes_number' => $data['votesNumber']
-//                         );
-//                     }
-//                 }
-//             }
-//         }
-
-//         return $categories;
-//     }
-// }
-
-// /**
-// * deliverAwardsPasse1
-// * Première passe pour l'attribution des AGPA (or, argent, bronze)
-// * Lors de cette première passe, on ne traite pas le HC "meilleur photographe"
-// * @param $categories, les données obtenues lors de l'appel à evalNote
-// */
-// if ( ! function_exists('deliverAwardsPasse1'))
-// {
-//     function deliverAwardsPasse1(&$categories)
-//     {
-//         $awards=array('diamant','or','argent','bronze');
-
-//         // On attribut simplement les agpa or, diamant et bronze au 1ere, deuxième et troisième photos
-//         foreach($categories as $idCat => &$category)
-//         {
-//             if ($idCat > 0)
-//             {
-
-//                 // test du double agpa d'or
-//                 if ($category['photos'][0]->user_id == $category['photos'][1]->user_id and
-//                     $category['photos'][0]->score   == $category['photos'][1]->score )
-//                 {
-//                     $category['photos'][0]->award = $awards[1];
-//                     $category['photos'][1]->award = $awards[1];
-//                     $category['photos'][2]->award = $awards[2];
-//                     $category['photos'][3]->award = $awards[3];
-//                 }
-//                 else
-//                 {
-//                     $category['photos'][0]->award = $awards[1];
-//                     $category['photos'][1]->award = $awards[2];
-//                     $category['photos'][2]->award = $awards[3];
-//                 }
-//             }
-//             elseif ($idCat == -3)
-//             {
-//                 // test du double agpa d'or
-//                 if ($category['photos'][0]->user_id == $category['photos'][1]->user_id and
-//                     $category['photos'][0]->score   == $category['photos'][1]->score )
-//                 {
-//                     $category['photos'][0]->awardTitle = $awards[1];
-//                     $category['photos'][1]->awardTitle = $awards[1];
-//                     $category['photos'][2]->awardTitle = $awards[2];
-//                     $category['photos'][3]->awardTitle = $awards[3];
-//                 }
-//                 else
-//                 {
-//                     $category['photos'][0]->awardTitle = $awards[1];
-//                     $category['photos'][1]->awardTitle = $awards[2];
-//                     $category['photos'][2]->awardTitle = $awards[3];
-//                 }
-//             }
-//             elseif ($idCat == -2)
-//             {
-//                 // test du double agpa d'or
-//                 if ($category['photos'][0]->user_id == $category['photos'][1]->user_id and
-//                     $category['photos'][0]->score   == $category['photos'][1]->score )
-//                 {
-//                     $category['photos'][0]->awardPhoto = $awards[1];
-//                     $category['photos'][1]->awardPhoto = $awards[1];
-//                     $category['photos'][2]->awardPhoto = $awards[2];
-//                     $category['photos'][3]->awardPhoto = $awards[3];
-//                 }
-//                 else
-//                 {
-//                     $category['photos'][0]->awardPhoto = $awards[1];
-//                     $category['photos'][1]->awardPhoto = $awards[2];
-//                     $category['photos'][2]->awardPhoto = $awards[3];
-//                 }
-//             }
-//         }
-//     }
-// }
-
-// /**
-// * deliverAwardsPasse2
-// * Première passe pour l'attribution des AGPA (or, argent, bronze)
-// * Lors de cette seconde passe, on ne traite que le HC "meilleur photographe"
-// * @param $categories, les données obtenues lors de l'appel à evalNote
-// */
-// if ( ! function_exists('deliverAwardsPasse2'))
-// {
-//     function deliverAwardsPasse2(&$categories)
-//     {
-//         $categories[-1][0]['award'] = 'or';
-//         $categories[-1][1]['award'] = 'argent';
-//         $categories[-1][2]['award'] = 'bronze';
-//     }
-// }
-
-
-
-// /**
-//  * deliverAwards
-//  * récupère les données retournées par la méthode evalNote(year, $categorie)
-//  * et retourne pour chaque catégorie (hors-catégorie compris) les récompenses obtenues
-//  * @param $ctx [array], le contexte des agpa
-//  * @param &$categories, les photos triées par catégories obtenue lors de l'appel à la méthode evalNote(year, $categorie)
-//  * @param $display, boolean, true : affichage dans le template du resultat
-//  *
-//  * @return array[mixed], par catégorie, les 4 meilleurs photos avec des
-//  *                       indications sur le type d'AGPA et les cas d'ex-aequo
-//  */
-// if ( ! function_exists('deliverAwards'))
-// {
-//     function deliverAwards(&$ctx, &$categories, $display)
-//     {
-
-//     // 2- Attribuer les AGPA de diamant
-//         foreach ($categories as $idCat => &$category)
-//         {
-//             if ($idCat != -1)
-//             {
-//                 if (checkDiamant($idCat, $category['photos'][0], $category['photos'][1]))
-//                 $category['photos'][0]->award = 'diamant';
-//             }
-//             else
-//             {
-//                 if (checkDiamant($idCat, $category[0], $category[1]))
-//                 $category[0]['award'] = 'diamant';
-//             }
-//         }
-
-//     // 2- Affichage
-//         if ($display)
-//         {
-//             // Meilleurs photographes - BUG BIZARRE > si on essaye de mettre ce code dans le foreach sur $categories : NE FONCTIONNE PAS
-//             foreach($categories[-1] as $position => $data)
-//             {
-//                 $ctx['computeStep'][-1]['photos'][] = array(
-//                     'leaderbord_rank' => $position,
-//                     'author' => $ctx['members'][$data['IdPhotographe']]->username,
-//                     'sum8' => $data['sum8'],
-//                     'average' => $data['average'],
-//                     'lower' => $data['lower'],
-//                     'sumpoints' => $data['sumScores'],
-//                     'votes_number' => $data['votesNumber'],
-//                     'award' => isset($data['award']) ? $data['award'] : ""
-//                 );
-//             }
-
-//             // Les autres catégories
-//             foreach ($categories as $categoryId => $category)
-//             {
-
-//                 if ($categoryId > 0)
-//                 {
-//                     $ctx['computeStep'][$categoryId] =  array(
-//                         'id' => $categoryId,
-//                         'judges_number' => $category['judgesNumber'],
-//                         'photos_number' => $category['photosNumber'],
-//                         'title' => $ctx['categories'][$categoryId]->title
-//                     );
-//                 }
-//                 else if ($categoryId < -1)
-//                 {
-//                     $ctx['computeStep'][$categoryId] =  array(
-//                         'id' => $categoryId,
-//                         'title' => $ctx['categories'][$categoryId]->title
-//                     );
-//                 }
-
-//                 // affichage categorie simple ou meilleures photos
-//                 if ($categoryId > 0 or $categoryId == -2)
-//                 {
-//                     foreach($category['photos'] as $positionInLeaderboard => $photo)
-//                     {
-//                         $ctx['computeStep'][$categoryId]['photos'][] = array(
-//                             'leaderbord_rank' => $positionInLeaderboard+1,
-//                             'photo' => $photo,
-//                             'author' => $ctx['members'][$photo->user_id]->username
-//                         );
-//                     }
-//                 }
-//                 // Meilleurs titres
-//                 elseif ($categoryId == -3)
-//                 {
-//                     foreach($category['photos'] as $positionInLeaderboard => $photo)
-//                     {
-//                         $ctx['computeStep'][$categoryId]['photos'][] = array(
-//                             'leaderbord_rank' => $positionInLeaderboard +1,
-//                             'author' => $ctx['members'][$photo->user_id]->username,
-//                             'photo' => $photo
-//                         );
-
-//                     }
-
-//                 }
-//             }
-
-//         }
-//         return $categories;
-//     }
-// }
+    return ctx;
+}
 
 // /**
 //  * checkDiamant
