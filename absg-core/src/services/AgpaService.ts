@@ -1,7 +1,12 @@
 import { User, LogModule, AgpaPhoto, AgpaCategory } from "../entities";
 import { getMaxArchiveEdition, getCurrentEdition, getMetaData } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
-import { p4AgpaAttribution, p4CheckVotes, p4ComputeNotes } from "../middleware/agpaAlgorithmsHelper";
+import {
+    p4AgpaAttribution,
+    p4CheckVotes,
+    p4ComputeNotes,
+    p4DiamondAttribution
+} from "../middleware/agpaAlgorithmsHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { logger } from "../middleware/logger";
@@ -230,7 +235,7 @@ class AgpaService {
         let context = null;
         if (user.roles.indexOf("admin") > -1) {
             // On récupère le contexte
-            context = await getMetaData(year);
+            context = await getMetaData(year, true);
 
             // Récupérer les votes et les vérifier
             context = await p4CheckVotes(context);
@@ -241,12 +246,8 @@ class AgpaService {
             // Attributions AGPA et création d'un "premier" palmares
             context = await p4AgpaAttribution(context);
 
-            // // 4- Attribution des AGPA de diamant
-            // $finalResult = p4DiamondAwards($ctx, awards, (($checkStep == 4)? true : false));
-            // //printCategoriesArray($finalResult);
-
-            // // 5- Clore les stats pour l'édition actuelle (maj bdd)
-            // p4CloseEdition($ctx, $finalResult);
+            // 4- Attribution des AGPA de diamant
+            context = await p4DiamondAttribution(context);
         }
         return context;
     }

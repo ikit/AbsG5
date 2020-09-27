@@ -104,19 +104,19 @@
                     <p>Le concours est ouvert à tous les membres du forum Absolument G. Il n'y a aucune limite d'âge,
                         les enfants comme les adultes peuvent aussi participer au concours.</p>
                     <p>Chaque candidat peut présenter une ou deux photo(s) par catégorie, pour autant de catégories qu’il le souhaite. </p>
-                    <p>Pour pouvoir être prise en compte, chaque photo doit remplir les conditions suivantes :
+                    <p>Pour pouvoir être prise en compte, chaque photo doit remplir les conditions suivantes:
                     <ul>
                         <li>Avoir été prise par le candidat au cours de l'année. Les photos du mois de décembre de l'année précédente sont acceptées;
                         <li>Les photos prises au retardateur sont admises, si le candidat a préparé l’appareil et cadré la photo lui-même;</li>
                         <li>Ne pas être un photo-montage, sauf pour la catégorie &laquo; Autre regard &raquo; où ils sont autorisés.</li>
                     </ul></p>
 
-                    <p>Les effets suivants ne sont pas considérés comme effets de montage et sont acceptés pour toutes les catégories :
+                    <p>Les effets suivants ne sont pas considérés comme effets de montage et sont acceptés pour toutes les catégories:
                     <ul>
-                        <li>Le redimensionnement ou le recadrage ;</li>
-                        <li>Les rotations ou la symétrie ;</li>
-                        <li>Les réglages de saturation, de luminosité ou de contraste ;</li>
-                        <li>L’effet noir et blanc, sépia ou négatif ;</li>
+                        <li>Le redimensionnement ou le recadrage;</li>
+                        <li>Les rotations ou la symétrie;</li>
+                        <li>Les réglages de saturation, de luminosité ou de contraste;</li>
+                        <li>L’effet noir et blanc, sépia ou négatif;</li>
                         <li>La correction des yeux rouges ou l’effacement de poussières.</li>
                     </ul></p>
                 </v-expansion-panel-content>
@@ -134,9 +134,9 @@
                     <p>Lors de l’enregistrement des photos, il est demandé au candidat d’attribuer un titre à chacune de ses œuvres.
                         Le titre donné est visible lors de l'évaluation des jurés, ils pourront donc en tenir compte s' ils le souhaitent.
                     </p>
-                    <p>Durant cette phase, le candidat peut :
+                    <p>Durant cette phase, le candidat peut:
                         <ul>
-                            <li>Envoyer et nommer de nouvelles photos (dans la limite de deux par catégorie) ;</li>
+                            <li>Envoyer et nommer de nouvelles photos (dans la limite de deux par catégorie);</li>
                             <li>Supprimer, remplacer ou renommer les photos déjà envoyées.</li>
                         </ul>
                     </p>
@@ -157,9 +157,9 @@
                 <v-expansion-panel-content>
                     <p>Une fois la phase d'enregistrement terminée, la phase de vérification des photos débute.
                         Durant cette phase d'une journée en général, les photos sont affichées sur le site Absolument G, dans la section consacrée aux AGPA. </p>
-                    <p>Pendant cette période, les membres du forum peuvent :
+                    <p>Pendant cette période, les membres du forum peuvent:
                         <ul>
-                            <li>Visualiser toutes les photos de tous les candidats ;</li>
+                            <li>Visualiser toutes les photos de tous les candidats;</li>
                             <li>Contacter l’organisation pour signaler une erreur ou une photo ne correspondant pas aux critères définis.</li>
                         </ul>
                     </p>
@@ -181,16 +181,16 @@
                     <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants de moins de 12 ans
                         peuvent voter, cependant seuls les votes des jurés ayant 12 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
                     <p>La phase de vote dure en général 3 jours. </p>
-                    <p>Pendant cette période, les membres du forum peuvent :
+                    <p>Pendant cette période, les membres du forum peuvent:
                         <ul>
                             <li>Visualiser les photos de tous les candidats. A noter que les photos refusées lors de la phase 2 ne seront pas visibles;</li>
-                            <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie :
+                            <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie:
                             <ul>
                                 <li>1 ou 2 étoiles aux meilleures photos;</li>
                                 <li>1 plume pour les meilleurs titres de photo.</li>
                             </ul></li>
-                            <li>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables</li>
-                            <li>Corriger leurs votes</li>
+                            <li>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables;</li>
+                            <li>Corriger leurs votes.</li>
                         </ul>
                     </p>
                     <p>Les candidats qui votent, doivent attribuer un minimum de points dans chaque catégorie.
@@ -223,7 +223,7 @@
                     <p>Remarques :
                         <ul>
                             <li>Si cette note technique n'a pas vocation à être diffusée lors de la cérémonie des AGPA,
-                                elle pourra être communiquée à chaque participant en faisant la demande ;</li>
+                                elle pourra être communiquée à chaque participant en faisant la demande;</li>
                             <li>Le palmarès des deux premières éditions ne sera pas modifié, même s’il aurait été différent avec ce mode d’évaluation,
                                 qui tient compte des nombres différents de photos entre les catégories.</li>
                         </ul>
@@ -252,18 +252,18 @@
 
 
                     <p>Remarques :<ul>
-                            <li>Les coefficients servent à départager les photos et rendre la note globale plus lisible qu’un chiffre à virgule ;</li>
-                            <li>La note des points (<i>NotePts</i>), affectée du plus fort coefficient, est la note déterminante, la note des votes (<i>NoteVts</i>) ne servant qu’à départager les photos à égalité avec le premier critère ;</li>
+                            <li>Les coefficients servent à départager les photos et rendre la note globale plus lisible qu’un chiffre à virgule;</li>
+                            <li>La note des points (<i>NotePts</i>), affectée du plus fort coefficient, est la note déterminante, la note des votes (<i>NoteVts</i>) ne servant qu’à départager les photos à égalité avec le premier critère;</li>
                             <li>La fusion des deux notes <i>NotePts</i> et <i>NoteVts</i> en  une variable unique permet de simplifier les calculs et les comparaisons, sans remettre en cause des critères historiques de classement.</li>
                             <li>La note moyenne de chaque catégorie est de 10 000 points.</li>
                         </ul>
                     </p>
 
-                    <p>En cas de notes équivalentes, deux photos sont départagées par les critères suivants (par ordre d’application) :<ul>
-                            <li>Présence ou non de titre (avantage à la photo titrée) ;</li>
-                            <li>Nombre total de photos de la catégorie (avantage à la photo provenant de la plus grande catégorie) ;</li>
-                            <li>Palmarès des auteurs des photos avant l’édition en cours (avantage à la photo dont l’auteur présente le plus faible palmarès ; cf. paragraphe III.) ;</li>
-                            <li>Edition (pour les comparaisons entre éditions ; avantage à la photo de l’édition la plus récente) ;</li>
+                    <p>En cas de notes équivalentes, deux photos sont départagées par les critères suivant (par ordre d’application):<ul>
+                            <li>Présence ou non de titre (avantage à la photo titrée);</li>
+                            <li>Nombre total de photos de la catégorie (avantage à la photo provenant de la plus grande catégorie);</li>
+                            <li>Edition (pour les comparaisons entre éditions; avantage à la photo de l’édition la plus récente);</li>
+                            <li>Palmarès des auteurs des photos avant l’édition en cours (avantage à la photo dont l’auteur présente le plus faible palmarès ; cf. paragraphe III.);</li>
                             <li>Tirage au sort.</li>
                         </ul>
                     </p>
@@ -276,7 +276,22 @@
                     <span><i style="display: inline-block; width: 40px">II.5.b.</i> AGPA du meilleur titre</span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <p>TODO</p>
+                    <p>Depuis 2011, les jurés ont la possibilité de récompenser les photos ayant le meilleur titre en leur attribuant une plume.
+                        Chaque juré peut ainsi voter pour 5 à 10 photos parmis toutes les photos proposées d'une édition.</p>
+                    <p>Comme pour les étoiles, il y a certaines conditions à respecter pour que les votes "plumes" d'un juré soient pris en compte:<ul>
+                        <li>Le juré doit avoir plus de 12 ans;</li>
+                        <li>Le juré doit avoir attribué au moins 5 plumes;</li>
+                        <li>Le juré doit avoir attribué au maximum 10 plumes.</li>
+                        </ul>
+                    </p>
+                    <p>Ensuite les photos sont classées en fonction du nombre de plumes qu'elles totalisent.</p>
+                    <p>En cas d'exaequo, deux photos sont départagées par les critères suivant (par ordre d’application):<ul>
+                            <li>Avantage à la photo ayant obtenu le plus petit score (voir section II.5.a. sur le calcul des points);</li>
+                            <li>Avantage à l'auteur ayant le moins bon palmarès sur l'édition en cours;</li>
+                            <li>Avantage à l'auteur ayant le moins bon palmarès cumulé sur les éditions précédantes;</li>
+                            <li>Tirage au sort.</li>
+                        </ul>
+                    </p>
                 </v-expansion-panel-content>
             </v-expansion-panel>
 
@@ -286,7 +301,13 @@
                     <span><i style="display: inline-block; width: 40px">II.5.c.</i> AGPA de la meilleure photographie</span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <p>TODO</p>
+                    <p>L'AGPA de la meilleure photographie récompense les photos qui ont obtenues les plus grands scores toutes catégories confondues.
+                        Le score dont le calcul est expliqué dans la section II.5.a. prend déjà en compte cette aspect là.
+                        En effet, le score moyen pour chaque catégories étant de 10 000 points, on peut ainsi comparer toutes les photos, mêmes celles d'édition et de catégorie différentes.
+                    </p>
+                    <p>A noter que le calcul du score favorise les photos provenant de la catégorie ou il y a le plus de photo.
+                        L'algorithme pour départager les exaequos est le même que celui présenté dans la section II.5.a. pour départager les photos au sein d'une même catégorie.
+                    </p>
                 </v-expansion-panel-content>
             </v-expansion-panel>
 
@@ -296,14 +317,14 @@
                     <span><i style="display: inline-block; width: 40px">II.5.d.</i> AGPA du meilleur photographe</span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <p>Le classement du meilleur photographe est calculé à partir de la somme des notes des six meilleures photos de chaque participant,
-                        ou de toutes les photos des participants ayant proposés six photos ou moins.
+                    <p>Le classement du meilleur photographe est calculé à partir de la somme des notes des 8 meilleures photos (8 étant le nombre de catégories du concours) de chaque participant,
+                        ou de toutes les photos des participants ayant proposés 8 photos ou moins.
                     </p>
-                    <p>En cas de notes équivalentes, deux photographes sont départagés par les critères suivants (par ordre d’application) :<ul>
-                            <li>Moyenne des photos du photographe pour l’édition en cours (avantage à la meilleure moyenne) ;</li>
-                            <li>Note de la moins bonne photo (avantage à la meilleure note) ;</li>
-                            <li>Palmarès de l’édition actuelle (hors catégorie « meilleur photographe, avantage au photographe possédant le meilleur palmarès ; cf. paragraphe III.) ;</li>
-                            <li>Palmarès cumulé des éditions précédentes (avantage au candidat présentant le plus faible palmarès ; cf. paragraphe III.) ;</li>
+                    <p>En cas de notes équivalentes, deux photographes sont départagés par les critères suivants (par ordre d’application):<ul>
+                            <li>Moyenne des photos du photographe pour l’édition en cours (avantage à la meilleure moyenne);</li>
+                            <li>Note de la moins bonne photo (avantage à la meilleure des deux);</li>
+                            <li>Palmarès de l’édition actuelle (hors catégorie spéciales), avantage au photographe possédant le meilleur palmarès;</li>
+                            <li>Palmarès cumulé des éditions précédentes (avantage au candidat présentant le plus faible palmarès);</li>
                             <li>Tirage au sort.</li>
                         </ul>
                     </p>
@@ -329,12 +350,13 @@
                     <span><i style="display: inline-block; width: 40px">II.5.f.</i> AGPA de diamant</span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <p>Dans certains cas bien précis, les AGPA d’or peuvent se transformer en AGPA de diamant : <ul>
-                        <li>AGPA de diamant de la meilleure photo de sa catégorie attribué à la première photo si : <ul>
-                            <li>La photo totalise 50 000 points ou plus;</li>
+                    <p>Dans certains cas bien précis, les AGPA d’or peuvent se transformer en AGPA de diamant: <ul>
+                        <li>AGPA de diamant de la meilleure photo de sa catégorie attribué à la première photo si: <ul>
+                            <li>Elle totalise 50 000 points ou plus;</li>
                             <li><b>ET</b> la note de la photo est strictement supérieure au double de la note de la deuxième meilleure photo de la catégorie.</li></ul></li>
+                        <li>AGPA de diamant du meilleur titre est attribué si la photo récolte plus du double de plume par rapport au deuxième meilleur titre.</li>
                         <li>AGPA de diamant de la meilleure photo toutes catégories attribué à la meilleure photo si : <ul>
-                            <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés moins un).</li></ul></li>
+                            <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés en age de voter moins un).</li></ul></li>
                         <li>AGPA de diamant du meilleur photographe attribué au premier photographe si :<ul>
                             <li>Il est l’auteur des trois meilleures photos et ses quatre meilleures photos totalisent 100 000 points ou plus ;</li>
                             <li><b>OU</b> il totalise 33 points ou plus au palmarès de l’édition actuelle (avant transformation de l’AGPA d’or du meilleur photographe en AGPA de diamant).</li></ul></li>

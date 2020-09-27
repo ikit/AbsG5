@@ -26,7 +26,6 @@
                 <v-tab><v-icon>fas fa-vote-yea</v-icon> &nbsp; Votes</v-tab>
                 <v-tab><v-icon>fas fa-calculator</v-icon> &nbsp; Notes</v-tab>
                 <v-tab><v-icon>fas fa-trophy</v-icon> &nbsp; Palmarès</v-tab>
-                <v-tab><v-icon>fas fa-gavel</v-icon> &nbsp; Clôture</v-tab>
 
                 <!-- Vérification des votes -->
                 <v-tab-item>
@@ -87,6 +86,7 @@
                         :items="notes"
                         :search="notesFilter.quickFilter"
                         :loading="isLoading"
+                        :custom-filter="notesSearchMethod"
                         loading-text="Récupération des données..."
                     >
                         <template v-slot:item.category="{ item }">
@@ -140,22 +140,69 @@
                 <!-- Palmarès -->
                 <v-tab-item>
                     <h2>Etablissement du palmarès</h2>
-                    todo
-                </v-tab-item>
+                    <v-data-table
+                        :headers="palmaresHeaders"
+                        :items="palmares"
+                        :search="palmaresFilter.quickFilter"
+                        :loading="isLoading"
+                        :custom-filter="palmaresSearchMethod"
+                        loading-text="Récupération des données..."
+                        no-data-text="Aucun palmarès disponible."
+                        no-results-text="Aucune personne trouvée."
+                    >
+                        <template v-slot:item.photographe="{ item }">
+                            <img :src="item.url" style="height: 40px; margin-right: 15px; vertical-align: middle"/>
+                            <span style="font-size: 1.2em">{{ item.username }}</span>
+                        </template>
 
-                <!-- Clôture de l'édition des AGPA -->
-                <v-tab-item>
-                    <h2>Clôture de l'édition</h2>
-                    <p>Si tout est ok, alors il n'y a plus qu'à sauvegarder les résultat.</p>
-                    <v-btn text color="primary" @click="closeEdition()">Enregistrer les résultats.</v-btn>
+                        <template v-slot:item.awards="{ item }">
+                            <template v-if="item.rewards.diamond">
+                                <i class="fas fa-circle" style="color: #c3f1ff"></i> {{ item.rewards.diamond }}
+                            </template>
+                            <template v-if="item.rewards.gold">
+                                <i class="fas fa-circle" style="color: #c68b00"></i> {{ item.rewards.gold }}
+                            </template>
+                            <template v-if="item.rewards.sylver">
+                                <i class="fas fa-circle" style="color: #9b9b9b"></i> {{ item.rewards.sylver }}
+                            </template>
+                            <template v-if="item.rewards.bronze">
+                                <i class="fas fa-circle" style="color: #964c31"></i> {{ item.rewards.bronze }}
+                            </template>
+                            <template v-if="item.rewards.nominated">
+                                <i class="far fa-circle"></i> {{ item.rewards.nominated }}
+                            </template>
+                            <template v-if="item.rewards.honor">
+                                <i class="far fa-smile"></i> {{ item.rewards.honor }}
+                            </template>
+                        </template>
+
+                        <template v-slot:item.scoreOf8="{ item }">
+                            <span style="font-weight: bold">{{ item.scoreOf8 }} </span> <template v-if="item.scoreOf8 > 1">pts</template><template v-else>pt</template>
+                        </template>
+
+                        <template v-slot:item.average="{ item }">
+                            <span>{{ item.average }} </span> <template v-if="item.average > 1">pts</template><template v-else>pt</template>
+                        </template>
+
+                        <template v-slot:item.lower="{ item }">
+                            <span>{{ item.lower }} </span> <template v-if="item.lower > 1">pts</template><template v-else>pt</template>
+                        </template>
+
+                        <template v-slot:item.score="{ item }">
+                            <span style="font-weight: bold">{{ item.palmares }} </span> <template v-if="item.palmares > 1">pts</template><template v-else>pt</template>
+                        </template>
+
+                        <template v-slot:item.formerPalmares="{ item }">
+                            <span>{{ item.formerPalmares }} </span> <template v-if="item.formerPalmares > 1">pts</template><template v-else>pt</template>
+                        </template>
+
+                        <template v-slot:item.newPalmares="{ item }">
+                            <span>{{ item.formerPalmares + item.palmares }} </span> <template v-if="item.formerPalmares + item.palmares > 1">pts</template><template v-else>pt</template>
+                        </template>
+
+                    </v-data-table>
                 </v-tab-item>
             </v-tabs>
-
-
-
-
-
-
         </v-card>
 
 
@@ -223,8 +270,6 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
-
     </section>
 </template>
 
@@ -273,6 +318,23 @@ export default {
         notesCategories: [{ label: "Toutes", id: null }],
         notes: [],
         notesAll: [],
+
+        palmaresHeaders: [
+            { text: 'Photographe', value: 'photographe' },
+            { text: 'Récompenses', value: 'awards' },
+            { text: '8 meilleurs photos', value: 'scoreOf8' },
+            { text: 'Moyenne des photos', value: 'average' },
+            { text: 'Moins bonne photo', value: 'lower' },
+            { text: 'Score', value: 'score' },
+            { text: 'Palmarès précédant', value: 'formerPalmares' },
+            { text: 'Nouveau Palmarès', value: 'newPalmares' },
+        ],
+        palmaresFilter: {
+            quickfilter: null, // un filtre par recherche de mot clés multichamps: cf construction du champs quickfilter dans mounted()
+            categoryId: null, // si on filtre une catégorie en particulier
+        },
+        palmares: [],
+
         data: null,
     }),
     computed: { ...mapState([
@@ -333,11 +395,54 @@ export default {
                 this.updateNotesList();
 
                 // On reformate le palmares par catégories
+                this.palmares = Object.values(this.data.users).map( u => ({
+                    ...u,
+                    ...getPeopleAvatar(u),
+                    average: Math.round(u.average),
+                    rewards: this.reformatAward(u.awards)
+                })).sort((a, b) => this.data.usersOrder.findIndex(e => e === a.id) - this.data.usersOrder.findIndex(e => e === b.id));
                 this.isLoading = false;
             }).catch( err => {
                 store.commit("onError", err);
             });
         },
+
+        reformatAward(awards) {
+            const rewards = {
+                diamond: 0,
+                gold: 0,
+                sylver: 0,
+                bronze: 0,
+                nominated: 0,
+                honor: 0
+            };
+            if (Array.isArray(awards)) {
+                awards.forEach(a => {
+                    switch(a.award) {
+                        case "diamond":
+                            rewards.diamond += 1;
+                            break;
+                        case "gold":
+                            rewards.gold += 1;
+                            break;
+                        case "sylver":
+                            rewards.sylver += 1;
+                            break;
+                        case "bronze":
+                            rewards.bronze += 1;
+                            break;
+                        case "nominated":
+                            rewards.nominated += 1;
+                            break;
+                        case "honor":
+                            rewards.honor += 1;
+                            break;
+                    }
+                });
+            }
+            return rewards;
+        },
+
 
         displayVotesDetails(data) {
             this.voteDetails.vote = data;

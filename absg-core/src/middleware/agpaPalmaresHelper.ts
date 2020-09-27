@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { AgpaPhoto, AgpaCategory, User } from "../entities";
+import { AgpaPhoto, AgpaCategory, User, AgpaAwardType } from "../entities";
 import { checkValidYear, getCurrentEdition, getPhasesBoundaries } from "./agpaCommonHelpers";
 import { AgpaPalmares } from "./model/AgpaPalmares";
 
@@ -71,15 +71,20 @@ import { AgpaPalmares } from "./model/AgpaPalmares";
  * @param award, le type de l'award (lice, bronze, argent, or, diamant)
  * @return la valeur en point
  */
-export function palmaresPoints(award: string) {
-    const palmaresPoints = {
-        diamond: 5,
-        gold: 4,
-        sylver: 3,
-        bronze: 2,
-        nominated: 1
-    };
-    return award in palmaresPoints ? palmaresPoints[award] : 0;
+export function palmaresPoints(award: AgpaAwardType) {
+    switch (award) {
+        case AgpaAwardType.diamond:
+            return 5;
+        case AgpaAwardType.gold:
+            return 4;
+        case AgpaAwardType.sylver:
+            return 3;
+        case AgpaAwardType.bronze:
+            return 2;
+        case AgpaAwardType.nominated:
+            return 1;
+    }
+    return 0;
 }
 
 /**
