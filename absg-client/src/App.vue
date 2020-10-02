@@ -94,7 +94,7 @@
         </v-menu>
     </v-app-bar>
 
-    <v-content id="bgcontent" style="background: #f9f9f9">
+    <v-main id="bgcontent" style="background: #f9f9f9">
         <div class="menu" v-if="user && user.id > 0 && $vuetify.breakpoint.lgAndUp">
             <v-list style="background: none">
                 <template v-for="item in menuItems">
@@ -154,7 +154,7 @@
                 </div>
             </div>
         </div>
-    </v-content>
+    </v-main>
 
 
     <v-dialog v-model="notifDialog" width="800px">

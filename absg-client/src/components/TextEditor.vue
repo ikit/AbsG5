@@ -3,7 +3,7 @@
         v-model="value"
         :extensions="extensions"
         placeholder="Rédigez ici votre nouveau message"
-        @keyup="onKeyDown"
+        @keydown="onKeyDown"
     />
 </template>
 
@@ -49,8 +49,10 @@ export default {
     }),
     methods: {
         onKeyDown (event) {
-            console.log(this.value)
-            this.$emit('change', this.value);
+            setTimeout(() => {
+                this.$emit('change', this.value);
+            });
+
         }
     }
 }
