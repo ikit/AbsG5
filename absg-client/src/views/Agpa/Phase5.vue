@@ -38,7 +38,6 @@ export default {
     }),
     props: ['current'],
     methods: {
-
         getCategoryPhoto (cat) {
             let url = '';
             if (cat.id > 0) {
@@ -50,7 +49,6 @@ export default {
             }
             return url;
         },
-
         resetDialog (open = false) {
             this.citationEditor.open = open;
             this.citationEditor.citationId = null;

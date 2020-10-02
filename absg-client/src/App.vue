@@ -110,7 +110,7 @@
             <div class="menuItem" style="position: absolute; bottom: 0; border-top: 1px solid rgba(0, 0, 0, 0.2)">
                 <router-link to="/changelog">
                     <v-icon color="inherit">far fa-question-circle</v-icon><br/>
-                    <span style="display: inline-block; line-height: 0.9em;">v5 apha</span>
+                    <span style="display: inline-block; line-height: 0.9em;">v5 beta</span>
                 </router-link>
             </div>
         </div>

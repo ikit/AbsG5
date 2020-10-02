@@ -107,7 +107,7 @@ export class AgpaController {
      */
     @Get("/p4")
     getP4Data(@CurrentUser() user) {
-        return agpaService.getP4Data(2019, user);
+        return agpaService.getP4Data(2011, user);
     }
 
     /**

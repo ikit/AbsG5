@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-card style="min-width: 500px;">
+    <v-card style="min-width: 460px;">
         <v-card-title >
             <v-menu
                 ref="dateMenu"
@@ -10,6 +10,7 @@
                 transition="scale-transition"
                 offset-y
                 min-width="290px"
+                v-if="$vuetify.breakpoint.lgAndUp"
             >
                 <template v-slot:activator="{ on }">
                     <v-btn text class="h2"

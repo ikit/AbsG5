@@ -1,5 +1,5 @@
 <template>
-    <section id="content">
+    <section id="content" v-if="isAdmin">
         <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
             <v-row style="padding: 15px">
 
@@ -270,6 +270,10 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+    </section>
+
+    <section v-else>
+
     </section>
 </template>
 

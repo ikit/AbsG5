@@ -266,7 +266,7 @@ export default {
 .immt {
     div {
         max-width: 700px;
-        min-width: 500px;
+        min-width: 460px;
         height: 450px;
         margin: auto;
         display: table;
@@ -279,7 +279,7 @@ export default {
             vertical-align: middle;
 
             img {
-                max-width: 700px;
+                max-width: min(90vw, 700px);
                 max-height: 450px;
                 background: white;
                 padding: 1px;

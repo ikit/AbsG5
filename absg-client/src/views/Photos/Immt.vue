@@ -19,33 +19,6 @@
                         </v-text-field>
                         <!-- <span class="grey--text">{{immts.length}} images</span> -->
                         <v-spacer></v-spacer>
-
-                        <!-- <v-spacer></v-spacer>
-
-                        <span class="grey--text">Images par page</span>
-                        <v-menu offset-y>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    class="ml-2"
-                                    :disabled="isLoading"
-                                    v-on="on">
-                                        {{ filter.pageSize }}
-                                    <v-icon>fa-angle-down</v-icon>
-                                </v-btn>
-                            </template>
-                                <v-list>
-                                <v-list-item
-                                    v-for="(number, index) in [24, 48, 96]"
-                                    :key="index"
-                                    @click="updateImmtsPerPage(number)">
-                                    <v-list-item-title>{{ number }}</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu> -->
-
-
                         <v-btn
                             icon small
                             :disabled="isLoading"
@@ -66,9 +39,13 @@
                         <v-spacer></v-spacer>
 
                         <v-btn
+                            v-if="$vuetify.breakpoint.mdAndUp"
                             @click.stop="resetDialog(true)">
                             <v-icon left>fas fa-plus</v-icon>
                             <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
+                        </v-btn>
+                        <v-btn v-else fab small @click.stop="resetDialog(true)">
+                            <v-icon>fas fa-plus</v-icon>
                         </v-btn>
                     </v-row>
                 </div>

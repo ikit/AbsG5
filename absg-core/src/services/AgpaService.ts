@@ -233,7 +233,7 @@ class AgpaService {
      */
     async getP4Data(year: number, user: User) {
         let context = null;
-        if (user.roles.indexOf("admin") > -1) {
+        if (user.is("admin")) {
             // On récupère le contexte
             context = await getMetaData(year, true);
 
