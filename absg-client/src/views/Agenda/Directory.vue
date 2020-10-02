@@ -25,12 +25,13 @@
                 loading-text="Récupération des données..."
                 no-data-text="Aucune personne enregistré dans l'annuaire."
                 no-results-text="Aucune personne trouvé."
+                disable-sort
             >
                 <template v-slot:item.photo="{ item }">
-                    <div v-if="item.thumb" class="thumb">
+                    <div v-if="item.thumb && $vuetify.breakpoint.lgAndUp" class="thumb">
                         <img :src="item.thumb" @click="photosGalleryDisplay(item.galleryIndex)"/>
                         </div>
-                    <div v-if="!item.thumb" class="noThumb">
+                    <div v-if="!item.thumb && $vuetify.breakpoint.lgAndUp" class="noThumb">
                         <v-icon small>fas fa-user-circle</v-icon>
                     </div>
                 </template>

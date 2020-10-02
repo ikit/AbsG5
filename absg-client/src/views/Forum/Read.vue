@@ -24,11 +24,11 @@
             <span v-if="pinned">Retirer le sujet des accès direct</span>
         </v-tooltip>
 
-        <v-btn
+        <!-- <v-btn
             style="position: absolute; right: 15px; top: 10px"
             @click.stop="newTopic()">
             <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
-        </v-btn>
+        </v-btn> -->
     </div>
 
     <Reader ref="messageReader"></Reader>
