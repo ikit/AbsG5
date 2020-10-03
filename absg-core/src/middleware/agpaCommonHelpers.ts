@@ -1,5 +1,5 @@
-import { addDays } from "date-fns";
-import { AgpaPhoto } from "../entities";
+import { addDays, addSeconds } from "date-fns";
+import { AgpaPhoto, Parameter } from "../entities";
 import { AgpaContext } from "./model/AgpaContext";
 import { getRepository } from "typeorm";
 import { AgpaPhase } from "./model/AgpaPhase";
@@ -39,7 +39,7 @@ export function checkValidYear(year, defaultYear: number = null): number {
  * Calcule les phases pour l'édition courante
  * @return la liste des phases
  */
-export function getPhasesBoundaries(): AgpaPhase[] {
+export async function getPhasesBoundaries(): Promise<AgpaPhase[]> {
     // Les durées des phases par défaut sont :
     //   1 : enregistrement des oeuvre        [ du 1er octobre au 15 décembre ] => 76 jours
     //   2 : vérification des photos          [ du 15 au 17 décembre ] => 2 jours
@@ -48,18 +48,34 @@ export function getPhasesBoundaries(): AgpaPhase[] {
     //   5 : post cérémonie                   [ du 24 jusqu'au démarrage de la prochaine édition ]
     // Mais pour l'année en cours, on récupère les durées via la DB car on peut les modifier
     // pour s'adapter au contraintes des agendas des participants
+    const repo = getRepository(Parameter);
     const phases = [];
     let startDate = new Date(getCurrentEdition(), 9, 1, 0, 0, 0);
     const phasesDayDurations = [76, 2, 4, 3, null];
+    let agpaCeremonyStartTime = 72000; // Par défaut la cérémonie débute à 20h (72000 seconds)
 
-    // TODO: récupérer les valeurs en bases de données
+    // Récupération des phases configurées par les admins
+    const sql = `SELECT * FROM parameter WHERE key LIKE 'agpa%';`;
+    const raw = await repo.query(sql);
+    if (Array.isArray(raw) && raw.length === 5) {
+        phasesDayDurations[0] = +raw.find(e => e.key === "agpaPhase1Duration").value;
+        phasesDayDurations[1] = +raw.find(e => e.key === "agpaPhase2Duration").value;
+        phasesDayDurations[2] = +raw.find(e => e.key === "agpaPhase3Duration").value;
+        phasesDayDurations[3] = +raw.find(e => e.key === "agpaPhase4Duration").value;
+        agpaCeremonyStartTime = +raw.find(e => e.key === "agpaCeremonyStartTime").value;
+    }
 
+    // Calcul des échéances
     for (let idx = 0; idx < phasesDayDurations.length; idx++) {
         const p = new AgpaPhase();
         p.id = idx + 1;
         p.startDate = new Date(startDate);
-        if (phasesDayDurations[idx]) {
+        if (idx <= 2) {
             startDate = addDays(startDate, phasesDayDurations[idx]);
+            p.endDate = new Date(startDate);
+        } else if (idx === 3) {
+            startDate = addDays(startDate, phasesDayDurations[idx]);
+            startDate = addSeconds(startDate, agpaCeremonyStartTime);
             p.endDate = new Date(startDate);
         } else {
             p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
@@ -95,10 +111,19 @@ export async function getMetaData(year = null, force = false): Promise<any> {
         year, // L'année de l'édition en cours
         maxYear: currentYear - 1, // L'année max pour les archives
         minYear: 2006,
-        boudaries: getPhasesBoundaries(),
+        boudaries: await getPhasesBoundaries(),
         categoriesOrders: [], // La liste ordonnées des (id des) catégories de l'année en cours
-        categories: {} // Données sur chaques catégories
+        categories: {}, // Données sur chaques catégories,
+        phase: null // La phase en cours
     };
+
+    // On en déduis la phase actuelle pour l'édition en cours
+    const date = new Date();
+    for (const p of data.boudaries) {
+        if (date > p.startDate) {
+            data.phase = p.id;
+        }
+    }
 
     // On récupère les données des catégories
     let sql = `SELECT c.* , v.title as "vTitle", v.description as "vDescription"
@@ -132,56 +157,6 @@ export async function getMetaData(year = null, force = false): Promise<any> {
     }
     return data;
 }
-
-/**
- * shuffleArray
- * Mélange les éléments d'un tableau. Attention, le tableau d'entré est mélangé
- * @param {Array} array, le tableau à mélanger
- 
-function shuffleArray(array: any[]) {
-    let j, tmp;
-    for (let i = array.length - 1; i > 0; i--) {
-        j = Math.floor(Math.random() * (i + 1));
-        tmp = array[i];
-        array[i] = array[j];
-        array[j] = tmp;
-    }
-}
-*/
-
-/**
- * sufflePhotos
- * Attribut un numéro aléatoire aux photos d'une même édition
- * et met à jour en même temps ce tableau avec les numéros générés
- *
- * @param photos,  les photos de l'éditions, triés par catégories.
- * @return ctx le contexte mis à jour avec le tableau récapitulatif des photos de l'edition des AGPA (triées par catégories)
-
-export function sufflePhotos(photos)
-{
-    const newPhotos = [];
-    // On concatène toutes les photos dans un même tableau
-    for(const cat of photos) {
-        for (const photo of cat) {
-            newPhotos.push(photo);
-        }
-    }
-    // On mélange
-    shuffleArray(newPhotos);
-
-    // Maj MySQL
-    let num = 1;
-    let sql = '';
-    for(const photo of newPhotos)
-    {
-        sql += `UPDATE agpa_photo SET number = '${num}' WHERE id=${photo.id};`;
-        photo.number = num;
-        ++num;
-    }
-    return sql;
-}
-*/
-
 /**
  * Calcule la phase de l'édition en cours
  * @return la phase de l'édition en cours
@@ -197,26 +172,5 @@ export function getCurrentPhase(): number {
  * @return l'année de la dernière édition
  */
 export function getMaxArchiveEdition(): number {
-    const now = new Date();
     return getCurrentPhase() < 5 ? getCurrentEdition() - 1 : getCurrentEdition();
 }
-
-// export function convertCatIdToCssId(caId)
-// {
-//     let result = caId;
-
-//     switch(caId)
-//     {
-//         case -3:
-//             result = 'x3';
-//             break;
-//         case -2:
-//             result = 'x2';
-//             break;
-//         case -1:
-//             result = 'x1';
-//             break;
-//     }
-
-//     return result;
-// }

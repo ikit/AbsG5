@@ -1,29 +1,29 @@
 <template>
-    <v-tabs centered>
-        <v-tab>
-            <v-icon v-if="agpaMeta && agpaMeta.phase === 1">far fa-check-square</v-icon>
-            <v-icon v-else>fas fa-square</v-icon>
-            &nbsp; Phase 1</v-tab>
-        <v-tab>
-            <v-icon v-if="agpaMeta && agpaMeta.phase < 2">far fa-square</v-icon>
-            <v-icon v-else-if="agpaMeta && agpaMeta.phase === 2">far fa-check-square</v-icon>
-            <v-icon v-else>fas fa-square</v-icon>
-            &nbsp; Phase 2</v-tab>
-        <v-tab>
-            <v-icon v-if="agpaMeta && agpaMeta.phase < 3">far fa-square</v-icon>
-            <v-icon v-else-if="agpaMeta && agpaMeta.phase === 3">far fa-check-square</v-icon>
-            <v-icon v-else>fas fa-square</v-icon>
-            &nbsp; Phase 3</v-tab>
-        <v-tab>
-            <v-icon v-if="agpaMeta && agpaMeta.phase < 4">far fa-square</v-icon>
-            <v-icon v-else-if="agpaMeta && agpaMeta.phase === 4">far fa-check-square</v-icon>
-            <v-icon v-else>fas fa-square</v-icon>
-            &nbsp; Phase 4</v-tab>
-        <v-tab>
-            <v-icon v-if="agpaMeta && agpaMeta.phase < 5">far fa-square</v-icon>
-            <v-icon v-else-if="agpaMeta && agpaMeta.phase === 5">far fa-check-square</v-icon>
-            <v-icon v-else>fas fa-square</v-icon>
-            &nbsp; Phase 5</v-tab>
+    <v-tabs centered v-model="selectedTab">
+        <v-tab key="1">
+            <v-icon left v-if="agpaMeta && agpaMeta.phase === 1">fas fa-square</v-icon>
+            <v-icon left v-else>far fa-check-square</v-icon>
+            Phase 1</v-tab>
+        <v-tab key="2">
+            <v-icon left v-if="agpaMeta && agpaMeta.phase < 2">far fa-square</v-icon>
+            <v-icon left v-else-if="agpaMeta && agpaMeta.phase === 2">fas fa-square</v-icon>
+            <v-icon left v-else>far fa-check-square</v-icon>
+            Phase 2</v-tab>
+        <v-tab key="3">
+            <v-icon left v-if="agpaMeta && agpaMeta.phase < 3">far fa-square</v-icon>
+            <v-icon left v-else-if="agpaMeta && agpaMeta.phase === 3">fas fa-square</v-icon>
+            <v-icon left v-else>far fa-check-square</v-icon>
+            Phase 3</v-tab>
+        <v-tab key="4">
+            <v-icon left v-if="agpaMeta && agpaMeta.phase < 4">far fa-square</v-icon>
+            <v-icon left v-else-if="agpaMeta && agpaMeta.phase === 4">fas fa-square</v-icon>
+            <v-icon left v-else>far fa-check-square</v-icon>
+            Phase 4</v-tab>
+        <v-tab key="5">
+            <v-icon left v-if="agpaMeta && agpaMeta.phase < 5">far fa-square</v-icon>
+            <v-icon left v-else-if="agpaMeta && agpaMeta.phase === 5">fas fa-square</v-icon>
+            <v-icon left v-else>far fa-check-square</v-icon>
+            Phase 5</v-tab>
 
         <!-- P1 -->
         <v-tab-item>
@@ -52,6 +52,7 @@
         <!-- P2 -->
         <v-tab-item>
             <div class="help-content">
+                <h3>Vérification des photos</h3>
                 <p>Pendant cette période, vous pouvez :
                     <ul>
                         <li>Visualiser toutes les photos de tous les candidats ;</li>
@@ -66,42 +67,45 @@
         <!-- P3 -->
         <v-tab-item>
             <div class="help-content">
-                    <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants de moins de 12 ans
-                        peuvent voter, cependant seuls les votes des jurés ayant 12 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
-                    <p>La phase de vote dure en général 3 jours. </p>
-                    <p>Pendant cette période, les membres du forum peuvent :
+                <h3>Votes</h3>
+                <p>Le vote est ouvert à tous les membres du forum Absolument G. Même les enfants de moins de 12 ans
+                    peuvent voter, cependant seuls les votes des jurés ayant 12 ans ou plus au cours de l'année sont pris en compte lors du décompte.</p>
+                <p>La phase de vote dure en général 3 jours. </p>
+                <p>Pendant cette période, les membres du forum peuvent :
+                    <ul>
+                        <li>Visualiser les photos de tous les candidats. A noter que les photos refusées lors de la phase 2 seront visibles, mais il ne sera pas possible
+                            de voter pour elles;
+                        </li>
+                        <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie :
                         <ul>
-                            <li>Visualiser les photos de tous les candidats. A noter que les photos refusées lors de la phase 2 seront visibles, mais il ne sera pas possible
-                                de voter pour elles;
-                            </li>
-                            <li>Voter pour les meilleures photos parmi celles envoyées par les autres candidats, en attribuant pour chaque catégorie :
-                            <ul>
-                                <li>1 ou 2 étoiles aux meilleures photos;</li>
-                                <li>1 plume pour les meilleurs titres de photo.</li>
-                            </ul></li>
-                            <li>Corriger leurs votes</li>
-                            <li>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables</li>
-                            <li>Corriger leurs votes</li>
-                        </ul>
-                    </p>
-                    <p>Les candidats qui votent, doivent attribuer un minimum de points dans chaque catégorie.
-                        S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.
-                        Un indicateur dans le formulaire de vote permet de savoir le nombre de points que l'on peut attribuer pour chaque catégorie
-                        Ainsi que le nombre de point que l'on a déjà attribué. Cet indicateur passe du rouge au vert quand un nombre suffisant de points
-                        a été attribués.
-                    </p>
+                            <li>1 ou 2 étoiles aux meilleures photos;</li>
+                            <li>1 plume pour les meilleurs titres de photo.</li>
+                        </ul></li>
+                        <li>Corriger leurs votes</li>
+                        <li>Toutes les photos qui n'ont pas été refusées lors de la phase précédente de vérification, sont considérées comme valables</li>
+                        <li>Corriger leurs votes</li>
+                    </ul>
+                </p>
+                <p>Les candidats qui votent, doivent attribuer un minimum de points dans chaque catégorie.
+                    S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.
+                    Un indicateur dans le formulaire de vote permet de savoir le nombre de points que l'on peut attribuer pour chaque catégorie
+                    Ainsi que le nombre de point que l'on a déjà attribué. Cet indicateur passe du rouge au vert quand un nombre suffisant de points
+                    a été attribués.
+                </p>
             </div>
         </v-tab-item>
 
         <!-- P4 -->
         <v-tab-item>
             <div class="help-content">
+                <h3>Dépouillement des votes</h3>
             </div>
         </v-tab-item>
 
         <!-- P5 -->
         <v-tab-item>
             <div class="help-content">
+                <h3>Cérémonie de remise des AGPA</h3>
             </div>
         </v-tab-item>
     </v-tabs>
@@ -114,7 +118,7 @@ import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 
 export default {
-    name: 'PhotoWidget',
+    name: 'AgpaHelp',
     props: [
         "selectedTab",
     ],
@@ -124,12 +128,6 @@ export default {
         ]),
     },
     mounted () {
-        console.log(this.agpaMeta);
-    },
-    watch: {
-        'selectedTab': function () {
-            console.log("Help selectedTab changed", this.selectedTab);
-        }
     },
     methods: {
     }

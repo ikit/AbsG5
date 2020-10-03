@@ -1,4 +1,4 @@
-import { AgpaPhoto, AgpaVote, AgpaAwardType, AgpaAward } from "../entities";
+import { AgpaPhoto, AgpaVote, AgpaAwardType } from "../entities";
 import { palmaresPoints } from "./agpaPalmaresHelper";
 import { getRepository } from "typeorm";
 
@@ -514,57 +514,6 @@ export async function p4DiamondAttribution(ctx: any) {
 
     return ctx;
 }
-
-// if ( ! function_exists('checkDiamant'))
-// {
-//     function checkDiamant($idCat, $a, $b)
-//     {
-//         $idCat = ($idCat > 0) ? 0 : $idCat;
-//         $result = false;
-//         switch($idCat)
-//         {
-//             // Catégorie simple (1 à 8)
-//             case 0 :
-//             if ( $a->g_score > 50000 and
-//                  $a->g_score > 2 * $b->g_score)
-//             $result = true;
-//             break;
-
-//             // Hors catégorie : meilleure titre
-//             case -3 :
-//             if ( $a->scoreTitle >= 2*  $b->scoreTitle )
-//             $result = true;
-//             break;
-
-//             // Hors catégorie : meilleure photo
-//             case -2 :
-//             if ( $a->g_score > 50000 and
-//                  $a->g_score > 2 * $b->g_score and
-//                  $a->vote == $a->refRoot[$a->category_id]->judgesNumber-1)
-//             $result = true;
-//             break;
-
-//             // Hors catégorie : meilleure photographe
-//             case -1 :
-// 			/*
-//             // Si ses 4 meilleurs photos > 100 000 et si auteur des 3 meilleurs photos
-//             if ( $a['sum4'] > 100000 and
-//                  $a->refRoot[-2]['photos'][0]['user_id'] == $a['IdPhotographe'] and
-//                  $a->refRoot[-2]['photos'][1]['user_id'] == $a['IdPhotographe'] and
-//                  $a->refRoot[-2]['photos'][2]['user_id'] == $a['IdPhotographe']
-//                  )
-// 				$result = true;
-
-//             // si il totalise 33 point au palmares actuel (sans conversion agpa diamant)
-//             if ($a['ActualWinners'] >= 33)
-// 				$result = true;
-// 				*/
-// 				$result = false;
-//             break;
-//         }
-//         return $result;
-//     }
-// }
 
 // /**
 //  * closeEdition

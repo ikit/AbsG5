@@ -3,14 +3,26 @@
 
         <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
             <v-row style="padding: 15px">
-                <v-tooltip bottom>
+                <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
                     <template v-slot:activator="{ on }">
                         <v-btn
                             v-on="on"
                             depressed small
                             :to="{path: '/agpa/archives/' }">
                             <v-icon left>fas fa-chevron-left</v-icon>
-                            <span v-if="$vuetify.breakpoint.mdAndUp">Retour</span>
+                            <span>Retour</span>
+                        </v-btn>
+                    </template>
+                    <span>Retour au sommaire des archives</span>
+                </v-tooltip>
+                <v-tooltip bottom v-else>
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            small
+                            v-on="on"
+                            depressed
+                            :to="{path: '/agpa/archives/' }">
+                            <v-icon>fas fa-chevron-left</v-icon>
                         </v-btn>
                     </template>
                     <span>Retour au sommaire des archives</span>
@@ -57,7 +69,7 @@
         </div>
 
         <div v-if="current && agpaMeta">
-            <v-row style="margin: 15px; ">
+            <!-- <v-row style="margin: 15px; ">
                 <v-card width="400px">
                     classement auteurs
                 </v-card>
@@ -69,7 +81,7 @@
                 <v-card width="400px">
                     meilleur titre
                 </v-card>
-            </v-row>
+            </v-row> -->
 
             <v-row v-for="catIdx of current.categoriesOrders" :key="catIdx" style="margin: 15px; margin-top: 50px; flex-wrap: nowrap;">
                 <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">

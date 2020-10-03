@@ -49,7 +49,7 @@ export class AgpaContext {
 
         // On récupère les dates butoires des différentes phases
         this.editionYear = getCurrentEdition();
-        this.phases = getPhasesBoundaries();
+        this.phases = await getPhasesBoundaries();
 
         // On en déduis la phase actuelle pour l'édition en cours
         for (const p of this.phases) {

@@ -21,6 +21,7 @@
                 loading-text="Récupération des données..."
                 no-data-text="Aucun palmarès disponible."
                 no-results-text="Aucune personne trouvée."
+                disable-sort
             >
                 <template v-slot:item.photographe="{ item }">
                     <img :src="item.url" style="height: 40px; margin-right: 15px; vertical-align: middle"/>

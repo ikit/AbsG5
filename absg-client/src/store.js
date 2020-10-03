@@ -93,7 +93,6 @@ export default new Vuex.Store({
                 };
             }));
             state.unreadNotifications = state.notifications.filter(e => !e.read ).length;
-            console.log(notifications)
         },
         readAllNotification(state) {
             for (const n of state.notifications) {

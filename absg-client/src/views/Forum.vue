@@ -7,7 +7,7 @@
                     <template v-slot:badge>
                         <span>{{ tbzNnewMessages }}</span>
                     </template>
-                    <v-icon>far fa-comment-dots</v-icon> &nbsp; T.B.Z.
+                    <v-icon left>far fa-comment-dots</v-icon> T.B.Z.
                 </v-badge>
             </template>
         </v-tab>
@@ -17,11 +17,11 @@
                     <template v-slot:badge>
                         <span>{{ t.newMessages}}</span>
                     </template>
-                    <v-icon>far fa-comment-dots</v-icon> &nbsp; {{ t.name }}
+                    <v-icon left>far fa-comment-dots</v-icon> {{ t.name }}
                 </v-badge>
             </template>
         </v-tab>
-        <v-tab :to="{path: `/forum/browse`}"> <v-icon>fas fa-archive</v-icon> &nbsp; Forums</v-tab>
+        <v-tab :to="{path: `/forum/browse`}"> <v-icon left>fas fa-archive</v-icon> Forums</v-tab>
     </v-tabs>
 
     <router-view></router-view>

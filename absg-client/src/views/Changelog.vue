@@ -9,7 +9,11 @@
         <v-card style="opacity: 0.5">
             <p>Fonctionnalités</p>
             <ul>
-                <li>AGPA: Phase 3 - Vote des photos</li>
+                <li>Déploiement de l'application</li>
+            </ul>
+            <p>Bug corrigés</p>
+            <ul>
+                <li>Stabilisation de l'application</li>
             </ul>
         </v-card>
 

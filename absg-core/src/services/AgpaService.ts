@@ -112,7 +112,7 @@ class AgpaService {
      * @param user l'utilisateur qui en fait la demande
      */
     async getP2Data(user: User) {
-        const year = 2019; // getCurrentEdition();
+        const year = getCurrentEdition();
         const sql = `SELECT p.*
             FROM agpa_photo p
             INNER JOIN agpa_category c ON p."categoryId" = c.id
@@ -167,7 +167,7 @@ class AgpaService {
      * @param user l'utilisateur qui en fait la demande
      */
     async getP3Data(user: User) {
-        const year = 2019; // getCurrentEdition();
+        const year = getCurrentEdition();
 
         // On récupère les votes
         let sql = `SELECT v.*
@@ -338,7 +338,7 @@ class AgpaService {
      * @param user l'utilisateur qui fait la demande
      */
     async vote(photoId, vote, user) {
-        const year = 2019; // getCurrentEdition();
+        const year = getCurrentEdition();
 
         // On récupère la photo
         const photo = await this.photoRepo.findOne({ where: { id: Equal(photoId) }, relations: ["user", "category"] });

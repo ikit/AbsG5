@@ -1,11 +1,11 @@
 <template>
 <div class="agpa" >
     <v-tabs centered>
-        <v-tab :to="{path:'/agpa/'}"> <v-icon>fas fa-star</v-icon> &nbsp; Edition {{ agpaMeta ? agpaMeta.year : "" }}</v-tab>
-        <v-tab :to="{path:'/agpa/rules'}"> <v-icon>fas fa-scroll</v-icon> &nbsp; Réglement</v-tab>
-        <v-tab :to="{path:'/agpa/archives'}"> <v-icon>fas fa-archive</v-icon> &nbsp; Archives</v-tab>
-        <v-tab :to="{path:'/agpa/palmares'}"> <v-icon>fas fa-trophy</v-icon> &nbsp; Palmarès</v-tab>
-        <v-tab :to="{path:'/agpa/ceremony'}"> <v-icon>fas fa-tv</v-icon> &nbsp; Cérémonies</v-tab>
+        <v-tab :to="{path:'/agpa/'}"> <v-icon left>fas fa-star</v-icon> Edition {{ agpaMeta ? agpaMeta.year : "" }}</v-tab>
+        <v-tab :to="{path:'/agpa/rules'}"> <v-icon left>fas fa-scroll</v-icon> Réglement</v-tab>
+        <v-tab :to="{path:'/agpa/archives'}"> <v-icon left>fas fa-archive</v-icon> Archives</v-tab>
+        <v-tab :to="{path:'/agpa/palmares'}"> <v-icon left>fas fa-trophy</v-icon> Palmarès</v-tab>
+        <v-tab :to="{path:'/agpa/ceremony'}"> <v-icon left>fas fa-tv</v-icon> Cérémonies</v-tab>
     </v-tabs>
 
     <router-view></router-view>

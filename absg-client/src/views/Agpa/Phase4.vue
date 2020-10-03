@@ -23,9 +23,9 @@
 
         <v-card style="margin: 24px">
             <v-tabs>
-                <v-tab><v-icon>fas fa-vote-yea</v-icon> &nbsp; Votes</v-tab>
-                <v-tab><v-icon>fas fa-calculator</v-icon> &nbsp; Notes</v-tab>
-                <v-tab><v-icon>fas fa-trophy</v-icon> &nbsp; Palmarès</v-tab>
+                <v-tab><v-icon left>fas fa-vote-yea</v-icon> Votes</v-tab>
+                <v-tab><v-icon left>fas fa-calculator</v-icon> Notes</v-tab>
+                <v-tab><v-icon left>fas fa-trophy</v-icon> Palmarès</v-tab>
 
                 <!-- Vérification des votes -->
                 <v-tab-item>
@@ -357,6 +357,8 @@ export default {
         this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
         if (this.agpaMeta) {
             this.refresh();
+        } else {
+            store.dispatch('initAGPA');
         }
     },
     methods: {
@@ -365,7 +367,6 @@ export default {
 
             axios.get(`/api/agpa/p4`).then(response => {
                 this.data = parseAxiosResponse(response);
-                console.log(this.data);
                 const categories = Object.values(this.data.categories);
 
                 // On reformate les votes pour les présenter sous forme de tableau "users x catégories"
@@ -451,7 +452,6 @@ export default {
         displayVotesDetails(data) {
             this.voteDetails.vote = data;
             this.voteDetails.displayed = true;
-            console.log(data);
         },
 
         updateNotesList(catId) {
@@ -467,7 +467,6 @@ export default {
 
             axios.get(`/api/agpa/p4/close`).then(response => {
                 this.closed = parseAxiosResponse(response);
-                console.log(data);
                 this.isLoading = false;
             }).catch( err => {
                 store.commit("onError", err);

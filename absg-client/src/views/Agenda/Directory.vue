@@ -12,9 +12,12 @@
                     hide-details
                 ></v-text-field>
                 <v-spacer></v-spacer>
-                <v-btn @click="resetDialog(true)">
+                <v-btn v-if="$vuetify.breakpoint.lgAndUp" @click="resetDialog(true)">
                     <v-icon small>fa-plus</v-icon>
                     Nouvelle entrée
+                </v-btn>
+                <v-btn v-else fab small @click.stop="resetDialog(true)">
+                    <v-icon>fas fa-plus</v-icon>
                 </v-btn>
             </v-card-title>
             <v-data-table

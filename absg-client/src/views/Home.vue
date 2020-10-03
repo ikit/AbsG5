@@ -200,7 +200,6 @@ export default {
             axios.get(`/api/passag`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
-                    console.log(data);
                     this.isLoading = false;
                     this.historyData.series[0].data = data.map(e => +e.count);
                     this.historyData.xAxis.categories = data.map(e => e.date);

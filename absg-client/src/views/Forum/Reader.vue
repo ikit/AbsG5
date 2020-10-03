@@ -153,7 +153,6 @@ export default {
         },
 
         initTopic(data) {
-            console.log("INUT READER", data)
             if (data.topic) {
                 this.topicId = data.topic.id;
             }

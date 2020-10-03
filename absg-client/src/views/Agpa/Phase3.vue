@@ -259,6 +259,8 @@ export default {
         this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
         if (this.agpaMeta) {
             this.initView();
+        } else {
+            store.dispatch('initAGPA');
         }
     },
     methods: {

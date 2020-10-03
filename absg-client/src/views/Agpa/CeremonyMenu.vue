@@ -1,7 +1,7 @@
 <template>
 <v-container>
     <v-card style="margin: 20px auto; margin-top: 100px; width: 600px; display: relative; padding: 40px 10px 40px 10px;">
-        <img src="/img/agpa/cupesMaxi/c1.png" width="200px" style="position: absolute; top: -100px; left: 200px"/>
+        <img src="/img/agpa/cupesMaxi/c1.png" width="200px" style="position: absolute; top: -100px; left: calc(100%/2 - 100px);"/>
         <h2 style="text-align: center; font-size: 3em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
             <span style="font-size: 2em; font-weight: normal; padding-right: 3px;">{{ current.year - 2005 }} </span><sup>ème</sup> cérémonie des A.G.P.A.
         </h2>

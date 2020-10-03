@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
-import { AgpaPhoto, AgpaCategory, User, AgpaAwardType } from "../entities";
-import { checkValidYear, getCurrentEdition, getPhasesBoundaries } from "./agpaCommonHelpers";
+import { AgpaPhoto, AgpaAwardType } from "../entities";
+import { checkValidYear } from "./agpaCommonHelpers";
 import { AgpaPalmares } from "./model/AgpaPalmares";
 
 // // PALMARES -----------------------------------------------------------------------------------------------------------------------------------------

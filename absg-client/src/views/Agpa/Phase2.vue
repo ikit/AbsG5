@@ -3,11 +3,12 @@
         <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
             <v-row style="padding: 15px">
 
-                <v-tooltip bottom>
+                <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
                     <template v-slot:activator="{ on }">
-                        <div class="phase-left-header" v-on="on" @click="help.displayed = true; help.page = 2">
-                            <h2>Phase n°2 en cours</h2>
-                            <p>Validation des photos</p>
+                        <v-icon left style="margin-top:-10px; font-size: 30px">far fa-question-circle</v-icon>
+                        <div class="phase-left-header" v-on="on" @click="help.displayed = true; help.page = 3">
+                            <h2>Phase n°2 en cours : Vérification</h2>
+                            <p>Phase n°3 Votes - à partir du {{ end }}</p>
                         </div>
                     </template>
                     <span>Besoin d'aide sur la phase actuelle du concours ?</span>
@@ -61,16 +62,6 @@
                 </v-tooltip>
 
                 <v-spacer></v-spacer>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }" v-on="on">
-                        <div class="phase-right-header" @click="help.displayed = true; help.page = 3">
-                            <h2>Prochaine phase: Votes</h2>
-                            <p>A partir du {{ end }}</p>
-                        </div>
-                    </template>
-                    <span>Besoin d'aide sur le déroulement du concours ?</span>
-                </v-tooltip>
             </v-row>
             <v-progress-linear
                 color="accent"
@@ -79,6 +70,7 @@
                 style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px">
             </v-progress-linear>
         </div>
+
         <v-container fluid>
             <v-layout row wrap>
                 <v-flex v-for="(photo, index) in photosGalery" :key="photo.id" style="min-width: 250px; width: 15%; margin: 15px">
@@ -123,9 +115,10 @@
         <v-dialog v-model="help.displayed" width="800px">
             <v-card>
                 <v-card-title class="grey lighten-4">
+                    <v-icon left>far fa-question-circle</v-icon>
                     Aide sur le déroulement du concours
                 </v-card-title>
-                <Help :selectedTab="help.page"></Help>
+                <Help selectedTab="2"></Help>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn text color="primary" @click="help.displayed = false">Fermer</v-btn>
@@ -221,8 +214,7 @@ export default {
         categories: [],
         category: null,
         photosGalery: [],
-        start: format(new Date(2020, 11, 19), "dd MMM 'à' HH'h'mm", {locale: fr}),
-        end: format(new Date(2020, 11, 20), "dd MMM 'à' HH'h'mm", {locale: fr}),
+        end: null,
         help: {
             displayed: false,
             page: 0
@@ -251,10 +243,15 @@ export default {
         if (this.agpaMeta) {
             this.initView();
             this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
+        } else {
+            store.dispatch('initAGPA');
         }
     },
     methods: {
         initView() {
+            // Fin de la phase 2
+            this.end = format(new Date(this.agpaMeta.boudaries[1].endDate), "dd MMM 'à' HH'h'mm", {locale: fr})
+
             // Reset photos list
             this.isLoading = true;
             this.photosGalery = [];
@@ -271,7 +268,6 @@ export default {
                 this.current = parseAxiosResponse(response);
                 if (this.current) {
                     this.category = this.current.categories.find(c => c.categoryId === this.catId);
-                    console.log("cat", this.category)
                     for (let photo of this.category.photos) {
                         this.photosGalery.push(photo);
                     }

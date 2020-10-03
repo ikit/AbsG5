@@ -15,8 +15,8 @@
                 </v-col>
             </v-row>
             <v-tabs>
-                <v-tab> <v-icon>fas fa-address-book</v-icon> &nbsp; Répertoire</v-tab>
-                <v-tab> <v-icon>fas fa-map-marked-alt</v-icon> &nbsp; Habitation</v-tab>
+                <v-tab> <v-icon left>fas fa-address-book</v-icon> Répertoire</v-tab>
+                <v-tab> <v-icon left>fas fa-map-marked-alt</v-icon> Habitation</v-tab>
             </v-tabs>
 
             <v-card-actions>

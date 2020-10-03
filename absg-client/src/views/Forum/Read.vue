@@ -54,7 +54,6 @@ export default {
     mounted() {
         this.isLoading = true;
         this.topicId = Number.parseInt(this.$route.params.topicId);
-        console.log("MOUNT READ", this.topicId)
         axios.get(`/api/forum/read/${this.topicId}`).then(response => {
             const data = parseAxiosResponse(response);
             this.$refs.messageReader.initTopic(data);

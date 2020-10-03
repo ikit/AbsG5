@@ -77,9 +77,9 @@
                 <v-list-item @click="setGPSPosition()">
                     <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-crosshairs</v-icon>Ma position</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="toggleDarkMode()">
+                <!-- <v-list-item @click="toggleDarkMode()">
                     <v-list-item-title :key="5"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-adjust</v-icon>Mode {{ $vuetify.theme.dark ? "sombre" : "clair" }}</v-list-item-title>
-                </v-list-item>
+                </v-list-item> -->
                 <v-list-item :to="{ path: '/admin/resetpwd'}">
                     <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
                 </v-list-item>
@@ -192,7 +192,7 @@
     <v-dialog v-model="notif.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="annonce">
-                <v-icon color="#fff">fas fa-info-circle</v-icon> &nbsp; {{ notif.title }}
+                <v-icon color="#fff" left>fas fa-info-circle</v-icon> {{ notif.title }}
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                <div v-html="notif.msg"></div>
@@ -207,7 +207,7 @@
     <v-dialog v-model="warning.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="warning">
-                <v-icon color="#fff">fas fa-exclamation-triangle</v-icon> &nbsp; Attention
+                <v-icon color="#fff" left>fas fa-exclamation-triangle</v-icon> Attention
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                <div v-html="warning.msg"></div>
@@ -222,7 +222,7 @@
     <v-dialog v-model="error.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="error">
-                <v-icon color="#fff">fas fa-exclamation-circle</v-icon> &nbsp; Une erreur s'est produite
+                <v-icon color="#fff" left>fas fa-exclamation-circle</v-icon> Une erreur s'est produite
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                <pre><span style="font-weight: bold">Date:    </span> {{ error.log }}</pre>
@@ -231,7 +231,7 @@
                <pre style="border: 1px solid #999; margin-top: 10px; padding: 5px">{{ error.msg ? error.msg : "Aucune information sur l'erreur :(" }}</pre>
             </v-container>
             <v-card-actions>
-                <v-btn text @click="copyError()"><v-icon>far fa-copy</v-icon> &nbsp; Copier l'erreur</v-btn>
+                <v-btn text @click="copyError()"><v-icon left>far fa-copy</v-icon> Copier l'erreur</v-btn>
                 <v-spacer></v-spacer>
                 <v-btn text @click="error.displayed=false">OK</v-btn>
             </v-card-actions>
@@ -412,7 +412,6 @@ export default {
         getOnline() {
             axios.get(`/api/online`).then(response => {
                 const data = parseAxiosResponse(response);
-                console.log(data);
             });
         }
     }
