@@ -3,7 +3,7 @@
     <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
         <v-row style="padding: 15px" align="center" justify="center">
 
-            <v-tooltip bottom>
+            <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
                 <template v-slot:activator="{ on }">
                     <v-btn
                         text
@@ -80,7 +80,7 @@
                 </v-tooltip>
             </div>
 
-            <v-tooltip bottom>
+            <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
                 <template v-slot:activator="{ on }">
                     <v-btn
                         text

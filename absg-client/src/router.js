@@ -205,6 +205,11 @@ export const router = new VueRouter({
                 }
             ]
         },
+        // GCloud
+        {
+            path: "/gcloud",
+            component: () => import("./views/GCloud.vue"),
+        },
         // Pages uniques
         {
             path: "/login",

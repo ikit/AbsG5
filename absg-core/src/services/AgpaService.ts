@@ -1,7 +1,12 @@
 import { User, LogModule, AgpaPhoto, AgpaCategory } from "../entities";
 import { getMaxArchiveEdition, getCurrentEdition, getMetaData } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
-import { p4AgpaAttribution, p4CheckVotes, p4ComputeNotes } from "../middleware/agpaAlgorithmsHelper";
+import {
+    p4AgpaAttribution,
+    p4CheckVotes,
+    p4ComputeNotes,
+    p4DiamondAttribution
+} from "../middleware/agpaAlgorithmsHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { logger } from "../middleware/logger";
@@ -107,7 +112,7 @@ class AgpaService {
      * @param user l'utilisateur qui en fait la demande
      */
     async getP2Data(user: User) {
-        const year = 2019; // getCurrentEdition();
+        const year = getCurrentEdition();
         const sql = `SELECT p.*
             FROM agpa_photo p
             INNER JOIN agpa_category c ON p."categoryId" = c.id
@@ -162,7 +167,7 @@ class AgpaService {
      * @param user l'utilisateur qui en fait la demande
      */
     async getP3Data(user: User) {
-        const year = 2019; // getCurrentEdition();
+        const year = getCurrentEdition();
 
         // On récupère les votes
         let sql = `SELECT v.*
@@ -228,9 +233,9 @@ class AgpaService {
      */
     async getP4Data(year: number, user: User) {
         let context = null;
-        if (user.roles.indexOf("admin") > -1) {
+        if (user.is("admin")) {
             // On récupère le contexte
-            context = await getMetaData(year);
+            context = await getMetaData(year, true);
 
             // Récupérer les votes et les vérifier
             context = await p4CheckVotes(context);
@@ -241,12 +246,8 @@ class AgpaService {
             // Attributions AGPA et création d'un "premier" palmares
             context = await p4AgpaAttribution(context);
 
-            // // 4- Attribution des AGPA de diamant
-            // $finalResult = p4DiamondAwards($ctx, awards, (($checkStep == 4)? true : false));
-            // //printCategoriesArray($finalResult);
-
-            // // 5- Clore les stats pour l'édition actuelle (maj bdd)
-            // p4CloseEdition($ctx, $finalResult);
+            // 4- Attribution des AGPA de diamant
+            context = await p4DiamondAttribution(context);
         }
         return context;
     }
@@ -337,7 +338,7 @@ class AgpaService {
      * @param user l'utilisateur qui fait la demande
      */
     async vote(photoId, vote, user) {
-        const year = 2019; // getCurrentEdition();
+        const year = getCurrentEdition();
 
         // On récupère la photo
         const photo = await this.photoRepo.findOne({ where: { id: Equal(photoId) }, relations: ["user", "category"] });

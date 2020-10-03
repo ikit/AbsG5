@@ -245,7 +245,7 @@ class ForumService {
             throw new BadRequestError(`Le message avec l'identifiant n°${id} n'existe pas.`);
         }
 
-        if (user.roles.indexOf("admin") > -1 || user.id === msg.poster.id) {
+        if (user.is("admin") || user.id === msg.poster.id) {
             return this.msgRepo.remove(msg);
         }
         throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer ce message.`);
@@ -319,7 +319,7 @@ class ForumService {
         // On analyse l'url pour retrouver le fichier sur le serveur
         const filePath = fileURI.replace(process.env.URL_FILES, process.env.PATH_FILES);
         if (fs.existsSync(filePath)) {
-            if (user.roles.contains("Admin") || filePath.indexOf(`/${user.id}_`) > -1) {
+            if (user.is("admin") || filePath.indexOf(`/${user.id}_`) > -1) {
                 return fs.unlinkSync(filePath);
             } else {
                 throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer ce fichier.`);

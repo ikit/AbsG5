@@ -92,7 +92,7 @@ export class UserController {
     @Authorized()
     @Post("/settings")
     async saveSettings(@Body() settings: any, @CurrentUser() user: User) {
-        if (user && Array.isArray(user.roles) && user.roles.indexOf("admin") > -1) {
+        if (user && user.is("admin")) {
             let sql = "";
             for (const key in settings) {
                 if (key == "agpaSpecialEdition") {

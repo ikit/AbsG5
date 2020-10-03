@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="agpaMeta">
     <div v-for="catIdx of agpaMeta.categoriesOrders" :key="catIdx" style="margin: 15px; margin-top: 50px;">
         <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
             <img :src="`/img/agpa/cupesMaxi/c${catIdx}.png`" width="100px" style="position: absolute; top: -50px; left: 275px"/>
@@ -130,8 +130,10 @@ export default {
         }
     },
     mounted () {
-        if (agpaMeta) {
+        if (this.agpaMeta) {
             this.refreshGallery();
+        } else {
+            store.dispatch('initAGPA');
         }
     },
     methods: {
@@ -157,7 +159,6 @@ export default {
                         this.agpaMeta.categories[s.categoryId].totalUsers = s.totalUsers;
                         this.agpaMeta.categories[s.categoryId].totalPhotos = s.totalPhotos;
                     }
-                    console.log(this.photos);
                 })
                 .catch(err => {
                     debugger;
@@ -174,7 +175,6 @@ export default {
             this.photoEditor.photo = photo;
             setTimeout(() => {
                 const { imgEditor } = this.$refs;
-                console.log("reset", photo, imgEditor)
                 imgEditor.reset();
             });
         },
@@ -184,7 +184,6 @@ export default {
 
             // On récupère l'image
             const imageUrl = imgEditor.imageUrl();
-            console.log(imageUrl);
             if (imageUrl) {
                 // Nouvelle image enregistrée ou modifiée: on doit d'abord récupérer l'image elle même.
                 axios.get(imageUrl, { responseType: 'blob' }).then(
@@ -231,7 +230,6 @@ export default {
         },
 
         deletePhoto() {
-            console.log("delete photo", this.photoDeletion.photo);
             axios.delete(`/api/agpa/photo/${this.photoDeletion.photo.id}`)
                 .then(response => {
                     this.photoDeletion.open = false;

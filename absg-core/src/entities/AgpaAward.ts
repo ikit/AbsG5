@@ -4,12 +4,12 @@ import { AgpaPhoto } from "./AgpaPhoto";
 import { User } from "./User";
 
 export enum AgpaAwardType {
-    honor,
-    nominated,
-    bronze,
-    sylver,
-    gold,
-    diamond
+    honor = "honor",
+    nominated = "nominated",
+    bronze = "bronze",
+    sylver = "sylver",
+    gold = "gold",
+    diamond = "diamond"
 }
 
 @Entity()

@@ -11,9 +11,12 @@
                     hide-details
                 ></v-text-field>
                 <v-spacer></v-spacer>
-                <v-btn @click.stop="resetDialog(true)">
+                <v-btn v-if="$vuetify.breakpoint.mdAndUp" @click.stop="resetDialog(true)">
                     <v-icon left>fas fa-plus</v-icon>
-                    <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
+                    <span>Nouvelle citation</span>
+                </v-btn>
+                <v-btn v-else fab small @click.stop="resetDialog(true)">
+                    <v-icon>fas fa-plus</v-icon>
                 </v-btn>
             </v-card-title>
 
@@ -25,10 +28,11 @@
                 loading-text="Récupération des citations..."
                 no-data-text="Aucune citation enregistrée."
                 no-results-text="Aucune citation trouvée."
+                disable-sort
             >
                 <template v-slot:item.citation="{ item }">
                     <div style="display: flex; vertical-align: middle">
-                        <v-avatar size="36px" style="flex: 0 1 1">
+                        <v-avatar size="36px" style="flex: 0 1 1" v-if="$vuetify.breakpoint.lgAndUp">
                             <img alt="photo" :src="item.author.thumb"/>
                         </v-avatar>
                         <div class="citation" style="margin-left: 10px; font-size: 1.1em;" v-html="item.citation"></div>

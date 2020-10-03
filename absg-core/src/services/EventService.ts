@@ -191,7 +191,7 @@ class EventService {
             throw new BadRequestError(`L'événement avec l'identifiant n°${id} n'existe pas.`);
         }
 
-        if (user.roles.indexOf("admin") > -1 || user.id === evt.author.id) {
+        if (user.roles.is("admin") || user.id === evt.author.id) {
             logger.notice(`Événement "${evt.name}" du ${evt.startDate.toISOString().substr(0, 10)} a été supprimé par ${
                     user.username
                 }`,

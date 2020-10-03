@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-card style="min-width: 500px;">
+    <v-card style="min-width: 460px;">
         <v-card-title >
             <v-menu
                 ref="dateMenu"
@@ -10,6 +10,7 @@
                 transition="scale-transition"
                 offset-y
                 min-width="290px"
+                v-if="$vuetify.breakpoint.lgAndUp"
             >
                 <template v-slot:activator="{ on }">
                     <v-btn text class="h2"
@@ -134,7 +135,7 @@
     <v-dialog v-model="eventEditor.displayed" width="800px">
         <v-card>
             <v-card-title class="grey lighten-4">
-                <v-icon>fas fa-calendar-alt</v-icon> &nbsp; Ajouter un nouvel événement
+                <v-icon left>fas fa-calendar-alt</v-icon> Ajouter un nouvel événement
             </v-card-title>
             <v-container>
                 <v-row>
@@ -372,7 +373,6 @@ export default {
         },
         editEvent(event = null) {
             this.eventEditor.displayed = true;
-            console.log("edit event", event)
             if (event) {
                 // Preload form
                 this.eventEditor.id = event.id;

@@ -11,9 +11,12 @@
                     hide-details
                 ></v-text-field>
                 <v-spacer></v-spacer>
-                <v-btn @click="resetDialog(true)">
+                <v-btn v-if="$vuetify.breakpoint.lgAndUp" @click="resetDialog(true)">
                     <v-icon small>fa-plus</v-icon>
                     Nouveau lieu
+                </v-btn>
+                <v-btn v-else fab small @click.stop="resetDialog(true)">
+                    <v-icon>fas fa-plus</v-icon>
                 </v-btn>
             </v-card-title>
             <v-data-table
@@ -24,12 +27,13 @@
                 loading-text="Récupération des données..."
                 no-data-text="Aucun lieu enregistré dans l'annuaire."
                 no-results-text="Aucun lieu trouvé."
+                disable-sort
             >
                 <template v-slot:item.name="{ item }">
-                    <div v-if="item.thumb" class="thumb">
+                    <div v-if="item.thumb && $vuetify.breakpoint.lgAndUp" class="thumb">
                         <img :src="item.thumb" @click="photosGalleryDisplay(item.galleryIndex)"/>
                         </div>
-                    <div v-if="!item.thumb" class="noThumb">
+                    <div v-if="!item.thumb && $vuetify.breakpoint.lgAndUp" class="noThumb">
                         <v-icon small>fas fa-home</v-icon>
                     </div>
                     <span style="font-weight: bold">{{ item.name }}</span>

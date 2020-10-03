@@ -10,10 +10,8 @@ export const MODULES = [
     { id:"event", icon: 'fas fa-calendar-alt', name: 'Calendrier', url: null, roles: ["member"] },
     { id:"voyag", icon: 'fas fa-map-marked-alt', name: 'Voya G', url: '/voyag', roles: ["member"] },
     { id:"agpa", icon: 'fas fa-camera', name: 'A.G.P.A', url: '/agpa', roles: ["member"] },
-    { id:"stats", icon: 'fas fa-chart-pie', name: 'Statistiques', url: '/stats', roles: ["member"] },
-    { id:"admin", icon: 'fas fa-cog', name: 'Admin', url: '/admin', roles: ["member"]  }];
-
-
+    { id:"gcloud", icon: 'fas fa-folder-open', name: 'G-Cloud', url: '/gcloud', roles: ["member"] },
+    { id:"admin", icon: 'fas fa-cog', name: 'Config', url: '/admin', roles: ["member"]  }];
 
 /**
  * Analyse la réponse retourné par axios, afin de traiter les cas d'erreur

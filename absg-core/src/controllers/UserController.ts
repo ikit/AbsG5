@@ -13,9 +13,9 @@ export class UserController {
 
     @Post("/")
     save(@Body() user: any, @CurrentUser() currentUser: User) {
-        if (user && user.id === -1 && currentUser.roles.contains("Admin")) {
+        if (user && user.id === -1 && currentUser.is("admin")) {
             return userService.createUser(user);
-        } else if (user && user.id > -1 && (currentUser.roles.contains("Admin") || currentUser.id === user.id)) {
+        } else if (user && user.id > -1 && (currentUser.is("admin") || currentUser.id === user.id)) {
             return userService.saveUser(user);
         }
         throw new BadRequestError("informations incomplètes");

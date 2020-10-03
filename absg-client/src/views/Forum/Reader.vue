@@ -8,12 +8,12 @@
                         <template v-slot:activator="{ on }">
                             <img :src="msg.poster.avatar" v-on="on" style="width: 50px;" />
                         </template>
-                        <span>{{ msg.poster.username }} {{ msg.shortLabel }}</span>
+                        <span>{{ msg.poster.username }} ({{ msg.dateLabel }})</span>
                     </v-tooltip>
 
                     <div class="msgDetails" v-bind:style="{ display: $vuetify.breakpoint.lgAndUp ? 'block' : 'none' }">
                         <span class="name">{{ msg.poster.username }}</span>
-                        <span class="date">le {{ msg.dateLabel }}<br/>à {{ msg.timeLabel }}</span>
+                        <span class="date">le {{ msg.dateLabel }}</span>
                     </div>
                 </div>
             </template>
@@ -153,7 +153,6 @@ export default {
         },
 
         initTopic(data) {
-            console.log("INUT READER", data)
             if (data.topic) {
                 this.topicId = data.topic.id;
             }

@@ -1,25 +1,34 @@
 <template>
     <div class="container">
 
-        <h1>Absolument G - V9 alpha</h1>
+        <h1>Absolument G - V5 beta 1</h1>
         <a style="display: block; text-align: center" href="https://trello.com/b/LDvwctf7/absg-5" target="_blank"> Voir la feuille de route </a>
 
 
-        <!-- <h2>Alpha 10 - septembre 2020</h2>
-        <v-card>
-            <p>Evolutions</p>
+        <h2 style="opacity: 0.5">Beta 1 - octobre 2020 (en cours de développement)</h2>
+        <v-card style="opacity: 0.5">
+            <p>Fonctionnalités</p>
             <ul>
-                <li>AGPA: Phase 3 - Vote des photos</li>
+                <li>Déploiement de l'application</li>
             </ul>
             <p>Bug corrigés</p>
             <ul>
-                <li></li>
+                <li>Stabilisation de l'application</li>
             </ul>
-        </v-card> -->
+        </v-card>
+
+        <h2>Alpha 10 - septembre 2020</h2>
+        <v-card>
+            <p>Fonctionnalités</p>
+            <ul>
+                <li>AGPA: Phase 3 - Vote des photos</li>
+                <li>AGPA: Phase 4 - Dépouillement des votes</li>
+            </ul>
+        </v-card>
 
         <h2>Alpha 9 - août 2020</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>AGPA: Phase 2 - Vérification des photos</li>
             </ul>
@@ -31,7 +40,7 @@
 
         <h2>Alpha 8 - juillet 2020</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>AGPA: Phase 1 - Enregistrement des photos</li>
             </ul>
@@ -39,7 +48,7 @@
 
         <h2>Alpha 7 - juin 2020</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>Calendrier: Calendrier des événements de la famille sur la page d'accueil</li>
                 <li>Calendrier: Ajout, édition, suppression d'événement</li>
@@ -56,7 +65,7 @@
 
         <h2>Alpha 6 - mai 2020</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>Menu principal responsive</li>
                 <li>AGPA: prise en compte de l'évolution des catégories au fils des éditions</li>
@@ -81,7 +90,7 @@
 
         <h2>Alpha 5 - avr 2020</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>Editeur d'image : avec rotation et crop</li>
                 <li>Photos: visualisation avec pagination des anciennes images du moment</li>
@@ -103,7 +112,7 @@
 
         <h2>Alpha 6 - mars 2020</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>Admin: Interface de paramètrage du site</li>
                 <li>Admin: Gestion (création/édition) des utilisateurs</li>
@@ -113,7 +122,7 @@
 
         <h2>Alpha 4 - fev 2020</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>Citations: Création, édition et suppression de citation</li>
                 <li>Accueil: affichage dernière "image du moment"</li>
@@ -123,7 +132,7 @@
 
         <h2>Alpha 3 - jan 2020</h2>
         <v-card>
-        <p>Evolutions</p>
+        <p>Fonctionnalités</p>
             <ul>
                 <li>Authentification des utilisateurs</li>
                 <li>AGPA: Palmarès</li>
@@ -134,7 +143,7 @@
 
         <h2>Alpha 2 - dec 2019</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>AGPA: Cérémonies en ligne, générées automatiquement</li>
             </ul>
@@ -142,7 +151,7 @@
 
         <h2>Alpha 1 - nov 2019</h2>
         <v-card>
-            <p>Evolutions</p>
+            <p>Fonctionnalités</p>
             <ul>
                 <li>AGPA: Réglement</li>
                 <li>AGPA: Archives et visualisations des anciennes éditions</li>

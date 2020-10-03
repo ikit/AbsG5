@@ -70,8 +70,6 @@ export default {
         "photo"
     ],
     mounted () {
-        console.log(this.current, this.photos)
-        // Récupérer la participation de l'utilisateur et les stats
     },
     methods: {
         addNewPhoto() {

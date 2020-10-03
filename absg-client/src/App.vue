@@ -29,10 +29,9 @@
 
     <v-app-bar
         v-if="user && user.id > 0"
-        color="primary"
         app
         fixed
-        style="z-index: 2000">
+        style="z-index: 2000; background: #37474f">
          <v-app-bar-nav-icon v-if="!$vuetify.breakpoint.lgAndUp" @click.stop="drawerOpen = !drawerOpen"/>
 
         <v-toolbar-title v-if="$vuetify.breakpoint.lgAndUp">
@@ -47,11 +46,11 @@
             </span>
         </v-toolbar-title>
         <v-spacer>
-        <div v-if="citation && $vuetify.breakpoint.lgAndUp" style="text-align:center; margin: 0 100px">
-            <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; " v-html="citation.citation"></span>
+        <div v-if="citation && $vuetify.breakpoint.lgAndUp" style="text-align:center; margin: 0 100px; color: #fff">
+            <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; color: #fff" v-html="citation.citation"></span>
         </div>
         </v-spacer >
-        <v-tooltip bottom>
+        <!-- <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-badge color="accent" style="margin-right: 15px" overlap :value="unreadNotifications">
                     <span slot="badge" >{{ unreadNotifications }}</span>
@@ -59,14 +58,11 @@
                         <v-icon>far fa-bell</v-icon>
                     </v-btn>
                 </v-badge>
-                <!-- <v-btn icon v-on="on" @click.stop="notifDialog = !notifDialog">
-                    <v-icon>far fa-bell</v-icon>
-                </v-btn> -->
             </template>
             <span>Voir l'historique des événements</span>
-        </v-tooltip>
+        </v-tooltip> -->
 
-        <v-btn @click="getOnline()">online</v-btn>
+        <!-- <v-btn @click="getOnline()">online</v-btn> -->
 
         <v-menu offset-y bottom left>
             <template v-slot:activator="{ on, attrs }">
@@ -81,9 +77,9 @@
                 <v-list-item @click="setGPSPosition()">
                     <v-list-item-title :key="2"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-crosshairs</v-icon>Ma position</v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="toggleDarkMode()">
+                <!-- <v-list-item @click="toggleDarkMode()">
                     <v-list-item-title :key="5"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-adjust</v-icon>Mode {{ $vuetify.theme.dark ? "sombre" : "clair" }}</v-list-item-title>
-                </v-list-item>
+                </v-list-item> -->
                 <v-list-item :to="{ path: '/admin/resetpwd'}">
                     <v-list-item-title :key="3"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-lock</v-icon>Changer mot de passe</v-list-item-title>
                 </v-list-item>
@@ -94,7 +90,7 @@
         </v-menu>
     </v-app-bar>
 
-    <v-content id="bgcontent" style="background: #f9f9f9">
+    <v-main id="bgcontent" style="background: rgba(200, 200, 200, 0.1)">
         <div class="menu" v-if="user && user.id > 0 && $vuetify.breakpoint.lgAndUp">
             <v-list style="background: none">
                 <template v-for="item in menuItems">
@@ -110,7 +106,7 @@
             <div class="menuItem" style="position: absolute; bottom: 0; border-top: 1px solid rgba(0, 0, 0, 0.2)">
                 <router-link to="/changelog">
                     <v-icon color="inherit">far fa-question-circle</v-icon><br/>
-                    <span style="display: inline-block; line-height: 0.9em;">v5 apha</span>
+                    <span style="display: inline-block; line-height: 0.9em;">v5 beta</span>
                 </router-link>
             </div>
         </div>
@@ -154,7 +150,7 @@
                 </div>
             </div>
         </div>
-    </v-content>
+    </v-main>
 
 
     <v-dialog v-model="notifDialog" width="800px">
@@ -196,7 +192,7 @@
     <v-dialog v-model="notif.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="annonce">
-                <v-icon color="#fff">fas fa-info-circle</v-icon> &nbsp; {{ notif.title }}
+                <v-icon color="#fff" left>fas fa-info-circle</v-icon> {{ notif.title }}
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                <div v-html="notif.msg"></div>
@@ -211,7 +207,7 @@
     <v-dialog v-model="warning.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="warning">
-                <v-icon color="#fff">fas fa-exclamation-triangle</v-icon> &nbsp; Attention
+                <v-icon color="#fff" left>fas fa-exclamation-triangle</v-icon> Attention
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                <div v-html="warning.msg"></div>
@@ -226,7 +222,7 @@
     <v-dialog v-model="error.displayed" class="msgDiallog" width="500px">
         <v-card>
             <v-card-title class="error">
-                <v-icon color="#fff">fas fa-exclamation-circle</v-icon> &nbsp; Une erreur s'est produite
+                <v-icon color="#fff" left>fas fa-exclamation-circle</v-icon> Une erreur s'est produite
             </v-card-title>
             <v-container grid-list-sm class="pa-4">
                <pre><span style="font-weight: bold">Date:    </span> {{ error.log }}</pre>
@@ -235,7 +231,7 @@
                <pre style="border: 1px solid #999; margin-top: 10px; padding: 5px">{{ error.msg ? error.msg : "Aucune information sur l'erreur :(" }}</pre>
             </v-container>
             <v-card-actions>
-                <v-btn text @click="copyError()"><v-icon>far fa-copy</v-icon> &nbsp; Copier l'erreur</v-btn>
+                <v-btn text @click="copyError()"><v-icon left>far fa-copy</v-icon> Copier l'erreur</v-btn>
                 <v-spacer></v-spacer>
                 <v-btn text @click="error.displayed=false">OK</v-btn>
             </v-card-actions>
@@ -416,7 +412,6 @@ export default {
         getOnline() {
             axios.get(`/api/online`).then(response => {
                 const data = parseAxiosResponse(response);
-                console.log(data);
             });
         }
     }

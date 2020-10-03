@@ -45,9 +45,13 @@
                         <v-spacer></v-spacer>
 
                         <v-btn
+                            v-if="$vuetify.breakpoint.lgAndUp"
                             @click.stop="resetDialog(true)">
                             <v-icon left>fas fa-plus</v-icon>
                             <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
+                        </v-btn>
+                        <v-btn v-else fab small @click.stop="resetDialog(true)">
+                            <v-icon>fas fa-plus</v-icon>
                         </v-btn>
                     </v-row>
                 </div>

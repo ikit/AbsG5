@@ -22,7 +22,7 @@
 
 
         <div style="position: absolute; top: 10px; left: 50px; z-index: 2000; text-align: center">
-            <v-tooltip bottom>
+            <!-- <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn color="accent" fab small v-on="on" style="margin-right: 10px">
                         <v-icon>far fa-clock</v-icon>
@@ -62,6 +62,7 @@
                 </template>
                 <span>Recentrer sur ma position</span>
             </v-tooltip>
+             -->
         </div>
     </div>
 </template>

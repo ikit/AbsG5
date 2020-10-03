@@ -103,12 +103,11 @@ export class AgpaController {
 
     /**
      * Effectue le dépouillement des votes
-     * @param step l'étape à laquelle on arrête le processus afin de permettre de le suivre étape par étape
      * @param user l'utilisateur qui effectue la demande
      */
     @Get("/p4")
     getP4Data(@CurrentUser() user) {
-        return agpaService.getP4Data(2019, user);
+        return agpaService.getP4Data(2011, user);
     }
 
     /**

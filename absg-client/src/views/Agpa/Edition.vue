@@ -1,7 +1,5 @@
 <template>
 <v-container style="max-width: 100%; margin: 0; padding: 0;">
-    <Phase4></Phase4>
-
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
     <v-card v-if="currentMonth > 0 && currentMonth < 9" style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;">
         <img src="/img/agpa/cupesMaxi/c1.png" height="100px" style="position: absolute; top: -50px; left: calc(50% - 56px)"/>
@@ -30,7 +28,6 @@
             N'hésitez pas à discuter de l'organisation sur <router-link :to="{ path: '/forum/' }" tag="a">le forum</router-link>.
         </v-card>
     </v-card>
-
     <!-- Affichage de l'édition en cours -->
     <section v-else>
         <div v-if="isLoading" style="width: 50px; margin: 50px auto;">
@@ -40,7 +37,6 @@
                 indeterminate>
             </v-progress-circular>
         </div>
-        <div v-if="!isLoading && !agpaMeta">Une erreur est survenue :( ...<br/>{{ error }}</div>
         <Phase1 v-if="agpaMeta && agpaMeta.phase == 1"></Phase1>
         <Phase2 v-if="agpaMeta && agpaMeta.phase == 2"></Phase2>
         <Phase3 v-if="agpaMeta && agpaMeta.phase == 3"></Phase3>
@@ -52,6 +48,7 @@
 
 
 <script>
+import store from '../../store';
 import { mapState } from 'vuex';
 import { getModuleInfo, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
@@ -70,11 +67,11 @@ export default {
         Phase4,
         Phase5,
     },
+    store,
     data: () => ({
         isLoading: true,
         currentMonth: null,
         currentYear: null,
-        error: null,
         phases: [
             { number: 1, label: "Enregistrement des photos", start: format(new Date(2020, 9, 1), "do MMM 'à' HH'h'mm", {locale: fr}) },
             { number: 2, label: "Validation des photos", start: format(new Date(2020, 11, 19), "dd MMM 'à' HH'h'mm", {locale: fr}) },
@@ -88,10 +85,27 @@ export default {
             'agpaMeta',
         ]),
     },
+    watch: {
+        'agpaMeta': function () {
+            this.init();
+        }
+    },
     mounted () {
         this.currentMonth = new Date().getMonth();
         this.currentYear = new Date().getFullYear();
+        if (this.agpaMeta) {
+            this.init();
+        }
     },
+    methods: {
+        init() {
+            this.isLoading = false;
+            console.log(this.agpaMeta)
+            for (const i = 0; i< 5; i++) {
+                this.phases[i].start = format(new Date(this.agpaMeta.boudaries[i].startDate), "do MMM 'à' HH'h'mm", {locale: fr})
+            }
+        }
+    }
 };
 </script>
 

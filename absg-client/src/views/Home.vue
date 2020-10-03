@@ -200,7 +200,6 @@ export default {
             axios.get(`/api/passag`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
-                    console.log(data);
                     this.isLoading = false;
                     this.historyData.series[0].data = data.map(e => +e.count);
                     this.historyData.xAxis.categories = data.map(e => e.date);
@@ -266,7 +265,7 @@ export default {
 .immt {
     div {
         max-width: 700px;
-        min-width: 500px;
+        min-width: 460px;
         height: 450px;
         margin: auto;
         display: table;
@@ -279,7 +278,7 @@ export default {
             vertical-align: middle;
 
             img {
-                max-width: 700px;
+                max-width: min(90vw, 700px);
                 max-height: 450px;
                 background: white;
                 padding: 1px;
@@ -336,7 +335,7 @@ h2 {
         }
     }
     div:nth-child(2n) {
-        background: #eee;
+        background: rgba(100,100,100, 0.1);;
     }
 }
 

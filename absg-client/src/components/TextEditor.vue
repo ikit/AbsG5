@@ -49,7 +49,10 @@ export default {
     }),
     methods: {
         onKeyDown (event) {
-            this.$emit('change', this.value);
+            setTimeout(() => {
+                this.$emit('change', this.value);
+            });
+
         }
     }
 }
