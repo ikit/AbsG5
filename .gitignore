@@ -94,4 +94,5 @@ coverage.xml
 Makefile
 absg-core/src/data/*.sql
 absg-core/log
-install/docker-compose.yml
+install/docker-compose-prod.yml
+install/docker-compose-dev.yml
