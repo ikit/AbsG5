@@ -29,10 +29,9 @@
 
     <v-app-bar
         v-if="user && user.id > 0"
-        color="primary"
         app
         fixed
-        style="z-index: 2000">
+        style="z-index: 2000; background: #37474f">
          <v-app-bar-nav-icon v-if="!$vuetify.breakpoint.lgAndUp" @click.stop="drawerOpen = !drawerOpen"/>
 
         <v-toolbar-title v-if="$vuetify.breakpoint.lgAndUp">
@@ -47,11 +46,11 @@
             </span>
         </v-toolbar-title>
         <v-spacer>
-        <div v-if="citation && $vuetify.breakpoint.lgAndUp" style="text-align:center; margin: 0 100px">
-            <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; " v-html="citation.citation"></span>
+        <div v-if="citation && $vuetify.breakpoint.lgAndUp" style="text-align:center; margin: 0 100px; color: #fff">
+            <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; color: #fff" v-html="citation.citation"></span>
         </div>
         </v-spacer >
-        <v-tooltip bottom>
+        <!-- <v-tooltip bottom>
             <template v-slot:activator="{ on }">
                 <v-badge color="accent" style="margin-right: 15px" overlap :value="unreadNotifications">
                     <span slot="badge" >{{ unreadNotifications }}</span>
@@ -59,14 +58,11 @@
                         <v-icon>far fa-bell</v-icon>
                     </v-btn>
                 </v-badge>
-                <!-- <v-btn icon v-on="on" @click.stop="notifDialog = !notifDialog">
-                    <v-icon>far fa-bell</v-icon>
-                </v-btn> -->
             </template>
             <span>Voir l'historique des événements</span>
-        </v-tooltip>
+        </v-tooltip> -->
 
-        <v-btn @click="getOnline()">online</v-btn>
+        <!-- <v-btn @click="getOnline()">online</v-btn> -->
 
         <v-menu offset-y bottom left>
             <template v-slot:activator="{ on, attrs }">
@@ -94,7 +90,7 @@
         </v-menu>
     </v-app-bar>
 
-    <v-main id="bgcontent" style="background: #f9f9f9">
+    <v-main id="bgcontent" style="background: rgba(200, 200, 200, 0.1)">
         <div class="menu" v-if="user && user.id > 0 && $vuetify.breakpoint.lgAndUp">
             <v-list style="background: none">
                 <template v-for="item in menuItems">

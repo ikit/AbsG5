@@ -336,7 +336,7 @@ h2 {
         }
     }
     div:nth-child(2n) {
-        background: #eee;
+        background: rgba(100,100,100, 0.1);;
     }
 }
 
