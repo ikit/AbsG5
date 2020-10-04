@@ -45,7 +45,7 @@ export default {
                 url = `/files/agpa/${this.current.editionYear}/mini/${photo.filename}`;
 
             } else {
-                url = '/img/avatars/016.png';
+                url = '/files/avatars/016.png';
             }
             return url;
         },
@@ -57,7 +57,7 @@ export default {
         },
         saveCitation: function () {
             this.citations.push({
-                authorAvatar: '/img/avatars/016.png',
+                authorAvatar: '/files/avatars/016.png',
                 authorId: 16,
                 authorName: this.citationEditor.author,
                 citation: this.citationEditor.citation,

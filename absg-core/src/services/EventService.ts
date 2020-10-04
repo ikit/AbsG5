@@ -96,7 +96,7 @@ class EventService {
                     return {
                         startDate: new Date(year, p.dateOfBirth.getMonth(), p.dateOfBirth.getDate()),
                         name: `🎂 ${p.getQuickName()}`,
-                        details: `${p.getQuickName()} fêtes ses ${p.getAge()}!<br/>Bravo ${e}!!`,
+                        details: `${p.getQuickName()} fête ses ${p.getAge()}!<br/>Bravo ${e}!!`,
                         type: "birthday",
                         editable: false
                     };

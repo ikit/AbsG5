@@ -187,7 +187,7 @@ export default {
                                 users: data.authors.sort(() => Math.random() - 0.5).map(
                                     e => ({
                                         ...e,
-                                        avatar: `/img/avatars/${padNumber(e.userId, 3)}.png`,
+                                        avatar: `/files/avatars/${padNumber(e.userId, 3)}.png`,
                                     }))}
                                 );
                             for (const s of data.categories[-1].nominated.reverse()) {
@@ -195,7 +195,7 @@ export default {
                                     type: "bestAuthorAward",
                                     ...s,
                                     photos:[],
-                                    avatar: `/img/avatars/${padNumber(s.userId, 3)}.png`,
+                                    avatar: `/files/avatars/${padNumber(s.userId, 3)}.png`,
                                     award: `/img/agpa/cupes/cx1-${s.award}.png`});
                             }
                         } else
@@ -207,7 +207,7 @@ export default {
                                 url: `/files/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
                                 username: photo.username,
-                                avatar: `/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                avatar: `/files/avatars/${padNumber(photo.userId, 3)}.png`,
                                 award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
 
                             }));
@@ -221,7 +221,7 @@ export default {
                                 url: `/files/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
                                 username: photo.username,
-                                avatar: `/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                avatar: `/files/avatars/${padNumber(photo.userId, 3)}.png`,
                             }));
                             nominated = nominated.map(photo => { photo.type = "photo"; return photo; }).sort(() => Math.random() - 0.5);
                             this.slides = this.slides.concat(nominated);
@@ -230,7 +230,7 @@ export default {
                                 url: `/files/agpa/${photo.year}/mini/${photo.filename}`,
                                 title: photo.title,
                                 username: photo.username,
-                                avatar: `/img/avatars/${padNumber(photo.userId, 3)}.png`,
+                                avatar: `/files/avatars/${padNumber(photo.userId, 3)}.png`,
                                 award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
 
                             }));

@@ -32,7 +32,7 @@
                 <v-expansion-panel-header>Comment choisir mon mot de passe ?</v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <p>
-                        Les personnes mal intentionnées ont 2 façons de trouver un mot de passe.
+                        Si on met de côté le vol de donnée, les personnes mal intentionnées ont 2 façons de deviner un mot de passe.
                         <ul><li><b>La méthode "force brute":</b> elle repose sur la capacité de calcul des ordinateurs
                             et va tester toutes les possibilités en testant d'abord les mots les plus courant (dictionnaire, statistiques, ...).
                             Ce qu'il faut comprendre quand on parle de dictionnaire, c'est qu'on ne va pas juste tester les 10 000 définitions du Grand Robert...
@@ -68,10 +68,7 @@
                         <ul>
                             <li>Composez votre mot de passe avec plusieurs mots pris au pif, par exemple <span class="code">cheval ibiscus poutre</span>...
                                 2 avantages: c'est long et facile à retenir... vous trouverez vite une petite histoire pour associer et vous souvenir facilement de ces mots;</li>
-                            <li>Vous pouriez en rester là si vous utilisez 4-5 mots. Mais sinon l'idée c'est de rendre ce mot passe inexistant lors d'une recherche par dictionnaire.
-                                Pour ça il suffit de vous inventer votre petite combine. Quelques idées, supprimer ou rajouter des lettres, écrire à l'envers,
-                                "décorer" avec des lettres/chiffres de votre choix... Et voilà le travaille !
-                                <span class="code">1lavehc-BSCS+IIU-p__tr_2</span></li>
+                            <li>Après libre à vous d'inventer des combines pour altérer le mot de passe et le rendre vraiment unique et introuvable.</li>
                         </ul>
                     </p>
                 </v-expansion-panel-content>

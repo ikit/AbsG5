@@ -54,7 +54,7 @@ export default new Vuex.Store({
             if (user) {
                 // Get user avatar url
                 const idAsStr = `${user.id}`;
-                user.avatarUrl = `/img/avatars/${idAsStr.padStart(3, '0')}.png`;
+                user.avatarUrl = `/files/avatars/${idAsStr.padStart(3, '0')}.png`;
             } else {
                 state.user = null;
             }

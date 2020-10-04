@@ -52,7 +52,7 @@ class ForumService {
             last: {
                 username: f.lastMessage.poster.username,
                 dateLabel: format(new Date(f.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
-                avatar: `/img/avatars/${f.lastMessage.poster.id.toString().padStart(3, "0")}.png`
+                avatar: `/files/avatars/${f.lastMessage.poster.id.toString().padStart(3, "0")}.png`
             }
         }));
     }
@@ -89,7 +89,7 @@ class ForumService {
                 last: {
                     username: t.lastMessage.poster.username,
                     dateLabel: format(new Date(t.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
-                    avatar: `/img/avatars/${t.lastMessage.poster.id.toString().padStart(3, "0")}.png`
+                    avatar: `/files/avatars/${t.lastMessage.poster.id.toString().padStart(3, "0")}.png`
                 }
             }))
         };
@@ -129,7 +129,7 @@ class ForumService {
                     id: e.poster.id,
                     rootFamily: e.poster.rootFamily,
                     username: e.poster.username,
-                    avatar: `/img/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
+                    avatar: `/files/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
                 }
             }))
         };
@@ -170,7 +170,7 @@ class ForumService {
                     id: e.poster.id,
                     rootFamily: e.poster.rootFamily,
                     username: e.poster.username,
-                    avatar: `/img/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
+                    avatar: `/files/avatars/${e.poster.id.toString().padStart(3, "0")}.png`
                 }
             }))
         };
@@ -225,7 +225,7 @@ class ForumService {
                 id: msg.poster.id,
                 rootFamily: msg.poster.rootFamily,
                 username: msg.poster.username,
-                avatar: `/img/avatars/${msg.poster.id.toString().padStart(3, "0")}.png`
+                avatar: `/files/avatars/${msg.poster.id.toString().padStart(3, "0")}.png`
             }
         };
     }

@@ -13,7 +13,7 @@
                 ></v-text-field>
                 <v-spacer></v-spacer>
                 <v-btn v-if="$vuetify.breakpoint.lgAndUp" @click="resetDialog(true)">
-                    <v-icon small>fa-plus</v-icon>
+                    <v-icon left>fa-plus</v-icon>
                     Nouvelle entrée
                 </v-btn>
                 <v-btn v-else fab small @click.stop="resetDialog(true)">

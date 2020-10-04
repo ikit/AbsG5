@@ -48,7 +48,7 @@
                                                 :alt="user.username"
                                                 v-on="on"
                                                 height="40px"
-                                                onError="this.src='/img/avatars/000.png';"
+                                                onError="this.src='/files/avatars/000.png';"
                                                 />
                                         </template>
                                         <span>{{ user.username }}</span>
@@ -188,7 +188,7 @@ export default {
                             time: `${h}h`,
                             passage: data.passag
                                 .filter(e => new Date(e.datetime).getHours() === h)
-                                .map(e => ({ username: `${e.username}`, avatar: `/img/avatars/${padNumber(e.userId, 3)}.png` })),
+                                .map(e => ({ username: `${e.username}`, avatar: `/files/avatars/${padNumber(e.userId, 3)}.png` })),
                         })
 
                     }
