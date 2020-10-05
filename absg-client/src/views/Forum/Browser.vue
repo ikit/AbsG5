@@ -64,7 +64,7 @@
                             <span style="opacity: 0.5">{{ item.last.dateLabel }}</span></td>
                     </router-link>
 
-                    <router-link v-if="breadcrumb.length === 1" :to="{ path: `/forum/read/${item.id}` }" tag="tr" style="cursor: pointer">
+                    <router-link v-if="breadcrumb.length === 1" :to="{ path: `/forum/read/${item.id}#post_${item.last.id}` }" tag="tr" style="cursor: pointer">
                         <td style="font-size: 1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
                             <v-icon>far fa-comment-dots</v-icon> {{ item.name }}
                         </td>

@@ -87,6 +87,7 @@ class ForumService {
                     dateLabel: format(new Date(t.firstMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr })
                 },
                 last: {
+                    id: t.lastMessage.id,
                     username: t.lastMessage.poster.username,
                     dateLabel: format(new Date(t.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
                     avatar: `/files/avatars/${t.lastMessage.poster.id.toString().padStart(3, "0")}.png`

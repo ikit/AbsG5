@@ -160,6 +160,7 @@ export default {
                 console.log(this.topicId, this.forumId)
             }
             this.messages = data.posts;
+            setTimeout(() => location.hash = "#post_" + this.messages[this.messages.length - 1].id);
         },
 
         // On enregistre le message
