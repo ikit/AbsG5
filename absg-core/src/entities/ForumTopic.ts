@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Forum } from "./Forum";
 import { ForumMessage } from "./ForumMessage";
 
@@ -8,18 +8,15 @@ export class ForumTopic {
     id: number;
 
     @ManyToOne(() => Forum)
-    @JoinColumn()
     forum: Forum;
 
     @Column({ comment: "Nom de la discussion" })
     name: string;
 
-    @OneToOne(() => ForumMessage)
-    @JoinColumn()
+    @ManyToOne(() => ForumMessage)
     firstMessage: ForumMessage;
 
-    @OneToOne(() => ForumMessage)
-    @JoinColumn()
+    @ManyToOne(() => ForumMessage)
     lastMessage: ForumMessage;
 
     @Column({ comment: "Est-ce que la discussion est épinglée" })

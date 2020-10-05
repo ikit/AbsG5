@@ -14,7 +14,7 @@ module.exports = [
         password: process.env.DB_PASSWORD_DEFAULT,
         database: process.env.DB_NAME_DEFAULT,
         synchronize: true,
-        logging: false,
+        logging: true,
         entities: [`${srcPath}/entities/**/*.${fileExt}`],
         migrations: [`${srcPath}/migration/**/*.${fileExt}`],
         subscribers: [`${srcPath}/subscriber/**/*.${fileExt}`],

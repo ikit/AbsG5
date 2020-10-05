@@ -17,7 +17,7 @@
                     </div>
                 </div>
             </template>
-            <a v-if="idx === messages.length - 1" id="last" name="last" ref="last"></a>
+            <a :id="'post_'+msg.id" :name="'post_'+msg.id" :ref="'post_'+msg.id"></a>
             <v-card class="msg" style="padding: 0 15px">
                 <div class="msgControls">
                     <v-tooltip bottom>
@@ -138,7 +138,7 @@ export default {
     }),
     mounted() {
         if (Number.isSafeInteger(this.$route.params.topicId)) {
-            this.initTopic(Number.parseInt(newValue));
+            this.loadTopic(Number.parseInt(this.$route.params.topicId));
         }
     },
     methods: {
@@ -153,28 +153,19 @@ export default {
         },
 
         initTopic(data) {
+            console.log(data)
             if (data.topic) {
                 this.topicId = data.topic.id;
+                this.forumId = data.topic.forum.id;
+                console.log(this.topicId, this.forumId)
             }
             this.messages = data.posts;
-
-            // On scroll automatiquement à la fin
-            if (this.autoScrollEnd) {
-                this.scrollToTheEnd();
-            }
         },
-
-        scrollToTheEnd() {
-            // const container = this.$el.querySelector("#last");
-            // console.log("ScrollTo", this.$el);
-            // container.scrollTop = container.scrollHeight;
-        },
-
 
         // On enregistre le message
         post() {
             const formData = new FormData();
-            formData.append("forumId", this.forumId ? null : 2);
+            formData.append("forumId", this.forumId ? this.forumId : 2);
             formData.append("topicId", this.topicId ? this.topicId : null);
             formData.append("text", this.editorText);
             axios.post(`/api/forum/post`, formData, {

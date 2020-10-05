@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, JoinColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { ForumTopic } from "./ForumTopic";
 import { Forum } from "./Forum";
 import { User } from "./User";
@@ -9,15 +9,12 @@ export class ForumMessage {
     id: number;
     
     @ManyToOne(() => Forum)
-    @JoinColumn()
     forum: Forum;
 
     @ManyToOne(() => ForumTopic)
-    @JoinColumn()
     topic: ForumTopic;
     
     @ManyToOne(() => User)
-    @JoinColumn()
     poster: User;
 
     @Column({ comment: "Date du message" })

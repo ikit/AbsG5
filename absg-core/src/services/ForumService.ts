@@ -196,6 +196,7 @@ class ForumService {
         msg.datetime = new Date();
         msg.poster = user;
         msg.forum = await this.forumRepo.findOne({ where: { id: data.forumId } });
+        msg.topic = await this.topicRepo.findOne({ where: { id: data.topicId } });
 
         // On extrait du message les images transmise encodé en base64 afin de les enregistré en
         // tant que fichier et économiser la taille de la base de donnée
@@ -215,8 +216,19 @@ class ForumService {
                 msg.text = msg.text.replace(img64, `src="${webUrl}"`);
             }
         }
-
         await this.msgRepo.save(msg);
+        console.log("MESSAGE TO SAVE", msg);
+
+        // On met à jour le sujet et forum
+        if (msg.topic) {
+            msg.topic.lastMessage = { id: msg.id } as ForumMessage;
+            await this.topicRepo.save(msg.topic);
+        }
+        if (msg.forum) {
+            msg.forum.lastMessage = { id: msg.id } as ForumMessage;
+            await this.forumRepo.save(msg.forum);
+        }
+
         return {
             ...msg,
             text: this.parseMessageText(msg.text),
