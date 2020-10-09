@@ -21,7 +21,7 @@ export class AuthController {
 
         // On recherche l'utilisateur par son email ou par son username
         let user = await this.userRepo.query(
-            `SELECT * FROM "user" WHERE "usernameClean" ILIKE $1 AND "isActive" = TRUE LIMIT 1`,
+            `SELECT * FROM "user" WHERE "usernameClean" = $1 AND "isActive" = TRUE LIMIT 1`,
             [cleanString(payload.username)]
         );
 

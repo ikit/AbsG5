@@ -161,7 +161,6 @@ export default {
                     }
                 })
                 .catch(err => {
-                    debugger;
                     store.commit("onError", err);
                 });
         },

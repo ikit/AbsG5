@@ -81,122 +81,124 @@
             </v-card-title>
 
             <v-container grid-list-sm class="pa-4">
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            label="Nom"
-                            prepend-icon="fas fa-user"
-                            v-model="personEditor.lastname">
-                        </v-text-field>
+                <v-form :disabled="personEditor.isLoading">
+                    <v-row>
+                        <v-col>
+                            <v-text-field
+                                label="Nom"
+                                prepend-icon="fas fa-user"
+                                v-model="personEditor.lastname">
+                            </v-text-field>
 
-                        <v-text-field
-                            label="Prénom (principale)"
-                            style="margin-left: 33px;"
-                            v-model="personEditor.firstname">
-                        </v-text-field>
+                            <v-text-field
+                                label="Prénom (principale)"
+                                style="margin-left: 33px;"
+                                v-model="personEditor.firstname">
+                            </v-text-field>
 
-                        <v-text-field
-                            label="Prénoms secondaires"
-                            style="margin-left: 33px;"
-                            v-model="personEditor.firstname2">
-                        </v-text-field>
+                            <v-text-field
+                                label="Prénoms secondaires"
+                                style="margin-left: 33px;"
+                                v-model="personEditor.firstname2">
+                            </v-text-field>
 
-                        <v-text-field
-                            label="Surnom (utilisé à la place du prénom dans la famille)"
-                            style="margin-left: 33px;"
-                            v-model="personEditor.surname">
-                        </v-text-field>
+                            <v-text-field
+                                label="Surnom (utilisé à la place du prénom dans la famille)"
+                                style="margin-left: 33px;"
+                                v-model="personEditor.surname">
+                            </v-text-field>
 
-                        <v-select
-                            :items="sexes"
-                            v-model="personEditor.sex"
-                            prepend-icon="fas fa-venus-mars"
-                            label="Sexe"
-                            item-text="label"
-                            item-value="id"
-                        ></v-select>
-                    </v-col>
+                            <v-select
+                                :items="sexes"
+                                v-model="personEditor.sex"
+                                prepend-icon="fas fa-venus-mars"
+                                label="Sexe"
+                                item-text="label"
+                                item-value="id"
+                            ></v-select>
+                        </v-col>
 
-                    <v-col>
-                        <v-menu
-                            v-model="personEditor.dateOfBirthMenu"
-                            :close-on-content-click="true"
-                            :nudge-right="40"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    :rules="editorRules.dateOfBirth"
-                                    v-model="personEditor.dateOfBirth"
-                                    label="Date de naissance"
-                                    prepend-icon="far fa-calendar-alt"
-                                    clearable
-                                    validate-on-blur
-                                    v-on="on"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker v-model="personEditor.dateOfBirth" @input="personEditor.dateOfBirthMenu = false"></v-date-picker>
-                        </v-menu>
+                        <v-col>
+                            <v-menu
+                                v-model="personEditor.dateOfBirthMenu"
+                                :close-on-content-click="true"
+                                :nudge-right="40"
+                                transition="scale-transition"
+                                offset-y
+                                min-width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        :rules="editorRules.dateOfBirth"
+                                        v-model="personEditor.dateOfBirth"
+                                        label="Date de naissance"
+                                        prepend-icon="far fa-calendar-alt"
+                                        clearable
+                                        validate-on-blur
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker v-model="personEditor.dateOfBirth" @input="personEditor.dateOfBirthMenu = false"></v-date-picker>
+                            </v-menu>
 
-                        <v-menu
-                            v-model="personEditor.dateOfDeathMenu"
-                            :close-on-content-click="true"
-                            :nudge-right="40"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    :rules="editorRules.dateOfDeath"
-                                    v-model="personEditor.dateOfDeath"
-                                    clearable
-                                    label="Date du décè"
-                                    prepend-icon="far fa-calendar-alt"
-                                    validate-on-blur
-                                    v-on="on"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker v-model="personEditor.dateOfDeath" @input="personEditor.dateOfDeathMenu = false"></v-date-picker>
-                        </v-menu>
+                            <v-menu
+                                v-model="personEditor.dateOfDeathMenu"
+                                :close-on-content-click="true"
+                                :nudge-right="40"
+                                transition="scale-transition"
+                                offset-y
+                                min-width="290px"
+                            >
+                                <template v-slot:activator="{ on }">
+                                    <v-text-field
+                                        :rules="editorRules.dateOfDeath"
+                                        v-model="personEditor.dateOfDeath"
+                                        clearable
+                                        label="Date du décè"
+                                        prepend-icon="far fa-calendar-alt"
+                                        validate-on-blur
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker v-model="personEditor.dateOfDeath" @input="personEditor.dateOfDeathMenu = false"></v-date-picker>
+                            </v-menu>
 
-                        <v-text-field
-                            label="Adresse"
-                            prepend-icon="fas fa-map-marker-alt"
-                            v-model="personEditor.address">
-                        </v-text-field>
+                            <v-text-field
+                                label="Adresse"
+                                prepend-icon="fas fa-map-marker-alt"
+                                v-model="personEditor.address">
+                            </v-text-field>
 
-                        <v-text-field
-                            label="Téléphone"
-                            prepend-icon="fas fa-phone"
-                            v-model="personEditor.phone">
-                        </v-text-field>
+                            <v-text-field
+                                label="Téléphone"
+                                prepend-icon="fas fa-phone"
+                                v-model="personEditor.phone">
+                            </v-text-field>
 
-                        <v-text-field
-                            label="Email"
-                            prepend-icon="fas fa-at"
-                            v-model="personEditor.email">
-                        </v-text-field>
+                            <v-text-field
+                                label="Email"
+                                prepend-icon="fas fa-at"
+                                v-model="personEditor.email">
+                            </v-text-field>
 
-                        <v-text-field
-                            label="Dernier métier exercé"
-                            prepend-icon="fas fa-briefcase"
-                            v-model="personEditor.job">
-                        </v-text-field>
+                            <v-text-field
+                                label="Dernier métier exercé"
+                                prepend-icon="fas fa-briefcase"
+                                v-model="personEditor.job">
+                            </v-text-field>
 
-                    </v-col>
+                        </v-col>
 
-                    <v-col>
-                        <ImageEditor ref="imgEditor" style="height: 300px; position: relative"/>
-                    </v-col>
-                </v-row>
+                        <v-col>
+                            <ImageEditor ref="imgEditor" :disabled="personEditor.isLoading" style="height: 300px; position: relative"/>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-container>
             <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-            <v-btn color="accent" @click="savePerson()">Enregistrer</v-btn>
+            <v-btn text color="primary" @click="resetDialog()" :disabled="personEditor.isLoading">Annuler</v-btn>
+            <v-btn color="accent" @click="savePerson()" :loading="personEditor.isLoading" :disabled="personEditor.isLoading">Enregistrer</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -338,6 +340,7 @@ export default  {
 
         resetDialog(open = false) {
             this.personEditor.open = open;
+            this.personEditor.isLoading = false;
             this.personEditor.id = null;
             this.personEditor.lastname = null;
             this.personEditor.firstname = null;
@@ -360,6 +363,7 @@ export default  {
 
         editPerson (person) {
             this.personEditor.open = true;
+            this.personEditor.isLoading = false;
             this.personEditor.id = person.id;
             this.personEditor.lastname = person.lastname;
             this.personEditor.firstname = person.firstname;
@@ -466,6 +470,7 @@ export default  {
             })
             .catch( err => {
                 store.commit('onError', err);
+                this.personEditor.isLoading = false;
             });
         },
 

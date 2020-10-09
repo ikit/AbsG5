@@ -164,7 +164,10 @@ L'équipe système`,
     /**
      * Retourne les dernières notifications à afficher pour l'utilisateur
      */
-    public async getLastNotifications() {
+    public async getLastNotifications(user: User) {
+        // On récupère où en est l'utilisateur de son activité
+        // user.lastTime
+
         // On récupère les 50 dernières notifications sur les 7 derniers jours
         const sql = `SELECT l.*, u.username
             FROM log_system l

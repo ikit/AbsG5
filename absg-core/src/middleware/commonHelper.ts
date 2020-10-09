@@ -9,7 +9,10 @@ import { logger } from "./logger";
  * @param str la chaine de caractère à "nettoyer"
  */
 export function cleanString(str: string): string {
-    return str.replace(/[^\w\s]/gi, "");
+    return str
+        .replace(/[^\w\s]/gi, "") // supprime les accents et caractères spéciaux
+        .toLowerCase() // met tout en minuscule
+        .trim(); // supprime les espaces superflux en début et fin de chaine
 }
 
 /**

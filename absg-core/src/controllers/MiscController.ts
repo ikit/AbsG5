@@ -19,7 +19,7 @@ export class UserController {
     async welcom(@CurrentUser() user: User) {
         const result = {
             citation: await citationService.random(),
-            notifications: await userService.getLastNotifications(),
+            notifications: await userService.getLastNotifications(user),
             settings: await this.getSettings()
             //formerPassag: await userService.getFormerPass
         };

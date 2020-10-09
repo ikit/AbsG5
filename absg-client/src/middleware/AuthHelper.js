@@ -8,6 +8,7 @@ import axios from 'axios';
 export function checkAutentication(store, ) {
     // Les infos de l'utilisateur authentifié
     let user = localStorage.getItem('user');
+    console.log("CHECK USER", user);
     if (user) {
         user = JSON.parse(user);
     }

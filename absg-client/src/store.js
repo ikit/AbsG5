@@ -153,15 +153,19 @@ export default new Vuex.Store({
         // ========
         // WEBSOCKETS methods
         SOCKET_ONOPEN (state, event)  {
-            Vue.prototype.$socket = event.currentTarget
-            state.socket.isConnected = true
-            console.log(`WS_CONNECTION:${state.user.id}`);
-            Vue.prototype.$socket.sendObj(`WS_CONNECTION:${state.user.id}`);
+            Vue.prototype.$socket = event.currentTarget;
+            state.socket.isConnected = true;
+            if (state.user) {
+                console.log(`WS_CONNECTION:${state.user.id}`);
+                Vue.prototype.$socket.sendObj(`WS_CONNECTION:${state.user.id}`);
+            }
         },
         SOCKET_ONCLOSE (state, event)  {
-            state.socket.isConnected = false
-            console.log(`WS_DISCONNECTION:${state.user.id}`);
-            Vue.prototype.$socket.sendObj(`WS_DISCONNECTION:${state.user.id}`);
+            state.socket.isConnected = false;
+            if (state.user) {
+                console.log(`WS_DISCONNECTION:${state.user.id}`);
+                Vue.prototype.$socket.sendObj(`WS_DISCONNECTION:${state.user.id}`);
+            }
         },
         SOCKET_ONERROR (state, event)  {
             console.log("TODO: processWebsocketError", event);

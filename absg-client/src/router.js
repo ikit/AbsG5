@@ -111,7 +111,7 @@ export const router = new VueRouter({
             children: [
                 {
                     path: "",
-                    redirect: "/forum/tbz"
+                    redirect: "/forum/browse"
                 },
                 {
                     path: "tbz",

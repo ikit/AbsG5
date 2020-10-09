@@ -68,7 +68,7 @@
         </v-container>
 
 
-    <v-dialog v-model="passagHistoryDialogDisplayed" width="800px">
+    <v-dialog v-model="passagHistoryDialogDisplayed">
         <v-card>
             <v-card-title class="grey lighten-4 py-4 title">
             Statistiques de passa G sur l'année
@@ -151,13 +151,14 @@ export default {
             }
         }
     }),
-    mounted() {
-        this.getWelcomData();
-    },
     watch: {
-        menu (val) {
+        'menu': (val) => {
             val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));
-        }
+        },
+    },
+    mounted() {
+        // On récupère les infos de base
+        this.getWelcomData();
     },
     methods: {
         getWelcomData() {
@@ -252,7 +253,6 @@ export default {
             timeZone: 'UTC', month: 'long',
             })
         },
-
     }
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-card style="width: 400px; padding:50px; margin: auto; margin-top: 100px; position: relative">
-            <v-form  v-on:submit="login" v-model="valid" >
+            <v-form v-model="valid" @submit="login"  onSubmit="return false;">
                 <div>
                     <v-text-field
                         prepend-icon="fas fa-user"
@@ -10,6 +10,7 @@
                         outlined
                         autocomplete="username"
                         v-model="username"
+                        data-cy='username'
                         :rules="[v => !!v || 'Ce champs est obligatoire']">
                     </v-text-field>
                 </div>
@@ -21,12 +22,13 @@
                         outlined
                         type="password"
                         autocomplete="current-password"
+                        data-cy='password'
                         v-model="password"
                         :rules="[v => !!v || 'Ce champs est obligatoire']">
                     </v-text-field>
                 </div>
                 <div style="text-align: center">
-                    <v-btn color="accent" @click="login()" :disabled="!valid">Se connecter</v-btn>
+                    <v-btn color="accent" :disabled="!valid" type="submit">Se connecter</v-btn>
                 </div>
                 <p class="errorMsg">
                     {{ error }}
@@ -60,23 +62,22 @@ export default {
         error: "",
     }),
     methods: {
-        login: function () {
-
-        let data = {
-            username: this.username,
-            password: this.password
-        }
-        axios.post("/api/auth/login", data)
-            .then(response => {
-                let user = parseAxiosResponse(response);
-                // On log l'utilisateur
-                logUser(store, user);
-                // On redirige vers l'accueil
-                this.$router.replace({path: `/`});
-            })
-            .catch((errors) => {
-                this.error = "Echec de l'authentification."
-            })
+        login() {
+            let data = {
+                username: this.username,
+                password: this.password
+            };
+            axios.post("/api/auth/login", data)
+                .then(response => {
+                    let user = parseAxiosResponse(response);
+                    // On log l'utilisateur
+                    logUser(store, user);
+                    // On redirige vers l'accueil
+                    this.$router.replace({path: `/`});
+                })
+                .catch((errors) => {
+                    this.error = "Echec de l'authentification."
+                });
         }
     }
 

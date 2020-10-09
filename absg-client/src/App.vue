@@ -276,6 +276,13 @@ export default {
     props: {
         source: String
     },
+    watch: {
+        'user': () => {
+            if (this.user) {
+                this.init();
+            }
+        }
+    },
     mounted() {
         // On charge les informations sur le thème à utiliser depuis le localstorage du browser
         const theme = localStorage.getItem("dark_theme");
@@ -287,10 +294,15 @@ export default {
             }
         }
 
-        // On initialise le store
-        store.dispatch("initStore");
+        if (this.user) {
+            this.init();
+        }
     },
     methods: {
+        init() {
+            // On initialise le store
+            store.dispatch("initStore");
+        },
         logout() {
             logoutUser(store);
             this.$router.push("/login");
