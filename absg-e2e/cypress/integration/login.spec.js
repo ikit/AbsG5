@@ -1,9 +1,13 @@
 
-beforeEach(() => {
-    cy.visit("localhost:8080/login");
-});
 
 describe("Authentification", () => {
+
+    before(() => {
+        const session = require("../fixtures/session.json");
+        cy.logout();
+        cy.visit(`${session.url}/login`);
+    });
+
 
     it("Perte d'identifiant", () => {
         cy.contains("J'ai oublié mes identifiants");
@@ -38,9 +42,10 @@ describe("Authentification", () => {
 
 
     it("Authent success", () => {
-        cy.get("[data-cy='username']").type("test");
-        cy.get("[data-cy='password']").type("testpassword");
+        const session = require("../fixtures/session.json");
+        cy.get("[data-cy='username']").type(session.user);
+        cy.get("[data-cy='password']").type(session.pwd);
         cy.contains("Se connecter").click();
-        cy.url().should("eq", "http://localhost:8080/");
+        cy.url().should("eq", session.url);
     });
 });

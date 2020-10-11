@@ -1,11 +1,12 @@
-const { it } = require("date-fns/locale");
 
-describe("Absg Home", () => {
 
-    it("Ouverture correcte de la page d'accueil", () => {
-        cy.viewport(1920, 1080);
-        cy.visit("https://absolumentg.fr");
+describe("On test", () => {
 
+    before(() => {
+        cy.login();
+    });
+
+    it("La page d'accueil contient tout les éléments", () => {
         // On vérifie que les principaux éléments sont là
         // La bannière
         cy.get("header").contains("Absolument G");
@@ -16,7 +17,7 @@ describe("Absg Home", () => {
         cy.get(".menu").contains("Forum");
         cy.get(".menu").contains("Agenda");
         cy.get(".menu").contains("Voya G");
-        cy.get(".menu").contains("AGPA");
+        cy.get(".menu").contains("A.G.P.A.");
         cy.get(".menu").contains("Config");
 
         // Le calendrier sur la date du jour

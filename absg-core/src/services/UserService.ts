@@ -202,7 +202,6 @@ L'équipe système`,
             WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD HH:mm")}:00' 
             AND '${format(to, "YYYY-MM-DD HH:mm")}:00'
             ORDER BY l.datetime ASC`;
-        console.log("GET PASSAG", sql);
         return getRepository(LogPassag).query(sql);
     }
 
@@ -221,17 +220,6 @@ L'équipe système`,
                 ) d
             LEFT OUTER JOIN log_passag l ON d.date = to_char(date_trunc('day', l.datetime), 'YYYY-MM-DD')
             GROUP BY d.date;`;
-        return getRepository(LogPassag).query(sql);
-    }
-
-    /**
-     * retourne la liste des utilisateurs en ligne (connecté il y a moins de 5 minutes)
-     */
-    getOnlineUsers() {
-        const sql = `SELECT *
-            FROM "user"
-            WHERE "lastTime" > ${subMinutes(new Date(), 5)}
-            ORDER BY "lastTime";`;
         return getRepository(LogPassag).query(sql);
     }
 

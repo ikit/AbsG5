@@ -1,7 +1,7 @@
 import * as Transport from "winston-transport";
 import { getRepository } from "typeorm";
 import { LogSystem, LogSeverity } from "../entities";
-import { websocketService } from "../services";
+import { websocketService, WSMessageType } from "../services/WebsocketService";
 
 export class PgLogger extends Transport {
     constructor(opts) {
@@ -31,7 +31,7 @@ export class PgLogger extends Transport {
 
             if (info.level === LogSeverity.notice) {
                 websocketService.broadcast({
-                    message: "notification",
+                    message: WSMessageType.notification,
                     payload: log
                 });
             }

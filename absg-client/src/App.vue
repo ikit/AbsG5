@@ -1,7 +1,7 @@
 <template>
-<v-app id="inspire">
+<v-app id="mainContent">
     <v-navigation-drawer v-if="user && user.id > 0 && !$vuetify.breakpoint.lgAndUp" v-model="drawerOpen" app style="height: 100%; z-index: 1000">
-        <v-list nav dense>
+        <v-list nav dense data-cy="menuDrawer">
             <v-list-item to="/" style="margin-top: 60px">
                 <v-list-item-action>
                     <v-icon>fas fa-home</v-icon>
@@ -32,27 +32,19 @@
         app
         fixed
         style="z-index: 2000; background: #37474f">
-         <v-app-bar-nav-icon v-if="!$vuetify.breakpoint.lgAndUp" @click.stop="drawerOpen = !drawerOpen"/>
+        <v-app-bar-nav-icon v-if="!$vuetify.breakpoint.lgAndUp" @click.stop="drawerOpen = !drawerOpen" data-cy="menuButton"/>
 
-        <v-toolbar-title v-if="$vuetify.breakpoint.lgAndUp">
-            <!-- <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon> -->
-            <span>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <router-link to="/" v-on="on"><span class="absg">Absolument <span>G</span></span></router-link>
-                    </template>
-                    <span>Revenir à l'accueil</span>
-                </v-tooltip>
-            </span>
+        <v-toolbar-title v-if="$vuetify.breakpoint.lgAndUp" data-cy="title">
+            <router-link id="title" to="/">Absolument <span>G</span></router-link>
         </v-toolbar-title>
         <v-spacer>
-        <div v-if="citation && $vuetify.breakpoint.lgAndUp" style="text-align:center; margin: 0 100px; color: #fff">
+        <div v-if="citation && $vuetify.breakpoint.lgAndUp" data-cy="citation" style="text-align:center; margin: 0 100px; color: #fff">
             <b>{{citation.author}} - </b> <span style="font-style: italic; font-weight: 200; opacity: 0.7; color: #fff" v-html="citation.citation"></span>
         </div>
         </v-spacer >
-        <!-- <v-tooltip bottom>
+        <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-                <v-badge color="accent" style="margin-right: 15px" overlap :value="unreadNotifications">
+                <v-badge color="accent" style="margin-right: 15px" overlap data-cy="notifications" :value="unreadNotifications">
                     <span slot="badge" >{{ unreadNotifications }}</span>
                     <v-btn icon v-on="on" @click.stop="notifDialog = !notifDialog">
                         <v-icon>far fa-bell</v-icon>
@@ -60,13 +52,21 @@
                 </v-badge>
             </template>
             <span>Voir l'historique des événements</span>
-        </v-tooltip> -->
+        </v-tooltip>
 
-        <!-- <v-btn @click="getOnline()">online</v-btn> -->
+        <div id="online" data-cy="online">
+            <v-tooltip bottom v-for="u of usersOnline" :key="u.id">
+                <template v-slot:activator="{ on }">
+                    <img v-on="on" :src="u.avatarUrl" :style="{ opacity: u.opacity }" />
+                </template>
+                <span>{{ u.username }} - {{ u.activity }}</span>
+            </v-tooltip>
+            <span>en ligne</span>
+        </div>
 
         <v-menu offset-y bottom left>
             <template v-slot:activator="{ on, attrs }">
-                <v-btn icon color="primary" v-bind="attrs" v-on="on" style="margin-right: 0">
+                <v-btn icon color="primary" v-bind="attrs" v-on="on" data-cy="user" style="margin-right: 0">
                     <img :src="user.avatarUrl" style="height: 40px;" />
                 </v-btn>
             </template>
@@ -90,8 +90,8 @@
         </v-menu>
     </v-app-bar>
 
-    <v-main id="bgcontent" style="background: rgba(200, 200, 200, 0.1)">
-        <div class="menu" v-if="user && user.id > 0 && $vuetify.breakpoint.lgAndUp">
+    <v-main>
+        <div id="menu" data-cy="menu" v-if="user && user.id > 0 && $vuetify.breakpoint.lgAndUp" >
             <v-list style="background: none">
                 <template v-for="item in menuItems">
                     <div class="menuItem" v-if="item.url && checkUserRolesMatch(item)" :key="item.id">
@@ -110,43 +110,41 @@
                 </router-link>
             </div>
         </div>
-        <div class="mainContent" v-bind:style="{ 'margin-left': $vuetify.breakpoint.lgAndUp ? '85px' : '0' }" >
-            <router-view :socket="ws" style="min-height: 100%"></router-view>
-            <div class="gallery" v-if="photosGalleryDisplayed">
-                <div style="position: relative; padding: 50px; height: 100%;" @click="photosGalleryAuto()">
-                    <div class="galleryControl">
-                        <div class="count" v-if="photosGallery.length > 1">
-                            {{ photosGalleryIndex + 1 }} / {{ photosGallery.length }}
-                        </div>
-
-                        <button v-if="photosGallery.length > 1" type="button" class="button"
-                            @click.stop="photosGalleryPrev()"
-                            @keyup.left.stop="photosGalleryPrev()"><i class="fas fa-chevron-left"></i></button>
-                        <button v-if="photosGallery.length > 1" type="button" class="button"
-                            @click.stop="photosGalleryPlayPause()"
-                            @keyup.space.stop="photosGalleryPlayPause()"><i class="fas fa-play"></i></button>
-                        <button v-if="photosGallery.length > 1" type="button" class="button"
-                            @click.stop="photosGalleryNext()"
-                            @keyup.right.stop="photosGalleryNext()"><i class="fas fa-chevron-right"></i></button>
-
-                        <button type="button" class="close"
-                            @click.stop="photosGalleryHide()"
-                            @keyup.esc.stop="photosGalleryHide()"><i class="fas fa-times"></i> Fermer</button>
+        <router-view :socket="ws" style="min-height: 100%" v-bind:style="{ 'padding-left': $vuetify.breakpoint.lgAndUp ? '85px' : '0' }" ></router-view>
+        <div class="gallery" v-if="user && user.id > 0 && photosGalleryDisplayed">
+            <div style="position: relative; padding: 50px; height: 100%;" @click="photosGalleryAuto()">
+                <div class="galleryControl">
+                    <div class="count" v-if="photosGallery.length > 1">
+                        {{ photosGalleryIndex + 1 }} / {{ photosGallery.length }}
                     </div>
-                    <div style="display: flex; max-height: 100%;">
-                        <!-- La photo -->
-                        <div style="flex: 1 1 0; max-height: 100%;">
-                            <img :src="photoDisplayed.url"/>
-                            <div v-if="photoDisplayed.hasOwnProperty('title')" style="text-align: center">
-                                {{photoDisplayed.title}}
-                            </div>
+
+                    <button v-if="photosGallery.length > 1" type="button" class="button"
+                        @click.stop="photosGalleryPrev()"
+                        @keyup.left.stop="photosGalleryPrev()"><i class="fas fa-chevron-left"></i></button>
+                    <button v-if="photosGallery.length > 1" type="button" class="button"
+                        @click.stop="photosGalleryPlayPause()"
+                        @keyup.space.stop="photosGalleryPlayPause()"><i class="fas fa-play"></i></button>
+                    <button v-if="photosGallery.length > 1" type="button" class="button"
+                        @click.stop="photosGalleryNext()"
+                        @keyup.right.stop="photosGalleryNext()"><i class="fas fa-chevron-right"></i></button>
+
+                    <button type="button" class="close"
+                        @click.stop="photosGalleryHide()"
+                        @keyup.esc.stop="photosGalleryHide()"><i class="fas fa-times"></i> Fermer</button>
+                </div>
+                <div style="display: flex; max-height: 100%;">
+                    <!-- La photo -->
+                    <div style="flex: 1 1 0; max-height: 100%;">
+                        <img :src="photoDisplayed.url"/>
+                        <div v-if="photoDisplayed.hasOwnProperty('title')" style="text-align: center">
+                            {{photoDisplayed.title}}
                         </div>
-                        <!-- L'éditeur de meta data -->
-                        <PhotoMetadataEditor
-                            v-if="photoMetadataEditorDisplayed"
-                            :photo="photoDisplayed"
-                            style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px; overflow: auto;"></PhotoMetadataEditor>
                     </div>
+                    <!-- L'éditeur de meta data -->
+                    <PhotoMetadataEditor
+                        v-if="photoMetadataEditorDisplayed"
+                        :photo="photoDisplayed"
+                        style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px; overflow: auto;"></PhotoMetadataEditor>
                 </div>
             </div>
         </div>
@@ -260,7 +258,7 @@ export default {
         notifDialog: false,
         errDialog: false,
         drawer: null,
-        ws: null,
+        usersOnline: [],
         menuItems: MODULES,
         notificationsHeaders: [
             { text: "Qui", value: "who" },
@@ -277,9 +275,21 @@ export default {
         source: String
     },
     watch: {
-        'user': () => {
-            if (this.user) {
+        user(newValue, oldValue) {
+            if (newValue && !oldValue) {
+                // On initialise qu'une fois quand on détecte qu'un user vient de se connecter
                 this.init();
+            }
+        },
+        wsMessage(newValue, oldValue) {
+            if (newValue.message === "onlineUsers") {
+                // on met à jours la liste des utilisateurs en ligne
+                const now = new Date().getTime();
+                this.usersOnline = newValue.payload.filter(e => e.id != this.user.id).map(e => ({
+                    ...e,
+                    avatarUrl: `/files/avatars/${e.id.toString().padStart(3, '0')}.png`,
+                    opacity: now - new Date(e.lastTime).getTime() <= 300000 ? 0.9 : 0.5 // 300000 = 5 minutes
+                }))
             }
         }
     },
@@ -385,11 +395,14 @@ export default {
             this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
             localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
         }
+
     },
     computed: {
         ...mapState([
             "citation",
             "user",
+            "wsOnline",
+            "wsMessage",
             "notifications",
             "unreadNotifications",
             "error",
@@ -433,18 +446,49 @@ export default {
 
 <style lang="scss" scoped>
 @import "./themes/global.scss";
-.absg {
+#title {
     font-size: 1.5em;
     line-height: 1.5em;
     font-family: "Comfortaa", sans-serif;
     color: white;
+    text-decoration: none;
+    span {
+        color: $accent;
+    }
 }
-.absg span {
-    color: $accent;
+
+#online {
+    margin: 0 20px;
+    min-width: 100px;
+    text-align: center;
+    position: relative;
+    padding-left: 15px;
+    border-bottom: 1px solid rgba(255,255,255, 0.2);
+    img {
+        height: 35px;
+        margin-left: -15px;
+    }
+    span {
+        position: absolute;
+        display: block;
+        width: 50px;
+        left: 50%;
+        margin-left: -25px;
+
+        text-align: center;
+        bottom: -7px;
+        color: rgba(255,255,255, 0.2);
+        background: #37474f;
+        font-variant: all-small-caps;
+        font-size: 11px;
+    }
 }
-#bgcontent {
+
+#mainContent {
+    position: relative;
     width: 100%;
     height: 100%;
+    background: rgba(200, 200, 200, 0.1)
     // background-image: url("/img/background/r00.png");
     // background-position: center;
     // background-size: cover;
@@ -452,7 +496,7 @@ export default {
     // position: relative;
 }
 
-.menu {
+#menu {
     position: fixed;
     font-family: "Comfortaa", sans-serif;
     top: 48px;
@@ -460,36 +504,40 @@ export default {
     left: 0;
     width: 85px;
     background: $primary;
-    padding-top: 8px
+    padding-top: 8px;
+
+    a {
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+        width: 85px;
+        height: 75px;
+        color: rgba(0,0,0, 0.9);
+        text-decoration: none;
+        cursor: pointer;
+        border-right: 1px solid #000;
+
+        span {
+            font-size: 0.8em
+        }
+    }
+
+    .router-link-active {
+        background: $accent;
+        color: white!important;
+
+        .theme--light.v-icon {
+            color: white;
+        }
+    }
 }
 .menuItem {
     border-bottom: 1px solid rgba(0,0,0, 0.2);
 }
-.menu a {
-    display: table-cell;
-    text-align: center;
-    vertical-align: middle;
-    width: 85px;
-    height: 75px;
-    color: rgba(0,0,0, 0.9);
-    text-decoration: none;
-    cursor: pointer;
-    border-right: 1px solid #000;
-}
-.menu .router-link-active {
-    background: $accent;
-    color: white!important;
-
-    .theme--light.v-icon {
-        color: white;
-    }
-}
-.menu a span {
-    font-size: 0.8em
-}
 .menuItem:hover {
     background: rgba(255,255,255, 0.2);
 }
+
 
 .unreadNotification {
     font-weight: bold;
@@ -497,9 +545,6 @@ export default {
     cursor: pointer;
 }
 
-.mainContent {
-    position: relative;
-}
 .theme--light.v-icon {
     color: rgba(0,0,0,0.54);
 }

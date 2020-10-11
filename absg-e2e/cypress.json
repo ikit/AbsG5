@@ -1,0 +1,8 @@
+{
+    "testFiles": [
+      "login.spec.js",
+      "components/appbar.spec.js",
+      "components/menu.spec.js",
+      "components/calendar.spec.js"
+    ]
+  }

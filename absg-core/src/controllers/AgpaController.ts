@@ -1,5 +1,15 @@
 import { getRepository } from "typeorm";
-import { JsonController, Param, Get, Delete, Authorized, CurrentUser, UploadedFile, Post, Body } from "routing-controllers";
+import {
+    JsonController,
+    Param,
+    Get,
+    Delete,
+    Authorized,
+    CurrentUser,
+    UploadedFile,
+    Post,
+    Body
+} from "routing-controllers";
 import { AgpaPhoto } from "../entities";
 import { agpaService } from "../services/AgpaService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
@@ -20,17 +30,17 @@ export class AgpaController {
     /**
      * Récupère les données globale sur l'ensemble des éditions permettant de faire
      * le résumé des archives
-     * @param user l'utilisateur qui fait la demande
+     * @param session l'utilisateur qui fait la demande
      */
     @Get("/archives")
-    archives(@CurrentUser() user) {
-        return agpaService.getArchiveSummary(user);
+    archives(@CurrentUser() session: any) {
+        return agpaService.getArchiveSummary(session);
     }
 
     /**
      * Récupère les données détaillées pour une édition en particulier
-     * @param year 
-     * @param user 
+     * @param year
+     * @param user
      */
     @Get("/archives/:year([0-9]{4})")
     getEdition(@Param("year") year: number, @CurrentUser() user) {
@@ -39,9 +49,9 @@ export class AgpaController {
 
     /**
      * Récupère les données détaillées pour une catégorie d'une édition en particulier
-     * @param year 
-     * @param catId 
-     * @param user 
+     * @param year
+     * @param catId
+     * @param user
      */
     @Get("/archives/:year([0-9]{4})/:catId([0-9]{1,2})")
     getCategory(@Param("year") year: number, @Param("catId") catId: number, @CurrentUser() user) {
@@ -50,7 +60,7 @@ export class AgpaController {
 
     /**
      * Permet de télécharger au format CSV les données des AGPA
-     * @param year 
+     * @param year
      */
     @Get("/archives/:year([0-9]{4})/files")
     getArchivesFile(@Param("year") year: number) {
@@ -61,12 +71,6 @@ export class AgpaController {
     @Get("/ceremony/:year([0-9]{4})")
     getCeremony(@Param("year") year: number) {
         return agpaService.getCeremonyData(year);
-    }
-
-    @Get("/stats")
-    getStats() {
-        // TODO
-        return {};
     }
 
     @Get("/palmares")
@@ -123,7 +127,7 @@ export class AgpaController {
 
     /**
      * Supprime une photo si autorisé
-     * @param photoId 
+     * @param photoId
      * @param user l'utilisateur qui effectue la demande
      */
     @Delete("/photo/:photoId([0-9]+)")
@@ -133,8 +137,8 @@ export class AgpaController {
 
     /**
      * Met à jour le vote d'un utilisateur pour une photo
-     * @param photoId 
-     * @param vote 
+     * @param photoId
+     * @param vote
      * @param user l'utilisateur qui effectue la demande
      */
     @Get("/vote/:photoId([0-9]+)/:vote")

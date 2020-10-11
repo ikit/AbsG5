@@ -1,13 +1,12 @@
 <template>
     <div>
-        <vo-basic :data="genealogData"></vo-basic>
+
     </div>
 </template>
 
 
 <script>
 import Vue from 'vue';
-import { VoBasic } from 'vue-orgchart';
 
 export default {
     components: {

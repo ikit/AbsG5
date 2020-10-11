@@ -1,6 +1,12 @@
 import wss from "../wss";
 import { logger } from "../middleware/logger";
 
+export enum WSMessageType {
+    notification = "notification",
+    pinnedTopicsChanged = "pinnedTopicsChanged",
+    onlineUsers = "onlineUsers"
+}
+
 export interface WSMessage {
     message: string;
     payload: any;
@@ -13,7 +19,6 @@ export class WebsocketService {
 
     private send(client, message: WSMessage) {
         const data = JSON.stringify(message);
-        logger.info(data);
         client.send(data);
     }
 

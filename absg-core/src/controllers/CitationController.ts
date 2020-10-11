@@ -1,10 +1,20 @@
-import { JsonController, Param, Body, Get, Post, Delete, Authorized, QueryParam, Req } from "routing-controllers";
+import {
+    JsonController,
+    Param,
+    Body,
+    Get,
+    Post,
+    Delete,
+    Authorized,
+    Req,
+    CurrentUser,
+    QueryParam
+} from "routing-controllers";
 import { Request } from "express";
-import { Citation } from "../entities";
+import { Citation, User } from "../entities";
 import { citationService } from "../services";
-import { getUserFromHeader } from "../middleware";
 
-//@Authorized()
+@Authorized()
 @JsonController("/citations")
 export class CitationController {
     @Get("")
@@ -23,14 +33,12 @@ export class CitationController {
     }
 
     @Post("/")
-    async save(@Req() request: Request, @Body() citation: Citation) {
-        const user = await getUserFromHeader(request);
+    async save(@Req() request: Request, @Body() citation: Citation, @CurrentUser() user: User) {
         return await citationService.save(user, citation);
     }
 
     @Delete("/:id")
-    async remove(@Req() request: Request, @Param("id") id: number) {
-        const user = await getUserFromHeader(request);
+    async remove(@Req() request: Request, @Param("id") id: number, @CurrentUser() user: User) {
         return await citationService.remove(user, id);
     }
 }

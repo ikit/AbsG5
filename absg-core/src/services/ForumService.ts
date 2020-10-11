@@ -6,14 +6,13 @@ import * as path from "path";
 import * as fs from "fs";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { BadRequestError } from "routing-controllers";
-import { websocketService } from "./WebsocketService";
+import { websocketService, WSMessageType } from "./WebsocketService";
 
 class ForumService {
     private forumRepo = null;
     private topicRepo = null;
     private msgRepo = null;
     private userRepo = null;
-    private wsService = null;
 
     public initService() {
         this.forumRepo = getRepository(Forum);
@@ -290,7 +289,7 @@ class ForumService {
             await this.topicRepo.save(topic);
 
             websocketService.broadcast({
-                message: "pinnedTopicsChanged",
+                message: WSMessageType.pinnedTopicsChanged,
                 payload: await this.pinnedTopics()
             });
             return topic;

@@ -16,11 +16,8 @@ export default new Vuex.Store({
         unreadNotifications: 0, // le nombre de notification non lu par
         settings: null, // les paramètres actuels du site
         // Websocket connection
-        socket: {
-            isConnected: false,
-            message: '',
-            reconnectError: false,
-        },
+        wsOnline: false, // Est-ce que la connexion temps réelle est active ou non
+        wsMessage: null, // Le dernier message reçu
         // Galerie photos
         photosGallery: [],
         photosGalleryIndex: 0,
@@ -154,33 +151,21 @@ export default new Vuex.Store({
         // WEBSOCKETS methods
         SOCKET_ONOPEN (state, event)  {
             Vue.prototype.$socket = event.currentTarget;
-            state.socket.isConnected = true;
-            if (state.user) {
-                console.log(`WS_CONNECTION:${state.user.id}`);
-                Vue.prototype.$socket.sendObj(`WS_CONNECTION:${state.user.id}`);
-            }
+            state.wsOnline = true;
         },
         SOCKET_ONCLOSE (state, event)  {
-            state.socket.isConnected = false;
-            if (state.user) {
-                console.log(`WS_DISCONNECTION:${state.user.id}`);
-                Vue.prototype.$socket.sendObj(`WS_DISCONNECTION:${state.user.id}`);
-            }
+            state.wsOnline = false;
+        },
+        SOCKET_ONMESSAGE (state, message)  {
+            state.wsMessage = message;
         },
         SOCKET_ONERROR (state, event)  {
             console.log("TODO: processWebsocketError", event);
         },
-        // default handler called for all methods
-        SOCKET_ONMESSAGE (state, message)  {
-            state.socket.message = message;
-            console.log("TODO: processWebsocketMessage", message);
-        },
-        // mutations for reconnect methods
         SOCKET_RECONNECT(state, count) {
             console.log("WS reconnect");
         },
         SOCKET_RECONNECT_ERROR(state) {
-            state.socket.reconnectError = true;
             console.log("WS reaconnect error", state);
         },
 

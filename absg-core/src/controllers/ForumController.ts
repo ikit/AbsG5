@@ -9,6 +9,7 @@ import {
     Post,
     Delete
 } from "routing-controllers";
+import { User } from "../entities";
 
 import { forumService } from "../services";
 
@@ -57,7 +58,7 @@ export class ForumController {
      *     sinon la limite en taille des body/json empeche de poster des messages avec image encodé
      */
     @Post("/post")
-    savePost(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() user: any) {
+    savePost(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() user: User) {
         return forumService.savePost(body, user);
     }
 
@@ -67,7 +68,7 @@ export class ForumController {
      * @param user
      */
     @Delete("/post/:id")
-    deletePost(@Param("id") id: number, @CurrentUser() user: any) {
+    deletePost(@Param("id") id: number, @CurrentUser() user: User) {
         return forumService.deletePost(id, user);
     }
 
@@ -94,36 +95,36 @@ export class ForumController {
      * @param user l'utilisateur qui fait la demande
      */
     @Post("/uploadFile")
-    saveFile(@UploadedFile("file") file: any, @CurrentUser() user: any) {
+    saveFile(@UploadedFile("file") file: any, @CurrentUser() user: User) {
         return forumService.saveFile(file, user.id);
     }
 
     /**
      * Supprime une pièce jointe du serveur
-     * @param fileURI 
-     * @param user 
+     * @param fileURI
+     * @param user
      */
     @Delete("/uploadFile/:fileURI")
-    deleteFile(@Param("fileURI") fileURI: string, @CurrentUser() user: any) {
+    deleteFile(@Param("fileURI") fileURI: string, @CurrentUser() user: User) {
         return forumService.deleteFile(decodeURI(fileURI), user);
     }
 
     /**
      * Sauvegarde un message en cours d'édition pour l'utilisateur courrant
-     * @param body 
-     * @param user 
+     * @param body
+     * @param user
      */
     @Post("/draft")
-    saveDraft(@Body() body: any, @CurrentUser() user: any) {
+    saveDraft(@Body() body: any, @CurrentUser() user: User) {
         return forumService.saveDraft(body, user.id);
     }
 
     /**
      * Récupère le brouillon en cours d'édition de l'utilisateur si il existe
-     * @param user 
+     * @param user
      */
     @Get("/draft")
-    getDraft(@CurrentUser() user: any) {
+    getDraft(@CurrentUser() user: User) {
         return forumService.getDraft(user.id);
     }
 }

@@ -3,8 +3,34 @@ import * as jwt from "jsonwebtoken";
 import { Action } from "routing-controllers";
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag } from "../entities";
-import { differenceInSeconds } from "date-fns";
+import { differenceInSeconds, format, subMinutes } from "date-fns";
 import { Mutex } from "async-mutex";
+import { websocketService, WSMessageType } from "../services/WebsocketService";
+
+const ACTIONS_LABELS = [
+    { route: "/agenda/person", label: "Agenda - Répertoire" },
+    { route: "/agenda/place", label: "Agenda - Lieux" },
+    { route: "/agenda/trombi", label: "Agenda - Trombinoscope" },
+    { route: "/agpa/archives", label: "A.G.P.A. - Archives" },
+    { route: "/agpa/ceremony", label: "A.G.P.A. - Cérémonie" },
+    { route: "/agpa/palmares", label: "A.G.P.A. - Palmarès" },
+    { route: "/agpa/p", label: "A.G.P.A. - Edition " + new Date().getFullYear() },
+    { route: "/agpa/photo", label: "A.G.P.A. - Edition " + new Date().getFullYear() },
+    { route: "/agpa/vote", label: "A.G.P.A. - Edition " + new Date().getFullYear() },
+    { route: "/agpa", label: "A.G.P.A." },
+    { route: "/citations", label: "Citations" },
+    { route: "/event", label: "Calendrier" },
+    { route: "/forum/tbz", label: "Forum - T.B.Z." },
+    { route: "/forum", label: "Forum" },
+    { route: "/immt", label: "Photos - Image du moment" },
+    { route: "/homepage", label: "Accueil Absolument G" },
+    { route: "/settings", label: "Paramètres" },
+    { route: "/photos", label: "Photos" },
+    { route: "/voyag", label: "Voya G" }
+];
+
+
+
 
 /**
  * Chiffre un mot de passe
@@ -73,16 +99,35 @@ export function checkRoles(userRoles: string[], authorizedRoles: string[]) {
  * Met à jours les données de l'utilisateur et retourne l'utilisateur modifié
  * @param url la nouvelle activité à mettre à jour
  */
-export function setLastActivity(user: User, url: string) {
+export async function setLastActivity(user: User, url: string) {
+    console.log("setLastActivity", url);
+    // En fonction de l'url on détermine un label "user friendly"
+    let label = ACTIONS_LABELS.find(e => url.indexOf(e.route) > -1) as any;
+    label = label ? label.label : null;
+
     if (!user.activity) {
         user.activity = {
+            lastActionLabel: label ? label : "Accueil Absolument G",
             lastAction: url, // lien (route) vers la dernière section du site visité
             lastAnnounce: 0, // dernière date à laquelle on a affiché l'annonce en cours du site à l'utilisateur (pas plus d'une fois par jour)
             unreadNotifications: [] // liste des id des notifications non lues de l'utilisateur
         };
     } else {
         user.activity.lastActio = url;
+        user.activity.lastActionLabel = label ? label : "Accueil Absolument G";
     }
+
+    await getRepository(User).save(user);
+    // On notify tout le monde des utilisateurs actuellement en ligne
+    const onlineUsers = await getRepository(LogPassag).query(`
+        SELECT id, username, "rootFamily", "lastTime", activity 
+        FROM "user" WHERE "lastTime" > '${format(subMinutes(new Date(), 10), "YYYY-MM-DD HH:mm")}'::date
+        ORDER BY "lastTime" ASC`);
+    websocketService.broadcast({
+        message: WSMessageType.onlineUsers,
+        payload: onlineUsers.map(u => ({ ...u, activity: u.activity ? u.activity.lastActionLabel : "-" }))
+    });
+
     return user;
 }
 
@@ -127,8 +172,7 @@ export async function checkUserPassag(user: User, url: string) {
 
             // On met à jour l'info dans de l'utilisateur
             user.lastTime = new Date();
-            user = setLastActivity(user, url);
-            await getRepository(User).save(user);
+            setLastActivity(user, url);
         }
     } finally {
         release();
@@ -175,9 +219,6 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
 
         // on vérifie les droits
         const isAuthorized = !!user && user.id && checkRoles([], roles);
-
-        // On met à jours les stats de passage de l'utilisateur
-        checkUserPassag(user, action.request.url);
 
         return isAuthorized;
     } catch (e) {

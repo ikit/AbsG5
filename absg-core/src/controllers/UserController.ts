@@ -1,6 +1,6 @@
 import { JsonController, Post, Body, BadRequestError, Get, Authorized, CurrentUser, Param } from "routing-controllers";
 import { User } from "../entities";
-import { userService, agendaService } from "../services";
+import { userService } from "../services";
 
 @Authorized()
 @JsonController("/users")

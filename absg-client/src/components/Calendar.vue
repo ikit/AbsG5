@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-card style="min-width: 460px;">
+    <v-card style="min-width: 460px;" data-cy="calendar">
         <v-card-title >
             <v-menu
                 ref="dateMenu"

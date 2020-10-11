@@ -51,15 +51,6 @@ export class UserController {
     }
 
     /**
-     * Récupère la liste des utilisateurs actuellement en ligne
-     */
-    @Authorized()
-    @Get("/online")
-    online() {
-        return userService.getOnlineUsers();
-    }
-
-    /**
      * Récupère la liste de tout les paramètres du site
      */
     @Authorized()
