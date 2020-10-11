@@ -1,6 +1,6 @@
 {
-    "user": "olive",
-    "pwd": "neme$i$161",
+    "user": "test",
+    "pwd": "test",
     "api": "http://localhost:5010/api",
     "url": "http://localhost:8080/"
 }

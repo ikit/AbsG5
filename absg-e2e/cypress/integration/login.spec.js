@@ -17,7 +17,7 @@ describe("Authentification", () => {
     it("Login obligatoire", () => {
         cy.get("form");
         cy.contains("Se connecter").should('be.disabled');
-        cy.get("[data-cy='username']").type("test");
+        cy.get("[data-cy='username']").type("t");
         cy.focused().clear()
         cy.get("form");
         cy.contains("Ce champs est obligatoire");
@@ -26,7 +26,7 @@ describe("Authentification", () => {
 
     it("Mot de passe obligatoire", () => {
         cy.get("[data-cy='username']").type("test");
-        cy.get("[data-cy='password']").type("testpassword");
+        cy.get("[data-cy='password']").type("t");
         cy.focused().clear()
         cy.get("form");
         cy.contains("Ce champs est obligatoire");
@@ -34,10 +34,10 @@ describe("Authentification", () => {
     });
 
     it("Erreur d'authentification", () => {
-        cy.get("[data-cy='username']").type("test");
         cy.get("[data-cy='password']").type("testpassword{enter}");
         cy.contains("Une erreur s'est produite");
-        cy.contains("Wrong username or password.");
+        cy.contains("Mauvais identifiant ou mot de passe");
+        cy.contains("OK").click();
     });
 
 

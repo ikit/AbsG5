@@ -29,9 +29,6 @@ const ACTIONS_LABELS = [
     { route: "/voyag", label: "Voya G" }
 ];
 
-
-
-
 /**
  * Chiffre un mot de passe
  *
@@ -121,7 +118,8 @@ export async function setLastActivity(user: User, url: string) {
     // On notify tout le monde des utilisateurs actuellement en ligne
     const onlineUsers = await getRepository(LogPassag).query(`
         SELECT id, username, "rootFamily", "lastTime", activity 
-        FROM "user" WHERE "lastTime" > '${format(subMinutes(new Date(), 10), "YYYY-MM-DD HH:mm")}'::date
+        FROM "user" 
+        WHERE "lastTime" IS NOT NULL AND  "lastTime" > now() - INTERVAL '10 min'
         ORDER BY "lastTime" ASC`);
     websocketService.broadcast({
         message: WSMessageType.onlineUsers,
