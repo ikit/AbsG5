@@ -10,10 +10,12 @@
             <p>Fonctionnalités</p>
             <ul>
                 <li>Déploiement de l'application</li>
+                <li>Notification présence des membres en ligne</li>
             </ul>
             <p>Bug corrigés</p>
             <ul>
                 <li>Stabilisation de l'application</li>
+                <li>Limite d'upload de fichier monté à 200Mo</li>
             </ul>
         </v-card>
 

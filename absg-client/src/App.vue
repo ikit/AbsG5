@@ -54,7 +54,7 @@
             <span>Voir l'historique des événements</span>
         </v-tooltip>
 
-        <div id="online" data-cy="online">
+        <div id="online" v-if="usersOnline.length > 0" data-cy="online">
             <v-tooltip bottom v-for="u of usersOnline" :key="u.id">
                 <template v-slot:activator="{ on }">
                     <img v-on="on" :src="u.avatarUrl" :style="{ opacity: u.opacity }" />
@@ -62,6 +62,9 @@
                 <span>{{ u.username }} - {{ u.activity }}</span>
             </v-tooltip>
             <span>en ligne</span>
+        </div>
+        <div id="online" v-else data-cy="online">
+            <span style="bottom: -15px">personne en ligne</span>
         </div>
 
         <v-menu offset-y bottom left>

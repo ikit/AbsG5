@@ -23,6 +23,9 @@
                 :loading="isLoading"
                 loading-text="Récupération des utilisateurs..."
             >
+                <template v-slot:item.username="{ item }">
+                    <img :src="item.url" style="width: 40px; vertical-align: middle; margin-right: 10px"/> {{ item.username }}
+                </template>
 
                 <template v-slot:item.roles="{ item }">
                     <v-chip
@@ -252,6 +255,7 @@ export default {
                 this.usersList.push(uData);
             }
             this.isLoading = false;
+            console.log(this.usersList)
         }).catch( err => {
             store.commit("onError", err);
         });
