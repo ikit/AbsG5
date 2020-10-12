@@ -8,6 +8,7 @@ describe("Barre principale de l'application", () => {
     });
 
     it("Affichage 1920x1080", () => {
+        const session = require("../../fixtures/session.json");
         cy.viewport(1920, 1080);
         cy.visit(`${session.url}`);
         cy.get("header").should('exist');

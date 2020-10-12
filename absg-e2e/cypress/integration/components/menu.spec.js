@@ -8,16 +8,17 @@ describe("Menu principale de l'application", () => {
     });
 
     it("Affichage 1920x1080", () => {
+        const session = require("../../fixtures/session.json");
         cy.viewport(1920, 1080);
         cy.visit(`${session.url}`);
         cy.get("[data-cy='menu']").should('exist');
-        cy.get(".menu").contains("Citations");
-        cy.get(".menu").contains("Photos");
-        cy.get(".menu").contains("Forum");
-        cy.get(".menu").contains("Agenda");
-        cy.get(".menu").contains("Voya G");
-        cy.get(".menu").contains("A.G.P.A.");
-        cy.get(".menu").contains("Config");
+        cy.get("[data-cy='menu']").contains("Citations");
+        cy.get("[data-cy='menu']").contains("Photos");
+        cy.get("[data-cy='menu']").contains("Forum");
+        cy.get("[data-cy='menu']").contains("Agenda");
+        cy.get("[data-cy='menu']").contains("Voya G");
+        cy.get("[data-cy='menu']").contains("A.G.P.A.");
+        cy.get("[data-cy='menu']").contains("Config");
 
         // TODO: check menu actions
     });
