@@ -2,5 +2,5 @@
     "user": "test",
     "pwd": "test",
     "api": "http://localhost:5010/api",
-    "url": "http://localhost:8080/"
+    "url": "http://localhost:8080"
 }

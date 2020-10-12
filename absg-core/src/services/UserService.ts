@@ -156,6 +156,8 @@ ${process.env.URL_CLIENT}resetpwd?session=${encodeURI(users[0].token)}.
 L'équipe système`,
                 users[0].person.email
             );
+            
+            return users[0].id;
         }
         // On ignore la demande
         return null;

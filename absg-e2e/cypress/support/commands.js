@@ -10,7 +10,6 @@ Cypress.Commands.add("login", () => {
         }
     }).then(answer => {
         window.localStorage.setItem('user', JSON.stringify(answer.body));
-        cy.visit(`${session.url}`);
     });
 })
 
@@ -24,13 +23,8 @@ Cypress.Commands.add("logout", () => {
             method: "GET",
             url: `${session.api}/auth/logout`,
             headers: [ { 'Authorization' : `Bearer ${current.token}`}]
-        }).then(() => {
-            cy.visit(`${session.url}/auth/login`);
         });
-    } else {
-        cy.visit(`${session.url}/auth/login`);
     }
-
 })
 //
 //

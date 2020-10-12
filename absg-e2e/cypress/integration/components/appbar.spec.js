@@ -3,12 +3,13 @@
 
 describe("Barre principale de l'application", () => {
 
-    before(() => {
+    beforeEach(() => {
         cy.login();
     });
 
     it("Affichage 1920x1080", () => {
         cy.viewport(1920, 1080);
+        cy.visit(`${session.url}`);
         cy.get("header").should('exist');
         cy.get("[data-cy='title']").should('exist');
         cy.get("[data-cy='menuButton']").should('not.exist');

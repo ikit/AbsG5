@@ -9,14 +9,16 @@
                     required
                     outlined
                     type="email"
+                    data-cy="forgotten-email"
                 ></v-text-field>
                 <div style="text-align: center">
-                    <v-btn color="accent" @click="go()" :disabled="!valid">Réinitialiser mon mot de passe</v-btn>
+                    <v-btn color="accent" @click="go()" :disabled="!valid" data-cy="forgotten-button">Réinitialiser mon mot de passe</v-btn>
                 </div>
             </v-form>
             <div v-if="sent" style="text-align: center">
                 <h3>Merci.</h3>
                 <p>Un message a été envoyé à l'adresse email indiqué afin de vous expliquer la marche à suivre pour réinitialiser votre mot de passe.</p>
+                <p>Vous devez déjà l'avoir reçu. Pensez à regarder dans <span style="font-weight: bold">vos SPAMS</span> si vous ne le voyez pas.</p>
             </div>
         </v-card>
     </v-container>
@@ -45,14 +47,12 @@ export default {
             axios.post("/api/auth/ask-new-pwd", { email: this.email })
             .then(response => {
                 const user = parseAxiosResponse(response);
+                console.log("response", user);
                 if (user) {
-                    // Le changement de mot de passe s'est bien déroulé, on met à jour la session de l'utilisateur
-                    store.commit("logUser", user);
-
-                    // On redirige vers la page d'accueil
-                    this.$router.push('/');
+                    this.sent = true;
+                } else {
+                    store.commit('onNotif', ["Email inconnu", "Aucun membre du site ne correspond avec l'adresse email indiqué."]);
                 }
-                this.sent = true;
             }).catch(err => {
                 store.commit('onError', err);
             });

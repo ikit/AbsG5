@@ -2,14 +2,9 @@
 
 describe("Authentification", () => {
 
-    before(() => {
-        const session = require("../fixtures/session.json");
-        cy.logout();
-        cy.visit(`${session.url}/login`);
-    });
-
-
     it("Perte d'identifiant", () => {
+        const session = require("../fixtures/session.json");
+        cy.visit(`${session.url}/login`);
         cy.contains("J'ai oublié mes identifiants");
         cy.should("have.attr", "href", "/forgotten");
     });

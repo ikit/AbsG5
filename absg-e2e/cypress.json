@@ -1,6 +1,7 @@
 {
     "testFiles": [
       "login.spec.js",
+      "reset-pwd.spec.js",
       "components/appbar.spec.js",
       "components/menu.spec.js",
       "components/calendar.spec.js"
