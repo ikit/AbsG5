@@ -42,6 +42,9 @@ export default {
             v => /.+@.+\..+/.test(v) || "Cette adresse email n'est pas valide",
         ],
     }),
+    mounted() {
+        localStorage.removeItem('user');
+    },
     methods: {
         go() {
             axios.post("/api/auth/ask-new-pwd", { email: this.email })

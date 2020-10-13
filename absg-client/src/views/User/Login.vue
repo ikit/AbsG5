@@ -61,6 +61,9 @@ export default {
         password: "",
         error: "",
     }),
+    mounted() {
+        localStorage.removeItem('user');
+    },
     methods: {
         login() {
             let data = {
