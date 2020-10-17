@@ -1,5 +1,6 @@
 <template>
     <tiptap-vuetify
+        ref="editor"
         v-model="value"
         :extensions="extensions"
         placeholder="Rédigez ici votre nouveau message"
@@ -10,6 +11,8 @@
 <script>
 import { TiptapVuetify, History, Heading, Bold, Italic, Strike, Underline, Code, Paragraph, BulletList, OrderedList, ListItem, Link, Blockquote, HardBreak, Image } from 'tiptap-vuetify';
 import FileSelector from './TextEditor/FileSelector';
+import { DOMParser } from 'prosemirror-model';
+
 // import {MyCustomExtension} from './TextEditor/MyCustomExtension'
 
 export default {
@@ -52,7 +55,23 @@ export default {
             setTimeout(() => {
                 this.$emit('change', this.value);
             });
+        },
+        reset() {
+            this.$refs.editor.editor.clearContent();
+        },
+        elementFromString(value) {
+            const element = document.createElement('div');
+            element.innerHTML = value.trim();
+            return element;
+        },
+        insert(value) {
+            const { state, view } = this.$refs.editor.editor;
+            const { selection } = state;
+            const element = this.elementFromString(value);
+            const slice = DOMParser.fromSchema(state.schema).parseSlice(element);
+            const transaction = state.tr.insert(selection.anchor, slice.content);
 
+            view.dispatch(transaction);
         }
     }
 }

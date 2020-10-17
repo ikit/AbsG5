@@ -45,18 +45,33 @@
     <v-card
         v-if="topicId && !isLoading && !readOnly"
         v-bind:class="{ largeEditor: $vuetify.breakpoint.lgAndUp, compactEditor: !$vuetify.breakpoint.lgAndUp }">
-        <TextEditor v-model="editorText"></TextEditor>
-        <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-                <v-btn
-                    style="margin: 5px 0 -5px 0;"
-                    v-on="on"
-                    @click="post()">
-                    Envoyer
-                </v-btn>
-            </template>
-            <span>Poster votre nouveau message sur le forum</span>
-        </v-tooltip>
+        <TextEditor ref="newMsgEditor" v-model="editorText"></TextEditor>
+        <div>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        style="margin: 5px 0 -5px 0;"
+                        v-on="on"
+                        @click="post()">
+                        Envoyer
+                    </v-btn>
+                </template>
+                <span>Poster votre nouveau message sur le forum</span>
+            </v-tooltip>
+            <v-tooltip bottom v-if="$vuetify.breakpoint.lgAndUp">
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        style="margin: 5px 0 -5px 10px;"
+                        v-on="on"
+                        @click="switchSmilies()">
+                        Smilies
+                    </v-btn>
+                </template>
+                <span>Voir les smilies</span>
+            </v-tooltip>
+        </div>
+        <VEmojiPicker v-if="displayEmojis" @select="selectEmoji" :emojisByRow="10" :showSearch="false" style="width: 100%; margin-top: 10px;">
+        </VEmojiPicker>
     </v-card>
 
     <v-dialog v-model="msgDeletion.open" width="800px">
@@ -97,11 +112,13 @@ import store from '../../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
 import TextEditor from '../../components/TextEditor.vue';
+import VEmojiPicker from 'v-emoji-picker';
 
 export default {
     name: 'Reader',
     components: {
-        TextEditor
+        TextEditor,
+        VEmojiPicker
     },
     props: {
         readOnly: {
@@ -125,6 +142,7 @@ export default {
         isLoading: false,
         messages: [],
         editorText: "",
+        displayEmojis: false,
 
         msgEdition: {
             open: false, // si oui ou non la boite de dialogue pour éditer un message est affichée
@@ -157,10 +175,18 @@ export default {
             if (data.topic) {
                 this.topicId = data.topic.id;
                 this.forumId = data.topic.forum.id;
-                console.log(this.topicId, this.forumId)
             }
             this.messages = data.posts;
             setTimeout(() => location.hash = "#post_" + this.messages[this.messages.length - 1].id);
+        },
+
+        // On affiche ou masque les smilies
+        switchSmilies() {
+            this.displayEmojis = !this.displayEmojis;
+        },
+
+        selectEmoji(emoji) {
+            this.$refs.newMsgEditor.insert(emoji.data);
         },
 
         // On enregistre le message
@@ -176,6 +202,7 @@ export default {
             })
             .then( response => {
                 this.messages.push(parseAxiosResponse(response));
+                this.$refs.newMsgEditor.reset();
             })
             .catch( err => {
                 store.commit('onError', err);
@@ -199,6 +226,7 @@ export default {
                 if (idx >= 0) {
                     this.messages[idx] = editedPost;
                 }
+                this.$refs.newMsgEditor.reset();
             })
             .catch( err => {
                 store.commit('onError', err);
@@ -287,6 +315,8 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
+
+
 
 .msg {
     position: relative;
