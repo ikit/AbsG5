@@ -1,4 +1,16 @@
-import { JsonController, Param, Body, Get, Post, Delete, Authorized, Req, CurrentUser } from "routing-controllers";
+import {
+    JsonController,
+    Param,
+    Body,
+    Get,
+    Post,
+    Delete,
+    Authorized,
+    Req,
+    CurrentUser,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    QueryParam
+} from "routing-controllers";
 import { Request } from "express";
 import { Citation, User } from "../entities";
 import { citationService } from "../services";
