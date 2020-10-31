@@ -71,7 +71,7 @@ import store from '../store';
 import { format } from "date-fns";
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { el } from 'date-fns/locale';
-import { Photo } from '../model';
+import { Photo } from '../model/Photo';
 
 export default {
     name: 'PhotoMetadataEditor',
