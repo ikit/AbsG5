@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from "typeorm";
-import { User } from "./User";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 export enum LogSeverity {
     emerg = "emerg",

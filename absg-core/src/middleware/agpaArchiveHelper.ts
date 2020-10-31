@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { AgpaPhoto, User } from "../entities";
-import { getMetaData, getCurrentEdition } from "./agpaCommonHelpers";
+import { getMetaData, getCurrentEdition, checkValidYear } from "./agpaCommonHelpers";
 
 /**
  * Retourne les informations sur les anciennes éditions
@@ -145,6 +145,11 @@ export async function archiveEdition(year: number, user: User): Promise<any> {
  * @param user l'utilisateur qui demande les informations
  */
 export async function archiveCategory(year: number, catId: number, user: User) {
+    // Si l'utilisateur n'est pas admin, il n'a pas le droit de récupérer les archives de l'édition en cours
+    if (user.isNot("admin")) {
+        year = checkValidYear(year);
+    }
+
     // Init data
     const repo = getRepository(AgpaPhoto);
     const category = await getMetaData(year);

@@ -7,13 +7,13 @@ import { User } from "./User";
 export class ForumMessage {
     @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
-    
+
     @ManyToOne(() => Forum)
     forum: Forum;
 
     @ManyToOne(() => ForumTopic)
     topic: ForumTopic;
-    
+
     @ManyToOne(() => User)
     poster: User;
 

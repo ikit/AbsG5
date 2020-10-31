@@ -7,7 +7,7 @@ export class PersonLocation {
     @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
 
-    @OneToOne(type => Person)
+    @OneToOne(() => Person)
     @JoinColumn()
     person: Person;
 

@@ -17,7 +17,7 @@ export class AgpaCategory {
     @Column({ comment: "Couleur de la catégorie", length: 7 })
     color: string;
 
-    @Column({ comment: "Première année où la catégorie est apparue", nullable: true  })
+    @Column({ comment: "Première année où la catégorie est apparue", nullable: true })
     from: number;
 
     @Column({ comment: "Dernière année où la catégorie était jouable", nullable: true })

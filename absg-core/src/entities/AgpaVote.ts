@@ -12,15 +12,15 @@ export class AgpaVote {
     @Column({ comment: "Année de la photo", width: 4 })
     year: number;
 
-    @ManyToOne(type => AgpaCategory)
+    @ManyToOne(() => AgpaCategory)
     @JoinColumn()
     category: AgpaCategory;
 
-    @ManyToOne(type => User)
+    @ManyToOne(() => User)
     @JoinColumn()
     user: User;
 
-    @ManyToOne(type => AgpaPhoto)
+    @ManyToOne(() => AgpaPhoto)
     @JoinColumn()
     photo: AgpaPhoto;
 

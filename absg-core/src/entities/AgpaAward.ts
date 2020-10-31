@@ -21,11 +21,11 @@ export class AgpaAward {
     @Column({ comment: "Année d'attribution de l'agpa", width: 4 })
     year: number;
 
-    @ManyToOne(type => AgpaCategory)
+    @ManyToOne(() => AgpaCategory)
     @JoinColumn()
     category: AgpaCategory;
 
-    @ManyToOne(type => User)
+    @ManyToOne(() => User)
     @JoinColumn()
     user: User;
 
@@ -35,7 +35,7 @@ export class AgpaAward {
     })
     award: AgpaAwardType;
 
-    @ManyToOne(type => AgpaPhoto)
+    @ManyToOne(() => AgpaPhoto)
     @JoinColumn()
     photo: AgpaPhoto;
 }

@@ -101,7 +101,7 @@ export class AgpaPalmares {
                     this.awards.total += 1;
                     break;
             }
-            
+
             this.awards.total += ["nominated", "honor"].find(e => e === award.award) ? 0 : 1;
             this.totalPoints += palmaresPoints(award.award);
             // On récupère la meilleure année/catégorie pour le jouruer
@@ -109,7 +109,6 @@ export class AgpaPalmares {
             this.statsByCategories.sort((a: { stats: number[] }, b: { stats: number[] }) => b.stats[6] - a.stats[6]);
             this.bestYear = this.statsByYears[0];
             this.bestCat = this.statsByCategories[0];
-
         }
     }
 }

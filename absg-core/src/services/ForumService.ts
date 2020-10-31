@@ -182,7 +182,7 @@ class ForumService {
      * @param user l'utilisateur qui fait la demande
      */
     async savePost(data: any, user: any) {
-        console.log("SAVE POST", data)
+        console.log("SAVE POST", data);
         let msg = null;
         if (data.id) {
             // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
@@ -208,7 +208,10 @@ class ForumService {
                 const fileName = new Date().getTime();
                 const fileExt = imageBuffer.type.substr(imageBuffer.type.indexOf("/") + 1);
 
-                const thumbPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}_mini.${fileExt}`);
+                const thumbPath = path.join(
+                    process.env.PATH_FILES,
+                    `attachments/${currentYear}/${fileName}_mini.${fileExt}`
+                );
                 const webPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}.${fileExt}`);
                 const webUrl = `${process.env.URL_FILES}/attachments/${currentYear}/${fileName}.${fileExt}`;
 

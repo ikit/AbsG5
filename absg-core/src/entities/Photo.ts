@@ -2,7 +2,6 @@ import { Entity, PrimaryColumn, Column } from "typeorm";
 
 @Entity()
 export class Photo {
-
     @PrimaryColumn({ comment: "Le nom de l'image" })
     id: string;
     @PrimaryColumn({ comment: "Le dossier de l'image" })

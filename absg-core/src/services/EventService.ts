@@ -1,7 +1,6 @@
 import { getRepository } from "typeorm";
-import { format, addMonths, addDays } from "date-fns";
+import { addMonths, addDays } from "date-fns";
 import * as path from "path";
-import * as fs from "fs";
 import { EventG, Person, User, Sex, LogModule } from "../entities";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { BadRequestError } from "routing-controllers";
@@ -147,7 +146,10 @@ class EventService {
                 const fileName = new Date().getTime();
                 const fileExt = imageBuffer.type.substr(imageBuffer.type.indexOf("/") + 1);
 
-                const thumbPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}_mini.${fileExt}`);
+                const thumbPath = path.join(
+                    process.env.PATH_FILES,
+                    `attachments/${currentYear}/${fileName}_mini.${fileExt}`
+                );
                 const webPath = path.join(process.env.PATH_FILES, `attachments/${currentYear}/${fileName}.${fileExt}`);
                 const webUrl = `${process.env.URL_FILES}/attachments/${currentYear}/${fileName}.${fileExt}`;
 
@@ -192,7 +194,8 @@ class EventService {
         }
 
         if (user.roles.is("admin") || user.id === evt.author.id) {
-            logger.notice(`Événement "${evt.name}" du ${evt.startDate.toISOString().substr(0, 10)} a été supprimé par ${
+            logger.notice(
+                `Événement "${evt.name}" du ${evt.startDate.toISOString().substr(0, 10)} a été supprimé par ${
                     user.username
                 }`,
                 {

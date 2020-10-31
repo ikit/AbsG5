@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import { Action } from "routing-controllers";
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag } from "../entities";
-import { differenceInSeconds, format, subMinutes } from "date-fns";
+import { differenceInSeconds } from "date-fns";
 import { Mutex } from "async-mutex";
 import { websocketService, WSMessageType } from "../services/WebsocketService";
 

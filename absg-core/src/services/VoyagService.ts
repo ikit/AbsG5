@@ -18,8 +18,7 @@ class VoyagService {
             FROM person p
             INNER JOIN "user" u ON u."personId" = p.id
             WHERE p."lastLocation" IS NOT NULL`);
-        const myPosition = await this.personsRepo
-            .query(`select p."lastLocation"
+        const myPosition = await this.personsRepo.query(`select p."lastLocation"
             FROM person p
             INNER JOIN "user" u ON u."personId" = p.id
             WHERE u.id = ${user.id}`);

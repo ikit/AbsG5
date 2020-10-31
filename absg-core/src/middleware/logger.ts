@@ -25,7 +25,9 @@ export const logger = createLogger({
                 timestamp(),
                 metadata({ fillExcept: ["message", "level", "timestamp"] }),
                 printf(info => {
-                    let out = `${formatDate(info.timestamp, "HH:mm:ss:SSSS")} ${info.level.toUpperCase()}: ${info.message}`;
+                    let out = `${formatDate(info.timestamp, "HH:mm:ss:SSSS")} ${info.level.toUpperCase()}: ${
+                        info.message
+                    }`;
                     if (Object.keys(info.metadata).length !== 0) {
                         if (info.metadata.stack) {
                             out += `\u001b[31m\n${info.metadata.stack}\u001b[39m`;
@@ -44,7 +46,9 @@ export const logger = createLogger({
                 timestamp(),
                 metadata({ fillExcept: ["message", "level", "timestamp"] }),
                 printf(info => {
-                    let out = `${formatDate(info.timestamp, "YYYY.MM.DD HH:mm:ss:SSSS")} ${info.level.toUpperCase()}: ${info.message}`;
+                    let out = `${formatDate(info.timestamp, "YYYY.MM.DD HH:mm:ss:SSSS")} ${info.level.toUpperCase()}: ${
+                        info.message
+                    }`;
                     if (Object.keys(info.metadata).length !== 0) {
                         if (info.metadata.stack) {
                             out += `\n${info.metadata.stack}`;

@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryColumn, Column, JoinColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 
 @Entity()
@@ -9,7 +9,7 @@ export class Immt {
     @PrimaryColumn({ comment: "Jour dans l'année de l'image", width: 3 })
     day: number;
 
-    @ManyToOne(type => User)
+    @ManyToOne(() => User)
     @JoinColumn()
     user: User;
 

@@ -65,7 +65,7 @@ export class AgpaController {
     @Get("/archives/:year([0-9]{4})/files")
     getArchivesFile(@Param("year") year: number) {
         // TODO
-        return "zip download from cloud";
+        return `Zip AGPA-${year}.zip created`;
     }
 
     @Get("/ceremony/:year([0-9]{4})")

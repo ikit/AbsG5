@@ -61,7 +61,7 @@ export class AuthController {
     check(@CurrentUser() user: User): User {
         return user;
     }
-    
+
     @Authorized()
     @Delete("/logout")
     async logout(@CurrentUser() user) {

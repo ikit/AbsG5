@@ -5,7 +5,6 @@ import { userService } from "../services";
 @Authorized()
 @JsonController("/users")
 export class UserController {
-
     @Get("/list")
     list() {
         return userService.getUsers();

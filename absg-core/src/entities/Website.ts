@@ -18,7 +18,7 @@ export class Website {
     @Column({ comment: "Date de la dernière maj du site" })
     lastUpdate: Date;
 
-    @OneToOne(type => User)
+    @OneToOne(() => User)
     @JoinColumn()
     lastUpdateBy: User;
 

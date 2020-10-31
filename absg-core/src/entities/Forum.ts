@@ -8,7 +8,7 @@ export class Forum {
 
     @Column()
     name: string;
-    
+
     @Column()
     description: string;
 

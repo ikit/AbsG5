@@ -7,14 +7,14 @@ export class Citation {
     @PrimaryGeneratedColumn({ comment: "id" })
     id: number;
 
-    @ManyToOne(type => User)
+    @ManyToOne(() => User)
     @JoinColumn()
     poster: User;
 
     @Column({ comment: "La citation", type: "text" })
     citation: string;
 
-    @ManyToOne(type => Person)
+    @ManyToOne(() => Person)
     @JoinColumn()
     author: Person;
 

@@ -34,7 +34,7 @@ export function decodeBase64Image(dataString) {
 
 /**
  * Enregistre une image sur le serveur
- * @param file les données de l'image récupérées depuis une requête POST 
+ * @param file les données de l'image récupérées depuis une requête POST
  * @param thumbPath Si renseigné: va y enregistrer la vignette 200x200px
  * @param webPath Si renseigné: va y enregistrer l'image optimisé pour affichage plein écran (1080p) 2000x2000px
  * @param originalPath Si renseigné: va y enregistrer l'image original sans modification

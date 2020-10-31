@@ -1,5 +1,4 @@
 import wss from "../wss";
-import { logger } from "../middleware/logger";
 
 export enum WSMessageType {
     notification = "notification",

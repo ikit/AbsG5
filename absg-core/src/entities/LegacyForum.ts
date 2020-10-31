@@ -24,7 +24,7 @@ export class LegacyForum {
 
     @Column({ nullable: true })
     last_post_time: number;
-    
+
     @Column({ nullable: true })
     last_poster_name: string;
 

@@ -51,4 +51,8 @@ export class User {
     public is(role: string) {
         return Array.isArray(this.roles) && this.roles.indexOf(role) > -1;
     }
+
+    public isNot(role: string) {
+        return Array.isArray(this.roles) && this.roles.indexOf(role) === -1;
+    }
 }

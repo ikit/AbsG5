@@ -1,6 +1,6 @@
 import { getRepository, Equal } from "typeorm";
 import { User, LogPassag, Person } from "../entities";
-import { format, differenceInDays, subMinutes } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { cleanString, sendEmail } from "../middleware/commonHelper";
 import { logger } from "../middleware/logger";
 import { hashPassword, createToken } from "../middleware";
@@ -67,7 +67,7 @@ class UserService {
             // On stock le nouvel utilisateur en base
             userData.id = null;
             await this.usersRepo.save(userData);
-            
+
             logger.notice(`Nouvel utilisateur créé: ${userData.username}`);
 
             return userData;
@@ -134,7 +134,7 @@ class UserService {
             .leftJoinAndSelect("u.person", "p")
             .where(`p.email = '${email}'`)
             .getMany();
-        
+
         if (users.length > 1) {
             throw new BadRequestError(
                 "Plusieurs comptes possèdent cet email. Veuillez voir avec un administrateur du site pour réinitialiser votre mot de passe"
@@ -156,7 +156,7 @@ ${process.env.URL_CLIENT}resetpwd?session=${encodeURI(users[0].token)}.
 L'équipe système`,
                 users[0].person.email
             );
-            
+
             return users[0].id;
         }
         // On ignore la demande
@@ -227,8 +227,8 @@ L'équipe système`,
 
     /**
      * Met à jour la position GPS d'un utilisateur
-     * @param userId 
-     * @param gpsLocation 
+     * @param userId
+     * @param gpsLocation
      */
     async updateGPS(userId: number, gpsLocation: any) {
         // on récupère l'utilisateur

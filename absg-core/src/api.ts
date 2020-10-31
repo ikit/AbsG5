@@ -2,7 +2,6 @@ require("dotenv").config();
 import "reflect-metadata";
 import { createConnections } from "typeorm";
 import { createExpressServer } from "routing-controllers";
-import * as bodyParser from "body-parser";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import * as express from "express";

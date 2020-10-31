@@ -9,7 +9,7 @@ export class PassaG {
     @Column({ comment: "Date et heure de passage sur le site" })
     date: Date;
 
-    @OneToOne(type => User)
+    @OneToOne(() => User)
     @JoinColumn()
     user: User;
 

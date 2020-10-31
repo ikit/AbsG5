@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { differenceInMonths, format } from "date-fns";
+import { differenceInMonths } from "date-fns";
 
 export enum Sex {
     female,

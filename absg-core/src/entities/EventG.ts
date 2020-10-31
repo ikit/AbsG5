@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from "typeorm";
 import { Person } from "./Person";
 import { Place } from "./Place";
 import { User } from "./User";
@@ -23,7 +23,7 @@ export class EventG {
     @Column({ comment: "Coordonnée GPS de l'événement", nullable: true })
     location: string;
 
-    @ManyToOne(type => User)
+    @ManyToOne(() => User)
     @JoinColumn()
     author: User;
 
@@ -31,13 +31,13 @@ export class EventG {
     type: string;
 
     @OneToMany(
-        type => Person,
+        () => Person,
         person => person.id
     )
     persons: Person[];
 
     @OneToMany(
-        type => Place,
+        () => Place,
         place => place.id
     )
     places: Place[];

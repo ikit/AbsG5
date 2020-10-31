@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from "typeorm";
 import { AgpaCategory } from "./AgpaCategory";
 import { User } from "./User";
 
@@ -8,11 +8,11 @@ export class AgpaPhoto {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => User)
+    @ManyToOne(() => User)
     @JoinColumn()
     user: User;
 
-    @ManyToOne(type => AgpaCategory)
+    @ManyToOne(() => AgpaCategory)
     @JoinColumn()
     category: AgpaCategory;
 

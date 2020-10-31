@@ -81,8 +81,11 @@ class ImmtService {
         immt.title = title;
         immt.day = getDayOfYear(new Date());
 
-        const thumb = path.join(process.env.PATH_FILES, `immt/mini/${immt.year}_${immt.day.toString().padStart(3, '0')}.jpg`);
-        const web = path.join(process.env.PATH_FILES, `immt/${immt.year}_${immt.day.toString().padStart(3, '0')}.jpg`);
+        const thumb = path.join(
+            process.env.PATH_FILES,
+            `immt/mini/${immt.year}_${immt.day.toString().padStart(3, "0")}.jpg`
+        );
+        const web = path.join(process.env.PATH_FILES, `immt/${immt.year}_${immt.day.toString().padStart(3, "0")}.jpg`);
         await saveImage(image.buffer, thumb, web, null);
         this.immtsRepo.save(immt);
 

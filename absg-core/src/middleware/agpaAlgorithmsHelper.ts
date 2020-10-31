@@ -109,21 +109,22 @@ export async function p4CheckVotes(ctx) {
         for (const userId in votes[catId]) {
             // résumé de l'utilisateur
             const stats = {
-                userId: -1,                     // L'id de l'utilisateur
-                username: "",                   // Le nom de l'utilisateur
+                userId: -1, // L'id de l'utilisateur
+                username: "", // Le nom de l'utilisateur
                 // eslint-disable-next-line prettier/prettier
                 age: 0,                         // Son age
-                votesScore: 0,                  // Le nombre total de points qu'il a attribué dans la catégorie
-                valid: false,                   // Si ses votes sont considérés comme valides pour cette catégorie
-                errors: {                       // La liste des problèmes rencontrés
-                    authorError: false,         // erreur: à voter pour ses propres photos
-                    categoryError: false,       // erreur: des votes comptés pour cette catégorie sont attribués à des photos d'une autre catégorie
-                    yearError: false,           // erreur: des votes comptés pour cette année sont attribués à des photos d'une autre année
-                    votesNumberError: false,    // erreur: a attribué trop ou pas assez de vote
-                    scoreError: false,          // erreur: a attribué trop ou pas assez de points
-                    childError: false           // erreur: trop jeune pour prendre en compte ses votes
+                votesScore: 0, // Le nombre total de points qu'il a attribué dans la catégorie
+                valid: false, // Si ses votes sont considérés comme valides pour cette catégorie
+                errors: {
+                    // La liste des problèmes rencontrés
+                    authorError: false, // erreur: à voter pour ses propres photos
+                    categoryError: false, // erreur: des votes comptés pour cette catégorie sont attribués à des photos d'une autre catégorie
+                    yearError: false, // erreur: des votes comptés pour cette année sont attribués à des photos d'une autre année
+                    votesNumberError: false, // erreur: a attribué trop ou pas assez de vote
+                    scoreError: false, // erreur: a attribué trop ou pas assez de points
+                    childError: false // erreur: trop jeune pour prendre en compte ses votes
                 },
-                votes: []                       // la liste des votes de l'utilisateur pour la catégorie
+                votes: [] // la liste des votes de l'utilisateur pour la catégorie
             };
 
             // Pour chacun des votes de l'utilisateur :
@@ -211,11 +212,11 @@ export async function p4ComputeNotes(ctx) {
             gscore: p.gscore
         };
         // On réinitialise les scores
-        p.votes = 0;            // Le nombre de vote "étoile" d'utilisateurs différents obtenu
-        p.votesTitle = 0;       // Le nombre de vote "plume" d'utilisateurs différents obtenu
-        p.score = 0;            // Le score "étoile" total obtenu
-        p.gscore = 0;           // Le score calculé
-        p.awards = null;        // Les récompenses obtenues
+        p.votes = 0; // Le nombre de vote "étoile" d'utilisateurs différents obtenu
+        p.votesTitle = 0; // Le nombre de vote "plume" d'utilisateurs différents obtenu
+        p.score = 0; // Le score "étoile" total obtenu
+        p.gscore = 0; // Le score calculé
+        p.awards = null; // Les récompenses obtenues
         ctx.photos[p.id] = p;
     }
 
@@ -226,9 +227,9 @@ export async function p4ComputeNotes(ctx) {
             continue;
         }
 
-        ctx.categories[catId].judgesNumber = 0;     // Nombre de jurés dont les votes sont pris en compte dans la catégorie
-        ctx.categories[catId].scoresSum = 0;        // Somme total du nombre de points attribués par l'ensemble des jurés dans la catégorie
-        ctx.categories[catId].votesSum = 0;         // Somme total du nombre de vote attribués par l'ensemble des jurés dans la catégorie
+        ctx.categories[catId].judgesNumber = 0; // Nombre de jurés dont les votes sont pris en compte dans la catégorie
+        ctx.categories[catId].scoresSum = 0; // Somme total du nombre de points attribués par l'ensemble des jurés dans la catégorie
+        ctx.categories[catId].votesSum = 0; // Somme total du nombre de vote attribués par l'ensemble des jurés dans la catégorie
 
         for (const userId in ctx.categories[catId].votes) {
             // Si les votes ne sont pas valides, on les ignores
@@ -294,15 +295,15 @@ export async function p4AgpaAttribution(ctx: any) {
         const p = ctx.photos[pId];
         if (!(p.userId in userData)) {
             userData[p.userId] = {
-                id: p.userId,           // Son id
-                username: p.username,   // Son nom
-                photos: [],             // Les photos de l'utilisateurs
-                scoreOf8: 0,            // Score aux votes obtenu par les 8 (8 = nombre de catégorie en jeux pour cette édition) meilleurs photos
-                scoreOf4: 0,            // Score aux votes obtenu par les 4 meilleurs photos (agpa de diamants meilleur photographe)
-                average: 0,             // Score moyen obtenu sur l'ensemble des photos posté de l'utilisateur
-                lower: 0,               // Plus petit score obtenu par les photos de l'utilisateur
-                formerPalmares: 0,      // Palmares cumulés des éditions précédantes
-                palmares: 0,            // total de points obtenu au palmares de l'édition actuelle
+                id: p.userId, // Son id
+                username: p.username, // Son nom
+                photos: [], // Les photos de l'utilisateurs
+                scoreOf8: 0, // Score aux votes obtenu par les 8 (8 = nombre de catégorie en jeux pour cette édition) meilleurs photos
+                scoreOf4: 0, // Score aux votes obtenu par les 4 meilleurs photos (agpa de diamants meilleur photographe)
+                average: 0, // Score moyen obtenu sur l'ensemble des photos posté de l'utilisateur
+                lower: 0, // Plus petit score obtenu par les photos de l'utilisateur
+                formerPalmares: 0, // Palmares cumulés des éditions précédantes
+                palmares: 0 // total de points obtenu au palmares de l'édition actuelle
             };
         }
         if (userData[p.userId].photos.length < catNumber) {
