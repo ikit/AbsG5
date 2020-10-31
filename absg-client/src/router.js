@@ -296,6 +296,11 @@ axios.interceptors.response.use(
         }
         // Erreur du serveur
         if (error.response.status === 400 || error.response.status === 500) {
+            // Cas spéciale de l'erreur mot de passe à réinitialiser
+            if (error.response && error.response.data && error.response.data.message === "Réinitialisation du mot de passe requis.") {
+                return error;
+            }
+
             store.commit("onError", error);
             return;
         }

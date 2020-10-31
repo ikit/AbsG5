@@ -136,7 +136,7 @@ class UserService {
             .getMany();
 
         if (users.length > 1) {
-            throw new BadRequestError(
+            throw new Error(
                 "Plusieurs comptes possèdent cet email. Veuillez voir avec un administrateur du site pour réinitialiser votre mot de passe"
             );
         } else if (users.length === 1) {

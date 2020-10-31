@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Absolument G - V5 beta 1</h1>
+    <h1>Absolument G - Version {{ version }}</h1>
     <a
       style="display: block; text-align: center"
       href="https://trello.com/b/LDvwctf7/absg-5"
@@ -8,10 +8,24 @@
     > Voir la feuille de route </a>
 
 
-    <h2 style="opacity: 0.5">
-      Beta 1 - octobre 2020 (en cours de développement)
+    <h2>
+      5.0
     </h2>
-    <v-card style="opacity: 0.5">
+    <v-card>
+      <p>Fonctionnalités</p>
+      <ul>
+        <li>Procédure de réinitialise du mot de passe automatique pour les comptes sans mot de passe.</li>
+      </ul>
+      <p>Bug corrigés</p>
+      <ul>
+        <li>Impossible de sortir de l'écran d'authentification</li>
+      </ul>
+    </v-card>
+
+    <h2>
+      Beta - octobre 2020
+    </h2>
+    <v-card>
       <p>Fonctionnalités</p>
       <ul>
         <li>Déploiement de l'application</li>
@@ -191,7 +205,13 @@
 import Vue from 'vue';
 
 export default {
-    data: () => ({})
+    data: () => ({
+        version: ""
+    }),
+    mounted() {
+        // On récupère le numéro de version
+        this.version = require("../../package.json").version;
+    }
 }
 </script>
 

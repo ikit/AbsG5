@@ -1,6 +1,3 @@
-
-
-
 export const MODULES = [
     { id:"absg", icon: 'fas fa-info', name: 'System', url: null, roles: ["member"] },
     { id:"citations", icon: 'fas fa-quote-left', name: 'Citations', url: '/citations', roles: ["member"] },

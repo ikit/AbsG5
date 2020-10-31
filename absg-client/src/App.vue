@@ -213,7 +213,7 @@
             <v-icon color="inherit">
               far fa-question-circle
             </v-icon><br>
-            <span style="display: inline-block; line-height: 0.9em;">v5 beta</span>
+            <span style="display: inline-block; line-height: 0.9em;">{{version ? `v${version}` : "v5 - beta"}}</span>
           </router-link>
         </div>
       </div>
@@ -487,6 +487,7 @@ export default {
         drawer: null,
         usersOnline: [],
         menuItems: MODULES,
+        version: "",
         notificationsHeaders: [
             { text: "Qui", value: "who" },
             { text: "Quoi", value: "what" },
@@ -554,6 +555,9 @@ export default {
         }
     },
     mounted() {
+        // On récupère le numéro de version
+        this.version = require("../package.json").version;
+
         // On charge les informations sur le thème à utiliser depuis le localstorage du browser
         const theme = localStorage.getItem("dark_theme");
         if (theme) {

@@ -35,6 +35,19 @@ export class AuthController {
             throw new BadRequestError(`Mauvais identifiant`);
         }
 
+        // Si le user n'a pas de mot de passe, on va lui proposer directement d'aller voir ses mails
+        if (!user.passwordHash) {
+            const uData = await this.userRepo
+                .createQueryBuilder("u")
+                .leftJoinAndSelect("u.person", "p")
+                .where(`p.id = '${user.id}'`)
+                .getOne();
+
+            logger.warning(`Réinitialisation du mot de passe requise pour ${user.username} (${uData.person.email})`);
+            userService.resetPassword(uData.person.email);
+            throw new Error(`Réinitialisation du mot de passe requis.`);
+        }
+
         // On vérifie le mot de passe envoyé
         try {
             const isPasswordCorrect = await checkPassword(payload.password, user.passwordHash);

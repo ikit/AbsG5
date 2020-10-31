@@ -80,14 +80,22 @@ export default {
             };
             axios.post("/api/auth/login", data)
                 .then(response => {
+                    // Cas spéciale de l'erreur mot de passe à réinitialiser
+                    if (response.response && response.response.data && response.response.data.message === "Réinitialisation du mot de passe requis.") {
+                        store.commit('onNotif', [
+                            "Réinitialisation de votre mot de passe",
+                            `${this.username}, un email t'as été envoyé pour réinitialiser ton mot de passe.
+                            Penses a regarder dans les spams si tu ne le trouve pas.`
+                        ]);
+                        return;
+                    }
+
+                    // Sinon c'est que l'utilisateur est bien identifié
                     let user = parseAxiosResponse(response);
                     // On log l'utilisateur
                     logUser(store, user);
                     // On redirige vers l'accueil
                     this.$router.replace({path: `/`});
-                })
-                .catch((errors) => {
-                    this.error = "Echec de l'authentification."
                 });
         }
     }
