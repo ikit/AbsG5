@@ -27,8 +27,12 @@ export class AuthController {
 
         user = user[0];
         if (!user) {
-            logger.warning(`Tentative de connection avec identifiant inconnu: ${payload.username}`);
-            throw new BadRequestError(`Mauvais identifiant ou mot de passe`);
+            logger.warning(
+                `Tentative de connection avec identifiant inconnu: ${payload.username} -> ${cleanString(
+                    payload.username
+                )}`
+            );
+            throw new BadRequestError(`Mauvais identifiant`);
         }
 
         // On vérifie le mot de passe envoyé
@@ -36,8 +40,8 @@ export class AuthController {
             const isPasswordCorrect = await checkPassword(payload.password, user.passwordHash);
 
             if (!isPasswordCorrect) {
-                logger.warning(`Tentative de connection avec identifiant inconnu: ${payload.username}`);
-                throw new BadRequestError(`Mauvais identifiant ou mot de passe`);
+                logger.warning(`Tentative de connection avec un mauvais mot de passe pour ${payload.username}`);
+                throw new BadRequestError(`Mauvais mot de passe`);
             }
 
             // On génère puis stocke un token

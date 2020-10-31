@@ -1,11 +1,7 @@
 <template>
   <v-container>
     <v-card style="width: 400px; padding:50px; margin: auto; margin-top: 100px; position: relative">
-      <v-form
-        v-model="valid"
-        on-submit="return false;"
-        @submit="login"
-      >
+      <v-form v-model="valid">
         <div>
           <v-text-field
             v-model="username"
@@ -35,7 +31,7 @@
           <v-btn
             color="accent"
             :disabled="!valid"
-            type="submit"
+            @click="login()"
           >
             Se connecter
           </v-btn>

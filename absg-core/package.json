@@ -1,6 +1,6 @@
 {
     "name": "absg-core",
-    "version": "5.0.2",
+    "version": "5.0.3",
     "description": "API principale de l'application Absolument G.",
     "repository": {
         "type": "git",

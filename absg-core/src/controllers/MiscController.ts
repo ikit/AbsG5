@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Post, Body, Get, Authorized, CurrentUser, UnauthorizedError } from "routing-controllers";
+import { JsonController, Post, Body, Get, Authorized, CurrentUser } from "routing-controllers";
 import { citationService, immtService, userService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
@@ -98,7 +98,7 @@ export class UserController {
             await this.repo.query(sql);
             return await this.getSettings();
         }
-        return new UnauthorizedError("Vous n'avez pas les droits suffisant pour modifier les paramètres du site");
+        return new Error("Vous n'avez pas les droits suffisant pour modifier les paramètres du site");
     }
 
     @Get("/testA")
