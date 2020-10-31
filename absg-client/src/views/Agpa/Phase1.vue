@@ -1,89 +1,148 @@
 <template>
-<div v-if="agpaMeta">
-    <div v-for="catIdx of agpaMeta.categoriesOrders" :key="catIdx" style="margin: 15px; margin-top: 50px;">
-        <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
-            <img :src="`/img/agpa/cupesMaxi/c${catIdx}.png`" width="100px" style="position: absolute; top: -50px; left: 275px"/>
-            <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
-                <span style="font-family: 'Tangerine', serif; font-size: 2em">
-                    {{ agpaMeta.categories[catIdx].title }}
-                </span>
-                <v-spacer></v-spacer>
-                <v-tooltip bottom>
-                    <v-spacer></v-spacer>
-                    <template v-slot:activator="{ on }">
-                        <span v-on="on" style="line-height: 48px"><i class="far fa-user"></i> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
-                    </template>
-                    <span >Nombre total de participants</span>
-                </v-tooltip>
+  <div v-if="agpaMeta">
+    <div
+      v-for="catIdx of agpaMeta.categoriesOrders"
+      :key="catIdx"
+      style="margin: 15px; margin-top: 50px;"
+    >
+      <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+        <img
+          :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
+          width="100px"
+          style="position: absolute; top: -50px; left: 275px"
+        >
+        <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
+          <span style="font-family: 'Tangerine', serif; font-size: 2em">
+            {{ agpaMeta.categories[catIdx].title }}
+          </span>
+          <v-spacer />
+          <v-tooltip bottom>
+            <v-spacer />
+            <template #activator="{ on }">
+              <span
+                style="line-height: 48px"
+                v-on="on"
+              ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
+            </template>
+            <span>Nombre total de participants</span>
+          </v-tooltip>
                 &nbsp; &nbsp;
-                <v-tooltip bottom>
-                    <v-spacer></v-spacer>
-                    <template v-slot:activator="{ on }">
-                        <span v-on="on" style="line-height: 48px"><i class="far fa-image"></i> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
-                    </template>
-                    <span >Nombre total de photos</span>
-                </v-tooltip>
-            </v-row>
-            <p style="font-size:0.9em; margin: 10px; text-align: center">{{ agpaMeta.categories[catIdx].description }}</p>
-            <div style="display: flex; width: 100%;">
-                <template v-for="(photo, idx) in photos">
-                    <PhotoWidget
-                        v-if="photo.categoryId == catIdx"
-                        :key="idx"
-                        style="display: inline-block; width: 250px; margin: 0 auto;"
-                        :photo="photo"
-                        @new-photo="onNewPhoto(catIdx)"
-                        @edit-photo="onEditPhoto(photo)"
-                        @delete-photo="onDeletePhoto(photo)">
-                    </PhotoWidget>
-                </template>
-            </div>
-        </v-card>
+          <v-tooltip bottom>
+            <v-spacer />
+            <template #activator="{ on }">
+              <span
+                style="line-height: 48px"
+                v-on="on"
+              ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
+            </template>
+            <span>Nombre total de photos</span>
+          </v-tooltip>
+        </v-row>
+        <p style="font-size:0.9em; margin: 10px; text-align: center">
+          {{ agpaMeta.categories[catIdx].description }}
+        </p>
+        <div style="display: flex; width: 100%;">
+          <template v-for="(photo, idx) in photos">
+            <PhotoWidget
+              v-if="photo.categoryId == catIdx"
+              :key="idx"
+              style="display: inline-block; width: 250px; margin: 0 auto;"
+              :photo="photo"
+              @new-photo="onNewPhoto(catIdx)"
+              @edit-photo="onEditPhoto(photo)"
+              @delete-photo="onDeletePhoto(photo)"
+            />
+          </template>
+        </div>
+      </v-card>
     </div>
 
 
-    <v-dialog v-model="photoEditor.open" width="800px">
-        <v-card>
-            <v-card-title class="grey lighten-4 py-4 title">
-                Nouvelle photo {{ agpaMeta.categories[photoEditor.categoryId].title }}
-            </v-card-title>
-            <v-container grid-list-sm class="pa-4">
-                <v-text-field
-                    prepend-icon="fas fa-feather-alt"
-                    label="Titre"
-                    v-model="photoEditor.title">
-                </v-text-field>
-                <ImageEditor ref="imgEditor" :formerUrl="photoEditor.photo ? photoEditor.photo.url : ''" icon="fas fa-camera" style="height: 300px;"/>
-                <div v-if="photoEditor.isLoading">
-                    Enregistrement en cours : {{ photoEditor.complete }}%
-                </div>
-            </v-container>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" :disabled="photoEditor.isLoading" @click="resetEditor()">Annuler</v-btn>
-                <v-btn color="accent" :disabled="photoEditor.isLoading" @click="savePhoto()">Enregistrer</v-btn>
-            </v-card-actions>
-        </v-card>
+    <v-dialog
+      v-model="photoEditor.open"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4 py-4 title">
+          Nouvelle photo {{ agpaMeta.categories[photoEditor.categoryId].title }}
+        </v-card-title>
+        <v-container
+          grid-list-sm
+          class="pa-4"
+        >
+          <v-text-field
+            v-model="photoEditor.title"
+            prepend-icon="fas fa-feather-alt"
+            label="Titre"
+          />
+          <ImageEditor
+            ref="imgEditor"
+            :former-url="photoEditor.photo ? photoEditor.photo.url : ''"
+            icon="fas fa-camera"
+            style="height: 300px;"
+          />
+          <div v-if="photoEditor.isLoading">
+            Enregistrement en cours : {{ photoEditor.complete }}%
+          </div>
+        </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            :disabled="photoEditor.isLoading"
+            @click="resetEditor()"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            :disabled="photoEditor.isLoading"
+            @click="savePhoto()"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
 
-    <v-dialog v-model="photoDeletion.open" width="800px">
-        <v-card v-if="photoDeletion.photo">
-            <v-card-title class="grey lighten-4">
-                Êtes vous sûr de vouloir supprimer cette photo ?
-            </v-card-title>
-            <div style="text-align: center; margin-top: 10px">
-
-                <img :src="photoDeletion.photo.thumb" style="margin:auto" class="thumb" />
-                <p style="margin: 10px;"> {{ photoDeletion.photo.title }}</p>
-            </div>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="photoDeletion.open = false">Annuler</v-btn>
-            <v-btn color="accent" @click="deletePhoto()">Supprimer</v-btn>
-            </v-card-actions>
-        </v-card>
+    <v-dialog
+      v-model="photoDeletion.open"
+      width="800px"
+    >
+      <v-card v-if="photoDeletion.photo">
+        <v-card-title class="grey lighten-4">
+          Êtes vous sûr de vouloir supprimer cette photo ?
+        </v-card-title>
+        <div style="text-align: center; margin-top: 10px">
+          <img
+            :src="photoDeletion.photo.thumb"
+            style="margin:auto"
+            class="thumb"
+          >
+          <p style="margin: 10px;">
+            {{ photoDeletion.photo.title }}
+          </p>
+        </div>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="photoDeletion.open = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="deletePhoto()"
+          >
+            Supprimer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-</div>
+  </div>
 </template>
 
 
@@ -98,12 +157,12 @@ import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
 
 export default {
+    name: 'Phase1',
     components: {
         PhotoWidget,
         ImageEditor
     },
     store,
-    name: 'Phase1',
     data: () => ({
         photos: {},
         photoEditor: {

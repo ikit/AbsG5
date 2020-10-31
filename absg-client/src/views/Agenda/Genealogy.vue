@@ -1,7 +1,5 @@
 <template>
-    <div>
-
-    </div>
+  <div />
 </template>
 
 
@@ -9,9 +7,6 @@
 import Vue from 'vue';
 
 export default {
-    components: {
-        VoBasic
-    },
     data: () => ({
         genealogData: {
             name: 'LETOT Raymond',

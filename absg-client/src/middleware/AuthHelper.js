@@ -5,7 +5,7 @@ import axios from 'axios';
  * Vérifie si l'utilisateur est connecté et quels sont ses rôles/autorisation
  *
  */
-export function checkAutentication(store, ) {
+export function checkAutentication(store ) {
     // Les infos de l'utilisateur authentifié
     let user = localStorage.getItem('user');
     if (user) {

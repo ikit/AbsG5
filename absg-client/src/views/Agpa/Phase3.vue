@@ -1,202 +1,267 @@
 <template>
-    <section id="content">
-        <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-            <v-row style="padding: 15px">
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <div class="phase-left-header" v-on="on" @click="help.displayed = true; help.page = 3">
-                            <h2>Phase n°3 en cours : Votes</h2>
-                            <p>Phase n°4 Délibération - à partir du {{ end }}</p>
-                        </div>
-                    </template>
-                    <span>Besoin d'aide sur la phase actuelle du concours ?</span>
-                </v-tooltip>
-
-                <v-spacer></v-spacer>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextCat(-1)"
-                            style="margin-top: 3px;">
-                            <v-icon>fas fa-chevron-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Catégorie précédente</span>
-                </v-tooltip>
-
-                <v-menu offset-y v-if="category">
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn v-bind="attrs" v-on="on" text class="grey--text">
-                            {{ category.title }}
-                        </v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-item
-                            v-for="cat in categories"
-                            :key="cat.categoryId"
-                            @click="gotoCat(cat.categoryId)"
-                        >
-                            <v-list-item-title>{{ cat.title }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextCat(1)"
-                            style="margin-top: 3px;">
-                            <v-icon>fas fa-chevron-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Catégorie suivante</span>
-                </v-tooltip>
-
-                <v-spacer></v-spacer>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }" v-on="on">
-                        <div class="phase-right-header" @click="help.displayed = true; help.page = 4">
-                            <h2>Vos votes</h2>
-                            <p v-if="category && category.categoryId > 0">
-                                <span v-bind:style="{ color: totalVotes >= category.maxVotes / 2.0  && totalVotes <= category.maxVotes ? 'green' : 'red'}">
-                                    {{ totalVotes }} / {{ category.maxVotes }}
-                                    <i class="fas fa-star"></i>
-                                </span>
-                                &nbsp;
-                                <span v-bind:style="{ color: totalTitleVotes >= 5  && totalTitleVotes <= 10 ? 'green' : 'red' }">
-                                    {{ totalTitleVotes }} / 10
-                                    <i class="fas fa-feather-alt"></i>
-                                </span>
-                            </p>
-                        </div>
-                    </template>
-                    <span>Besoin d'aide sur le déroulement du concours ?</span>
-                </v-tooltip>
-            </v-row>
-            <v-progress-linear
-                color="accent"
-                indeterminate
-                v-if="isLoading"
-                style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px">
-            </v-progress-linear>
-        </div>
-
-
-        <div v-if="category && category.categoryId === 0">
-            <h2>Résumé de vos votes par catégorie</h2>
-            <v-data-table
-                :headers="headers"
-                :items="resume"
-                :loading="waitingScreen"
-                disable-filtering
-                disable-sort
-                hide-default-footer
-                loading-text="Mise à jours des données"
-                style="margin: 25px"
-                @click:row="gotoCat($event.categoryId)"
+  <section id="content">
+    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+      <v-row style="padding: 15px">
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <div
+              class="phase-left-header"
+              v-on="on"
+              @click="help.displayed = true; help.page = 3"
             >
-                <template v-slot:item.votes="{ item }">
-                    <span v-if="item.categoryId > 0" v-bind:style="{ color: item.votes >= item.maxVotes / 2.0  && item.votes <= item.maxVotes ? 'green' : 'red'}">
-                        {{ item.votes }} / {{ item.maxVotes }}
-                    </span>
-                    <b v-else>{{ item.votes }} / {{ item.maxVotes }}</b>
-                </template>
+              <h2>Phase n°3 en cours : Votes</h2>
+              <p>Phase n°4 Délibération - à partir du {{ end }}</p>
+            </div>
+          </template>
+          <span>Besoin d'aide sur la phase actuelle du concours ?</span>
+        </v-tooltip>
 
-                <template v-slot:item.tvotes="{ item }">
-                    <span v-if="item.categoryId > 0">
-                        {{ item.tvotes }}
-                    </span>
-                    <b v-else v-bind:style="{ color: item.tvotes >= 5  && item.tvotes <= 10 ? 'green' : 'red'}">{{ item.tvotes }} / 10</b>
-                </template>
-            </v-data-table>
-            <h2>Les photos que vous avez sélectionnées pour le meilleur titre</h2>
-        </div>
+        <v-spacer />
 
-        <v-container fluid>
-            <v-layout row wrap>
-                <v-flex v-for="(photo, index) in photosGalery" :key="photo.id" style="min-width: 250px; width: 15%; margin: 15px">
-                    <div>
-                        <div style="width: 250px; height: 250px; margin: auto;">
-                            <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                <img class="thumb" :src="photo.thumb" @click="photosGalleryDisplay(index)"/>
-                            </div>
-                        </div>
-                        <v-card class="card" style="margin-bottom: 50px" >
-                            <div class="thumb-title" style="text-align: center">
-                                {{ photo.title }}
-                            </div>
-                            <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                            icon small
-                                            v-on="on"
-                                            :disabled="isLoading"
-                                            @click="vote(photo, 1)"
-                                            style="opacity: 1; background: #fff">
-                                            <v-icon v-bind:style="{ color: photo.userVote > 0 ? '#ecce00' : '' }">fas fa-star</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>{{ photo.userVote != 1 ? "Mettre 1 étoile sur cette photo" : "Annuler le vote 1 étoile pour cette photo" }}</span>
-                                </v-tooltip>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              style="margin-top: 3px;"
+              v-on="on"
+              @click="gotoNextCat(-1)"
+            >
+              <v-icon>fas fa-chevron-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Catégorie précédente</span>
+        </v-tooltip>
 
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                            icon small
-                                            v-on="on"
-                                            :disabled="isLoading"
-                                            @click="vote(photo, 2)"
-                                            style="opacity: 1; background: #fff">
-                                            <v-icon v-bind:style="{ color: photo.userVote > 1 ? '#ecce00' : '' }">fas fa-star</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>{{ photo.userVote != 2 ? "Mettre 2 étoiles sur cette photo" : "Annuler le vote 2 étoiles pour cette photo" }}</span>
-                                </v-tooltip>
+        <v-menu
+          v-if="category"
+          offset-y
+        >
+          <template #activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              text
+              class="grey--text"
+              v-on="on"
+            >
+              {{ category.title }}
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="cat in categories"
+              :key="cat.categoryId"
+              @click="gotoCat(cat.categoryId)"
+            >
+              <v-list-item-title>{{ cat.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
 
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                            icon small
-                                            v-on="on"
-                                            :disabled="isLoading"
-                                            @click="vote(photo, -3)"
-                                            style="opacity: 1; background: #fff">
-                                            <v-icon v-bind:style="{ color: photo.titleVote > 0 ? '#ecce00' : '' }">fas fa-feather-alt</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>{{ photo.titleVote == 0 ? "Sélectionner la photo pour le meilleur titre" : "Retirer la photo de votre sélection pour le meilleur titre" }}</span>
-                                </v-tooltip>
-                            </div>
-                        </v-card>
-                    </div>
-                </v-flex>
-            </v-layout>
-        </v-container>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              style="margin-top: 3px;"
+              v-on="on"
+              @click="gotoNextCat(1)"
+            >
+              <v-icon>fas fa-chevron-right</v-icon>
+            </v-btn>
+          </template>
+          <span>Catégorie suivante</span>
+        </v-tooltip>
 
-        <!-- Aide -->
-        <v-dialog v-model="help.displayed" width="800px">
-            <v-card>
-                <v-card-title class="grey lighten-4">
-                    Aide sur le déroulement du concours
-                </v-card-title>
-                <Help :selectedTab="help.page"></Help>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="help.displayed = false">Fermer</v-btn>
-                </v-card-actions>
+        <v-spacer />
+
+        <v-tooltip bottom>
+          <template
+            #activator="{ on }"
+            v-on="on"
+          >
+            <div
+              class="phase-right-header"
+              @click="help.displayed = true; help.page = 4"
+            >
+              <h2>Vos votes</h2>
+              <p v-if="category && category.categoryId > 0">
+                <span :style="{ color: totalVotes >= category.maxVotes / 2.0 && totalVotes <= category.maxVotes ? 'green' : 'red'}">
+                  {{ totalVotes }} / {{ category.maxVotes }}
+                  <i class="fas fa-star" />
+                </span>
+                                &nbsp;
+                <span :style="{ color: totalTitleVotes >= 5 && totalTitleVotes <= 10 ? 'green' : 'red' }">
+                  {{ totalTitleVotes }} / 10
+                  <i class="fas fa-feather-alt" />
+                </span>
+              </p>
+            </div>
+          </template>
+          <span>Besoin d'aide sur le déroulement du concours ?</span>
+        </v-tooltip>
+      </v-row>
+      <v-progress-linear
+        v-if="isLoading"
+        color="accent"
+        indeterminate
+        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
+      />
+    </div>
+
+
+    <div v-if="category && category.categoryId === 0">
+      <h2>Résumé de vos votes par catégorie</h2>
+      <v-data-table
+        :headers="headers"
+        :items="resume"
+        :loading="waitingScreen"
+        disable-filtering
+        disable-sort
+        hide-default-footer
+        loading-text="Mise à jours des données"
+        style="margin: 25px"
+        @click:row="gotoCat($event.categoryId)"
+      >
+        <template #[`item.votes`]="{ item }">
+          <span
+            v-if="item.categoryId > 0"
+            :style="{ color: item.votes >= item.maxVotes / 2.0 && item.votes <= item.maxVotes ? 'green' : 'red'}"
+          >
+            {{ item.votes }} / {{ item.maxVotes }}
+          </span>
+          <b v-else>{{ item.votes }} / {{ item.maxVotes }}</b>
+        </template>
+
+        <template #[`item.tvotes`]="{ item }">
+          <span v-if="item.categoryId > 0">
+            {{ item.tvotes }}
+          </span>
+          <b
+            v-else
+            :style="{ color: item.tvotes >= 5 && item.tvotes <= 10 ? 'green' : 'red'}"
+          >{{ item.tvotes }} / 10</b>
+        </template>
+      </v-data-table>
+      <h2>Les photos que vous avez sélectionnées pour le meilleur titre</h2>
+    </div>
+
+    <v-container fluid>
+      <v-layout
+        row
+        wrap
+      >
+        <v-flex
+          v-for="(photo, index) in photosGalery"
+          :key="photo.id"
+          style="min-width: 250px; width: 15%; margin: 15px"
+        >
+          <div>
+            <div style="width: 250px; height: 250px; margin: auto;">
+              <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+                <img
+                  class="thumb"
+                  :src="photo.thumb"
+                  @click="photosGalleryDisplay(index)"
+                >
+              </div>
+            </div>
+            <v-card
+              class="card"
+              style="margin-bottom: 50px"
+            >
+              <div
+                class="thumb-title"
+                style="text-align: center"
+              >
+                {{ photo.title }}
+              </div>
+              <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <v-btn
+                      icon
+                      small
+                      :disabled="isLoading"
+                      style="opacity: 1; background: #fff"
+                      v-on="on"
+                      @click="vote(photo, 1)"
+                    >
+                      <v-icon :style="{ color: photo.userVote > 0 ? '#ecce00' : '' }">
+                        fas fa-star
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ photo.userVote != 1 ? "Mettre 1 étoile sur cette photo" : "Annuler le vote 1 étoile pour cette photo" }}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <v-btn
+                      icon
+                      small
+                      :disabled="isLoading"
+                      style="opacity: 1; background: #fff"
+                      v-on="on"
+                      @click="vote(photo, 2)"
+                    >
+                      <v-icon :style="{ color: photo.userVote > 1 ? '#ecce00' : '' }">
+                        fas fa-star
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ photo.userVote != 2 ? "Mettre 2 étoiles sur cette photo" : "Annuler le vote 2 étoiles pour cette photo" }}</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <v-btn
+                      icon
+                      small
+                      :disabled="isLoading"
+                      style="opacity: 1; background: #fff"
+                      v-on="on"
+                      @click="vote(photo, -3)"
+                    >
+                      <v-icon :style="{ color: photo.titleVote > 0 ? '#ecce00' : '' }">
+                        fas fa-feather-alt
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <span>{{ photo.titleVote == 0 ? "Sélectionner la photo pour le meilleur titre" : "Retirer la photo de votre sélection pour le meilleur titre" }}</span>
+                </v-tooltip>
+              </div>
             </v-card>
-        </v-dialog>
-    </section>
+          </div>
+        </v-flex>
+      </v-layout>
+    </v-container>
+
+    <!-- Aide -->
+    <v-dialog
+      v-model="help.displayed"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          Aide sur le déroulement du concours
+        </v-card-title>
+        <Help :selected-tab="help.page" />
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="help.displayed = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </section>
 </template>
 
 

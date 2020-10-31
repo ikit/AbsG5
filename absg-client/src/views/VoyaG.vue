@@ -1,28 +1,38 @@
 <template>
-    <div style="width: 100%; height: 100%; position: relative">
+  <div style="width: 100%; height: 100%; position: relative">
+    <div
+      id="map-wrap"
+      style="height: 100vh"
+    >
+      <l-map
+        ref="theMap"
+        :zoom="zoom"
+        :center="center"
+        zoom-control="false"
+      >
+        <l-tile-layer :url="url" />
+        <l-marker-cluster ref="markersLayer">
+          <l-marker
+            v-for="p in persons"
+            :key="p.id"
+            :lat-lng="p.location"
+          >
+            <l-icon
+              :icon-size="dynamicSize"
+              :icon-anchor="dynamicAnchor"
+              :icon-url="p.avatar.url"
+            />
+            <l-popup>
+              {{ p.avatar.label }}
+            </l-popup>
+          </l-marker>
+        </l-marker-cluster>
+      </l-map>
+    </div>
 
 
-        <div id="map-wrap" style="height: 100vh">
-            <l-map ref="theMap" :zoom="zoom" :center="center" zoomControl="false">
-                <l-tile-layer :url="url"></l-tile-layer>
-                <l-marker-cluster ref="markersLayer">
-                    <l-marker v-for="p in persons" :key="p.id" :lat-lng="p.location">
-                        <l-icon
-                            :icon-size="dynamicSize"
-                            :icon-anchor="dynamicAnchor"
-                            :icon-url="p.avatar.url"
-                        />
-                        <l-popup>
-                            {{ p.avatar.label }}
-                        </l-popup>
-                    </l-marker>
-                </l-marker-cluster>
-            </l-map>
-        </div>
-
-
-        <div style="position: absolute; top: 10px; left: 50px; z-index: 2000; text-align: center">
-            <!-- <v-tooltip bottom>
+    <div style="position: absolute; top: 10px; left: 50px; z-index: 2000; text-align: center">
+      <!-- <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <v-btn color="accent" fab small v-on="on" style="margin-right: 10px">
                         <v-icon>far fa-clock</v-icon>
@@ -63,15 +73,15 @@
                 <span>Recentrer sur ma position</span>
             </v-tooltip>
              -->
-        </div>
     </div>
+  </div>
 </template>
 
 <script>
 import Vue from 'vue';
 import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar } from '../middleware/CommonHelper';
-import { LMap, LTileLayer, LMarker, LPopup, LTooltip, LIcon } from 'vue2-leaflet';
+import { LMap, LTileLayer, LMarker, LPopup, LIcon } from 'vue2-leaflet';
 import Vue2LeafletMarkerCluster from 'vue2-leaflet-markercluster'
 import { latLng } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -83,7 +93,6 @@ export default {
         LTileLayer,
         LMarker,
         LPopup,
-        LTooltip,
         LIcon,
         'l-marker-cluster': Vue2LeafletMarkerCluster
     },
@@ -99,6 +108,14 @@ export default {
         myPosition: [],
         iconSize: 64
     }),
+    computed: {
+        dynamicSize() {
+            return [this.iconSize, this.iconSize * 1.15];
+        },
+        dynamicAnchor() {
+            return [this.iconSize / 2, this.iconSize * 1.15];
+        }
+    },
     mounted () {
         axios.get(`/api/voyag`).then(response => {
             const data = parseAxiosResponse(response);
@@ -116,14 +133,6 @@ export default {
             this.$refs.theMap.fitBounds(group.getBounds());
         });
 
-    },
-    computed: {
-        dynamicSize() {
-            return [this.iconSize, this.iconSize * 1.15];
-        },
-        dynamicAnchor() {
-            return [this.iconSize / 2, this.iconSize * 1.15];
-        }
     },
     methods: {
         zoomUpdate(zoom) {

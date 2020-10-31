@@ -1,16 +1,16 @@
 <template>
-<div class="d-flex flex-row flex-wrap">
+  <div class="d-flex flex-row flex-wrap">
     <v-img
-        v-for="(img, i) in images"
-        :key="'img-' + i"
-        :alt="img.alt"
-        :src="img.src"
-        class="ma-2 selectable"
-        max-height="100"
-        max-width="100"
-        @click="selectImage(img)"
+      v-for="(img, i) in images"
+      :key="'img-' + i"
+      :alt="img.alt"
+      :src="img.src"
+      class="ma-2 selectable"
+      max-height="100"
+      max-width="100"
+      @click="selectImage(img)"
     />
-</div>
+  </div>
 </template>
 
 <script>

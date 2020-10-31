@@ -1,31 +1,39 @@
 <template>
-<div>
+  <div>
     <v-container>
-        <v-card>
-            <v-card-title>
-                Mes informations personnelles
-            </v-card-title>
+      <v-card>
+        <v-card-title>
+          Mes informations personnelles
+        </v-card-title>
 
-            <v-row>
-                <v-col>avatar</v-col>
-                <v-col>
-                    Login<br/>
-                    Authorisations (mes roles)<br/>
-                    famille principale<br/>
-                </v-col>
-            </v-row>
-            <v-tabs>
-                <v-tab> <v-icon left>fas fa-address-book</v-icon> Répertoire</v-tab>
-                <v-tab> <v-icon left>fas fa-map-marked-alt</v-icon> Habitation</v-tab>
-            </v-tabs>
+        <v-row>
+          <v-col>avatar</v-col>
+          <v-col>
+            Login<br>
+            Authorisations (mes roles)<br>
+            famille principale<br>
+          </v-col>
+        </v-row>
+        <v-tabs>
+          <v-tab>
+            <v-icon left>
+              fas fa-address-book
+            </v-icon> Répertoire
+          </v-tab>
+          <v-tab>
+            <v-icon left>
+              fas fa-map-marked-alt
+            </v-icon> Habitation
+          </v-tab>
+        </v-tabs>
 
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn>Sauvegarder</v-btn>
-            </v-card-actions>
-        </v-card>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn>Sauvegarder</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-container>
-</div>
+  </div>
 </template>
 
 

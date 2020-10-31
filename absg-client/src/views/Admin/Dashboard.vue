@@ -1,10 +1,10 @@
 <template>
-    <div>
-        <h1>TODO:</h1>
-        <p> - Les logs systèmes</p>
-        <p> - Statistiques mémoire assets et DB</p>
-        <p> - Liens vers outils d'admin (traefic, swarm, grafana, dedibox)</p>
-    </div>
+  <div>
+    <h1>TODO:</h1>
+    <p> - Les logs systèmes</p>
+    <p> - Statistiques mémoire assets et DB</p>
+    <p> - Liens vers outils d'admin (traefic, swarm, grafana, dedibox)</p>
+  </div>
 </template>
 
 

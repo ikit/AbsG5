@@ -1,49 +1,88 @@
 <template>
-<v-container style="max-width: 100%; margin: 0; padding: 0;">
+  <v-container style="max-width: 100%; margin: 0; padding: 0;">
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
-    <v-card v-if="currentMonth > 0 && currentMonth < 9" style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;">
-        <img src="/img/agpa/cupesMaxi/c1.png" height="100px" style="position: absolute; top: -50px; left: calc(50% - 56px)"/>
-        <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
-            L'édition <span style="font-size: 2em; font-weight: normal; padding-right: 3px;"> {{ currentYear }}</span> des A.G.P.A. n'a pas encore démarrée.
+    <v-card
+      v-if="currentMonth > 0 && currentMonth < 9"
+      style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;"
+    >
+      <img
+        src="/img/agpa/cupesMaxi/c1.png"
+        height="100px"
+        style="position: absolute; top: -50px; left: calc(50% - 56px)"
+      >
+      <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
+        L'édition <span style="font-size: 2em; font-weight: normal; padding-right: 3px;"> {{ currentYear }}</span> des A.G.P.A. n'a pas encore démarrée.
+      </p>
+      <v-timeline>
+        <v-timeline-item
+          v-for="item in phases"
+          :key="item.id"
+          small
+          right
+        >
+          <template #opposite>
+            <span> {{ item.start }}</span>
+          </template>
+          {{ item.label }}
+        </v-timeline-item>
+      </v-timeline>
+      <v-card
+        v-if="agpaMeta && agpaMeta.categories[8] && agpaMeta.categories[8].title"
+        style="margin: 15px; text-align: center; padding: 15px"
+      >
+        <p style="opacity: 0.5; ">
+          Thème de l'année
         </p>
-        <v-timeline >
-            <v-timeline-item small v-for="item in phases" :key="item.id" right>
-                <template v-slot:opposite>
-                    <span> {{ item.start }}</span>
-                </template>
-                {{ item.label }}
-            </v-timeline-item>
-        </v-timeline>
-        <v-card v-if="agpaMeta && agpaMeta.categories[8] && agpaMeta.categories[8].title" style="margin: 15px; text-align: center; padding: 15px">
-            <p style="opacity: 0.5; ">Thème de l'année</p>
-            <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">{{ agpaMeta.categories[8].title }}</p>
-            <p style="font-style: italic">{{ agpaMeta.categories[8].description }}</p>
-        </v-card>
-        <v-card v-else style="margin: 15px; font-weight: bold; color: #ff8f00; padding: 15px">
-            <v-icon color="warning" style="width: 50px">fas fa-exclamation-triangle</v-icon>
-            Aucun thème pour la catégorie spéciale n'a été décidé
-        </v-card>
-        <v-card style="margin: 15px; padding: 15px">
-            <v-icon style="width: 50px">fas fa-info</v-icon>
-            N'hésitez pas à discuter de l'organisation sur <router-link :to="{ path: '/forum/' }" tag="a">le forum</router-link>.
-        </v-card>
+        <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">
+          {{ agpaMeta.categories[8].title }}
+        </p>
+        <p style="font-style: italic">
+          {{ agpaMeta.categories[8].description }}
+        </p>
+      </v-card>
+      <v-card
+        v-else
+        style="margin: 15px; font-weight: bold; color: #ff8f00; padding: 15px"
+      >
+        <v-icon
+          color="warning"
+          style="width: 50px"
+        >
+          fas fa-exclamation-triangle
+        </v-icon>
+        Aucun thème pour la catégorie spéciale n'a été décidé
+      </v-card>
+      <v-card style="margin: 15px; padding: 15px">
+        <v-icon style="width: 50px">
+          fas fa-info
+        </v-icon>
+        N'hésitez pas à discuter de l'organisation sur <router-link
+          :to="{ path: '/forum/' }"
+          tag="a"
+        >
+          le forum
+        </router-link>.
+      </v-card>
     </v-card>
     <!-- Affichage de l'édition en cours -->
     <section v-else>
-        <div v-if="isLoading" style="width: 50px; margin: 50px auto;">
-            <v-progress-circular
-                :size="50"
-                color="primary"
-                indeterminate>
-            </v-progress-circular>
-        </div>
-        <Phase1 v-if="agpaMeta && agpaMeta.phase == 1"></Phase1>
-        <Phase2 v-if="agpaMeta && agpaMeta.phase == 2"></Phase2>
-        <Phase3 v-if="agpaMeta && agpaMeta.phase == 3"></Phase3>
-        <Phase4 v-if="agpaMeta && agpaMeta.phase == 4"></Phase4>
-        <Phase5 v-if="agpaMeta && agpaMeta.phase == 5"></Phase5>
+      <div
+        v-if="isLoading"
+        style="width: 50px; margin: 50px auto;"
+      >
+        <v-progress-circular
+          :size="50"
+          color="primary"
+          indeterminate
+        />
+      </div>
+      <Phase1 v-if="agpaMeta && agpaMeta.phase == 1" />
+      <Phase2 v-if="agpaMeta && agpaMeta.phase == 2" />
+      <Phase3 v-if="agpaMeta && agpaMeta.phase == 3" />
+      <Phase4 v-if="agpaMeta && agpaMeta.phase == 4" />
+      <Phase5 v-if="agpaMeta && agpaMeta.phase == 5" />
     </section>
-</v-container>
+  </v-container>
 </template>
 
 

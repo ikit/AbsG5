@@ -1,241 +1,334 @@
 <template>
-<div>
-    <v-card style="min-width: 460px;" data-cy="calendar">
-        <v-card-title >
-            <v-menu
-                ref="dateMenu"
-                v-model="selectDateMenu"
-                :close-on-content-click="false"
-                :return-value.sync="date"
+  <div>
+    <v-card
+      style="min-width: 460px;"
+      data-cy="calendar"
+    >
+      <v-card-title>
+        <v-menu
+          v-if="$vuetify.breakpoint.lgAndUp"
+          ref="dateMenu"
+          v-model="selectDateMenu"
+          :close-on-content-click="false"
+          :return-value.sync="date"
+          transition="scale-transition"
+          offset-y
+          min-width="290px"
+        >
+          <template #activator="{ on }">
+            <v-btn
+              text
+              class="h2"
+              v-on="on"
+            >
+              {{ title }}
+            </v-btn>
+          </template>
+          <v-date-picker
+            v-model="selectedDate"
+            no-title
+            scrollable
+            type="month"
+            @input="changeDate()"
+          >
+            <v-spacer />
+            <v-btn
+              text
+              color="primary"
+              @click="selectDateMenu = false"
+            >
+              Annuler
+            </v-btn>
+            <v-btn
+              text
+              color="primary"
+              @click="$refs.dateMenu.save(date)"
+            >
+              OK
+            </v-btn>
+          </v-date-picker>
+        </v-menu>
+
+        <div style="position: absolute; right: 15px">
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                style="margin-right: 15px"
+                v-on="on"
+                @click="setToday()"
+              >
+                <v-icon>far fa-dot-circle</v-icon>
+              </v-btn>
+            </template>
+            <span>Revenir à la date du jour</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                style="margin-right: 15px"
+                v-on="on"
+                @click="prev()"
+              >
+                <v-icon>fas fa-angle-left</v-icon>
+              </v-btn>
+            </template>
+            <span>Mois précédent</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                style="margin-right: 15px"
+                v-on="on"
+                @click="next()"
+              >
+                <v-icon>fas fa-angle-right</v-icon>
+              </v-btn>
+            </template>
+            <span>Mois suivant</span>
+          </v-tooltip>
+
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                v-bind="attrs"
+                v-on="on"
+                @click="editEvent()"
+              >
+                <v-icon>fas fa-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Ajouter un événement</span>
+          </v-tooltip>
+        </div>
+      </v-card-title>
+      <v-sheet>
+        <v-calendar
+          ref="calendar"
+          v-model="focus"
+          style="min-height:426px;"
+          color="primary"
+          :weekdays="[1, 2, 3, 4, 5, 6, 0]"
+          :header-date-format="headerDay"
+          :events="events"
+          :event-color="getEventColor"
+          :event-margin-bottom="3"
+          :now="today"
+          type="month"
+          @click:event="showEvent"
+          @click:more="viewDay"
+          @click:date="viewDay"
+          @change="updateRange"
+        />
+        <v-menu
+          v-model="selectedOpen"
+          :close-on-content-click="false"
+          :activator="selectedElement"
+          offset-x
+        >
+          <v-card
+            color="grey lighten-4"
+            min-width="350px"
+            flat
+          >
+            <v-toolbar :color="selectedEvent.color">
+              <v-toolbar-title v-html="selectedEvent.name" />
+              <v-spacer />
+              <v-tooltip
+                v-if="selectedEvent.editable"
+                bottom
+              >
+                <template #activator="{ on }">
+                  <v-btn
+                    icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="editEvent(selectedEvent)"
+                  >
+                    <v-icon>fas fa-pen</v-icon>
+                  </v-btn>
+                </template>
+                <span>Editer l'événement</span>
+              </v-tooltip>
+
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn
+                    icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="selectedOpen = false"
+                  >
+                    <v-icon>fas fa-times</v-icon>
+                  </v-btn>
+                </template>
+                <span>Fermer</span>
+              </v-tooltip>
+            </v-toolbar>
+            <v-card-text>
+              <span v-html="selectedEvent.details" />
+            </v-card-text>
+          </v-card>
+        </v-menu>
+      </v-sheet>
+    </v-card>
+
+    <v-dialog
+      v-model="eventEditor.displayed"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          <v-icon left>
+            fas fa-calendar-alt
+          </v-icon> Ajouter un nouvel événement
+        </v-card-title>
+        <v-container>
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="eventEditor.name"
+                prepend-icon="fas fa-user"
+                label="Titre"
+              />
+            </v-col>
+            <v-col>
+              <v-select
+                v-model="eventEditor.type"
+                :items="eventTypes"
+                label="Catégorie d'événement"
+                item-text="label"
+                item-value="id"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-menu
+                v-model="eventEditor.startDateMenu"
+                :close-on-content-click="true"
+                :nudge-right="40"
                 transition="scale-transition"
                 offset-y
                 min-width="290px"
-                v-if="$vuetify.breakpoint.lgAndUp"
-            >
-                <template v-slot:activator="{ on }">
-                    <v-btn text class="h2"
-                        v-on="on">
-                        {{ title }}
-                    </v-btn>
+              >
+                <template #activator="{ on }">
+                  <v-text-field
+                    v-model="eventEditor.startDate"
+                    :rules="eventEditor.dateRule"
+                    label="Début de l'événement"
+                    prepend-icon="far fa-calendar-alt"
+                    clearable
+                    validate-on-blur
+                    v-on="on"
+                  />
                 </template>
                 <v-date-picker
-                    no-title scrollable
-                    v-model="selectedDate"
-                    type="month"
-                    @input="changeDate()">
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="selectDateMenu = false">Annuler</v-btn>
-                    <v-btn text color="primary" @click="$refs.dateMenu.save(date)">OK</v-btn>
-                </v-date-picker>
-            </v-menu>
+                  v-model="eventEditor.startDate"
+                  @input="eventEditor.startDateMenu = false"
+                />
+              </v-menu>
+            </v-col>
+            <v-col>
+              <v-menu
+                v-model="eventEditor.endDateMenu"
+                :close-on-content-click="true"
+                :nudge-right="40"
+                transition="scale-transition"
+                offset-y
+                min-width="290px"
+              >
+                <template #activator="{ on }">
+                  <v-text-field
+                    v-model="eventEditor.endDate"
+                    :rules="eventEditor.dateRule"
+                    label="Date de fin de l'événement"
+                    prepend-icon="far fa-calendar-alt"
+                    clearable
+                    validate-on-blur
+                    v-on="on"
+                  />
+                </template>
+                <v-date-picker
+                  v-model="eventEditor.endDate"
+                  @input="eventEditor.endDateMenu = false"
+                />
+              </v-menu>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <TextEditor v-model="eventEditor.details" />
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-card-actions>
+          <v-btn
+            text
+            color="primary"
+            @click="confirmDeletion = true"
+          >
+            <i class="fas fa-trash-alt" /> Supprimer
+          </v-btn>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="eventEditor.displayed = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="saveEvent()"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-            <div style="position: absolute; right: 15px">
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon small style="margin-right: 15px"
-                            v-on="on"
-                            @click="setToday()">
-                            <v-icon>far fa-dot-circle</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Revenir à la date du jour</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon small style="margin-right: 15px"
-                            v-on="on"
-                            @click="prev()">
-                            <v-icon>fas fa-angle-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Mois précédent</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon small style="margin-right: 15px"
-                            v-on="on"
-                            @click="next()">
-                            <v-icon>fas fa-angle-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Mois suivant</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn icon small v-bind="attrs"
-                            v-on="on"
-                            @click="editEvent()">
-                            <v-icon>fas fa-plus</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Ajouter un événement</span>
-                </v-tooltip>
-            </div>
+    <v-dialog
+      v-model="confirmDeletion"
+      persistent
+      width="500px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          Supprimer l'événement
         </v-card-title>
-        <v-sheet>
-            <v-calendar
-                style="min-height:426px;"
-                ref="calendar"
-                v-model="focus"
-                color="primary"
-                :weekdays="[1, 2, 3, 4, 5, 6, 0]"
-                :header-date-format="headerDay"
-                :events="events"
-                :event-color="getEventColor"
-                :event-margin-bottom="3"
-                :now="today"
-                type="month"
-                @click:event="showEvent"
-                @click:more="viewDay"
-                @click:date="viewDay"
-                @change="updateRange"
-                >
-            </v-calendar>
-            <v-menu
-                v-model="selectedOpen"
-                :close-on-content-click="false"
-                :activator="selectedElement"
-                offset-x
-                >
-                <v-card color="grey lighten-4" min-width="350px" flat>
-                    <v-toolbar :color="selectedEvent.color">
-                    <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
-                        <v-spacer></v-spacer>
-                        <v-tooltip bottom v-if="selectedEvent.editable">
-                            <template v-slot:activator="{ on }">
-                                <v-btn icon small v-bind="attrs"
-                                    v-on="on"
-                                    @click="editEvent(selectedEvent)">
-                                    <v-icon>fas fa-pen</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Editer l'événement</span>
-                        </v-tooltip>
 
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-btn icon small v-bind="attrs"
-                                    v-on="on"
-                                    @click="selectedOpen = false">
-                                    <v-icon>fas fa-times</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>Fermer</span>
-                        </v-tooltip>
-                    </v-toolbar>
-                    <v-card-text>
-                    <span v-html="selectedEvent.details"></span>
-                    </v-card-text>
-                </v-card>
-            </v-menu>
-        </v-sheet>
-    </v-card>
-
-    <v-dialog v-model="eventEditor.displayed" width="800px">
-        <v-card>
-            <v-card-title class="grey lighten-4">
-                <v-icon left>fas fa-calendar-alt</v-icon> Ajouter un nouvel événement
-            </v-card-title>
-            <v-container>
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            prepend-icon="fas fa-user"
-                            label="Titre"
-                            v-model="eventEditor.name">
-                        </v-text-field>
-                    </v-col>
-                    <v-col>
-                        <v-select
-                            :items="eventTypes"
-                            v-model="eventEditor.type"
-                            label="Catégorie d'événement"
-                            item-text="label"
-                            item-value="id"
-                        ></v-select>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-menu
-                            v-model="eventEditor.startDateMenu"
-                            :close-on-content-click="true"
-                            :nudge-right="40"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    :rules="eventEditor.dateRule"
-                                    v-model="eventEditor.startDate"
-                                    label="Début de l'événement"
-                                    prepend-icon="far fa-calendar-alt"
-                                    clearable
-                                    validate-on-blur
-                                    v-on="on"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker v-model="eventEditor.startDate" @input="eventEditor.startDateMenu = false"></v-date-picker>
-                        </v-menu>
-                    </v-col>
-                    <v-col>
-                        <v-menu
-                            v-model="eventEditor.endDateMenu"
-                            :close-on-content-click="true"
-                            :nudge-right="40"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    :rules="eventEditor.dateRule"
-                                    v-model="eventEditor.endDate"
-                                    label="Date de fin de l'événement"
-                                    prepend-icon="far fa-calendar-alt"
-                                    clearable
-                                    validate-on-blur
-                                    v-on="on"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker v-model="eventEditor.endDate" @input="eventEditor.endDateMenu = false"></v-date-picker>
-                        </v-menu>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <TextEditor v-model="eventEditor.details"></TextEditor>
-                    </v-col>
-                </v-row>
-            </v-container>
-            <v-card-actions>
-            <v-btn text color="primary" @click="confirmDeletion = true"><i class="fas fa-trash-alt"></i> Supprimer</v-btn>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="eventEditor.displayed = false">Annuler</v-btn>
-            <v-btn color="accent" @click="saveEvent()">Enregistrer</v-btn>
-            </v-card-actions>
-        </v-card>
+        <v-container>
+          Êtes-vous sûr de vouloir supprimer l'événement : {{ eventEditor.name }} ?
+        </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="confirmDeletion = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="deleteEvent()"
+          >
+            Supprimer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-
-    <v-dialog v-model="confirmDeletion" persistent width="500px">
-        <v-card>
-            <v-card-title class="grey lighten-4">
-                Supprimer l'événement
-            </v-card-title>
-
-            <v-container>
-                Êtes-vous sûr de vouloir supprimer l'événement : {{ eventEditor.name }} ?
-            </v-container>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="confirmDeletion = false">Annuler</v-btn>
-                <v-btn color="accent" @click="deleteEvent()">Supprimer</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
-</div>
+  </div>
 </template>
 
 <script>

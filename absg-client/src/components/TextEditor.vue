@@ -1,11 +1,11 @@
 <template>
-    <tiptap-vuetify
-        ref="editor"
-        v-model="value"
-        :extensions="extensions"
-        placeholder="Rédigez ici votre nouveau message"
-        @keydown="onKeyDown"
-    />
+  <tiptap-vuetify
+    ref="editor"
+    v-model="value"
+    :extensions="extensions"
+    placeholder="Rédigez ici votre nouveau message"
+    @keydown="onKeyDown"
+  />
 </template>
 
 <script>
@@ -16,10 +16,10 @@ import { DOMParser } from 'prosemirror-model';
 // import {MyCustomExtension} from './TextEditor/MyCustomExtension'
 
 export default {
+    name: 'TextEditor',
     components: {
         TiptapVuetify
     },
-    name: 'TextEditor',
     model: {
         prop: 'value',
         event: 'change'

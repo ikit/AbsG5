@@ -1,62 +1,84 @@
 <template>
-    <div class="editor">
-        <div class="canvas">
-            <img
-                ref="image"
-                :alt="data.name"
-                :src="data.url"
-                @loadstart="start"
-                @load="start"
-            />
-        </div>
-
-        <div v-if="cropper" class="toolbar" @click="click">
-            <button data-action="move" title="Déplacer">
-                <i class="fas fa-arrows-alt"></i>
-            </button>
-            <button data-action="crop" title="Rogner">
-                <i class="fas fa-crop-alt"></i>
-            </button>
-            <button data-action="rotate-left" title="Rotation à gauche">
-                <i class="fas fa-undo"></i>
-            </button>
-            <button data-action="rotate-right" title="Rotation à droite">
-                <i class="fas fa-redo"></i>
-            </button>
-            <button data-action="flip-horizontal" title="Flip horizontal">
-                <i class="fas fa-arrows-alt-h"></i>
-            </button>
-            <button data-action="flip-vertical" title="Flip vertical">
-                <i class="fas fa-arrows-alt-v"></i>
-            </button>
-
-            <!-- Bouttons spéciaux (en bas) -->
-            <div style="position: absolute; bottom:0; color: white">
-                <button
-                    v-if="data.loaded && !data.cropping"
-                    data-action="remove"
-                    title="Supprimer l'image"
-                >
-                    <v-icon>fas fa-trash</v-icon>
-                </button>
-                <button
-                    v-if="data.cropping"
-                    data-action="clear"
-                    title="Annuler le rognage"
-                >
-                    <v-icon>fas fa-ban</v-icon>
-                </button>
-                <button
-                    v-if="data.cropping"
-                    type="button"
-                    data-action="applyCrop"
-                    title="Valider le rognage"
-                >
-                    <v-icon>fas fa-check</v-icon>
-                </button>
-            </div>
-        </div>
+  <div class="editor">
+    <div class="canvas">
+      <img
+        ref="image"
+        :alt="data.name"
+        :src="data.url"
+        @loadstart="start"
+        @load="start"
+      >
     </div>
+
+    <div
+      v-if="cropper"
+      class="toolbar"
+      @click="click"
+    >
+      <button
+        data-action="move"
+        title="Déplacer"
+      >
+        <i class="fas fa-arrows-alt" />
+      </button>
+      <button
+        data-action="crop"
+        title="Rogner"
+      >
+        <i class="fas fa-crop-alt" />
+      </button>
+      <button
+        data-action="rotate-left"
+        title="Rotation à gauche"
+      >
+        <i class="fas fa-undo" />
+      </button>
+      <button
+        data-action="rotate-right"
+        title="Rotation à droite"
+      >
+        <i class="fas fa-redo" />
+      </button>
+      <button
+        data-action="flip-horizontal"
+        title="Flip horizontal"
+      >
+        <i class="fas fa-arrows-alt-h" />
+      </button>
+      <button
+        data-action="flip-vertical"
+        title="Flip vertical"
+      >
+        <i class="fas fa-arrows-alt-v" />
+      </button>
+
+      <!-- Bouttons spéciaux (en bas) -->
+      <div style="position: absolute; bottom:0; color: white">
+        <button
+          v-if="data.loaded && !data.cropping"
+          data-action="remove"
+          title="Supprimer l'image"
+        >
+          <v-icon>fas fa-trash</v-icon>
+        </button>
+        <button
+          v-if="data.cropping"
+          data-action="clear"
+          title="Annuler le rognage"
+        >
+          <v-icon>fas fa-ban</v-icon>
+        </button>
+        <button
+          v-if="data.cropping"
+          type="button"
+          data-action="applyCrop"
+          title="Valider le rognage"
+        >
+          <v-icon>fas fa-check</v-icon>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

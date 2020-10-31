@@ -1,27 +1,41 @@
 <template>
-    <v-container>
-        <v-card style="width: 400px; padding:50px; margin: auto; margin: 50px auto">
-            <v-form v-if="!sent" ref="form" v-model="valid">
-                <v-text-field
-                    v-model="email"
-                    label="Votre adresse email"
-                    :rules="rules"
-                    required
-                    outlined
-                    type="email"
-                    data-cy="forgotten-email"
-                ></v-text-field>
-                <div style="text-align: center">
-                    <v-btn color="accent" @click="go()" :disabled="!valid" data-cy="forgotten-button">Réinitialiser mon mot de passe</v-btn>
-                </div>
-            </v-form>
-            <div v-if="sent" style="text-align: center">
-                <h3>Merci.</h3>
-                <p>Un message a été envoyé à l'adresse email indiqué afin de vous expliquer la marche à suivre pour réinitialiser votre mot de passe.</p>
-                <p>Vous devez déjà l'avoir reçu. Pensez à regarder dans <span style="font-weight: bold">vos SPAMS</span> si vous ne le voyez pas.</p>
-            </div>
-        </v-card>
-    </v-container>
+  <v-container>
+    <v-card style="width: 400px; padding:50px; margin: auto; margin: 50px auto">
+      <v-form
+        v-if="!sent"
+        ref="form"
+        v-model="valid"
+      >
+        <v-text-field
+          v-model="email"
+          label="Votre adresse email"
+          :rules="rules"
+          required
+          outlined
+          type="email"
+          data-cy="forgotten-email"
+        />
+        <div style="text-align: center">
+          <v-btn
+            color="accent"
+            :disabled="!valid"
+            data-cy="forgotten-button"
+            @click="go()"
+          >
+            Réinitialiser mon mot de passe
+          </v-btn>
+        </div>
+      </v-form>
+      <div
+        v-if="sent"
+        style="text-align: center"
+      >
+        <h3>Merci.</h3>
+        <p>Un message a été envoyé à l'adresse email indiqué afin de vous expliquer la marche à suivre pour réinitialiser votre mot de passe.</p>
+        <p>Vous devez déjà l'avoir reçu. Pensez à regarder dans <span style="font-weight: bold">vos SPAMS</span> si vous ne le voyez pas.</p>
+      </div>
+    </v-card>
+  </v-container>
 </template>
 
 <script>

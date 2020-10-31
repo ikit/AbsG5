@@ -1,102 +1,125 @@
 <template>
-<div>
-    <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-        <v-row style="padding: 15px" align="center" justify="center">
+  <div>
+    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+      <v-row
+        style="padding: 15px"
+        align="center"
+        justify="center"
+      >
+        <v-tooltip
+          v-if="$vuetify.breakpoint.mdAndUp"
+          bottom
+        >
+          <template #activator="{ on }">
+            <v-btn
+              text
+              :disabled="isLoading || (currentYear == 2004 && currentMonth == 0)"
+              v-on="on"
+              @click="go(2004, 0)"
+            >
+              Janvier 2004
+            </v-btn>
+          </template>
+          <span>Premier message</span>
+        </v-tooltip>
 
-            <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        text
-                        v-on="on"
-                        :disabled="isLoading || (currentYear == 2004 && currentMonth == 0)"
-                        @click="go(2004, 0)">
-                        Janvier 2004
-                    </v-btn>
-                </template>
-                <span>Premier message</span>
-            </v-tooltip>
+        <div>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                :disabled="isLoading || currentYear < 2015"
+                v-on="on"
+                @click="goByMonths(-12)"
+              >
+                <v-icon>fas fa-angle-double-left</v-icon>
+              </v-btn>
+            </template>
+            <span>Revenir un an en arrière</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                :disabled="isLoading || currentYear < 2004 || (currentYear == 2004 && currentMonth == 0)"
+                v-on="on"
+                @click="goByMonths(-1)"
+              >
+                <v-icon>fa-chevron-left</v-icon>
+              </v-btn>
+            </template>
+            <span>Revenir un mois en arrière</span>
+          </v-tooltip>
 
-            <div>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            @click="goByMonths(-12)"
-                            :disabled="isLoading || currentYear < 2015">
-                            <v-icon>fas fa-angle-double-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Revenir un an en arrière</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            @click="goByMonths(-1)"
-                            :disabled="isLoading || currentYear < 2004 || (currentYear == 2004 && currentMonth == 0)">
-                            <v-icon>fa-chevron-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Revenir un mois en arrière</span>
-                </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                text
+                width="200px"
+                :disabled="isLoading"
+                v-on="on"
+              >
+                {{ monthLabels[currentMonth] }} {{ currentYear }}
+              </v-btn>
+            </template>
+            <span>Modifier directement la date en cours</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                :disabled="isLoading || currentYear > todayYear || (currentYear == todayYear && currentMonth == todayMonth)"
+                v-on="on"
+                @click="goByMonths(1)"
+              >
+                <v-icon>fa-chevron-right</v-icon>
+              </v-btn>
+            </template>
+            <span>Aller au mois suivant</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                icon
+                small
+                :disabled="isLoading || currentYear >= todayYear || (currentYear == todayYear -1 && currentMonth > todayMonth)"
+                v-on="on"
+                @click="goByMonths(12)"
+              >
+                <v-icon>fas fa-angle-double-right</v-icon>
+              </v-btn>
+            </template>
+            <span>Aller à l'année suivante</span>
+          </v-tooltip>
+        </div>
 
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            text
-                            v-on="on"
-                            width="200px"
-                            :disabled="isLoading">
-                            {{ monthLabels[currentMonth] }} {{ currentYear }}
-                        </v-btn>
-                    </template>
-                    <span>Modifier directement la date en cours</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            @click="goByMonths(1)"
-                            :disabled="isLoading || currentYear > todayYear || (currentYear == todayYear && currentMonth == todayMonth)">
-                            <v-icon>fa-chevron-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Aller au mois suivant</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            @click="goByMonths(12)"
-                            :disabled="isLoading || currentYear >= todayYear || (currentYear == todayYear -1 && currentMonth > todayMonth)">
-                            <v-icon>fas fa-angle-double-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Aller à l'année suivante</span>
-                </v-tooltip>
-            </div>
-
-            <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        text
-                        v-on="on"
-                        @click="go(todayYear, todayMonth, true)"
-                        :disabled="isLoading || (currentYear === todayYear && currentMonth === todayMonth)">
-                        Aujourd'hui
-                    </v-btn>
-                </template>
-                <span>Dernier message</span>
-            </v-tooltip>
-        </v-row>
+        <v-tooltip
+          v-if="$vuetify.breakpoint.mdAndUp"
+          bottom
+        >
+          <template #activator="{ on }">
+            <v-btn
+              text
+              :disabled="isLoading || (currentYear === todayYear && currentMonth === todayMonth)"
+              v-on="on"
+              @click="go(todayYear, todayMonth, true)"
+            >
+              Aujourd'hui
+            </v-btn>
+          </template>
+          <span>Dernier message</span>
+        </v-tooltip>
+      </v-row>
     </div>
 
-    <Reader ref="messageReader" topicId="-1"></Reader>
-</div>
+    <Reader
+      ref="messageReader"
+      topic-id="-1"
+    />
+  </div>
 </template>
 
 <script>

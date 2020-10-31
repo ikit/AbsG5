@@ -1,60 +1,133 @@
 <template>
-<div>
+  <div>
     <div class="ceremony">
-        <div class="reveal">
-            <div class="slides">
-                <section>
-                    <h1>Absolument G Photos Awards</h1>
-                    <h2>{{ year }}</h2>
-                </section>
+      <div class="reveal">
+        <div class="slides">
+          <section>
+            <h1>Absolument G Photos Awards</h1>
+            <h2>{{ year }}</h2>
+          </section>
 
-                <section>
-                    <h3>Participation</h3>
-                    <highcharts :options="stats.diag1"></highcharts>
-                </section>
+          <section>
+            <h3>Participation</h3>
+            <highcharts :options="stats.diag1" />
+          </section>
 
-                <section v-for="(slide, cidx) in slides" :key="cidx" style="width:100%; height:100%">
-                    <div v-if="slide.type === 'category'">
-                        <h3>{{ slide.title }}</h3>
-                        <img :src="`/img/agpa/cupesMaxi/c${slide.id}.png`" class="catIllustration"/>
-                    </div>
-                    <div v-if="slide.type === 'photo'">
-                        <div style="position: absolute; top:0; left:0; right:0; bottom:0">
-                            <v-img class="photo" :src="slide.url" :contain="true" aspect-ratio="1"></v-img>
-                            <div class="photoInfo">
-                                {{slide.title}}
-                                <img :src="slide.avatar" class="authorAvatar"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-if="slide.type === 'awardWaiting'" style="width:100%; height:100%">
-                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
-                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[0]" :contain="true" aspect-ratio="1"></v-img></div>
-                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[1]" :contain="true" aspect-ratio="1"></v-img></div>
-                        </div>
-                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
-                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[2]" :contain="true" aspect-ratio="1"></v-img></div>
-                            <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[3]" :contain="true" aspect-ratio="1"></v-img></div>
-                        </div>
-                    </div>
-                    <div v-if="slide.type === 'photoAward'">
-                        <div style="position: absolute; top:0; left:0; right:0; bottom:0">
-                            <v-img class="photo" :src="slide.url" :contain="true" aspect-ratio="1"></v-img>
-                            <div class="photoInfo">
-                                {{slide.title}}
-                                <img :src="slide.avatar" class="authorAvatar"/>
-                                <img :src="slide.award" class="award"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-if="slide.type === 'bestAuthorWaiting'" class="allAuthors">
-                        <img v-for="user of slide.users" v-bind:key="user.userId" :src="user.avatar" />
-                    </div>
-                    <div v-if="slide.type === 'bestAuthorAward'" style="width:100%; height:100%">
-                        <img :src="slide.avatar" class="authorAvatar"/>
-                        <h3>{{ slide.username }}</h3>
-                        <img :src="slide.award" class="award"/>
-<!--
+          <section
+            v-for="(slide, cidx) in slides"
+            :key="cidx"
+            style="width:100%; height:100%"
+          >
+            <div v-if="slide.type === 'category'">
+              <h3>{{ slide.title }}</h3>
+              <img
+                :src="`/img/agpa/cupesMaxi/c${slide.id}.png`"
+                class="catIllustration"
+              >
+            </div>
+            <div v-if="slide.type === 'photo'">
+              <div style="position: absolute; top:0; left:0; right:0; bottom:0">
+                <v-img
+                  class="photo"
+                  :src="slide.url"
+                  :contain="true"
+                  aspect-ratio="1"
+                />
+                <div class="photoInfo">
+                  {{ slide.title }}
+                  <img
+                    :src="slide.avatar"
+                    class="authorAvatar"
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              v-if="slide.type === 'awardWaiting'"
+              style="width:100%; height:100%"
+            >
+              <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                <div class="photoDeliberating">
+                  <v-img
+                    style="height: 100%;"
+                    :src="slide.photos[0]"
+                    :contain="true"
+                    aspect-ratio="1"
+                  />
+                </div>
+                <div class="photoDeliberating">
+                  <v-img
+                    style="height: 100%;"
+                    :src="slide.photos[1]"
+                    :contain="true"
+                    aspect-ratio="1"
+                  />
+                </div>
+              </div>
+              <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                <div class="photoDeliberating">
+                  <v-img
+                    style="height: 100%;"
+                    :src="slide.photos[2]"
+                    :contain="true"
+                    aspect-ratio="1"
+                  />
+                </div>
+                <div class="photoDeliberating">
+                  <v-img
+                    style="height: 100%;"
+                    :src="slide.photos[3]"
+                    :contain="true"
+                    aspect-ratio="1"
+                  />
+                </div>
+              </div>
+            </div>
+            <div v-if="slide.type === 'photoAward'">
+              <div style="position: absolute; top:0; left:0; right:0; bottom:0">
+                <v-img
+                  class="photo"
+                  :src="slide.url"
+                  :contain="true"
+                  aspect-ratio="1"
+                />
+                <div class="photoInfo">
+                  {{ slide.title }}
+                  <img
+                    :src="slide.avatar"
+                    class="authorAvatar"
+                  >
+                  <img
+                    :src="slide.award"
+                    class="award"
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              v-if="slide.type === 'bestAuthorWaiting'"
+              class="allAuthors"
+            >
+              <img
+                v-for="user of slide.users"
+                :key="user.userId"
+                :src="user.avatar"
+              >
+            </div>
+            <div
+              v-if="slide.type === 'bestAuthorAward'"
+              style="width:100%; height:100%"
+            >
+              <img
+                :src="slide.avatar"
+                class="authorAvatar"
+              >
+              <h3>{{ slide.username }}</h3>
+              <img
+                :src="slide.award"
+                class="award"
+              >
+              <!--
                         <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
                             <div class="photoDeliberating">
                                 <img :src="slide.avatar" class="authorAvatar"/>
@@ -65,28 +138,58 @@
                             <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[1]" :contain="true" aspect-ratio="1"></v-img></div>
                             <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[2]" :contain="true" aspect-ratio="1"></v-img></div>
                         </div> -->
-                    </div>
-                </section>
-
-                <section>
-                    <h1>Merci !</h1>
-                </section>
-
-                <section>
-                    <button type="button" class="button" @click="close()">Quitter la cérémonie</button>
-                </section>
             </div>
-        </div>
+          </section>
 
-        <div class="controls">
-            <v-btn small color="primary" dark>Début</v-btn>
-            <v-btn small color="primary" dark>Précédante</v-btn>
-            <v-btn small color="primary" dark>Suivante</v-btn>
-            <v-btn small color="primary" dark @click="close()">Quitter</v-btn>
+          <section>
+            <h1>Merci !</h1>
+          </section>
+
+          <section>
+            <button
+              type="button"
+              class="button"
+              @click="close()"
+            >
+              Quitter la cérémonie
+            </button>
+          </section>
         </div>
+      </div>
+
+      <div class="controls">
+        <v-btn
+          small
+          color="primary"
+          dark
+        >
+          Début
+        </v-btn>
+        <v-btn
+          small
+          color="primary"
+          dark
+        >
+          Précédante
+        </v-btn>
+        <v-btn
+          small
+          color="primary"
+          dark
+        >
+          Suivante
+        </v-btn>
+        <v-btn
+          small
+          color="primary"
+          dark
+          @click="close()"
+        >
+          Quitter
+        </v-btn>
+      </div>
     </div>
-
-</div>
+  </div>
 </template>
 
 

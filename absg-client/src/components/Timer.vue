@@ -1,32 +1,57 @@
 <template>
-<div style="text-align: center">
+  <div style="text-align: center">
     <ul class="vuejs-countdown">
-        <li v-if="days > 0">
-            <p class="digit">{{ days | twoDigits }}</p>
-            <p class="text">{{ days > 1 ? 'jours' : 'jour' }}</p>
-        </li>
-        <li v-if="hours > 0">
-            <p class="digit">{{ hours | twoDigits }}</p>
-            <p class="text">{{ hours > 1 ? 'heures' : 'heur' }}</p>
-        </li>
-        <li>
-            <p class="digit">{{ minutes | twoDigits }}</p>
-            <p class="text">min</p>
-        </li>
-        <li>
-            <p class="digit">{{ seconds | twoDigits }}</p>
-            <p class="text">sec</p>
-        </li>
+      <li v-if="days > 0">
+        <p class="digit">
+          {{ days | twoDigits }}
+        </p>
+        <p class="text">
+          {{ days > 1 ? 'jours' : 'jour' }}
+        </p>
+      </li>
+      <li v-if="hours > 0">
+        <p class="digit">
+          {{ hours | twoDigits }}
+        </p>
+        <p class="text">
+          {{ hours > 1 ? 'heures' : 'heur' }}
+        </p>
+      </li>
+      <li>
+        <p class="digit">
+          {{ minutes | twoDigits }}
+        </p>
+        <p class="text">
+          min
+        </p>
+      </li>
+      <li>
+        <p class="digit">
+          {{ seconds | twoDigits }}
+        </p>
+        <p class="text">
+          sec
+        </p>
+      </li>
     </ul>
-</div>
+  </div>
 </template>
 
 <script>
 let interval = null;
 export default {
+    filters: {
+        twoDigits(value) {
+            if ( value.toString().length <= 1 ) {
+                return '0'+value.toString()
+            }
+            return value.toString()
+        }
+    },
     props: {
         end: {
-            type: Date
+            type: Date,
+            required: true
         }
     },
     data: () => ({
@@ -34,9 +59,6 @@ export default {
         date: null,
         diff: 0
     }),
-    created() {
-        this.init();
-    },
     computed: {
         seconds() {
             return Math.trunc(this.diff) % 60
@@ -61,13 +83,8 @@ export default {
             }
         }
     },
-    filters: {
-        twoDigits(value) {
-            if ( value.toString().length <= 1 ) {
-                return '0'+value.toString()
-            }
-            return value.toString()
-        }
+    created() {
+        this.init();
     },
     destroyed() {
         clearInterval(interval);

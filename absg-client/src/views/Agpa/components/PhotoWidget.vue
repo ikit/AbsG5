@@ -1,53 +1,84 @@
 <template>
-<div>
-    <table v-if="photo.id !== -1" width="100%">
-        <tr>
-            <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
-                <img class="thumb" :src="photo.thumb"/>
-            </td>
-        </tr>
-        <tr>
-            <td style="text-align: center">{{ photo.title }}</td>
-        </tr>
-        <tr>
-            <td style="text-align: center; padding-top: 20px">
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" fab small @click="editPhoto()">
-                            <v-icon style="font-size: 20px">fas fa-pen</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Modifier la photo</span>
-                </v-tooltip>
+  <div>
+    <table
+      v-if="photo.id !== -1"
+      width="100%"
+    >
+      <tr>
+        <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
+          <img
+            class="thumb"
+            :src="photo.thumb"
+          >
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: center">
+          {{ photo.title }}
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: center; padding-top: 20px">
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                fab
+                small
+                v-on="on"
+                @click="editPhoto()"
+              >
+                <v-icon style="font-size: 20px">
+                  fas fa-pen
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Modifier la photo</span>
+          </v-tooltip>
                 &nbsp;
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" fab small @click="deletePhoto()">
-                            <v-icon style="font-size: 20px">fas fa-times</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Supprimer la photo</span>
-                </v-tooltip>
-            </td>
-        </tr>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                fab
+                small
+                v-on="on"
+                @click="deletePhoto()"
+              >
+                <v-icon style="font-size: 20px">
+                  fas fa-times
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>Supprimer la photo</span>
+          </v-tooltip>
+        </td>
+      </tr>
     </table>
 
-    <table v-else width="100%">
-        <tr>
-            <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" depressed @click="addNewPhoto()">
-                            <v-icon left>fas fa-plus</v-icon>
-                            <span>Photo</span>
-                        </v-btn>
-                    </template>
-                    <span>Enregistrer une nouvelle photo</span>
-                </v-tooltip>
-            </td>
-        </tr>
+    <table
+      v-else
+      width="100%"
+    >
+      <tr>
+        <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                depressed
+                v-on="on"
+                @click="addNewPhoto()"
+              >
+                <v-icon left>
+                  fas fa-plus
+                </v-icon>
+                <span>Photo</span>
+              </v-btn>
+            </template>
+            <span>Enregistrer une nouvelle photo</span>
+          </v-tooltip>
+        </td>
+      </tr>
     </table>
-</div>
+  </div>
 </template>
 
 
@@ -57,18 +88,18 @@ import { mapState } from 'vuex';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
-import ImageEditor from '../../../components/ImageEditor.vue';
+import { Photo } from '../../../model';
 
 export default {
     name: 'PhotoWidget',
-    components: {
-        ImageEditor
+    props: {
+        photo: {
+            type: Photo,
+            required: true
+        }
     },
     data: () => ({
     }),
-    props: [
-        "photo"
-    ],
     mounted () {
     },
     methods: {

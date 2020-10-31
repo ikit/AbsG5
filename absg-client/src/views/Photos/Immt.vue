@@ -1,111 +1,177 @@
 <template>
-<div>
-    <v-container fluid  grid-list-md style="padding:0">
-        <v-data-iterator
-            :items="immts"
-            :items-per-page="filter.pageSize"
-            :page="filter.pageIndex"
-            :search="filter.request"
-            hide-default-footer>
+  <div>
+    <v-container
+      fluid
+      grid-list-md
+      style="padding:0"
+    >
+      <v-data-iterator
+        :items="immts"
+        :items-per-page="filter.pageSize"
+        :page="filter.pageIndex"
+        :search="filter.request"
+        hide-default-footer
+      >
+        <template #header>
+          <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+            <v-row
+              style="margin: 0"
+              align="center"
+              justify="center"
+            >
+              <v-text-field
+                v-model="filter.request"
+                prepend-icon="fa-search"
+                placeholder="Rechercher"
+                style="max-width: 300px;"
+              />
+              <!-- <span class="grey--text">{{immts.length}} images</span> -->
+              <v-spacer />
+              <v-btn
+                icon
+                small
+                :disabled="isLoading"
+                @click="formerPage"
+              >
+                <v-icon>fa-chevron-left</v-icon>
+              </v-btn>
+              <span class="grey--text">
+                Page {{ filter.pageIndex }} / {{ numberOfPages }}
+              </span>
+              <v-btn
+                icon
+                small
+                :disabled="isLoading"
+                @click="nextPage"
+              >
+                <v-icon>fa-chevron-right</v-icon>
+              </v-btn>
 
-            <template v-slot:header>
-                <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-                    <v-row style="margin: 0" align="center" justify="center">
-                        <v-text-field
-                            v-model="filter.request"
-                            prepend-icon="fa-search"
-                            placeholder="Rechercher"
-                            style="max-width: 300px;">
-                        </v-text-field>
-                        <!-- <span class="grey--text">{{immts.length}} images</span> -->
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            icon small
-                            :disabled="isLoading"
-                            @click="formerPage">
-                            <v-icon>fa-chevron-left</v-icon>
-                        </v-btn>
-                        <span class="grey--text" >
-                            Page {{ filter.pageIndex}} / {{ numberOfPages }}
-                        </span>
-                        <v-btn
-                            icon small
-                            :disabled="isLoading"
-                            @click="nextPage"
-                        >
-                            <v-icon>fa-chevron-right</v-icon>
-                        </v-btn>
+              <v-spacer />
 
-                        <v-spacer></v-spacer>
+              <v-btn
+                v-if="$vuetify.breakpoint.mdAndUp"
+                @click.stop="resetDialog(true)"
+              >
+                <v-icon left>
+                  fas fa-plus
+                </v-icon>
+                <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
+              </v-btn>
+              <v-btn
+                v-else
+                fab
+                small
+                @click.stop="resetDialog(true)"
+              >
+                <v-icon>fas fa-plus</v-icon>
+              </v-btn>
+            </v-row>
+          </div>
+        </template>
 
-                        <v-btn
-                            v-if="$vuetify.breakpoint.mdAndUp"
-                            @click.stop="resetDialog(true)">
-                            <v-icon left>fas fa-plus</v-icon>
-                            <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
-                        </v-btn>
-                        <v-btn v-else fab small @click.stop="resetDialog(true)">
-                            <v-icon>fas fa-plus</v-icon>
-                        </v-btn>
-                    </v-row>
+        <template #default="props">
+          <v-container
+            fluid
+            grid-list-sm
+          >
+            <v-layout
+              row
+              wrap
+            >
+              <v-flex
+                v-for="p in props.items"
+                :key="p.id"
+                style="text-align: center; max-width: 250px;"
+              >
+                <div style="width: 250px; height: 250px; margin: auto;">
+                  <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+                    <img
+                      :src="p.thumb"
+                      class="thumb"
+                      :alt="p.id"
+                      @click="photosGalleryDisplay(p.index)"
+                    >
+                  </div>
                 </div>
-            </template>
-
-            <template v-slot:default="props">
-                <v-container fluid grid-list-sm>
-                    <v-layout row wrap>
-                        <v-flex v-for="p in props.items" :key="p.id" style="text-align: center; max-width: 250px;">
-                            <div style="width: 250px; height: 250px; margin: auto;">
-                                <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                    <img :src="p.thumb" class="thumb" :alt="p.id" @click="photosGalleryDisplay(p.index)">
-                                </div>
-                            </div>
-                            <v-card style="margin-bottom: 50px">
-                                <div style="text-align: center">
-                                    {{ p.title }}
-                                </div>
-                                <div style="text-align: center; font-size: 0.8em; opacity: 0.7">
-                                    {{ p.user ? p.user.username : "" }} le {{ p.date }} </div>
-                            </v-card>
-                        </v-flex>
-                    </v-layout>
-                </v-container>
-            </template>
-        </v-data-iterator>
+                <v-card style="margin-bottom: 50px">
+                  <div style="text-align: center">
+                    {{ p.title }}
+                  </div>
+                  <div style="text-align: center; font-size: 0.8em; opacity: 0.7">
+                    {{ p.user ? p.user.username : "" }} le {{ p.date }}
+                  </div>
+                </v-card>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </template>
+      </v-data-iterator>
     </v-container>
 
 
-    <v-dialog v-model="immtEditor.open" width="800px">
-        <v-card>
-            <v-card-title class="grey lighten-4 py-4 title">
-                Nouvelle image du moment
-            </v-card-title>
-            <v-container grid-list-sm class="pa-4">
-                <div v-if="immtEditor.displayTodayWarning" style="position: relative; color: #ff8f00; padding-left: 40px;">
-                    <v-icon color="warning" style="position:absolute; top: 10px; left: 0">fas fa-exclamation-triangle</v-icon>
-                    Attention, il y a déjà une image pour aujourd'hui. <br/>
-                    Vous allez donc remplacer l'image existante par une nouvelle.
-                </div>
+    <v-dialog
+      v-model="immtEditor.open"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4 py-4 title">
+          Nouvelle image du moment
+        </v-card-title>
+        <v-container
+          grid-list-sm
+          class="pa-4"
+        >
+          <div
+            v-if="immtEditor.displayTodayWarning"
+            style="position: relative; color: #ff8f00; padding-left: 40px;"
+          >
+            <v-icon
+              color="warning"
+              style="position:absolute; top: 10px; left: 0"
+            >
+              fas fa-exclamation-triangle
+            </v-icon>
+            Attention, il y a déjà une image pour aujourd'hui. <br>
+            Vous allez donc remplacer l'image existante par une nouvelle.
+          </div>
 
 
-                <v-text-field
-                    prepend-icon="fas fa-feather-alt"
-                    label="Titre"
-                    v-model="immtEditor.title">
-                </v-text-field>
-                <ImageEditor ref="imgEditor" icon="fas fa-camera" style="height: 300px;"/>
-                <div v-if="immtEditor.isLoading">
-                    Enregistrement en cours : {{ immtEditor.complete }}%
-                </div>
-            </v-container>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" :disabled="immtEditor.isLoading" @click="resetDialog()">Annuler</v-btn>
-                <v-btn color="accent" :disabled="immtEditor.isLoading" @click="saveImmt()">Enregistrer</v-btn>
-            </v-card-actions>
-        </v-card>
+          <v-text-field
+            v-model="immtEditor.title"
+            prepend-icon="fas fa-feather-alt"
+            label="Titre"
+          />
+          <ImageEditor
+            ref="imgEditor"
+            icon="fas fa-camera"
+            style="height: 300px;"
+          />
+          <div v-if="immtEditor.isLoading">
+            Enregistrement en cours : {{ immtEditor.complete }}%
+          </div>
+        </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            :disabled="immtEditor.isLoading"
+            @click="resetDialog()"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            :disabled="immtEditor.isLoading"
+            @click="saveImmt()"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-</div>
+  </div>
 </template>
 
 
@@ -139,6 +205,11 @@ export default {
             complete: 0,
         },
     }),
+    computed: {
+        numberOfPages () {
+            return Math.ceil(this.immts.length / this.filter.pageSize)
+        }
+    },
     mounted () {
         if (!this.authors) {
             // Il faut initialiser la vue
@@ -169,11 +240,6 @@ export default {
                 this.isLoading = false;
                 store.commit('photosGalleryReset', this.immts);
             });
-        }
-    },
-    computed: {
-        numberOfPages () {
-            return Math.ceil(this.immts.length / this.filter.pageSize)
         }
     },
     methods: {

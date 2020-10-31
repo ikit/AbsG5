@@ -1,187 +1,279 @@
 <template>
-    <section id="content">
-        <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-            <v-row style="padding: 15px">
+  <section id="content">
+    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+      <v-row style="padding: 15px">
+        <v-tooltip
+          v-if="$vuetify.breakpoint.mdAndUp"
+          bottom
+        >
+          <template #activator="{ on }">
+            <v-icon
+              left
+              style="margin-top:-10px; font-size: 30px"
+            >
+              far fa-question-circle
+            </v-icon>
+            <div
+              class="phase-left-header"
+              v-on="on"
+              @click="help.displayed = true; help.page = 3"
+            >
+              <h2>Phase n°2 en cours : Vérification</h2>
+              <p>Phase n°3 Votes - à partir du {{ end }}</p>
+            </div>
+          </template>
+          <span>Besoin d'aide sur la phase actuelle du concours ?</span>
+        </v-tooltip>
 
-                <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
-                    <template v-slot:activator="{ on }">
-                        <v-icon left style="margin-top:-10px; font-size: 30px">far fa-question-circle</v-icon>
-                        <div class="phase-left-header" v-on="on" @click="help.displayed = true; help.page = 3">
-                            <h2>Phase n°2 en cours : Vérification</h2>
-                            <p>Phase n°3 Votes - à partir du {{ end }}</p>
-                        </div>
-                    </template>
-                    <span>Besoin d'aide sur la phase actuelle du concours ?</span>
-                </v-tooltip>
+        <v-spacer />
 
-                <v-spacer></v-spacer>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              style="margin-top: 3px;"
+              v-on="on"
+              @click="gotoNextCat(-1)"
+            >
+              <v-icon>fas fa-chevron-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Catégorie précédente</span>
+        </v-tooltip>
 
+        <v-menu
+          v-if="agpaMeta && category"
+          offset-y
+        >
+          <template #activator="{ on, attrs }">
+            <v-btn
+              dark
+              v-bind="attrs"
+              text
+              class="grey--text"
+              v-on="on"
+            >
+              {{ agpaMeta.categories[category.categoryId].title }}
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="catIdx in agpaMeta.categoriesOrders"
+              :key="catIdx"
+              @click="gotoCat(agpaMeta.categories[catIdx].categoryId)"
+            >
+              <v-list-item-title>{{ agpaMeta.categories[catIdx].title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              style="margin-top: 3px;"
+              v-on="on"
+              @click="gotoNextCat(1)"
+            >
+              <v-icon>fas fa-chevron-right</v-icon>
+            </v-btn>
+          </template>
+          <span>Catégorie suivante</span>
+        </v-tooltip>
+
+        <v-spacer />
+      </v-row>
+      <v-progress-linear
+        v-if="isLoading"
+        color="accent"
+        indeterminate
+        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
+      />
+    </div>
+
+    <v-container fluid>
+      <v-layout
+        row
+        wrap
+      >
+        <v-flex
+          v-for="(photo, index) in photosGalery"
+          :key="photo.id"
+          style="min-width: 250px; width: 15%; margin: 15px"
+        >
+          <div>
+            <div style="width: 250px; height: 250px; margin: auto;">
+              <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+                <img
+                  class="thumb"
+                  :src="photo.thumb"
+                  @click="photosGalleryDisplay(index)"
+                >
+              </div>
+            </div>
+            <div style="" />
+            <v-card
+              class="card"
+              style="margin-bottom: 50px"
+            >
+              <div
+                class="thumb-title"
+                style="text-align: center"
+              >
+                {{ photo.title }}
+              </div>
+              <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
                 <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextCat(-1)"
-                            style="margin-top: 3px;">
-                            <v-icon>fas fa-chevron-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Catégorie précédente</span>
+                  <template #activator="{ on }">
+                    <v-btn
+                      icon
+                      small
+                      :disabled="isLoading"
+                      style="opacity: 1; background: #fff"
+                      v-on="on"
+                      @click="displayPhotoDiscussion(photo)"
+                    >
+                      <v-icon
+                        v-if="photo.error && photo.error.status !== 'accepted'"
+                        :style="{ color: photo.error.status === 'refused' ? '#d32f2f' : '#ff8f00' }"
+                      >
+                        fas fa-exclamation-circle
+                      </v-icon>
+                      <v-icon v-else>
+                        fas fa-question-circle
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Discussion sur la photo</span>
                 </v-tooltip>
+              </div>
+            </v-card>
+          </div>
+        </v-flex>
+      </v-layout>
+    </v-container>
 
-                <v-menu offset-y v-if="agpaMeta && category">
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn dark v-bind="attrs" v-on="on" text class="grey--text">
-                            {{ agpaMeta.categories[category.categoryId].title }}
-                        </v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-item
-                            v-for="catIdx in agpaMeta.categoriesOrders"
-                            :key="catIdx"
-                            @click="gotoCat(agpaMeta.categories[catIdx].categoryId)"
-                        >
-                            <v-list-item-title>{{ agpaMeta.categories[catIdx].title }}</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
+    <!-- Aide -->
+    <v-dialog
+      v-model="help.displayed"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          <v-icon left>
+            far fa-question-circle
+          </v-icon>
+          Aide sur le déroulement du concours
+        </v-card-title>
+        <Help selected-tab="2" />
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="help.displayed = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextCat(1)"
-                            style="margin-top: 3px;">
-                            <v-icon>fas fa-chevron-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Catégorie suivante</span>
-                </v-tooltip>
+    <!-- Photo discussion -->
+    <v-dialog
+      v-model="photoDiscussion.displayed"
+      width="800px"
+    >
+      <v-card v-if="photoDiscussion.photo">
+        <v-card-title class="grey lighten-4">
+          Commentaires sur la photo
+          <v-spacer />
+          <template v-if="!isAdmin">
+            <span
+              v-if="photoDiscussion.status === 'accepted'"
+              style="color: #2e7d32"
+            >Statut: Acceptée</span>
+            <span
+              v-if="photoDiscussion.status === 'checking'"
+              style="color: #ff8f00"
+            >Statut: En cours de vérification</span>
+            <span
+              v-if="photoDiscussion.status === 'refused'"
+              style="color: #d32f2f"
+            >Statut: Refusée</span>
+          </template>
+          <template v-else>
+            <span
+              v-if="photoDiscussion.status === 'accepted'"
+              style="color: #2e7d32"
+            >Statut: </span>
+            <span
+              v-if="photoDiscussion.status === 'checking'"
+              style="color: #ff8f00"
+            >Statut: </span>
+            <span
+              v-if="photoDiscussion.status === 'refused'"
+              style="color: #d32f2f"
+            >Statut: </span>
+            <v-select
+              :items="status"
+              :value="photoDiscussion.status"
+              item-text="text"
+              item-value="value"
+              solo
+              style="height: 50px; margin-left: 10px; width: 150px;"
+              @change="updatePhotoStatus($event)"
+            />
+          </template>
+        </v-card-title>
+        <p style="opacity: 0.5; padding: 0 24px">
+          Utilisez ce formulaire pour signaler un photo ne respectant pas le réglement de sa catégorie, ou bien pour
+          poser des questions à l'organisation si vous avez des doutes.
+        </p>
+        <div style="display: flex; margin: 0 24px">
+          <div style="flex: 1 1 auto">
+            <div style="text-align: center; margin-top: 10px">
+              <img
+                :src="photoDiscussion.photo.thumb"
+                style="margin:auto"
+                class="thumb"
+              >
+              <p style="margin: 10px;">
+                {{ photoDiscussion.photo.title }}
+              </p>
+            </div>
+          </div>
 
-                <v-spacer></v-spacer>
-            </v-row>
-            <v-progress-linear
-                color="accent"
-                indeterminate
-                v-if="isLoading"
-                style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px">
-            </v-progress-linear>
+          <div style="flex: 1 1 auto;">
+            <p>Discussion:</p>
+            <p
+              v-if="photoDiscussion.discussion"
+              v-html="photoDiscussion.discussion"
+            />
+            <v-text-field
+              v-model="photoDiscussion.comment"
+              label="Votre commentaire"
+              @keydown.enter="addCommentaryPhoto()"
+            />
+          </div>
         </div>
-
-        <v-container fluid>
-            <v-layout row wrap>
-                <v-flex v-for="(photo, index) in photosGalery" :key="photo.id" style="min-width: 250px; width: 15%; margin: 15px">
-                    <div>
-                        <div style="width: 250px; height: 250px; margin: auto;">
-                            <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                <img class="thumb" :src="photo.thumb" @click="photosGalleryDisplay(index)"/>
-                            </div>
-                        </div>
-                        <div style="">
-
-                        </div>
-                        <v-card class="card" style="margin-bottom: 50px" >
-                            <div class="thumb-title" style="text-align: center">
-                                {{ photo.title }}
-                            </div>
-                            <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                            icon small
-                                            v-on="on"
-                                            :disabled="isLoading"
-                                            @click="displayPhotoDiscussion(photo)"
-                                            style="opacity: 1; background: #fff">
-                                            <v-icon
-                                                v-if="photo.error && photo.error.status !== 'accepted'"
-                                                v-bind:style="{ color: photo.error.status === 'refused' ? '#d32f2f' : '#ff8f00' }">fas fa-exclamation-circle</v-icon>
-                                            <v-icon v-else>fas fa-question-circle</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>Discussion sur la photo</span>
-                                </v-tooltip>
-                            </div>
-                        </v-card>
-                    </div>
-                </v-flex>
-            </v-layout>
-        </v-container>
-
-        <!-- Aide -->
-        <v-dialog v-model="help.displayed" width="800px">
-            <v-card>
-                <v-card-title class="grey lighten-4">
-                    <v-icon left>far fa-question-circle</v-icon>
-                    Aide sur le déroulement du concours
-                </v-card-title>
-                <Help selectedTab="2"></Help>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="help.displayed = false">Fermer</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <!-- Photo discussion -->
-        <v-dialog v-model="photoDiscussion.displayed" width="800px">
-            <v-card v-if="photoDiscussion.photo">
-                <v-card-title class="grey lighten-4">
-                    Commentaires sur la photo
-                    <v-spacer></v-spacer>
-                    <template v-if="!isAdmin">
-                        <span v-if="photoDiscussion.status === 'accepted'" style="color: #2e7d32">Statut: Acceptée</span>
-                        <span v-if="photoDiscussion.status === 'checking'" style="color: #ff8f00">Statut: En cours de vérification</span>
-                        <span v-if="photoDiscussion.status === 'refused'" style="color: #d32f2f">Statut: Refusée</span>
-                    </template>
-                    <template v-else>
-                        <span v-if="photoDiscussion.status === 'accepted'" style="color: #2e7d32">Statut: </span>
-                        <span v-if="photoDiscussion.status === 'checking'" style="color: #ff8f00">Statut: </span>
-                        <span v-if="photoDiscussion.status === 'refused'" style="color: #d32f2f">Statut: </span>
-                        <v-select
-                            :items="status"
-                            :value="photoDiscussion.status"
-                            item-text="text"
-                            item-value="value"
-                            @change="updatePhotoStatus($event)"
-                            solo
-                            style="height: 50px; margin-left: 10px; width: 150px;"
-                        ></v-select>
-                    </template>
-                </v-card-title>
-                <p style="opacity: 0.5; padding: 0 24px">
-                    Utilisez ce formulaire pour signaler un photo ne respectant pas le réglement de sa catégorie, ou bien pour
-                    poser des questions à l'organisation si vous avez des doutes.
-                </p>
-                <div style="display: flex; margin: 0 24px">
-                    <div style="flex: 1 1 auto">
-                        <div style="text-align: center; margin-top: 10px">
-                            <img :src="photoDiscussion.photo.thumb" style="margin:auto" class="thumb" />
-                            <p style="margin: 10px;"> {{ photoDiscussion.photo.title }}</p>
-                        </div>
-                    </div>
-
-                    <div style="flex: 1 1 auto;">
-
-                        <p>Discussion:</p>
-                        <p v-if="photoDiscussion.discussion" v-html="photoDiscussion.discussion"></p>
-                        <v-text-field
-                            label="Votre commentaire"
-                            v-model="photoDiscussion.comment"
-                            @keydown.enter="addCommentaryPhoto()">
-                        </v-text-field>
-                    </div>
-                </div>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="photoDiscussion.displayed = false">Fermer</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-    </section>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="photoDiscussion.displayed = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </section>
 </template>
 
 

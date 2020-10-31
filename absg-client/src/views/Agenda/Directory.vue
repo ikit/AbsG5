@@ -1,209 +1,289 @@
 <template>
-<div>
+  <div>
     <v-container>
-        <v-card>
-            <v-card-title>
-                <v-text-field
-                    v-model="filter.search"
-                    prepend-icon="fas fa-search"
-                    style="max-width: 300px"
-                    label="Rechercher"
-                    single-line
-                    hide-details
-                ></v-text-field>
-                <v-spacer></v-spacer>
-                <v-btn v-if="$vuetify.breakpoint.lgAndUp" @click="resetDialog(true)">
-                    <v-icon left>fa-plus</v-icon>
-                    Nouvelle entrée
-                </v-btn>
-                <v-btn v-else fab small @click.stop="resetDialog(true)">
-                    <v-icon>fas fa-plus</v-icon>
-                </v-btn>
-            </v-card-title>
-            <v-data-table
-                :headers="headers"
-                :items="persons"
-                :search="filter.search"
-                :loading="isLoading"
-                loading-text="Récupération des données..."
-                no-data-text="Aucune personne enregistré dans l'annuaire."
-                no-results-text="Aucune personne trouvé."
-                disable-sort
+      <v-card>
+        <v-card-title>
+          <v-text-field
+            v-model="filter.search"
+            prepend-icon="fas fa-search"
+            style="max-width: 300px"
+            label="Rechercher"
+            single-line
+            hide-details
+          />
+          <v-spacer />
+          <v-btn
+            v-if="$vuetify.breakpoint.lgAndUp"
+            @click="resetDialog(true)"
+          >
+            <v-icon left>
+              fa-plus
+            </v-icon>
+            Nouvelle entrée
+          </v-btn>
+          <v-btn
+            v-else
+            fab
+            small
+            @click.stop="resetDialog(true)"
+          >
+            <v-icon>fas fa-plus</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-data-table
+          :headers="headers"
+          :items="persons"
+          :search="filter.search"
+          :loading="isLoading"
+          loading-text="Récupération des données..."
+          no-data-text="Aucune personne enregistré dans l'annuaire."
+          no-results-text="Aucune personne trouvé."
+          disable-sort
+        >
+          <template #[`item.photo`]="{ item }">
+            <div
+              v-if="item.thumb && $vuetify.breakpoint.lgAndUp"
+              class="thumb"
             >
-                <template v-slot:item.photo="{ item }">
-                    <div v-if="item.thumb && $vuetify.breakpoint.lgAndUp" class="thumb">
-                        <img :src="item.thumb" @click="photosGalleryDisplay(item.galleryIndex)"/>
-                        </div>
-                    <div v-if="!item.thumb && $vuetify.breakpoint.lgAndUp" class="noThumb">
-                        <v-icon small>fas fa-user-circle</v-icon>
-                    </div>
-                </template>
+              <img
+                :src="item.thumb"
+                @click="photosGalleryDisplay(item.galleryIndex)"
+              >
+            </div>
+            <div
+              v-if="!item.thumb && $vuetify.breakpoint.lgAndUp"
+              class="noThumb"
+            >
+              <v-icon small>
+                fas fa-user-circle
+              </v-icon>
+            </div>
+          </template>
 
-                <template v-slot:item.name="{ item }">
-                    <div v-if="item.surname" style="font-style: italic;">{{ item.surname }}</div>
-                    <div v-if="item.lastname" style="font-weight: bold">{{ item.lastname }}</div>
-                    <div v-if="item.lastname" >
-                        {{ item.firstname }}
-                        <span style="opacity:0.5">{{ item.firstname2 }}</span>
-                    </div>
-                </template>
+          <template #[`item.name`]="{ item }">
+            <div
+              v-if="item.surname"
+              style="font-style: italic;"
+            >
+              {{ item.surname }}
+            </div>
+            <div
+              v-if="item.lastname"
+              style="font-weight: bold"
+            >
+              {{ item.lastname }}
+            </div>
+            <div v-if="item.lastname">
+              {{ item.firstname }}
+              <span style="opacity:0.5">{{ item.firstname2 }}</span>
+            </div>
+          </template>
 
-                <template v-slot:item.age="{ item }">
-                    <div v-if="item.age.age" style="font-weight: bold">{{ item.age.age }}</div>
-                    <div v-if="item.age.birth" >{{ item.age.birth }}</div>
-                    <div v-if="item.age.death" >{{ item.age.death }}</div>
-                </template>
+          <template #[`item.age`]="{ item }">
+            <div
+              v-if="item.age.age"
+              style="font-weight: bold"
+            >
+              {{ item.age.age }}
+            </div>
+            <div v-if="item.age.birth">
+              {{ item.age.birth }}
+            </div>
+            <div v-if="item.age.death">
+              {{ item.age.death }}
+            </div>
+          </template>
 
-                <template v-slot:item.contact="{ item }">
-                    <div v-if="item.phone">{{ item.phone }}</div>
-                    <div v-if="item.email" >{{ item.email }}</div>
-                </template>
+          <template #[`item.contact`]="{ item }">
+            <div v-if="item.phone">
+              {{ item.phone }}
+            </div>
+            <div v-if="item.email">
+              {{ item.email }}
+            </div>
+          </template>
 
 
-                <template v-slot:item.actions="{ item }">
-                    <v-icon v-if="item.address" small class="mr-2" @click="openMap(item)">
-                        fas fa-map-marker-alt
-                    </v-icon>
-                    <v-icon small class="mr-2" @click="editPerson(item)">
-                        fa-pen
-                    </v-icon>
-                </template>
-
-            </v-data-table>
-        </v-card>
+          <template #[`item.actions`]="{ item }">
+            <v-icon
+              v-if="item.address"
+              small
+              class="mr-2"
+              @click="openMap(item)"
+            >
+              fas fa-map-marker-alt
+            </v-icon>
+            <v-icon
+              small
+              class="mr-2"
+              @click="editPerson(item)"
+            >
+              fa-pen
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-card>
     </v-container>
 
 
-    <v-dialog v-model="personEditor.open" width="900px">
-        <v-card>
-            <v-card-title class="grey lighten-4">
-                {{ personEditor.id ? `Modifier les informations de ${personEditor.lastname} ${personEditor.firstname}` : "Nouvelle fiche" }}
-            </v-card-title>
+    <v-dialog
+      v-model="personEditor.open"
+      width="900px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          {{ personEditor.id ? `Modifier les informations de ${personEditor.lastname} ${personEditor.firstname}` : "Nouvelle fiche" }}
+        </v-card-title>
 
-            <v-container grid-list-sm class="pa-4">
-                <v-form :disabled="personEditor.isLoading">
-                    <v-row>
-                        <v-col>
-                            <v-text-field
-                                label="Nom"
-                                prepend-icon="fas fa-user"
-                                v-model="personEditor.lastname">
-                            </v-text-field>
+        <v-container
+          grid-list-sm
+          class="pa-4"
+        >
+          <v-form :disabled="personEditor.isLoading">
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="personEditor.lastname"
+                  label="Nom"
+                  prepend-icon="fas fa-user"
+                />
 
-                            <v-text-field
-                                label="Prénom (principale)"
-                                style="margin-left: 33px;"
-                                v-model="personEditor.firstname">
-                            </v-text-field>
+                <v-text-field
+                  v-model="personEditor.firstname"
+                  label="Prénom (principale)"
+                  style="margin-left: 33px;"
+                />
 
-                            <v-text-field
-                                label="Prénoms secondaires"
-                                style="margin-left: 33px;"
-                                v-model="personEditor.firstname2">
-                            </v-text-field>
+                <v-text-field
+                  v-model="personEditor.firstname2"
+                  label="Prénoms secondaires"
+                  style="margin-left: 33px;"
+                />
 
-                            <v-text-field
-                                label="Surnom (utilisé à la place du prénom dans la famille)"
-                                style="margin-left: 33px;"
-                                v-model="personEditor.surname">
-                            </v-text-field>
+                <v-text-field
+                  v-model="personEditor.surname"
+                  label="Surnom (utilisé à la place du prénom dans la famille)"
+                  style="margin-left: 33px;"
+                />
 
-                            <v-select
-                                :items="sexes"
-                                v-model="personEditor.sex"
-                                prepend-icon="fas fa-venus-mars"
-                                label="Sexe"
-                                item-text="label"
-                                item-value="id"
-                            ></v-select>
-                        </v-col>
+                <v-select
+                  v-model="personEditor.sex"
+                  :items="sexes"
+                  prepend-icon="fas fa-venus-mars"
+                  label="Sexe"
+                  item-text="label"
+                  item-value="id"
+                />
+              </v-col>
 
-                        <v-col>
-                            <v-menu
-                                v-model="personEditor.dateOfBirthMenu"
-                                :close-on-content-click="true"
-                                :nudge-right="40"
-                                transition="scale-transition"
-                                offset-y
-                                min-width="290px"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :rules="editorRules.dateOfBirth"
-                                        v-model="personEditor.dateOfBirth"
-                                        label="Date de naissance"
-                                        prepend-icon="far fa-calendar-alt"
-                                        clearable
-                                        validate-on-blur
-                                        v-on="on"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker v-model="personEditor.dateOfBirth" @input="personEditor.dateOfBirthMenu = false"></v-date-picker>
-                            </v-menu>
+              <v-col>
+                <v-menu
+                  v-model="personEditor.dateOfBirthMenu"
+                  :close-on-content-click="true"
+                  :nudge-right="40"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="290px"
+                >
+                  <template #activator="{ on }">
+                    <v-text-field
+                      v-model="personEditor.dateOfBirth"
+                      :rules="editorRules.dateOfBirth"
+                      label="Date de naissance"
+                      prepend-icon="far fa-calendar-alt"
+                      clearable
+                      validate-on-blur
+                      v-on="on"
+                    />
+                  </template>
+                  <v-date-picker
+                    v-model="personEditor.dateOfBirth"
+                    @input="personEditor.dateOfBirthMenu = false"
+                  />
+                </v-menu>
 
-                            <v-menu
-                                v-model="personEditor.dateOfDeathMenu"
-                                :close-on-content-click="true"
-                                :nudge-right="40"
-                                transition="scale-transition"
-                                offset-y
-                                min-width="290px"
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        :rules="editorRules.dateOfDeath"
-                                        v-model="personEditor.dateOfDeath"
-                                        clearable
-                                        label="Date du décè"
-                                        prepend-icon="far fa-calendar-alt"
-                                        validate-on-blur
-                                        v-on="on"
-                                    ></v-text-field>
-                                </template>
-                                <v-date-picker v-model="personEditor.dateOfDeath" @input="personEditor.dateOfDeathMenu = false"></v-date-picker>
-                            </v-menu>
+                <v-menu
+                  v-model="personEditor.dateOfDeathMenu"
+                  :close-on-content-click="true"
+                  :nudge-right="40"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="290px"
+                >
+                  <template #activator="{ on }">
+                    <v-text-field
+                      v-model="personEditor.dateOfDeath"
+                      :rules="editorRules.dateOfDeath"
+                      clearable
+                      label="Date du décè"
+                      prepend-icon="far fa-calendar-alt"
+                      validate-on-blur
+                      v-on="on"
+                    />
+                  </template>
+                  <v-date-picker
+                    v-model="personEditor.dateOfDeath"
+                    @input="personEditor.dateOfDeathMenu = false"
+                  />
+                </v-menu>
 
-                            <v-text-field
-                                label="Adresse"
-                                prepend-icon="fas fa-map-marker-alt"
-                                v-model="personEditor.address">
-                            </v-text-field>
+                <v-text-field
+                  v-model="personEditor.address"
+                  label="Adresse"
+                  prepend-icon="fas fa-map-marker-alt"
+                />
 
-                            <v-text-field
-                                label="Téléphone"
-                                prepend-icon="fas fa-phone"
-                                v-model="personEditor.phone">
-                            </v-text-field>
+                <v-text-field
+                  v-model="personEditor.phone"
+                  label="Téléphone"
+                  prepend-icon="fas fa-phone"
+                />
 
-                            <v-text-field
-                                label="Email"
-                                prepend-icon="fas fa-at"
-                                v-model="personEditor.email">
-                            </v-text-field>
+                <v-text-field
+                  v-model="personEditor.email"
+                  label="Email"
+                  prepend-icon="fas fa-at"
+                />
 
-                            <v-text-field
-                                label="Dernier métier exercé"
-                                prepend-icon="fas fa-briefcase"
-                                v-model="personEditor.job">
-                            </v-text-field>
+                <v-text-field
+                  v-model="personEditor.job"
+                  label="Dernier métier exercé"
+                  prepend-icon="fas fa-briefcase"
+                />
+              </v-col>
 
-                        </v-col>
-
-                        <v-col>
-                            <ImageEditor ref="imgEditor" :disabled="personEditor.isLoading" style="height: 300px; position: relative"/>
-                        </v-col>
-                    </v-row>
-                </v-form>
-            </v-container>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="resetDialog()" :disabled="personEditor.isLoading">Annuler</v-btn>
-            <v-btn color="accent" @click="savePerson()" :loading="personEditor.isLoading" :disabled="personEditor.isLoading">Enregistrer</v-btn>
-            </v-card-actions>
-        </v-card>
+              <v-col>
+                <ImageEditor
+                  ref="imgEditor"
+                  :disabled="personEditor.isLoading"
+                  style="height: 300px; position: relative"
+                />
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            :disabled="personEditor.isLoading"
+            @click="resetDialog()"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            :loading="personEditor.isLoading"
+            :disabled="personEditor.isLoading"
+            @click="savePerson()"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-
-</div>
+  </div>
 </template>
 
 

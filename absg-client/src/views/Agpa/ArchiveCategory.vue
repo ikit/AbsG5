@@ -1,119 +1,148 @@
 <template>
-    <section id="content">
+  <section id="content">
+    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+      <v-row style="padding: 15px">
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              depressed
+              small
+              :to="{path: `/agpa/archives/${year}` }"
+              v-on="on"
+            >
+              <v-icon left>
+                fas fa-chevron-left
+              </v-icon>
+              <span v-if="$vuetify.breakpoint.mdAndUp">Retour</span>
+            </v-btn>
+          </template>
+          <span>Retour au sommaire de l'édition</span>
+        </v-tooltip>
 
-        <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-            <v-row style="padding: 15px">
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            v-on="on"
-                            depressed small
-                            :to="{path: `/agpa/archives/${year}` }">
-                            <v-icon left>fas fa-chevron-left</v-icon>
-                            <span v-if="$vuetify.breakpoint.mdAndUp">Retour</span>
-                        </v-btn>
-                    </template>
-                    <span>Retour au sommaire de l'édition</span>
-                </v-tooltip>
+        <v-spacer />
 
-                <v-spacer></v-spacer>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              v-on="on"
+              @click="gotoNextYear(-1)"
+            >
+              <v-icon>fa-chevron-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Edition précédente</span>
+        </v-tooltip>
+        <span class="grey--text">
+          {{ year }}
+        </span>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              v-on="on"
+              @click="gotoNextYear(1)"
+            >
+              <v-icon>fa-chevron-right</v-icon>
+            </v-btn>
+          </template>
+          <span>Edition suivante</span>
+        </v-tooltip>
 
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextYear(-1)">
-                            <v-icon>fa-chevron-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Edition précédente</span>
-                </v-tooltip>
-                <span class="grey--text" >
-                    {{ year }}
-                </span>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextYear(1)">
-                            <v-icon>fa-chevron-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Edition suivante</span>
-                </v-tooltip>
+        <v-spacer />
 
-                <v-spacer></v-spacer>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              v-on="on"
+              @click="gotoNextCat(-1)"
+            >
+              <v-icon>fas fa-chevron-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Catégorie précédente</span>
+        </v-tooltip>
+        <span class="grey--text">
+          {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
+        </span>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              v-on="on"
+              @click="gotoNextCat(1)"
+            >
+              <v-icon>fas fa-chevron-right</v-icon>
+            </v-btn>
+          </template>
+          <span>Catégorie suivante</span>
+        </v-tooltip>
 
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextCat(-1)">
-                            <v-icon>fas fa-chevron-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Catégorie précédente</span>
-                </v-tooltip>
-                <span class="grey--text" >
-                    {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
-                </span>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextCat(1)">
-                            <v-icon>fas fa-chevron-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Catégorie suivante</span>
-                </v-tooltip>
+        <v-spacer />
+      </v-row>
+      <v-progress-linear
+        v-if="isLoading"
+        color="accent"
+        indeterminate
+        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
+      />
+    </div>
 
-                <v-spacer></v-spacer>
-            </v-row>
-            <v-progress-linear
-                color="accent"
-                indeterminate
-                v-if="isLoading"
-                style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px">
-            </v-progress-linear>
-        </div>
-
-        <div v-if="current">
-            <v-container fluid v-if="current">
-                <v-layout row wrap>
-                    <v-flex v-for="(photo, index) in photosGalery" :key="photo.id" style="min-width: 250px; width: 15%; margin: 15px">
-                        <div>
-                            <div style="width: 250px; height: 250px; margin: auto;">
-                                <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                                    <img class="thumb" :src="photo.thumb" @click="photosGalleryDisplay(index)"/>
-                                </div>
-                            </div>
-                            <div style="">
-
-                            </div>
-                            <v-card class="card shiny" v-bind:class="{
-                                gold: photo.rank == 1,
-                                sylver: photo.rank === 2,
-                                bronze: photo.rank === 3 }" style="margin-bottom: 50px" >
-                                <div class="thumb-title">
-                                    {{ photo.title }}
-                                </div>
-                                <div style="position: absolute; bottom: 5px; left: 5px; right: 5px; opacity:.5"> {{ photo.username }} </div>
-                            </v-card>
-                        </div>
-                    </v-flex>
-                </v-layout>
-            </v-container>
-        </div>
-    </section>
+    <div v-if="current">
+      <v-container
+        v-if="current"
+        fluid
+      >
+        <v-layout
+          row
+          wrap
+        >
+          <v-flex
+            v-for="(photo, index) in photosGalery"
+            :key="photo.id"
+            style="min-width: 250px; width: 15%; margin: 15px"
+          >
+            <div>
+              <div style="width: 250px; height: 250px; margin: auto;">
+                <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+                  <img
+                    class="thumb"
+                    :src="photo.thumb"
+                    @click="photosGalleryDisplay(index)"
+                  >
+                </div>
+              </div>
+              <div style="" />
+              <v-card
+                class="card shiny"
+                :class="{
+                  gold: photo.rank == 1,
+                  sylver: photo.rank === 2,
+                  bronze: photo.rank === 3 }"
+                style="margin-bottom: 50px"
+              >
+                <div class="thumb-title">
+                  {{ photo.title }}
+                </div>
+                <div style="position: absolute; bottom: 5px; left: 5px; right: 5px; opacity:.5">
+                  {{ photo.username }}
+                </div>
+              </v-card>
+            </div>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </div>
+  </section>
 </template>
 
 
@@ -137,13 +166,13 @@ export default {
     computed: { ...mapState([
         'agpaMeta'
     ])},
-    mounted () {
-        this.initView();
-    },
     watch: {
         $route(to, from) {
             this.initView();
         }
+    },
+    mounted () {
+        this.initView();
     },
     methods: {
         initView() {

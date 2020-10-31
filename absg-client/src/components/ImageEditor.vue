@@ -1,19 +1,23 @@
 <template>
-  <div style="border: 1px solid rgba(0, 0, 0, 0.4); position: relative" v-bind:style="{ 'margin-left': icon ? '33px' : '0' }">
-
-    <v-icon  style="display: block; position: absolute; left: -33px; top: 0;">{{icon}}</v-icon>
+  <div
+    style="border: 1px solid rgba(0, 0, 0, 0.4); position: relative"
+    :style="{ 'margin-left': icon ? '33px' : '0' }"
+  >
+    <v-icon style="display: block; position: absolute; left: -33px; top: 0;">
+      {{ icon }}
+    </v-icon>
     <main class="main">
-        <Editor
-            v-if="data.loaded"
-            ref="editor"
-            :data="data"
-        />
-        <Loader
-            v-else
-            ref="loader"
-            :data="data"
-            :bgUrl="formerUrl"
-        />
+      <Editor
+        v-if="data.loaded"
+        ref="editor"
+        :data="data"
+      />
+      <Loader
+        v-else
+        ref="loader"
+        :data="data"
+        :bg-url="formerUrl"
+      />
     </main>
   </div>
 </template>
@@ -34,11 +38,11 @@ Vue.component(Loader.name, Loader);
 
 
 export default {
+    name: 'ImageEditor',
     components: {
         Editor,
         Loader
     },
-    name: 'ImageEditor',
     props: {
         icon: {
             type: String,

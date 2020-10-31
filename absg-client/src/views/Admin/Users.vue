@@ -1,182 +1,241 @@
 <template>
-<div>
+  <div>
     <v-container>
-        <v-card>
-            <v-card-title>
-            <v-text-field
-                v-model="filter.quickFilter"
-                prepend-icon="fas fa-search"
-                label="Rechercher"
-                single-line
-                hide-details
-            ></v-text-field>
-            <v-spacer></v-spacer>
-            <v-btn @click="resetDialog(true)">
-                <v-icon small>fa-plus</v-icon>
-                Nouvel utilisateur
-            </v-btn>
-            </v-card-title>
-            <v-data-table
-                :headers="headers"
-                :items="usersList"
-                :search="filter.quickFilter"
-                :loading="isLoading"
-                loading-text="Récupération des utilisateurs..."
+      <v-card>
+        <v-card-title>
+          <v-text-field
+            v-model="filter.quickFilter"
+            prepend-icon="fas fa-search"
+            label="Rechercher"
+            single-line
+            hide-details
+          />
+          <v-spacer />
+          <v-btn @click="resetDialog(true)">
+            <v-icon small>
+              fa-plus
+            </v-icon>
+            Nouvel utilisateur
+          </v-btn>
+        </v-card-title>
+        <v-data-table
+          :headers="headers"
+          :items="usersList"
+          :search="filter.quickFilter"
+          :loading="isLoading"
+          loading-text="Récupération des utilisateurs..."
+        >
+          <template #[`item.username`]="{ item }">
+            <img
+              :src="item.url"
+              style="width: 40px; vertical-align: middle; margin-right: 10px"
+            > {{ item.username }}
+          </template>
+
+          <template #[`item.roles`]="{ item }">
+            <v-chip
+              v-for="r in item.roles"
+              :key="r"
+              :color="getRoleColor(r)"
             >
-                <template v-slot:item.username="{ item }">
-                    <img :src="item.url" style="width: 40px; vertical-align: middle; margin-right: 10px"/> {{ item.username }}
-                </template>
+              {{ getRoleLabel(r) }}
+            </v-chip>
+          </template>
 
-                <template v-slot:item.roles="{ item }">
-                    <v-chip
-                        v-for="r in item.roles"
-                        :key="r"
-                        :color="getRoleColor(r)">
-                        {{ getRoleLabel(r) }}
-                    </v-chip>
-                </template>
-
-                <template v-slot:item.active="{ item }">
-                    <v-icon
-                        v-if="item.isActive"
-                        small
-                        class="mr-2"
-                        color="green"
-                        @click="switchUserActivity(item)">
-                        fas fa-check-circle
-                    </v-icon>
-                    <v-icon
-                        v-if="!item.isActive"
-                        small
-                        class="mr-2"
-                        color="red"
-                        @click="switchUserActivity(item)">
-                        fas fa-times-circle
-                    </v-icon>
-                </template>
+          <template #[`item.active`]="{ item }">
+            <v-icon
+              v-if="item.isActive"
+              small
+              class="mr-2"
+              color="green"
+              @click="switchUserActivity(item)"
+            >
+              fas fa-check-circle
+            </v-icon>
+            <v-icon
+              v-if="!item.isActive"
+              small
+              class="mr-2"
+              color="red"
+              @click="switchUserActivity(item)"
+            >
+              fas fa-times-circle
+            </v-icon>
+          </template>
 
 
-                <template v-slot:item.actions="{ item }">
-                    <v-icon small class="mr-2" @click="editUser(item)">
-                        fa-pen
-                    </v-icon>
-                </template>
-
-            </v-data-table>
-        </v-card>
+          <template #[`item.actions`]="{ item }">
+            <v-icon
+              small
+              class="mr-2"
+              @click="editUser(item)"
+            >
+              fa-pen
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-card>
     </v-container>
 
 
-    <v-dialog v-model="userEditor.open" width="800px">
-        <v-card>
-            <v-card-title class="grey lighten-4">
-            {{ userEditor.id != -1 ? `Editer le compte utilisateur n°${userEditor.id}` : "Nouvel utilisateur" }}
-            </v-card-title>
+    <v-dialog
+      v-model="userEditor.open"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          {{ userEditor.id != -1 ? `Editer le compte utilisateur n°${userEditor.id}` : "Nouvel utilisateur" }}
+        </v-card-title>
 
-            <v-container grid-list-sm class="pa-4">
-                <v-row>
-                    <v-col>
-                        <h2>Compte utilisateur</h2>
-                        <p style="opacity: 0.5">Informations obligatoires.</p>
-                        <v-text-field
-                            prepend-icon="fas fa-user"
-                            label="Pseudo"
-                            v-model="userEditor.username">
-                        </v-text-field>
+        <v-container
+          grid-list-sm
+          class="pa-4"
+        >
+          <v-row>
+            <v-col>
+              <h2>Compte utilisateur</h2>
+              <p style="opacity: 0.5">
+                Informations obligatoires.
+              </p>
+              <v-text-field
+                v-model="userEditor.username"
+                prepend-icon="fas fa-user"
+                label="Pseudo"
+              />
 
-                        <v-text-field
-                            prepend-icon="fas fa-at"
-                            label="Email"
-                            v-model="userEditor.person.email">
-                        </v-text-field>
+              <v-text-field
+                v-model="userEditor.person.email"
+                prepend-icon="fas fa-at"
+                label="Email"
+              />
 
-                        <v-text-field
-                            prepend-icon="fas fa-unlock"
-                            label="Mot de passe"
-                            v-model="userEditor.password">
-                        </v-text-field>
-                        <v-select
-                            prepend-icon="fas fa-user-tag"
-                            prepend-inner=""
-                            v-model="userEditor.roles"
-                            :items="roles"
-                            attach
-                            chips
-                            label="Rôles"
-                            multiple
-                            item-text="label"
-                            item-value="id"
-                        ></v-select>
-                    </v-col>
+              <v-text-field
+                v-model="userEditor.password"
+                prepend-icon="fas fa-unlock"
+                label="Mot de passe"
+              />
+              <v-select
+                v-model="userEditor.roles"
+                prepend-icon="fas fa-user-tag"
+                prepend-inner=""
+                :items="roles"
+                attach
+                chips
+                label="Rôles"
+                multiple
+                item-text="label"
+                item-value="id"
+              />
+            </v-col>
 
-                    <v-col>
-                        <h2>Informations personnelles</h2>
-                        <p style="opacity: 0.5">Informations optionnels mais recommandées.</p>
-                        <v-text-field
-                            label="Nom"
-                            v-model="userEditor.person.lastname">
-                        </v-text-field>
+            <v-col>
+              <h2>Informations personnelles</h2>
+              <p style="opacity: 0.5">
+                Informations optionnels mais recommandées.
+              </p>
+              <v-text-field
+                v-model="userEditor.person.lastname"
+                label="Nom"
+              />
 
-                        <v-text-field
-                            label="Prénom"
-                            v-model="userEditor.person.firstname">
-                        </v-text-field>
+              <v-text-field
+                v-model="userEditor.person.firstname"
+                label="Prénom"
+              />
 
-                        <v-select
-                            :items="sexes"
-                            v-model="userEditor.person.sex"
-                            label="Sexe"
-                            item-text="label"
-                            item-value="id"
-                        ></v-select>
+              <v-select
+                v-model="userEditor.person.sex"
+                :items="sexes"
+                label="Sexe"
+                item-text="label"
+                item-value="id"
+              />
 
-                        <v-select
-                            :items="rootFamillies"
-                            v-model="userEditor.rootFamily"
-                            label="Maison mère"
-                            item-text="label"
-                            item-value="id"
-                        ></v-select>
-                    </v-col>
-                </v-row>
-            </v-container>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-            <v-btn color="accent" @click="saveUser()">Enregistrer</v-btn>
-            </v-card-actions>
-        </v-card>
+              <v-select
+                v-model="userEditor.rootFamily"
+                :items="rootFamillies"
+                label="Maison mère"
+                item-text="label"
+                item-value="id"
+              />
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="resetDialog()"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="saveUser()"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
 
-    <v-dialog v-model="userActivity.open" width="800px">
-        <v-card v-if="userActivity.user && userActivity.user.isActive">
-            <v-card-title class="grey lighten-4">
-                Désactiver le compte {{ userActivity.user.username }}
-            </v-card-title>
-            <p style="margin: 0 24px;">
-                Êtes vous sûr de vouloir désactiver ce compte ?
-                Il ne sera plus possible d'utiliser ce compte pour accéder au site, mais l'historique et les informations le concernant sont conservés.</p>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="userActivity.open = false">Annuler</v-btn>
-            <v-btn color="accent" @click="setUserIsActive(false)">Désactiver</v-btn>
-            </v-card-actions>
-        </v-card>
-        <v-card v-if="userActivity.user && !userActivity.user.isActive">
-            <v-card-title class="grey lighten-4">
-                Réactiver le compte {{ userActivity.user.username }}
-            </v-card-title>
-            <p style="margin: 0 24px;">
-                Êtes vous sûr de vouloir réactiver ce compte ?
-                Il ne sera à nouveau possible de l'utiliser pour accéder au site.</p>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="userActivity.open = false">Annuler</v-btn>
-            <v-btn color="accent" @click="setUserIsActive(true)">Réactiver</v-btn>
-            </v-card-actions>
-        </v-card>
+    <v-dialog
+      v-model="userActivity.open"
+      width="800px"
+    >
+      <v-card v-if="userActivity.user && userActivity.user.isActive">
+        <v-card-title class="grey lighten-4">
+          Désactiver le compte {{ userActivity.user.username }}
+        </v-card-title>
+        <p style="margin: 0 24px;">
+          Êtes vous sûr de vouloir désactiver ce compte ?
+          Il ne sera plus possible d'utiliser ce compte pour accéder au site, mais l'historique et les informations le concernant sont conservés.
+        </p>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="userActivity.open = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="setUserIsActive(false)"
+          >
+            Désactiver
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+      <v-card v-if="userActivity.user && !userActivity.user.isActive">
+        <v-card-title class="grey lighten-4">
+          Réactiver le compte {{ userActivity.user.username }}
+        </v-card-title>
+        <p style="margin: 0 24px;">
+          Êtes vous sûr de vouloir réactiver ce compte ?
+          Il ne sera à nouveau possible de l'utiliser pour accéder au site.
+        </p>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="userActivity.open = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="setUserIsActive(true)"
+          >
+            Réactiver
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-</div>
+  </div>
 </template>
 
 
@@ -334,5 +393,4 @@ export default {
     }
 };
 </script>
-
 

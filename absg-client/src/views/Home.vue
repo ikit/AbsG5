@@ -1,90 +1,127 @@
 <template>
-    <div class="home" v-cloak>
-        <v-container fluid grid-list-xl>
-            <v-layout row wrap>
-                <v-flex stretch>
-                    <Calendar></Calendar>
-                </v-flex>
+  <div
+    v-cloak
+    class="home"
+  >
+    <v-container
+      fluid
+      grid-list-xl
+    >
+      <v-layout
+        row
+        wrap
+      >
+        <v-flex stretch>
+          <Calendar />
+        </v-flex>
 
-                <v-flex shrink>
-                    <div class="immt" v-if="immt">
-                        <div>
-                            <div>
-                                <img :src="immt.src" @click="zoomOnImmt"/>
-                            </div>
-                        </div>
-                        <p>{{ immt.title }}</p>
-                    </div>
-                </v-flex>
-            </v-layout>
-            <v-layout row wrap>
+        <v-flex shrink>
+          <div
+            v-if="immt"
+            class="immt"
+          >
+            <div>
+              <div>
+                <img
+                  :src="immt.src"
+                  @click="zoomOnImmt"
+                >
+              </div>
+            </div>
+            <p>{{ immt.title }}</p>
+          </div>
+        </v-flex>
+      </v-layout>
+      <v-layout
+        row
+        wrap
+      >
+        <v-flex>
+          <v-card>
+            <v-card-title>
+              <h2>
+                Passa G
+                <v-btn
+                  text
+                  style="position: absolute; right: 15px; top: 15px;"
+                  @click.stop="displayPassagHistoryDialog()"
+                >
+                  <v-icon left>
+                    far fa-clock
+                  </v-icon>historique
+                </v-btn>
+              </h2>
+            </v-card-title>
 
-                <v-flex>
-                    <v-card>
-                        <v-card-title>
-                            <h2>Passa G
-                            <v-btn text
-                                style="position: absolute; right: 15px; top: 15px;"
-                                @click.stop="displayPassagHistoryDialog()">
-                                <v-icon left>far fa-clock</v-icon>historique
-                            </v-btn>
-
-                            </h2>
-                        </v-card-title>
-
-                        <v-list class="passage overflow-auto">
-                        <template v-for="item in passage">
-                            <v-list-item
-                                :key="item.title"
-                                ripple>
-
-                                <div class="date">{{ item.time }}</div>
-                                <template v-for="(user, i2) in item.passage">
-                                    <v-tooltip :key="i2" bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <img
-                                                :key="i2"
-                                                :src="user.avatar"
-                                                :alt="user.username"
-                                                v-on="on"
-                                                height="40px"
-                                                onError="this.src='/files/avatars/000.png';"
-                                                />
-                                        </template>
-                                        <span>{{ user.username }}</span>
-                                    </v-tooltip>
-                                </template>
-
-                            </v-list-item>
-                        </template>
-                        </v-list>
-                    </v-card>
-                </v-flex>
-
-            </v-layout>
-            <v-layout row wrap>
-                <div id="coke" data-src="/img/cube.jpg" data-depth-src="/img/cube-depth.jpg"></div>
-            </v-layout>
-        </v-container>
+            <v-list class="passage overflow-auto">
+              <template v-for="item in passage">
+                <v-list-item
+                  :key="item.title"
+                  ripple
+                >
+                  <div class="date">
+                    {{ item.time }}
+                  </div>
+                  <template v-for="(user, i2) in item.passage">
+                    <v-tooltip
+                      :key="i2"
+                      bottom
+                    >
+                      <template #activator="{ on }">
+                        <img
+                          :key="i2"
+                          :src="user.avatar"
+                          :alt="user.username"
+                          height="40px"
+                          onError="this.src='/files/avatars/000.png';"
+                          v-on="on"
+                        >
+                      </template>
+                      <span>{{ user.username }}</span>
+                    </v-tooltip>
+                  </template>
+                </v-list-item>
+              </template>
+            </v-list>
+          </v-card>
+        </v-flex>
+      </v-layout>
+      <v-layout
+        row
+        wrap
+      >
+        <div
+          id="coke"
+          data-src="/img/cube.jpg"
+          data-depth-src="/img/cube-depth.jpg"
+        />
+      </v-layout>
+    </v-container>
 
 
     <v-dialog v-model="passagHistoryDialogDisplayed">
-        <v-card>
-            <v-card-title class="grey lighten-4 py-4 title">
-            Statistiques de passa G sur l'année
-            </v-card-title>
-            <v-container grid-list-sm class="pa-4">
-                <highcharts :options="historyData"></highcharts>
-            </v-container>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="passagHistoryDialogDisplayed=false">Fermer</v-btn>
-            </v-card-actions>
-        </v-card>
+      <v-card>
+        <v-card-title class="grey lighten-4 py-4 title">
+          Statistiques de passa G sur l'année
+        </v-card-title>
+        <v-container
+          grid-list-sm
+          class="pa-4"
+        >
+          <highcharts :options="historyData" />
+        </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click="passagHistoryDialogDisplayed=false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-
-
-    </div>
+  </div>
 </template>
 
 
@@ -151,8 +188,44 @@ export default {
             }
         }
     }),
+    computed: {
+        // Méthode pour la calendrier
+        title () {
+            const { start, end } = this
+            if (!start || !end) {
+            return ''
+            }
+
+            const startMonth = this.monthFormatter(start)
+            const endMonth = this.monthFormatter(end)
+            const suffixMonth = startMonth === endMonth ? '' : endMonth
+
+            const startYear = start.year
+            const endYear = end.year
+            const suffixYear = startYear === endYear ? '' : endYear
+
+            const startDay = start.day + this.nth(start.day)
+            const endDay = end.day + this.nth(end.day)
+
+            switch (this.type) {
+            case 'month':
+                return `${startMonth} ${startYear}`
+            case 'week':
+            case '4day':
+                return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
+            case 'day':
+                return `${startMonth} ${startDay} ${startYear}`
+            }
+            return ''
+        },
+        monthFormatter () {
+            return this.$refs.calendar.getFormatter({
+            timeZone: 'UTC', month: 'long',
+            })
+        },
+    },
     watch: {
-        'menu': (val) => {
+        menu (val) {
             val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));
         },
     },
@@ -217,42 +290,6 @@ export default {
         zoomOnImmt(event) {
             store.commit('photosGalleryDisplay');
         }
-    },
-    computed: {
-        // Méthode pour la calendrier
-        title () {
-            const { start, end } = this
-            if (!start || !end) {
-            return ''
-            }
-
-            const startMonth = this.monthFormatter(start)
-            const endMonth = this.monthFormatter(end)
-            const suffixMonth = startMonth === endMonth ? '' : endMonth
-
-            const startYear = start.year
-            const endYear = end.year
-            const suffixYear = startYear === endYear ? '' : endYear
-
-            const startDay = start.day + this.nth(start.day)
-            const endDay = end.day + this.nth(end.day)
-
-            switch (this.type) {
-            case 'month':
-                return `${startMonth} ${startYear}`
-            case 'week':
-            case '4day':
-                return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
-            case 'day':
-                return `${startMonth} ${startDay} ${startYear}`
-            }
-            return ''
-        },
-        monthFormatter () {
-            return this.$refs.calendar.getFormatter({
-            timeZone: 'UTC', month: 'long',
-            })
-        },
     }
 };
 </script>

@@ -1,109 +1,185 @@
 <template>
-<div>
-    <v-timeline v-if="messages.length > 0" align-top dense style="background: none; margin: auto; max-width: 700px; width: 100%;">
-        <v-timeline-item fill-dot color="#fff" v-for="(msg, idx) in messages" :key="msg.id">
-            <template v-slot:icon>
-                <div>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <img :src="msg.poster.avatar" v-on="on" style="width: 50px;" />
-                        </template>
-                        <span>{{ msg.poster.username }} ({{ msg.dateLabel }})</span>
-                    </v-tooltip>
+  <div>
+    <v-timeline
+      v-if="messages.length > 0"
+      align-top
+      dense
+      style="background: none; margin: auto; max-width: 700px; width: 100%;"
+    >
+      <v-timeline-item
+        v-for="msg in messages"
+        :key="msg.id"
+        fill-dot
+        color="#fff"
+      >
+        <template #icon>
+          <div>
+            <v-tooltip bottom>
+              <template #activator="{ on }">
+                <img
+                  :src="msg.poster.avatar"
+                  style="width: 50px;"
+                  v-on="on"
+                >
+              </template>
+              <span>{{ msg.poster.username }} ({{ msg.dateLabel }})</span>
+            </v-tooltip>
 
-                    <div class="msgDetails" v-bind:style="{ display: $vuetify.breakpoint.lgAndUp ? 'block' : 'none' }">
-                        <span class="name">{{ msg.poster.username }}</span>
-                        <span class="date">le {{ msg.dateLabel }}</span>
-                    </div>
-                </div>
-            </template>
-            <a :id="'post_'+msg.id" :name="'post_'+msg.id" :ref="'post_'+msg.id"></a>
-            <v-card class="msg" style="padding: 0 15px">
-                <div class="msgControls">
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <a v-on="on" @click="edit(msg)">Editer</a>
-                        </template>
-                        <span>Modifier le message</span>
-                    </v-tooltip>
-                    -
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <a v-on="on" @click="supr(msg)">Supprimer</a>
-                        </template>
-                        <span>Supprimer le message</span>
-                    </v-tooltip>
-
-                </div>
-                <v-list-item-content>
-                    <div v-html="msg.text"></div>
-                </v-list-item-content>
-            </v-card>
-        </v-timeline-item>
+            <div
+              class="msgDetails"
+              :style="{ display: $vuetify.breakpoint.lgAndUp ? 'block' : 'none' }"
+            >
+              <span class="name">{{ msg.poster.username }}</span>
+              <span class="date">le {{ msg.dateLabel }}</span>
+            </div>
+          </div>
+        </template>
+        <a
+          :id="'post_'+msg.id"
+          :ref="'post_'+msg.id"
+          :name="'post_'+msg.id"
+        />
+        <v-card
+          class="msg"
+          style="padding: 0 15px"
+        >
+          <div class="msgControls">
+            <v-tooltip bottom>
+              <template #activator="{ on }">
+                <a
+                  v-on="on"
+                  @click="edit(msg)"
+                >Editer</a>
+              </template>
+              <span>Modifier le message</span>
+            </v-tooltip>
+            -
+            <v-tooltip bottom>
+              <template #activator="{ on }">
+                <a
+                  v-on="on"
+                  @click="supr(msg)"
+                >Supprimer</a>
+              </template>
+              <span>Supprimer le message</span>
+            </v-tooltip>
+          </div>
+          <v-list-item-content>
+            <div v-html="msg.text" />
+          </v-list-item-content>
+        </v-card>
+      </v-timeline-item>
     </v-timeline>
 
     <v-card
-        v-if="topicId && !isLoading && !readOnly"
-        v-bind:class="{ largeEditor: $vuetify.breakpoint.lgAndUp, compactEditor: !$vuetify.breakpoint.lgAndUp }">
-        <TextEditor ref="newMsgEditor" v-model="editorText"></TextEditor>
-        <div>
-            <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        style="margin: 5px 0 -5px 0;"
-                        v-on="on"
-                        @click="post()">
-                        Envoyer
-                    </v-btn>
-                </template>
-                <span>Poster votre nouveau message sur le forum</span>
-            </v-tooltip>
-            <v-tooltip bottom v-if="$vuetify.breakpoint.lgAndUp">
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        style="margin: 5px 0 -5px 10px;"
-                        v-on="on"
-                        @click="switchSmilies()">
-                        Smilies
-                    </v-btn>
-                </template>
-                <span>Voir les smilies</span>
-            </v-tooltip>
-        </div>
-        <VEmojiPicker v-if="displayEmojis" @select="selectEmoji" :emojisByRow="10" :showSearch="false" style="width: 100%; margin-top: 10px;">
-        </VEmojiPicker>
+      v-if="topicId && !isLoading && !readOnly"
+      :class="{ largeEditor: $vuetify.breakpoint.lgAndUp, compactEditor: !$vuetify.breakpoint.lgAndUp }"
+    >
+      <TextEditor
+        ref="newMsgEditor"
+        v-model="editorText"
+      />
+      <div>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              style="margin: 5px 0 -5px 0;"
+              v-on="on"
+              @click="post()"
+            >
+              Envoyer
+            </v-btn>
+          </template>
+          <span>Poster votre nouveau message sur le forum</span>
+        </v-tooltip>
+        <v-tooltip
+          v-if="$vuetify.breakpoint.lgAndUp"
+          bottom
+        >
+          <template #activator="{ on }">
+            <v-btn
+              style="margin: 5px 0 -5px 10px;"
+              v-on="on"
+              @click="switchSmilies()"
+            >
+              Smilies
+            </v-btn>
+          </template>
+          <span>Voir les smilies</span>
+        </v-tooltip>
+      </div>
+      <VEmojiPicker
+        v-if="displayEmojis"
+        :emojis-by-row="10"
+        :show-search="false"
+        style="width: 100%; margin-top: 10px;"
+        @select="selectEmoji"
+      />
     </v-card>
 
-    <v-dialog v-model="msgDeletion.open" width="800px">
-        <v-card v-if="msgDeletion.post">
-            <v-card-title class="grey lighten-4">
-                Supprimer le message
-            </v-card-title>
-            <p style="margin: 0 24px;">Êtes vous sûr de vouloir supprimer ce message écrit par {{ msgDeletion.post.poster.username }} le {{ msgDeletion.post.dateLabel }}?</p>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="msgDeletion.open = false">Annuler</v-btn>
-                <v-btn color="accent" @click="suprMsg()">Supprimer</v-btn>
-            </v-card-actions>
-        </v-card>
+    <v-dialog
+      v-model="msgDeletion.open"
+      width="800px"
+    >
+      <v-card v-if="msgDeletion.post">
+        <v-card-title class="grey lighten-4">
+          Supprimer le message
+        </v-card-title>
+        <p style="margin: 0 24px;">
+          Êtes vous sûr de vouloir supprimer ce message écrit par {{ msgDeletion.post.poster.username }} le {{ msgDeletion.post.dateLabel }}?
+        </p>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="msgDeletion.open = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="suprMsg()"
+          >
+            Supprimer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
 
-    <v-dialog v-model="msgEdition.open" persistent width="800px">
-        <v-card v-if="msgEdition.post">
-            <v-card-title class="grey lighten-4">
-                Modifier le message
-            </v-card-title>
-            <TextEditor style="max-height: 80vh" v-model="msgEdition.text">
-            </TextEditor>
+    <v-dialog
+      v-model="msgEdition.open"
+      persistent
+      width="800px"
+    >
+      <v-card v-if="msgEdition.post">
+        <v-card-title class="grey lighten-4">
+          Modifier le message
+        </v-card-title>
+        <TextEditor
+          v-model="msgEdition.text"
+          style="max-height: 80vh"
+        />
 
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="msgEdition.open = false">Annuler</v-btn>
-                <v-btn color="accent" @click="saveMsg()">Sauvegarder</v-btn>
-            </v-card-actions>
-        </v-card>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="msgEdition.open = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="saveMsg()"
+          >
+            Sauvegarder
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-</div>
+  </div>
 </template>
 
 <script>
@@ -257,7 +333,6 @@ export default {
                 this.msgDeletion.open = false;
             })
         },
-
 
 
 

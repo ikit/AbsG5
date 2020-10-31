@@ -1,25 +1,24 @@
 <template>
-    <div
-        class="loader"
-        @change="change"
-        @dragover="dragover"
-        @drop="drop"
-        :style="{ 'background-image': `url('${bgUrl}')` }"
-    >
-
-        <p>
-            <span v-if="bgUrl">Si vous souhaitez changer de photo;<br/></span>
-            Déposer la nouvelle photo ici, ou bien
-            <label class="browse">sélectionnez là...
-                <input
-                    id="file"
-                    class="sr-only"
-                    type="file"
-                    accept="image/*"
-                />
-            </label>
-        </p>
-    </div>
+  <div
+    class="loader"
+    :style="{ 'background-image': `url('${bgUrl}')` }"
+    @change="change"
+    @dragover="dragover"
+    @drop="drop"
+  >
+    <p>
+      <span v-if="bgUrl">Si vous souhaitez changer de photo;<br></span>
+      Déposer la nouvelle photo ici, ou bien
+      <label class="browse">sélectionnez là...
+        <input
+          id="file"
+          class="sr-only"
+          type="file"
+          accept="image/*"
+        >
+      </label>
+    </p>
+  </div>
 </template>
 
 <script>

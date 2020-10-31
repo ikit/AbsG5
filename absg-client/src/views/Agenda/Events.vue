@@ -1,5 +1,5 @@
 <template>
-    <Calendar style="min-height: 100%"></Calendar>
+  <Calendar style="min-height: 100%" />
 </template>
 
 

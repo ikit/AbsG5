@@ -1,38 +1,62 @@
 <template>
-<div>
-    <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }" style="padding: 15px">
-        <v-btn
-            icon small
-            @click="$router.push(`/forum/archives`)">
-            <v-icon>fas fa-home</v-icon>
-        </v-btn>
+  <div>
+    <div
+      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      style="padding: 15px"
+    >
+      <v-btn
+        icon
+        small
+        @click="$router.push(`/forum/archives`)"
+      >
+        <v-icon>fas fa-home</v-icon>
+      </v-btn>
 
-        <div style="display: inline-block; margin-left: 15px" v-for="(path, idx) in breadcrumb" :key="idx">
-            <router-link :to="{ path: path.url }" tag="button">
-                <v-icon left>fas fa-chevron-right</v-icon> {{ path.label }}
-            </router-link>
-        </div>
+      <div
+        v-for="(path, idx) in breadcrumb"
+        :key="idx"
+        style="display: inline-block; margin-left: 15px"
+      >
+        <router-link
+          :to="{ path: path.url }"
+          tag="button"
+        >
+          <v-icon left>
+            fas fa-chevron-right
+          </v-icon> {{ path.label }}
+        </router-link>
+      </div>
 
 
-        <v-tooltip bottom v-if="topicId && topicId > 0">
-            <template v-slot:activator="{ on }">
-                <v-btn icon small v-on="on" :color="pinned ? 'accent' : 'default'" @click.stop="switchPin()" style="margin-left: 20px">
-                    <v-icon>fas fa-thumbtack</v-icon>
-                </v-btn>
-            </template>
-            <span v-if="!pinned">Mettre le sujet en accès direct</span>
-            <span v-if="pinned">Retirer le sujet des accès direct</span>
-        </v-tooltip>
+      <v-tooltip
+        v-if="topicId && topicId > 0"
+        bottom
+      >
+        <template #activator="{ on }">
+          <v-btn
+            icon
+            small
+            :color="pinned ? 'accent' : 'default'"
+            style="margin-left: 20px"
+            v-on="on"
+            @click.stop="switchPin()"
+          >
+            <v-icon>fas fa-thumbtack</v-icon>
+          </v-btn>
+        </template>
+        <span v-if="!pinned">Mettre le sujet en accès direct</span>
+        <span v-if="pinned">Retirer le sujet des accès direct</span>
+      </v-tooltip>
 
-        <!-- <v-btn
+      <!-- <v-btn
             style="position: absolute; right: 15px; top: 10px"
             @click.stop="newTopic()">
             <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
         </v-btn> -->
     </div>
 
-    <Reader ref="messageReader"></Reader>
-</div>
+    <Reader ref="messageReader" />
+  </div>
 </template>
 
 <script>

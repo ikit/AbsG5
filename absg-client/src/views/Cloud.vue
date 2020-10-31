@@ -1,16 +1,19 @@
 <template>
-    <div>
-        <v-btn slot="activator"
-          class="ds-skinny-button"
-          depressed
-          :icon="$vuetify.breakpoint.smAndDown"
-          @click="getUserData">
-          <span v-if="$vuetify.breakpoint.mdAndUp">Load</span>
-          <v-icon v-else>{{ labels.todayIcon }}</v-icon>
-
-        </v-btn>
-        <p>{{ directoryItems }}</p>
-    </div>
+  <div>
+    <v-btn
+      slot="activator"
+      class="ds-skinny-button"
+      depressed
+      :icon="$vuetify.breakpoint.smAndDown"
+      @click="getUserData"
+    >
+      <span v-if="$vuetify.breakpoint.mdAndUp">Load</span>
+      <v-icon v-else>
+        {{ labels.todayIcon }}
+      </v-icon>
+    </v-btn>
+    <p>{{ directoryItems }}</p>
+  </div>
 </template>
 
 

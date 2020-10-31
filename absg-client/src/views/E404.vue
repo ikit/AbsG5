@@ -1,11 +1,13 @@
 <template>
-    <div>
-        <h1>404</h1>
-        <hr/>
-        <p>La page demandée n'existe pas.</p>
-        <p>N'hésitez pas à en parler à Olivier si ça vous paraît bizarre.</p>
-        <p class="token">Numéro de log <span style="color: red">{{ debugToken }}</span></p>
-    </div>
+  <div>
+    <h1>404</h1>
+    <hr>
+    <p>La page demandée n'existe pas.</p>
+    <p>N'hésitez pas à en parler à Olivier si ça vous paraît bizarre.</p>
+    <p class="token">
+      Numéro de log <span style="color: red">{{ debugToken }}</span>
+    </p>
+  </div>
 </template>
 
 

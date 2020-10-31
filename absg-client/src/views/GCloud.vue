@@ -1,11 +1,11 @@
 <template>
-    <div>
-        <h1>404</h1>
-        <hr/>
-        <p>La page demandée n'existe pas encore.</p>
-        <p>Vous trouverez ici un espace de stockage partagé entre les membres du site.</p>
-        <p>AGPA, archives et montages vidéos, documents en tout genre...</p>
-    </div>
+  <div>
+    <h1>404</h1>
+    <hr>
+    <p>La page demandée n'existe pas encore.</p>
+    <p>Vous trouverez ici un espace de stockage partagé entre les membres du site.</p>
+    <p>AGPA, archives et montages vidéos, documents en tout genre...</p>
+  </div>
 </template>
 
 

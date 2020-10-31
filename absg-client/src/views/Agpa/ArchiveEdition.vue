@@ -1,75 +1,89 @@
 <template>
-    <section id="content">
+  <section id="content">
+    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+      <v-row style="padding: 15px">
+        <v-tooltip
+          v-if="$vuetify.breakpoint.mdAndUp"
+          bottom
+        >
+          <template #activator="{ on }">
+            <v-btn
+              depressed
+              small
+              :to="{path: '/agpa/archives/' }"
+              v-on="on"
+            >
+              <v-icon left>
+                fas fa-chevron-left
+              </v-icon>
+              <span>Retour</span>
+            </v-btn>
+          </template>
+          <span>Retour au sommaire des archives</span>
+        </v-tooltip>
+        <v-tooltip
+          v-else
+          bottom
+        >
+          <template #activator="{ on }">
+            <v-btn
+              small
+              depressed
+              :to="{path: '/agpa/archives/' }"
+              v-on="on"
+            >
+              <v-icon>fas fa-chevron-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Retour au sommaire des archives</span>
+        </v-tooltip>
 
-        <div v-bind:class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-            <v-row style="padding: 15px">
-                <v-tooltip bottom v-if="$vuetify.breakpoint.mdAndUp">
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            v-on="on"
-                            depressed small
-                            :to="{path: '/agpa/archives/' }">
-                            <v-icon left>fas fa-chevron-left</v-icon>
-                            <span>Retour</span>
-                        </v-btn>
-                    </template>
-                    <span>Retour au sommaire des archives</span>
-                </v-tooltip>
-                <v-tooltip bottom v-else>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            small
-                            v-on="on"
-                            depressed
-                            :to="{path: '/agpa/archives/' }">
-                            <v-icon>fas fa-chevron-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Retour au sommaire des archives</span>
-                </v-tooltip>
+        <v-spacer />
 
-                <v-spacer></v-spacer>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              v-on="on"
+              @click="gotoNextYear(-1)"
+            >
+              <v-icon>fa-chevron-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Edition précédente</span>
+        </v-tooltip>
+        <span class="grey--text">
+          {{ year }}
+        </span>
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="isLoading"
+              v-on="on"
+              @click="gotoNextYear(1)"
+            >
+              <v-icon>fa-chevron-right</v-icon>
+            </v-btn>
+          </template>
+          <span>Edition suivante</span>
+        </v-tooltip>
 
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextYear(-1)">
-                            <v-icon>fa-chevron-left</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Edition précédente</span>
-                </v-tooltip>
-                <span class="grey--text" >
-                    {{ year }}
-                </span>
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-btn
-                            icon small
-                            v-on="on"
-                            :disabled="isLoading"
-                            @click="gotoNextYear(1)">
-                            <v-icon>fa-chevron-right</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Edition suivante</span>
-                </v-tooltip>
+        <v-spacer />
+      </v-row>
+      <v-progress-linear
+        v-if="isLoading"
+        color="accent"
+        indeterminate
+        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
+      />
+    </div>
 
-                <v-spacer></v-spacer>
-            </v-row>
-            <v-progress-linear
-                color="accent"
-                indeterminate
-                v-if="isLoading"
-                style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px">
-            </v-progress-linear>
-        </div>
-
-        <div v-if="current && agpaMeta">
-            <!-- <v-row style="margin: 15px; ">
+    <div v-if="current && agpaMeta">
+      <!-- <v-row style="margin: 15px; ">
                 <v-card width="400px">
                     classement auteurs
                 </v-card>
@@ -83,83 +97,141 @@
                 </v-card>
             </v-row> -->
 
-            <v-row v-for="catIdx of current.categoriesOrders" :key="catIdx" style="margin: 15px; margin-top: 50px; flex-wrap: nowrap;">
-                <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
-                    <img :src="`/img/agpa/cupesMaxi/c${catIdx}.png`" width="100px" style="position: absolute; top: -50px; left: 150px"/>
-                    <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
-                        <span style="font-family: 'Tangerine', serif; font-size: 2em">
-                            {{ current.categories[catIdx].title }}
-                        </span>
-                        <v-spacer></v-spacer>
-                        <v-tooltip bottom>
-                            <v-spacer></v-spacer>
-                            <template v-slot:activator="{ on }">
-                                <span v-on="on" style="line-height: 48px"><i class="far fa-user"></i> {{ current.categories[catIdx].totalUsers }}</span>
-                            </template>
-                            <span >Nombre total de participants</span>
-                        </v-tooltip>
+      <v-row
+        v-for="catIdx of current.categoriesOrders"
+        :key="catIdx"
+        style="margin: 15px; margin-top: 50px; flex-wrap: nowrap;"
+      >
+        <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+          <img
+            :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
+            width="100px"
+            style="position: absolute; top: -50px; left: 150px"
+          >
+          <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
+            <span style="font-family: 'Tangerine', serif; font-size: 2em">
+              {{ current.categories[catIdx].title }}
+            </span>
+            <v-spacer />
+            <v-tooltip bottom>
+              <v-spacer />
+              <template #activator="{ on }">
+                <span
+                  style="line-height: 48px"
+                  v-on="on"
+                ><i class="far fa-user" /> {{ current.categories[catIdx].totalUsers }}</span>
+              </template>
+              <span>Nombre total de participants</span>
+            </v-tooltip>
                         &nbsp; &nbsp;
-                        <v-tooltip bottom>
-                            <v-spacer></v-spacer>
-                            <template v-slot:activator="{ on }">
-                                <span v-on="on" style="line-height: 48px"><i class="far fa-image"></i> {{ current.categories[catIdx].totalPhotos }}</span>
-                            </template>
-                            <span >Nombre total de photos</span>
-                        </v-tooltip>
-                    </v-row>
+            <v-tooltip bottom>
+              <v-spacer />
+              <template #activator="{ on }">
+                <span
+                  style="line-height: 48px"
+                  v-on="on"
+                ><i class="far fa-image" /> {{ current.categories[catIdx].totalPhotos }}</span>
+              </template>
+              <span>Nombre total de photos</span>
+            </v-tooltip>
+          </v-row>
 
-                    <v-list>
-                        <v-simple-table dense>
-                            <template v-slot:default>
-                                <tbody>
-                                    <tr v-for="p of current.categories[catIdx].photos" :key="p.id">
-                                        <td style="text-align: left">
-                                            <span v-for="a of p.awards" :key="a">
-                                                <i v-if="a == 'diamond'" class="fas fa-circle" style="color: #c3f1ff"></i>
-                                                <i v-if="a == 'gold'" class="fas fa-circle" style="color: #c68b00"></i>
-                                                <i v-if="a == 'sylver'" class="fas fa-circle" style="color: #9b9b9b"></i>
-                                                <i v-if="a == 'bronze'" class="fas fa-circle" style="color: #964c31"></i>
-                                                <i v-if="a == 'nominated'" class="far fa-circle"></i>
-                                                <i v-if="a == 'honor'" class="far fa-smile"></i>
-                                            </span>
-                                        </td>
-                                        <td style="text-align: left">{{ p.user.username }}</td>
-                                        <td style="text-align: left">{{ p.title }}</td>
-                                    </tr>
-                                </tbody>
-                            </template>
-                        </v-simple-table>
-                    </v-list>
+          <v-list>
+            <v-simple-table dense>
+              <template #default>
+                <tbody>
+                  <tr
+                    v-for="p of current.categories[catIdx].photos"
+                    :key="p.id"
+                  >
+                    <td style="text-align: left">
+                      <span
+                        v-for="a of p.awards"
+                        :key="a"
+                      >
+                        <i
+                          v-if="a == 'diamond'"
+                          class="fas fa-circle"
+                          style="color: #c3f1ff"
+                        />
+                        <i
+                          v-if="a == 'gold'"
+                          class="fas fa-circle"
+                          style="color: #c68b00"
+                        />
+                        <i
+                          v-if="a == 'sylver'"
+                          class="fas fa-circle"
+                          style="color: #9b9b9b"
+                        />
+                        <i
+                          v-if="a == 'bronze'"
+                          class="fas fa-circle"
+                          style="color: #964c31"
+                        />
+                        <i
+                          v-if="a == 'nominated'"
+                          class="far fa-circle"
+                        />
+                        <i
+                          v-if="a == 'honor'"
+                          class="far fa-smile"
+                        />
+                      </span>
+                    </td>
+                    <td style="text-align: left">
+                      {{ p.user.username }}
+                    </td>
+                    <td style="text-align: left">
+                      {{ p.title }}
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-list>
 
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-btn
-                                v-on="on"
-                                style="margin-top: 20px"
-                                depressed
-                                :to="{path: `/agpa/archives/${year}/${catIdx}` }">
-                                <v-icon left>far fa-images</v-icon>
-                                <span v-if="$vuetify.breakpoint.mdAndUp">Gallerie</span>
-                            </v-btn>
-                        </template>
-                        <span>Voir les photos de la catégorie {{current.categories[catIdx].title}} </span>
-                    </v-tooltip>
-                </v-card>
-                <div style="overflow: hidden; display: flex; width: 100%;">
-                    <div v-for="photo of current.categories[catIdx].photos" :key="photo.id" style="display: inline-block; width: 250px; height: 250px; margin: auto;">
-                        <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <img class="thumb" v-on="on" :src="photo.thumb" @click="photosGalleryDisplay(photo.idx)"/>
-                                </template>
-                                <span>{{ photo.username }} - {{ photo.title }}</span>
-                            </v-tooltip>
-                        </div>
-                    </div>
-                </div>
-            </v-row>
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn
+                style="margin-top: 20px"
+                depressed
+                :to="{path: `/agpa/archives/${year}/${catIdx}` }"
+                v-on="on"
+              >
+                <v-icon left>
+                  far fa-images
+                </v-icon>
+                <span v-if="$vuetify.breakpoint.mdAndUp">Gallerie</span>
+              </v-btn>
+            </template>
+            <span>Voir les photos de la catégorie {{ current.categories[catIdx].title }} </span>
+          </v-tooltip>
+        </v-card>
+        <div style="overflow: hidden; display: flex; width: 100%;">
+          <div
+            v-for="photo of current.categories[catIdx].photos"
+            :key="photo.id"
+            style="display: inline-block; width: 250px; height: 250px; margin: auto;"
+          >
+            <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <img
+                    class="thumb"
+                    :src="photo.thumb"
+                    v-on="on"
+                    @click="photosGalleryDisplay(photo.idx)"
+                  >
+                </template>
+                <span>{{ photo.username }} - {{ photo.title }}</span>
+              </v-tooltip>
+            </div>
+          </div>
         </div>
-    </section>
+      </v-row>
+    </div>
+  </section>
 </template>
 
 
@@ -184,13 +256,13 @@ export default {
             'photosGallery',
         ])
     },
-    mounted () {
-        this.initView();
-    },
     watch: {
         $route(to, from) {
             this.initView();
         }
+    },
+    mounted () {
+        this.initView();
     },
     methods: {
         initView() {

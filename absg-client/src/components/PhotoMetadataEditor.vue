@@ -1,66 +1,68 @@
 <template>
-    <v-card dark>
-        <v-form style="text-align: left">
-            <p style="font-familly: monospace; line-height: 35px; font-size: 20px;">
-                <v-icon style="vertical-align: middle">fas fa-info-circle</v-icon> ID: {{ photo.folder }} {{ photo.id }}
-            </p>
+  <v-card dark>
+    <v-form style="text-align: left">
+      <p style="font-familly: monospace; line-height: 35px; font-size: 20px;">
+        <v-icon style="vertical-align: middle">
+          fas fa-info-circle
+        </v-icon> ID: {{ photo.folder }} {{ photo.id }}
+      </p>
 
-            <v-textarea
-                v-model="photo.comment"
-                label="Commentaire"
-                prepend-icon="fas fa-pen"
-                rows="1"
-                auto-grow
-            ></v-textarea>
+      <v-textarea
+        v-model="photo.comment"
+        label="Commentaire"
+        prepend-icon="fas fa-pen"
+        rows="1"
+        auto-grow
+      />
 
-            <v-text-field
-                v-model="photo.date"
-                label="Date"
-                :rules="photosEditorRules.date"
-                placeholder="YYYY-MM-DD HH:mm"
-                prepend-icon="far fa-calendar-alt"
-                validate-on-blur
-            ></v-text-field>
+      <v-text-field
+        v-model="photo.date"
+        label="Date"
+        :rules="photosEditorRules.date"
+        placeholder="YYYY-MM-DD HH:mm"
+        prepend-icon="far fa-calendar-alt"
+        validate-on-blur
+      />
 
-            <v-combobox
-                v-model="photo.persons"
-                :items="persons"
-                label="Personnes"
-                prepend-icon="fas fa-user"
-                multiple
-                small-chips
-                deletable-chips
-                auto-select-first
-            ></v-combobox>
+      <v-combobox
+        v-model="photo.persons"
+        :items="persons"
+        label="Personnes"
+        prepend-icon="fas fa-user"
+        multiple
+        small-chips
+        deletable-chips
+        auto-select-first
+      />
 
-            <v-combobox
-                v-model="photo.place"
-                :items="places"
-                label="Lieux"
-                prepend-icon="fas fa-map-marker-alt"
-                @change="onSelectPlace($event)"
-            ></v-combobox>
+      <v-combobox
+        v-model="photo.place"
+        :items="places"
+        label="Lieux"
+        prepend-icon="fas fa-map-marker-alt"
+        @change="onSelectPlace($event)"
+      />
 
-            <v-text-field
-                v-model="photo.gps"
-                placeholder="Position GPS"
-                style="padding: 0; margin-left: 34px; margin-top: 0;"
-            ></v-text-field>
+      <v-text-field
+        v-model="photo.gps"
+        placeholder="Position GPS"
+        style="padding: 0; margin-left: 34px; margin-top: 0;"
+      />
 
 
-            <div style="text-align: center">
-                <v-btn
-                    color="accent"
-                    style="margin-top: 30px"
-                    @click="savePhotoMetadata()"
-                >
-                <v-icon>fas fa-save</v-icon>
-                    &nbsp; Enregistrer et suivante &nbsp;
-                <v-icon>fas fa-chevron-right</v-icon>
-                </v-btn>
-            </div>
-        </v-form>
-    </v-card>
+      <div style="text-align: center">
+        <v-btn
+          color="accent"
+          style="margin-top: 30px"
+          @click="savePhotoMetadata()"
+        >
+          <v-icon>fas fa-save</v-icon>
+          &nbsp; Enregistrer et suivante &nbsp;
+          <v-icon>fas fa-chevron-right</v-icon>
+        </v-btn>
+      </div>
+    </v-form>
+  </v-card>
 </template>
 
 <script>
@@ -69,11 +71,15 @@ import store from '../store';
 import { format } from "date-fns";
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { el } from 'date-fns/locale';
+import { Photo } from '../model';
 
 export default {
     name: 'PhotoMetadataEditor',
     props: {
-        photo: null
+        photo: {
+            type: Photo,
+            required: true
+        }
     },
     data: () => ({
         persons: [],
@@ -108,6 +114,7 @@ export default {
     },
     methods: {
         onSelectPlace(placeName) {
+
             const elt = this.placesData.find(e => e.name === placeName);
             if (elt) {
                 this.photo.gps = elt.gps;

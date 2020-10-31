@@ -1,110 +1,161 @@
 <template>
-<div>
+  <div>
     <v-container>
-        <v-card>
-            <v-card-title>
-                <v-text-field
-                    v-model="filter.search"
-                    prepend-icon="fas fa-search"
-                    label="Rechercher"
-                    single-line
-                    hide-details
-                ></v-text-field>
-                <v-spacer></v-spacer>
-                <v-btn v-if="$vuetify.breakpoint.lgAndUp" @click="resetDialog(true)">
-                    <v-icon left>fa-plus</v-icon>
-                    Nouveau lieu
-                </v-btn>
-                <v-btn v-else fab small @click.stop="resetDialog(true)">
-                    <v-icon>fas fa-plus</v-icon>
-                </v-btn>
-            </v-card-title>
-            <v-data-table
-                :headers="headers"
-                :items="places"
-                :search="filter.search"
-                :loading="isLoading"
-                loading-text="Récupération des données..."
-                no-data-text="Aucun lieu enregistré dans l'annuaire."
-                no-results-text="Aucun lieu trouvé."
-                disable-sort
+      <v-card>
+        <v-card-title>
+          <v-text-field
+            v-model="filter.search"
+            prepend-icon="fas fa-search"
+            label="Rechercher"
+            single-line
+            hide-details
+          />
+          <v-spacer />
+          <v-btn
+            v-if="$vuetify.breakpoint.lgAndUp"
+            @click="resetDialog(true)"
+          >
+            <v-icon left>
+              fa-plus
+            </v-icon>
+            Nouveau lieu
+          </v-btn>
+          <v-btn
+            v-else
+            fab
+            small
+            @click.stop="resetDialog(true)"
+          >
+            <v-icon>fas fa-plus</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-data-table
+          :headers="headers"
+          :items="places"
+          :search="filter.search"
+          :loading="isLoading"
+          loading-text="Récupération des données..."
+          no-data-text="Aucun lieu enregistré dans l'annuaire."
+          no-results-text="Aucun lieu trouvé."
+          disable-sort
+        >
+          <template #[`item.name`]="{ item }">
+            <div
+              v-if="item.thumb && $vuetify.breakpoint.lgAndUp"
+              class="thumb"
             >
-                <template v-slot:item.name="{ item }">
-                    <div v-if="item.thumb && $vuetify.breakpoint.lgAndUp" class="thumb">
-                        <img :src="item.thumb" @click="photosGalleryDisplay(item.galleryIndex)"/>
-                        </div>
-                    <div v-if="!item.thumb && $vuetify.breakpoint.lgAndUp" class="noThumb">
-                        <v-icon small>fas fa-home</v-icon>
-                    </div>
-                    <span style="font-weight: bold">{{ item.name }}</span>
-                </template>
+              <img
+                :src="item.thumb"
+                @click="photosGalleryDisplay(item.galleryIndex)"
+              >
+            </div>
+            <div
+              v-if="!item.thumb && $vuetify.breakpoint.lgAndUp"
+              class="noThumb"
+            >
+              <v-icon small>
+                fas fa-home
+              </v-icon>
+            </div>
+            <span style="font-weight: bold">{{ item.name }}</span>
+          </template>
 
-                <template v-slot:item.actions="{ item }">
-
-                    <v-icon small class="mr-2" v-if="item.virtualVisitUrl" @click="openVirtualVisit(item)">
-                        fas fa-eye
-                    </v-icon>
-                    <v-icon small class="mr-2" @click="openMap(item)">
-                        fas fa-map-marker-alt
-                    </v-icon>
-                    <v-icon small class="mr-2" @click="editPlace(item)">
-                        fa-pen
-                    </v-icon>
-                </template>
-            </v-data-table>
-        </v-card>
+          <template #[`item.actions`]="{ item }">
+            <v-icon
+              v-if="item.virtualVisitUrl"
+              small
+              class="mr-2"
+              @click="openVirtualVisit(item)"
+            >
+              fas fa-eye
+            </v-icon>
+            <v-icon
+              small
+              class="mr-2"
+              @click="openMap(item)"
+            >
+              fas fa-map-marker-alt
+            </v-icon>
+            <v-icon
+              small
+              class="mr-2"
+              @click="editPlace(item)"
+            >
+              fa-pen
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-card>
     </v-container>
 
 
-    <v-dialog v-model="placeEditor.open" width="800px">
-        <v-card>
-            <v-card-title class="grey lighten-4">
-                {{ placeEditor.id ? `Modifier les informations du lieux ${placeEditor.name}` : "Nouveau lieu" }}
-            </v-card-title>
+    <v-dialog
+      v-model="placeEditor.open"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          {{ placeEditor.id ? `Modifier les informations du lieux ${placeEditor.name}` : "Nouveau lieu" }}
+        </v-card-title>
 
-            <v-container grid-list-sm class="pa-4">
-                <v-row>
-                    <v-col>
-                        <v-text-field
-                            label="Nom d'usage"
-                            prepend-icon="fas fa-home"
-                            v-model="placeEditor.name">
-                        </v-text-field>
+        <v-container
+          grid-list-sm
+          class="pa-4"
+        >
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="placeEditor.name"
+                label="Nom d'usage"
+                prepend-icon="fas fa-home"
+              />
 
-                        <v-text-field
-                            label="Adresse complète"
-                            prepend-icon="fas fa-map-marked-alt"
-                            v-model="placeEditor.address">
-                        </v-text-field>
+              <v-text-field
+                v-model="placeEditor.address"
+                label="Adresse complète"
+                prepend-icon="fas fa-map-marked-alt"
+              />
 
-                        <v-text-field
-                            label="Coordonnées GPS"
-                            style="margin-left: 33px;"
-                            v-model="placeEditor.gps">
-                        </v-text-field>
+              <v-text-field
+                v-model="placeEditor.gps"
+                label="Coordonnées GPS"
+                style="margin-left: 33px;"
+              />
 
-                        <v-text-field
-                            label="Téléphone fixe"
-                            prepend-icon="fas fa-phone"
-                            v-model="placeEditor.phone">
-                        </v-text-field>
-                    </v-col>
+              <v-text-field
+                v-model="placeEditor.phone"
+                label="Téléphone fixe"
+                prepend-icon="fas fa-phone"
+              />
+            </v-col>
 
-                    <v-col>
-                        <ImageEditor ref="imgEditor" style="height: 300px; position: relative"/>
-
-
-                    </v-col>
-                </v-row>
-            </v-container>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text color="primary" @click="resetDialog()">Annuler</v-btn>
-            <v-btn color="accent" @click="savePlace()">Enregistrer</v-btn>
-            </v-card-actions>
-        </v-card>
+            <v-col>
+              <ImageEditor
+                ref="imgEditor"
+                style="height: 300px; position: relative"
+              />
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="resetDialog()"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="savePlace()"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
-</div>
+  </div>
 </template>
 
 

@@ -19,7 +19,8 @@ if (process.env.NODE_ENV === 'production') {
             console.debug('New content is downloading.');
         },
         updated () {
-            console.debug('New content is available; please refresh.');
+            alert('Une nouvelle version du site est disponible et va être installé. Merci de recharger la page.');
+            setTimeout(() => window.location.reload(), 1000)
         },
         offline () {
             console.debug('No internet connection found. App is running in offline mode.');
