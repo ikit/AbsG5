@@ -1,8 +1,8 @@
 module.exports = {
-    transpileDependencies: ['vuetify'],
+    transpileDependencies: ["vuetify"],
     lintOnSave: false,
     devServer: {
-        proxy: 'http://localhost:5010',
+        proxy: "http://localhost:5010",
         overlay: {
           warnings: true,
           errors: true
