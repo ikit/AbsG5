@@ -7,6 +7,7 @@ import * as fs from "fs";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { BadRequestError } from "routing-controllers";
 import { websocketService, WSMessageType } from "./WebsocketService";
+import { logger, errorLogHandler, accessLogHandler } from "../middleware/logger";
 
 class ForumService {
     private forumRepo = null;
@@ -182,18 +183,17 @@ class ForumService {
      * @param user l'utilisateur qui fait la demande
      */
     async savePost(data: any, user: any) {
-        console.log("SAVE POST", data);
         let msg = null;
-        if (data.id) {
+        if (data.postId) {
             // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
-            msg = await this.msgRepo.findOne({ where: { id: data.id } });
+            msg = await this.msgRepo.findOne({ where: { id: data.postId } });
         }
         if (!msg) {
             msg = new ForumMessage();
         }
         // On met à jour le message
         msg.text = data.text;
-        msg.datetime = new Date();
+        msg.datetime = !data.postId ? new Date() : msg.datetime;
         msg.poster = user;
         msg.forum = await this.forumRepo.findOne({ where: { id: data.forumId } });
         msg.topic = await this.topicRepo.findOne({ where: { id: data.topicId } });
@@ -220,7 +220,6 @@ class ForumService {
             }
         }
         await this.msgRepo.save(msg);
-        console.log("MESSAGE TO SAVE", msg);
 
         // On met à jour le sujet et forum
         if (msg.topic) {

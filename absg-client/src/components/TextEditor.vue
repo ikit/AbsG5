@@ -56,8 +56,12 @@ export default {
                 this.$emit('change', this.value);
             });
         },
-        reset() {
-            this.$refs.editor.editor.clearContent();
+        reset(value = null) {
+            if (value) {
+                this.$refs.editor.editor.setContent(value);
+            } else {
+                this.$refs.editor.editor.clearContent();
+            }
         },
         elementFromString(value) {
             const element = document.createElement('div');

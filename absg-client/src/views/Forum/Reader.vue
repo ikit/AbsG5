@@ -79,7 +79,7 @@
     >
       <TextEditor
         ref="newMsgEditor"
-        v-model="editorText"
+        v-model="newMessageText"
       />
       <div>
         <v-tooltip bottom>
@@ -150,17 +150,18 @@
     </v-dialog>
 
     <v-dialog
-      v-model="msgEdition.open"
+      v-model="editMessageDisplayed"
       persistent
       width="800px"
     >
-      <v-card v-if="msgEdition.post">
+      <v-card>
         <v-card-title class="grey lighten-4">
           Modifier le message
         </v-card-title>
         <TextEditor
-          v-model="msgEdition.text"
-          style="max-height: 80vh"
+            ref="msgEditor"
+            v-model="editMessageText"
+            style="max-height: 80vh"
         />
 
         <v-card-actions>
@@ -168,7 +169,7 @@
           <v-btn
             text
             color="primary"
-            @click="msgEdition.open = false"
+            @click="editMessageDisplayed = null"
           >
             Annuler
           </v-btn>
@@ -219,14 +220,13 @@ export default {
     data: () => ({
         isLoading: false,
         messages: [],
-        editorText: "",
+        newMessageText: "", // text de l'éditeur de nouveau message
         displayEmojis: false,
 
-        msgEdition: {
-            open: false, // si oui ou non la boite de dialogue pour éditer un message est affichée
-            id: null, // l'ID du message
-            text: "", // le texte du message
-        },
+        editMessageDisplayed: false, // affichage ou non de l'éditeur de message
+        editMessageText: "", // text de l'éditeur de message déjà existant
+        editMessageId: null, // l'identifiant du message en cours d'édition
+
         msgDeletion: {
             open: false, // si oui ou non la boite de dialogue pour confirmer la suppression d'un message est affichée
             post: null, // le message à supprimer
@@ -249,7 +249,6 @@ export default {
         },
 
         initTopic(data) {
-            console.log(data)
             if (data.topic) {
                 this.topicId = data.topic.id;
                 this.forumId = data.topic.forum.id;
@@ -275,7 +274,7 @@ export default {
             const formData = new FormData();
             formData.append("forumId", this.forumId ? this.forumId : 2);
             formData.append("topicId", this.topicId ? this.topicId : null);
-            formData.append("text", this.editorText);
+            formData.append("text", this.newMessageText);
             axios.post(`/api/forum/post`, formData, {
                 headers: {
                     "Content-Type" : "multipart/form-data",
@@ -294,8 +293,8 @@ export default {
             const formData = new FormData();
             formData.append("forumId", this.forumId ? this.forumId : 2);
             formData.append("topicId", this.topicId ? this.topicId : null);
-            formData.append("postId", this.msgEdition.post.id);
-            formData.append("text", this.msgEdition.post.text);
+            formData.append("postId", this.editMessageId);
+            formData.append("text", this.editMessageText);
             axios.post(`/api/forum/post`, formData, {
                 headers: {
                     "Content-Type" : "multipart/form-data",
@@ -307,7 +306,8 @@ export default {
                 if (idx >= 0) {
                     this.messages[idx] = editedPost;
                 }
-                this.$refs.newMsgEditor.reset();
+                this.$refs.msgEditor.reset();
+                this.editMessageDisplayed = false;
             })
             .catch( err => {
                 store.commit('onError', err);
@@ -315,10 +315,10 @@ export default {
         },
 
         edit(msg) {
-            this.msgEdition.post = msg;
-            this.msgEdition.text = "";
-            this.msgEdition.open = true;
-            setTimeout(() => this.msgEdition.text = msg.text);
+            this.editMessageDisplayed = true;
+            this.editMessageId = msg.id;
+            this.editMessageText = msg.text;
+            setTimeout(() => this.$refs.msgEditor.reset(msg.text));
         },
 
         supr(msg) {
