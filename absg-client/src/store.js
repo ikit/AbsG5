@@ -86,7 +86,7 @@ export default new Vuex.Store({
                     datetime: new Date(e.datetime),
                     dateLabel: format(new Date(e.datetime), "dd MMM h'h'mm", {locale: fr}),
                     url: getPeopleAvatar(e).url,
-                    read: new Date(e.datetime).getTime() < new Date(2020, 4, 5).getTime(), // TODO: state.user.lastActivity
+                    read: e.read
                 };
             }));
             state.unreadNotifications = state.notifications.filter(e => !e.read ).length;
@@ -96,14 +96,17 @@ export default new Vuex.Store({
                 n.read = true;
             }
             state.unreadNotifications = 0;
+            // On notifie le back de marquer comme lu cette notification pour l'utilisateur
+            axios.get(`/api/markAsRead/all`);
         },
         readNotification(state, notification) {
             //const t = notification.datetime.getTime();
             const idx = state.notifications.findIndex( e => e.datetime === notification.datetime)
             if (idx > -1) {
-
                 state.notifications[idx].read = true;
                 state.unreadNotifications -= 1;
+                // On notifie le back de marquer comme lu cette notification pour l'utilisateur
+                axios.get(`/api/markAsRead/${notification.id}`);
             }
         },
 

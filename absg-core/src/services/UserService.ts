@@ -177,19 +177,39 @@ L'équipe système`,
             WHERE severity = 'notice'
             ORDER BY l.datetime DESC
             LIMIT 50`;
-        return getRepository(LogPassag).query(sql);
+        const notifs = await getRepository(LogPassag).query(sql);
+        const notReads = user.activity.unreadNotifications;
+        for (const n of notifs) {
+            if (new Date(n.datetime) > user.lastTime && n.userId != user.id && notReads.indexOf(n.id) === -1) {
+                n.read = false;
+                notReads.push(n);
+            } else {
+                n.read = true;
+            }
+        }
+        user.activity.unreadNotifications = notReads;
+        await this.usersRepo.save(user);
+
+        return notifs;
     }
 
     /**
-     * Valide les notifications "vues" par l'utilisateur en mettant à jour sa date de "dernière vue"
+     * Marque comme lu une notification pour l'utilisateur donné
+     * @param notifId l'identifiant de la notification
+     * @param user l'utilisateur concerné
      */
-    public async checkNotifications(userId: number) {
-        const user = await this.usersRepo.get(userId);
-        if (user) {
-            user.lastActivity = new Date();
-            this.usersRepo.save(user);
-        }
-        return new Date();
+    markAsRead(notifId: number, user: User) {
+        user.activity.unreadNotifications = user.activity.unreadNotifications.filter(id => id != notifId);
+        this.usersRepo.save(user);
+    }
+
+    /**
+     * Marque comme lu toutes les notifications pour l'utilisateur donné
+     * @param user l'utilisateur concerné
+     */
+    markAllAsRead(user: User) {
+        user.activity.unreadNotifications = [];
+        this.usersRepo.save(user);
     }
 
     /**

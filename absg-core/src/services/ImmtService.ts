@@ -113,7 +113,7 @@ class ImmtService {
             throw new BadRequestError(`Immt was not found.`);
         }
 
-        logger.notice(`Immage immt ${year}_${day} supprimé par ${user.username}`, {
+        logger.notice(`Image du moment ${year}_${day} supprimé par ${user.username}`, {
             userId: user.id,
             module: LogModule.photos
         });

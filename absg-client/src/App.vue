@@ -220,7 +220,7 @@
       <router-view
         :socket="ws"
         style="min-height: 100%"
-        :style="{ 'padding-left': $vuetify.breakpoint.lgAndUp ? '85px' : '0' }"
+        :style="{ 'margin-left': $vuetify.breakpoint.lgAndUp ? '85px' : '0' }"
       />
       <div
         v-if="user && user.id > 0 && photosGalleryDisplayed"
@@ -441,7 +441,7 @@
           <pre><span style="font-weight: bold">Date:    </span> {{ error.log }}</pre>
           <pre><span style="font-weight: bold">Requête: </span> {{ error.query ? error.query : "-" }}</pre>
           <pre><span style="font-weight: bold">Status:  </span> {{ error.htmlError ? error.htmlError : "-" }}</pre>
-          <pre style="border: 1px solid #999; margin-top: 10px; padding: 5px">{{ error.msg ? error.msg : "Aucune information sur l'erreur :(" }}</pre>
+          <pre style="border: 1px solid #999; margin-top: 10px; padding: 5px; white-space: pre-line;">{{ error.msg ? error.msg : "Aucune information sur l'erreur :(" }}</pre>
         </v-container>
         <v-card-actions>
           <v-btn

@@ -18,7 +18,6 @@
       </ul>
       <p>Bug corrigés</p>
       <ul>
-        <li>Impossible de sortir de l'écran d'authentification</li>
       </ul>
     </v-card>
 
@@ -34,7 +33,8 @@
       <p>Bug corrigés</p>
       <ul>
         <li>Stabilisation de l'application</li>
-        <li>Limite d'upload de fichier monté à 200Mo</li>
+        <li>Impossible de sortir de l'écran d'authentification</li>
+        <li>Limite d'upload des fichiers montée à 200Mo</li>
       </ul>
     </v-card>
 

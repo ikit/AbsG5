@@ -1,5 +1,5 @@
 import { getRepository } from "typeorm";
-import { JsonController, Post, Body, Get, Authorized, CurrentUser } from "routing-controllers";
+import { JsonController, Post, Body, Get, Authorized, CurrentUser, Param } from "routing-controllers";
 import { citationService, immtService, userService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
@@ -101,6 +101,31 @@ export class UserController {
         return new Error("Vous n'avez pas les droits suffisant pour modifier les paramètres du site");
     }
 
+    /**
+     * Marque comme lu une notification pour l'utilisateur donné
+     * @param notifId l'identifiant de la notification
+     * @param user l'utilisateur concerné
+     */
+    @Get("/markAsRead/all")
+    markAllAsRead(@CurrentUser() user: User) {
+        userService.markAllAsRead(user);
+        return true;
+    }
+
+    /**
+     * Marque comme lu une notification pour l'utilisateur donné
+     * @param notifId l'identifiant de la notification
+     * @param user l'utilisateur concerné
+     */
+    @Get("/markAsRead/:noifId([0-9]+)")
+    markAsRead(@Param("notifId") notifId: number, @CurrentUser() user: User) {
+        userService.markAsRead(notifId, user);
+        return true;
+    }
+
+    /**
+     * 
+     */
     @Get("/testA")
     async testA() {
         const d0 = new Date();

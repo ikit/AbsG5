@@ -1,46 +1,27 @@
 <template>
-  <div>
-    <v-tabs
-      v-model="activeTab"
-      centered
-    >
-      <v-tab :to="{path: `/forum/tbz`}">
-        <v-badge
-          right
-          color="accent"
-          :value="tbzNnewMessages"
-        >
-          <template #badge>
-            <span>{{ tbzNnewMessages }}</span>
-          </template>
-          <v-icon left>
-            far fa-comment-dots
-          </v-icon> T.B.Z.
-        </v-badge>
-      </v-tab>
-      <v-tab
-        v-for="t in topics"
-        :key="t.forumId"
-        :to="{path: `/forum/read/${t.id}`}"
-      >
-        <v-badge
-          right
-          color="accent"
-          :value="t.newMessages ? t.newMessages : 0"
-        >
-          <template #badge>
-            <span>{{ t.newMessages }}</span>
-          </template>
-          <v-icon left>
-            far fa-comment-dots
-          </v-icon> {{ t.name }}
-        </v-badge>
-      </v-tab>
-      <v-tab :to="{path: `/forum/browse`}">
-        <v-icon left>
-          fas fa-archive
-        </v-icon> Forums
-      </v-tab>
+<div>
+    <v-tabs centered v-model="activeTab" class="fixed-tabs-bar">
+        <v-tab :to="{path: `/forum/tbz`}">
+            <template >
+                <v-badge right color="accent" :value="tbzNnewMessages">
+                    <template v-slot:badge>
+                        <span>{{ tbzNnewMessages }}</span>
+                    </template>
+                    <v-icon left>far fa-comment-dots</v-icon> T.B.Z.
+                </v-badge>
+            </template>
+        </v-tab>
+        <v-tab v-for="t in topics" :key="t.forumId" :to="{path: `/forum/read/${t.id}`}">
+            <template >
+                <v-badge right color="accent" :value="t.newMessages ? t.newMessages : 0">
+                    <template v-slot:badge>
+                        <span>{{ t.newMessages}}</span>
+                    </template>
+                    <v-icon left>far fa-comment-dots</v-icon> {{ t.name }}
+                </v-badge>
+            </template>
+        </v-tab>
+        <v-tab :to="{path: `/forum/browse`}"> <v-icon left>fas fa-archive</v-icon> Forums</v-tab>
     </v-tabs>
 
     <router-view />
