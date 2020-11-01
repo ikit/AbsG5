@@ -18,8 +18,8 @@ if (process.env.NODE_ENV === "production") {
             console.debug("New content is downloading.");
         },
         updated () {
-            let confirmationResult = confirm("Une nouvelle version du site est disponible. Voulez-vous recharger la page.")
-            if (confirmationResult) registration.waiting.postMessage({action: "skipWaiting"})
+            confirm("Une nouvelle version du site est disponible. Merci de recharger la page.")
+            window.location.reload();
         },
         offline () {
             console.debug("No internet connection found. App is running in offline mode.");
@@ -28,12 +28,4 @@ if (process.env.NODE_ENV === "production") {
             console.debug("Error during service worker registration:", error);
         }
     });
-
-    // On s'abonne au changement de service worker pour forcer le rechargement de la page
-    let refreshing
-    navigator.serviceWorker.addEventListener("controllerchange", e => {
-        if (refreshing) return
-        window.location.reload()
-        refreshing = true
-    })
 }
