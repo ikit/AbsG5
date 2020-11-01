@@ -7,5 +7,11 @@ module.exports = {
           warnings: true,
           errors: true
         }
+    },
+    pwa: {
+        workboxPluginMode: "InjectManifest",
+        workboxOptions: {
+            swSrc: "src/service-worker.js"
+        }
     }
 };
