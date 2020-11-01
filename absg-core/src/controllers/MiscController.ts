@@ -122,21 +122,4 @@ export class UserController {
         userService.markAsRead(notifId, user);
         return true;
     }
-
-    /**
-     *
-     */
-    @Get("/testA")
-    async testA() {
-        const d0 = new Date();
-        const e0 = new Date(2020, 10, 10);
-        return {
-            d0,
-            d1: d0.toUTCString(),
-            d2: d0.toLocaleString(),
-            e0,
-            e1: e0.toUTCString(),
-            e2: e0.toLocaleString()
-        };
-    }
 }

@@ -4,6 +4,13 @@ import * as nodemailer from "nodemailer";
 import { logger } from "./logger";
 
 /**
+ * Async sleep method
+ */
+export function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Supprime tout les caractères spéciaux d'une chaîne de caractère
  * (ne fonctionne qu'avec l'alphabet "latin")
  * @param str la chaine de caractère à "nettoyer"

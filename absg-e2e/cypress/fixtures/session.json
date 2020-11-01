@@ -1,5 +1,5 @@
 {
-    "user": "test",
+    "user": "test-01",
     "pwd": "test",
     "api": "http://localhost:5010/api",
     "url": "http://localhost:8080"

@@ -23,9 +23,15 @@ describe("Authentification", () => {
     });
 
     it("Erreur d'authentification", () => {
-        cy.get("[data-cy='password']").clear().type("testpassword{enter}");
+        const session = require("../fixtures/session.json");
+        cy.get("[data-cy='password']").clear().type("testpassword");
+        cy.contains("Se connecter").click();
         cy.contains("Une erreur s'est produite");
-        cy.contains("Mauvais identifiant ou mot de passe");
+        cy.contains("Mauvais identifiant");
+        cy.contains("OK").click();
+        cy.get("[data-cy='username']").clear().type(session.user);
+        cy.contains("Se connecter").click();
+        cy.contains("Mauvais mot de passe");
         cy.contains("OK").click();
     });
 

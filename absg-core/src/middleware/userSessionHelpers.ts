@@ -95,9 +95,9 @@ export function checkRoles(userRoles: string[], authorizedRoles: string[]) {
 /**
  * Met à jours les données de l'utilisateur et retourne l'utilisateur modifié
  * @param url la nouvelle activité à mettre à jour
+ * @param urser l'utilisateur à modifier
  */
 export async function setLastActivity(user: User, url: string) {
-    console.log("setLastActivity", url);
     // En fonction de l'url on détermine un label "user friendly"
     let label = ACTIONS_LABELS.find(e => url.indexOf(e.route) > -1) as any;
     label = label ? label.label : null;
