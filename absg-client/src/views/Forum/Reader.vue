@@ -1,5 +1,7 @@
 <template>
   <div>
+
+
     <v-timeline
       v-if="messages.length > 0"
       align-top
@@ -12,10 +14,10 @@
         fill-dot
         color="#fff"
       >
-        <template #icon>
+        <template v-slot:icon>
           <div>
             <v-tooltip bottom>
-              <template #activator="{ on }">
+              <template v-slot:activator="{ on }">
                 <img
                   :src="msg.poster.avatar"
                   style="width: 50px;"
@@ -45,7 +47,7 @@
         >
           <div class="msgControls">
             <v-tooltip bottom>
-              <template #activator="{ on }">
+              <template v-slot:activator="{ on }">
                 <a
                   v-on="on"
                   @click="edit(msg)"
@@ -55,7 +57,7 @@
             </v-tooltip>
             -
             <v-tooltip bottom>
-              <template #activator="{ on }">
+              <template v-slot:activator="{ on }">
                 <a
                   v-on="on"
                   @click="supr(msg)"
@@ -81,7 +83,7 @@
       />
       <div>
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template v-slot:activator="{ on }">
             <v-btn
               style="margin: 5px 0 -5px 0;"
               v-on="on"
@@ -96,7 +98,7 @@
           v-if="$vuetify.breakpoint.lgAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template v-slot:activator="{ on }">
             <v-btn
               style="margin: 5px 0 -5px 10px;"
               v-on="on"
@@ -188,7 +190,7 @@ import store from '../../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
 import TextEditor from '../../components/TextEditor.vue';
-import VEmojiPicker from 'v-emoji-picker';
+import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
 
 export default {
     name: 'Reader',
@@ -253,7 +255,10 @@ export default {
                 this.forumId = data.topic.forum.id;
             }
             this.messages = data.posts;
-            setTimeout(() => location.hash = "#post_" + this.messages[this.messages.length - 1].id);
+            // Si le sujet possède des messages, on scroll automatiquement à la fin de la discussion
+            if (this.messages.length > 0) {
+                setTimeout(() => location.hash = "#post_" + this.messages[this.messages.length - 1].id);
+            }
         },
 
         // On affiche ou masque les smilies

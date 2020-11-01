@@ -124,7 +124,7 @@ export class UserController {
     }
 
     /**
-     * 
+     *
      */
     @Get("/testA")
     async testA() {

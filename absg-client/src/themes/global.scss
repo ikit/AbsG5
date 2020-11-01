@@ -59,11 +59,10 @@ h1 {
 }
 
 @font-face {
-    font-family: NotomojiColor;
+    font-family: "NotomojiColor";
     font-weight: 400;
-    src: url(
-        https://cdn.glitch.com/61908de1-dd0a-4359-a54b-6cb6d41bb5fd%2FNotoColorEmoji.ttf?1513108808150
-      )format("truetype");
+    font-display: swap;
+    src: url(https://cdn.glitch.com/61908de1-dd0a-4359-a54b-6cb6d41bb5fd%2FNotoColorEmoji.ttf?1513108808150) format("truetype");
 }
 
 .v-tabs {
