@@ -139,7 +139,6 @@ export default {
     methods: {
         init() {
             this.isLoading = false;
-            console.log(this.agpaMeta)
             for (const i = 0; i< 5; i++) {
                 this.phases[i].start = format(new Date(this.agpaMeta.boudaries[i].startDate), "do MMM 'à' HH'h'mm", {locale: fr})
             }

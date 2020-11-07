@@ -109,7 +109,6 @@ export class UserController {
 
         // Connexion de tous les membres
 
-
         // Deconnection de tous les membres
     }
 }

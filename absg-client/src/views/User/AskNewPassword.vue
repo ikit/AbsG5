@@ -64,7 +64,6 @@ export default {
             axios.post("/api/auth/ask-new-pwd", { email: this.email })
             .then(response => {
                 const user = parseAxiosResponse(response);
-                console.log("response", user);
                 if (user) {
                     this.sent = true;
                 } else {

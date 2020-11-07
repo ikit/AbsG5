@@ -113,7 +113,8 @@ export async function setLastActivity(user: User, url: string) {
         user.activity.lastActio = url;
         user.activity.lastActionLabel = label ? label : "Accueil Absolument G";
         // On récupère toutes les notifications qu'a loupé l'utilisateur depuis la dernière fois
-        const notifs = await getRepository(LogSystem).query(`
+        const notifs = await getRepository(LogSystem).query(
+            `
             SELECT id FROM log_system 
             WHERE severity = 'notice' AND "userId" <> $1 AND datetime > $2 
             ORDER BY id DESC

@@ -314,7 +314,6 @@ export default {
                 this.usersList.push(uData);
             }
             this.isLoading = false;
-            console.log(this.usersList)
         }).catch( err => {
             store.commit("onError", err);
         });
