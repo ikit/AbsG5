@@ -2,7 +2,7 @@ import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { Action } from "routing-controllers";
 import { getRepository, Equal } from "typeorm";
-import { User, LogPassag } from "../entities";
+import { User, LogPassag, LogSystem } from "../entities";
 import { differenceInSeconds } from "date-fns";
 import { Mutex } from "async-mutex";
 import { websocketService, WSMessageType } from "../services/WebsocketService";
@@ -112,8 +112,22 @@ export async function setLastActivity(user: User, url: string) {
     } else {
         user.activity.lastActio = url;
         user.activity.lastActionLabel = label ? label : "Accueil Absolument G";
+        // On récupère toutes les notifications qu'a loupé l'utilisateur depuis la dernière fois
+        const notifs = await getRepository(LogSystem).query(`
+            SELECT id FROM log_system 
+            WHERE severity = 'notice' AND "userId" <> $1 AND datetime > $2 
+            ORDER BY id DESC
+            LIMIT 50`,
+            [user.id, user.lastTime]
+        );
+        // On ajoute ces notifs à la liste de celles qu'il n'a pas encore vu
+        user.activity.unreadNotifications = user.activity.unreadNotifications.concat(notifs.map(e => e.id));
+        // On ne garde au maximum que les 50 dernières
+        user.activity.unreadNotifications.sort((a, b) => b - a);
+        user.activity.unreadNotifications.slice(0, 50);
     }
 
+    user.lastTime = new Date();
     await getRepository(User).save(user);
     // On notify tout le monde des utilisateurs actuellement en ligne
     const onlineUsers = await getRepository(LogPassag).query(`
@@ -123,7 +137,11 @@ export async function setLastActivity(user: User, url: string) {
         ORDER BY "lastTime" ASC`);
     websocketService.broadcast({
         message: WSMessageType.onlineUsers,
-        payload: onlineUsers.map(u => ({ ...u, activity: u.activity ? u.activity.lastActionLabel : "-" }))
+        payload: onlineUsers.map(u => ({
+            ...u,
+            activity: u.activity ? u.activity.lastActionLabel : "-",
+            unreadNotifications: u.activity.unreadNotifications
+        }))
     });
 
     return user;
@@ -169,7 +187,6 @@ export async function checkUserPassag(user: User, url: string) {
             }
 
             // On met à jour l'info dans de l'utilisateur
-            user.lastTime = new Date();
             setLastActivity(user, url);
         }
     } finally {

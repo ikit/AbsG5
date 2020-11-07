@@ -102,6 +102,15 @@ export class UserController {
     }
 
     /**
+     * Récupère les notifications d'un utilisateur
+     */
+    @Authorized()
+    @Get("/notifications")
+    notifications(@CurrentUser() user: User) {
+        return userService.getLastNotifications(user);
+    }
+
+    /**
      * Marque comme lu une notification pour l'utilisateur donné
      * @param notifId l'identifiant de la notification
      * @param user l'utilisateur concerné
@@ -117,7 +126,7 @@ export class UserController {
      * @param notifId l'identifiant de la notification
      * @param user l'utilisateur concerné
      */
-    @Get("/markAsRead/:noifId([0-9]+)")
+    @Get("/markAsRead/:notifId([0-9]+)")
     markAsRead(@Param("notifId") notifId: number, @CurrentUser() user: User) {
         userService.markAsRead(notifId, user);
         return true;

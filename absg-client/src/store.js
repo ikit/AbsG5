@@ -78,17 +78,19 @@ export default new Vuex.Store({
         // ========
         // Notification methods
         updateNotifications(state, notifications) {
-            state.notifications = state.notifications.concat(notifications.map(e => {
+            state.notifications = notifications.map(e => {
                 const m = getModuleInfo(e.module);
                 return {
+                    id: e.id,
                     module: m,
                     message: e.message,
                     datetime: new Date(e.datetime),
-                    dateLabel: format(new Date(e.datetime), "dd MMM h'h'mm", {locale: fr}),
+                    dateLabel: format(new Date(e.datetime), "dd MMM HH'h'mm", {locale: fr}),
                     url: getPeopleAvatar(e).url,
                     read: e.read
                 };
-            }));
+            });
+            console.log(state.notifications.filter(e => !e.read ));
             state.unreadNotifications = state.notifications.filter(e => !e.read ).length;
         },
         readAllNotification(state) {

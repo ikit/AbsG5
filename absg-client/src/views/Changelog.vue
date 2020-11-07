@@ -15,6 +15,7 @@
       <p>Fonctionnalités</p>
       <ul>
         <li>Procédure de réinitialise du mot de passe automatique pour les comptes sans mot de passe.</li>
+        <li>Mise en place des notifications</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>

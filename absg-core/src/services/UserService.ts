@@ -179,16 +179,7 @@ L'équipe système`,
             LIMIT 50`;
         const notifs = await getRepository(LogPassag).query(sql);
         const notReads = user.activity.unreadNotifications;
-        for (const n of notifs) {
-            if (new Date(n.datetime) > user.lastTime && n.userId != user.id && notReads.indexOf(n.id) === -1) {
-                n.read = false;
-                notReads.push(n);
-            } else {
-                n.read = true;
-            }
-        }
-        user.activity.unreadNotifications = notReads;
-        await this.usersRepo.save(user);
+        notifs.forEach(e => (e.read = notReads.indexOf(e.id) === -1));
 
         return notifs;
     }

@@ -92,7 +92,7 @@
             <v-btn
               icon
               v-on="on"
-              @click.stop="notifDialog = !notifDialog"
+              @click.stop="displayNotifications()"
             >
               <v-icon>far fa-bell</v-icon>
             </v-btn>
@@ -122,13 +122,13 @@
         </v-tooltip>
         <span>en ligne</span>
       </div>
-      <div
+      <!-- <div
         v-else
         id="online"
         data-cy="online"
       >
         <span style="bottom: -15px">personne en ligne</span>
-      </div>
+      </div> -->
 
       <v-menu
         offset-y
@@ -213,7 +213,7 @@
             <v-icon color="inherit">
               far fa-question-circle
             </v-icon><br>
-            <span style="display: inline-block; line-height: 0.9em;">{{version ? `v${version}` : "v5 - beta"}}</span>
+            <span style="display: inline-block; line-height: 0.9em;">{{ version ? `v${version}` : "v5 - beta" }}</span>
           </router-link>
         </div>
       </div>
@@ -550,7 +550,12 @@ export default {
                     ...e,
                     avatarUrl: `/files/avatars/${e.id.toString().padStart(3, '0')}.png`,
                     opacity: now - new Date(e.lastTime).getTime() <= 300000 ? 0.9 : 0.5 // 300000 = 5 minutes
-                }))
+                }));
+                // On met à jour l'indicateur de notifications pour l'utilisateur
+                const activity = newValue.payload.find(e => e.id === this.user.id);
+                if (activity && activity.unreadNotifications.length > this.unreadNotifications) {
+                    this.refreshNotifications();
+                }
             }
         }
     },
@@ -640,9 +645,18 @@ export default {
         photosGalleryAuto() {
             console.debug("TODO: photosGalleryAuto");
         },
+        refreshNotifications() {
+            axios.get("/api/notifications").then( response => {
+                const notifications = parseAxiosResponse(response);
+                store.commit("updateNotifications", notifications);
+            })
+        },
+        displayNotifications() {
+            this.notifDialog = true;
+            this.refreshNotifications();
+        },
         onNotificationClicked(notification) {
-            console.debug("onNotificationClicked", notification);
-            if (notification) {
+            if (notification && !notification.read) {
                 store.commit("readNotification", notification);
                 this.$router.push(notification.module.url);
                 this.notifDialog = false;
