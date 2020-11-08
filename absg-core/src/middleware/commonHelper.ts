@@ -17,7 +17,8 @@ export function sleep(ms: number) {
  */
 export function cleanString(str: string): string {
     return str
-        .replace(/[^\w\s]/gi, "") // supprime les accents et caractères spéciaux
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // supprime les accents et caractères spéciaux
         .toLowerCase() // met tout en minuscule
         .trim(); // supprime les espaces superflux en début et fin de chaine
 }
