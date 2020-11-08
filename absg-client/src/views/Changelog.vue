@@ -19,6 +19,7 @@
       </ul>
       <p>Bug corrigés</p>
       <ul>
+        <li>Problème de connection pour les identifiants avec accent</li>
       </ul>
     </v-card>
 
