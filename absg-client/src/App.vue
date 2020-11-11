@@ -550,7 +550,8 @@ export default {
                     ...e,
                     avatarUrl: `/files/avatars/${e.id.toString().padStart(3, '0')}.png`,
                     opacity: now - new Date(e.lastTime).getTime() <= 300000 ? 0.9 : 0.5 // 300000 = 5 minutes
-                }));
+                })).sort((a,b) => new Date(a.lastTime).getTime() < new Date(b.lastTime).getTime());
+                // console.log(this.usersOnline.reduce((p, e) => (`${p}> ${e.id}:${e.username} `), ""))
                 // On met à jour l'indicateur de notifications pour l'utilisateur
                 const activity = newValue.payload.find(e => e.id === this.user.id);
                 if (activity && activity.unreadNotifications.length > this.unreadNotifications) {

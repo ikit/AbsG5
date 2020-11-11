@@ -1,3 +1,5 @@
+import axios from "axios";
+
 describe("Barre principale de l'application", () => {
 
     beforeEach(() => {
@@ -23,18 +25,26 @@ describe("Barre principale de l'application", () => {
 
         // On s'assure que l'IHM est bien chargé avant de démarrer le scénario
         cy.get("header").should("exist");
-        cy.get("[data-cy=online]").should("exist");
-        // cy.contains("personne en ligne");
 
-        // L'api va dérouler un scénario et simuler un ensemble de connexion/déconnexion/actions
-        cy.request({
-            method: "GET",
-            url: `${session.api}/test/user-online-indicator`
-        });
+        // Deconnection de tous les membres
+        cy.request({ url: `${session.api}/test/user-online-indicator/1` });
+        cy.get("[data-cy=online]").should("not.exist");
 
-        // Cypress va vérifier qu'un certains nombre de chose se déroule bien sur l'interface
-        cy.get("[data-cy=online] > img").should("have.attr", "src").should("include", "038.png");
-        cy.get("[data-cy=online] > img").should("have.attr", "src").should("include", "031.png");
+        // Connexion d'un deuxième utilisateur A
+        cy.request({  url: `${session.api}/test/user-online-indicator/2` });
+        cy.get("[data-cy=online]>img").should("have.attr", "src").should("include", "038.png");
+
+        // Connexion d'un troisième utilisateur B
+        cy.request({  url: `${session.api}/test/user-online-indicator/3` });
+        cy.request({  url: `${session.api}/test/user-online-indicator/3` });
+        cy.get("[data-cy=online]>img").eq(0).should("have.attr", "src").should("include", "038.png");
+        cy.get("[data-cy=online]>img").eq(1).should("have.attr", "src").should("include", "031.png");
+
+        // Action de l'utilisateur A
+        cy.request({  url: `${session.api}/test/user-online-indicator/4` });
+        cy.request({  url: `${session.api}/test/user-online-indicator/4` });
+        cy.get("[data-cy=online]>img").eq(0).should("have.attr", "src").should("include", "031.png");
+        cy.get("[data-cy=online]>img").eq(1).should("have.attr", "src").should("include", "038.png");
     });
 
     // it("Affichage 800x600", () => {
