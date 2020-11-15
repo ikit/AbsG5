@@ -62,8 +62,8 @@ class AgendaService {
 
         logger.notice(
             personId
-                ? `La fiche de "${person.getFullname()}" a été modifié dans le répertoire par ${user.username}`
-                : `Nouvelle fiche "${person.getFullname()}" a été ajouté au répertoire par ${user.username}`,
+                ? `La fiche de "${person.getFullname()}" a été modifiée dans le répertoire par ${user.username}`
+                : `Nouvelle fiche "${person.getFullname()}" a été ajoutée au répertoire par ${user.username}`,
             {
                 userId: user.id,
                 module: LogModule.agenda
@@ -186,7 +186,7 @@ class AgendaService {
             const url = path.join(process.env.PATH_FILES, `trombi/${filename}`);
             await saveImage(image.buffer, thumb, url, null);
 
-            logger.notice(`Nouvelle trombinette "${title}" a été ajouté par ${user.username}`, {
+            logger.notice(`Nouvelle trombinette "${title}" a été ajoutée par ${user.username}`, {
                 userId: user.id,
                 module: LogModule.agenda
             });

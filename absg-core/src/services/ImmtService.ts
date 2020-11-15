@@ -89,7 +89,7 @@ class ImmtService {
         await saveImage(image.buffer, thumb, web, null);
         this.immtsRepo.save(immt);
 
-        logger.notice(`Nouvelle image du moment ajouté par ${user.username}`, {
+        logger.notice(`Nouvelle image du moment ajoutée par ${user.username}`, {
             userId: user.id,
             module: LogModule.photos
         });

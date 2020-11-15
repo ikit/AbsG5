@@ -284,10 +284,11 @@ class AgpaService {
             await saveImage(image.buffer, thumb, web, raw);
         }
 
-        logger.notice(
+        // Ce log n'est visible que par les admins
+        logger.info(
             photoId
-                ? `${user.username} a modifié la photo "${photo.title}" (id: ${photo.id}) des AGPA`
-                : `Nouvelle photo "${photo.title}" (id: ${photo.id}) a été enregistré pour les AGPA par ${user.username}`,
+                ? `${user.username} a modifié la photo (id: ${photo.id}) des AGPA`
+                : `Nouvelle photo (id: ${photo.id}) a été enregistrée pour les AGPA par ${user.username}`,
             {
                 userId: user.id,
                 module: LogModule.agpa

@@ -160,7 +160,7 @@ class EventService {
 
         logger.notice(
             evt.id === -1
-                ? `Nouvelle événement ajouté au calendrier par ${user.username} le ${evt.startDate
+                ? `Nouvel événement ajouté au calendrier par ${user.username} le ${evt.startDate
                       .toISOString()
                       .substr(0, 10)}`
                 : `Événement "${evt.name}" du ${evt.startDate.toISOString().substr(0, 10)} a été modifié par ${

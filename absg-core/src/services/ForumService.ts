@@ -222,6 +222,7 @@ class ForumService {
         await this.msgRepo.save(msg);
 
         // On met à jour le sujet et forum
+        console.log("SAVE FORUM MSG", msg);
         if (msg.topic) {
             msg.topic.lastMessage = { id: msg.id } as ForumMessage;
             await this.topicRepo.save(msg.topic);

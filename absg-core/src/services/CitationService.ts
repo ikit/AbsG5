@@ -109,7 +109,7 @@ class CitationService {
         await this.citationsRepo.save(citation);
 
         logger.notice(
-            newCitation ? `Citation corrigé par ${user.username}` : `Nouvelle citation ajouté par ${user.username}`,
+            newCitation ? `Citation corrigée par ${user.username}` : `Nouvelle citation ajoutée par ${user.username}`,
             { userId: user.id, module: LogModule.citations }
         );
 
