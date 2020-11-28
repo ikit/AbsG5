@@ -87,10 +87,10 @@ export default new Vuex.Store({
                     datetime: new Date(e.datetime),
                     dateLabel: format(new Date(e.datetime), "dd MMM HH'h'mm", {locale: fr}),
                     url: getPeopleAvatar(e).url,
-                    read: e.read
+                    read: e.read,
+                    data: e.data
                 };
             });
-            console.log(state.notifications.filter(e => !e.read ));
             state.unreadNotifications = state.notifications.filter(e => !e.read ).length;
         },
         readAllNotification(state) {

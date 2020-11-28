@@ -1,5 +1,5 @@
 import { getRepository, Between } from "typeorm";
-import { ForumMessage, ForumTopic, User, Forum } from "../entities";
+import { ForumMessage, ForumTopic, User, Forum, LogModule } from "../entities";
 import { addMonths, format } from "date-fns";
 import * as fr from "date-fns/locale/fr";
 import * as path from "path";
@@ -220,6 +220,20 @@ class ForumService {
             }
         }
         await this.msgRepo.save(msg);
+        // On prévient les utilisateur seulement quand il s'agit d'un nouveau message
+        if (!data.postId) {
+            logger.notice(`Nouveau message ajouté par ${user.username}`, {
+                userId: user.id,
+                module: LogModule.forum,
+                data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: msg.forum.id }
+            });
+        } else {
+            logger.info(`${user.username} modifie le message ${msg.id}`, {
+                userId: user.id,
+                module: LogModule.forum,
+                data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: msg.forum.id }
+            });
+        }
 
         // On met à jour le sujet et forum
         console.log("SAVE FORUM MSG", msg);
@@ -254,13 +268,20 @@ class ForumService {
         let msg = null;
         if (id) {
             // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
-            msg = await this.msgRepo.findOne({ where: { id: id } });
+            msg = await this.msgRepo.findOne({ where: { id: id }, relations: ["forum", "topic"] });
         }
         if (!msg) {
             throw new BadRequestError(`Le message avec l'identifiant n°${id} n'existe pas.`);
         }
 
         if (user.is("admin") || user.id === msg.poster.id) {
+            // Log visible seulement par les admins
+            logger.info(`${user.username} supprime le message ${msg.id}`, {
+                userId: user.id,
+                module: LogModule.forum,
+                data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: msg.forum.id }
+            });
+
             return this.msgRepo.remove(msg);
         }
         throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer ce message.`);

@@ -22,9 +22,7 @@ export class PgLogger extends Transport {
             if (Object.keys(info.metadata).length !== 0) {
                 log.module = info.metadata.module;
                 log.userId = info.metadata.userId ? info.metadata.userId : null;
-                delete info.metadata.module;
-                delete info.metadata.userId;
-                log.data = info.metadata;
+                log.data = info.metadata.data;
             }
 
             logRepo.save(log);

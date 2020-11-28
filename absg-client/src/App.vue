@@ -659,8 +659,16 @@ export default {
         onNotificationClicked(notification) {
             if (notification && !notification.read) {
                 store.commit("readNotification", notification);
-                this.$router.push(notification.module.url);
                 this.notifDialog = false;
+                if (notification.module.id == "forum") {
+                    const topic = notification.data.topicId ? `read/${notification.data.topicId}` : "tbz";
+                    const msgId = notification.data.msgId;
+                    const url = `${notification.module.url}/${topic}`;
+                    this.$router.push({ path: url, hash: `#post_${msgId}` });
+                } else {
+                    this.$router.push(notification.module.url);
+                }
+
             }
         },
         closeNotifications(readAll = false) {
