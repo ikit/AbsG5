@@ -67,7 +67,7 @@
           <template #item="{item}">
             <router-link
               v-if="breadcrumb.length === 0"
-              :to="{ path: `/forum/browse/${item.id}` }"
+              :to="{ path: item.id === 2 ? `/forum/tbz` : `/forum/browse/${item.id}` }"
               tag="tr"
               style="cursor: pointer"
             >

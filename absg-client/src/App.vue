@@ -664,7 +664,7 @@ export default {
                     const topic = notification.data.topicId ? `read/${notification.data.topicId}` : "tbz";
                     const msgId = notification.data.msgId;
                     const url = `${notification.module.url}/${topic}`;
-                    this.$router.push({ path: url, hash: `#post_${msgId}` });
+                    this.$router.push({ path: url }); // , hash: `#post_${msgId}`
                 } else {
                     this.$router.push(notification.module.url);
                 }
