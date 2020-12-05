@@ -1,148 +1,213 @@
 <template>
-  <div v-if="agpaMeta">
-    <div
-      v-for="catIdx of agpaMeta.categoriesOrders"
-      :key="catIdx"
-      style="margin: 15px; margin-top: 50px;"
-    >
-      <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
-        <img
-          :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
-          width="100px"
-          style="position: absolute; top: -50px; left: 275px"
+
+<section id="content">
+    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+      <v-row style="padding: 15px">
+        <v-tooltip
+          v-if="$vuetify.breakpoint.mdAndUp"
+          bottom
         >
-        <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
-          <span style="font-family: 'Tangerine', serif; font-size: 2em">
-            {{ agpaMeta.categories[catIdx].title }}
-          </span>
-          <v-spacer />
-          <v-tooltip bottom>
-            <v-spacer />
-            <template #activator="{ on }">
-              <span
-                style="line-height: 48px"
-                v-on="on"
-              ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
-            </template>
-            <span>Nombre total de participants</span>
-          </v-tooltip>
-                &nbsp; &nbsp;
-          <v-tooltip bottom>
-            <v-spacer />
-            <template #activator="{ on }">
-              <span
-                style="line-height: 48px"
-                v-on="on"
-              ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
-            </template>
-            <span>Nombre total de photos</span>
-          </v-tooltip>
-        </v-row>
-        <p style="font-size:0.9em; margin: 10px; text-align: center">
-          {{ agpaMeta.categories[catIdx].description }}
-        </p>
-        <div style="display: flex; width: 100%;">
-          <template v-for="(photo, idx) in photos">
-            <PhotoWidget
-              v-if="photo.categoryId == catIdx"
-              :key="idx"
-              style="display: inline-block; width: 250px; margin: 0 auto;"
-              :photo="photo"
-              @new-photo="onNewPhoto(catIdx)"
-              @edit-photo="onEditPhoto(photo)"
-              @delete-photo="onDeletePhoto(photo)"
-            />
+          <template #activator="{ on }">
+            <v-icon
+              left
+              style="margin-top:-10px; font-size: 30px"
+            >
+              far fa-question-circle
+            </v-icon>
+            <div
+              class="phase-left-header"
+              v-on="on"
+              @click="help.displayed = true; help.page = 3"
+            >
+              <h4>Phase n°1 en cours : Enregistrement des photos</h4>
+              <p>Phase n°2 Vérification - à partir du {{ end }}</p>
+            </div>
           </template>
-        </div>
-      </v-card>
+          <span>Besoin d'aide sur la phase actuelle du concours ?</span>
+        </v-tooltip>
+
+        <v-spacer />
+      </v-row>
+      <v-progress-linear
+        v-if="isLoading"
+        color="accent"
+        indeterminate
+        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
+      />
     </div>
-
-
-    <v-dialog
-      v-model="photoEditor.open"
-      width="800px"
-    >
-      <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
-          Nouvelle photo {{ agpaMeta.categories[photoEditor.categoryId].title }}
-        </v-card-title>
-        <v-container
-          grid-list-sm
-          class="pa-4"
+    <div v-if="agpaMeta">
+        <div
+        v-for="catIdx of agpaMeta.categoriesOrders"
+        :key="catIdx"
+        style="margin: 15px; margin-top: 50px;"
         >
-          <v-text-field
-            v-model="photoEditor.title"
-            prepend-icon="fas fa-feather-alt"
-            label="Titre"
-          />
-          <ImageEditor
-            ref="imgEditor"
-            :former-url="photoEditor.photo ? photoEditor.photo.url : ''"
-            icon="fas fa-camera"
-            style="height: 300px;"
-          />
-          <div v-if="photoEditor.isLoading">
-            Enregistrement en cours : {{ photoEditor.complete }}%
-          </div>
-        </v-container>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            text
-            color="primary"
-            :disabled="photoEditor.isLoading"
-            @click="resetEditor()"
-          >
-            Annuler
-          </v-btn>
-          <v-btn
-            color="accent"
-            :disabled="photoEditor.isLoading"
-            @click="savePhoto()"
-          >
-            Enregistrer
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog
-      v-model="photoDeletion.open"
-      width="800px"
-    >
-      <v-card v-if="photoDeletion.photo">
-        <v-card-title class="grey lighten-4">
-          Êtes vous sûr de vouloir supprimer cette photo ?
-        </v-card-title>
-        <div style="text-align: center; margin-top: 10px">
-          <img
-            :src="photoDeletion.photo.thumb"
-            style="margin:auto"
-            class="thumb"
-          >
-          <p style="margin: 10px;">
-            {{ photoDeletion.photo.title }}
-          </p>
+        <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+            <img
+            :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
+            width="100px"
+            style="position: absolute; top: -50px; left: 275px"
+            >
+            <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
+            <span style="font-family: 'Tangerine', serif; font-size: 2em">
+                {{ agpaMeta.categories[catIdx].title }}
+            </span>
+            <v-spacer />
+            <v-tooltip bottom>
+                <v-spacer />
+                <template #activator="{ on }">
+                <span
+                    style="line-height: 48px; margin-right: 10px;"
+                    v-on="on"
+                ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
+                </template>
+                <span>Nombre total de participants</span>
+            </v-tooltip>
+                    &nbsp; &nbsp;
+            <v-tooltip bottom>
+                <v-spacer />
+                <template #activator="{ on }">
+                <span
+                    style="line-height: 48px"
+                    v-on="on"
+                ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
+                </template>
+                <span>Nombre total de photos</span>
+            </v-tooltip>
+            </v-row>
+            <p style="font-size:0.9em; margin: 10px; text-align: center">
+            {{ agpaMeta.categories[catIdx].description }}
+            </p>
+            <div style="display: flex; width: 100%;">
+            <template v-for="(photo, idx) in photos">
+                <PhotoWidget
+                v-if="photo.categoryId == catIdx"
+                :key="idx"
+                style="display: inline-block; width: 250px; margin: 0 auto;"
+                :photo="photo"
+                @new-photo="onNewPhoto(catIdx)"
+                @edit-photo="onEditPhoto(photo)"
+                @delete-photo="onDeletePhoto(photo)"
+                />
+            </template>
+            </div>
+        </v-card>
         </div>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            text
-            color="primary"
-            @click="photoDeletion.open = false"
-          >
-            Annuler
-          </v-btn>
-          <v-btn
-            color="accent"
-            @click="deletePhoto()"
-          >
-            Supprimer
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+
+        <!-- Enregistrement/Edition photo -->
+        <v-dialog
+        v-model="photoEditor.open"
+        width="800px"
+        >
+        <v-card>
+            <v-card-title class="grey lighten-4 py-4 title">
+            Nouvelle photo {{ agpaMeta.categories[photoEditor.categoryId].title }}
+            </v-card-title>
+            <v-container
+            grid-list-sm
+            class="pa-4"
+            >
+            <v-text-field
+                v-model="photoEditor.title"
+                prepend-icon="fas fa-feather-alt"
+                label="Titre"
+            />
+            <ImageEditor
+                ref="imgEditor"
+                :former-url="photoEditor.photo ? photoEditor.photo.url : ''"
+                icon="fas fa-camera"
+                style="height: 300px;"
+            />
+            <div v-if="photoEditor.isLoading">
+                Enregistrement en cours : {{ photoEditor.complete }}%
+            </div>
+            </v-container>
+            <v-card-actions>
+            <v-spacer />
+            <v-btn
+                text
+                color="primary"
+                :disabled="photoEditor.isLoading"
+                @click="resetEditor()"
+            >
+                Annuler
+            </v-btn>
+            <v-btn
+                color="accent"
+                :disabled="photoEditor.isLoading"
+                @click="savePhoto()"
+            >
+                Enregistrer
+            </v-btn>
+            </v-card-actions>
+        </v-card>
+        </v-dialog>
+
+        <!-- Suppression photo -->
+        <v-dialog
+        v-model="photoDeletion.open"
+        width="800px"
+        >
+        <v-card v-if="photoDeletion.photo">
+            <v-card-title class="grey lighten-4">
+            Êtes vous sûr de vouloir supprimer cette photo ?
+            </v-card-title>
+            <div style="text-align: center; margin-top: 10px">
+            <img
+                :src="photoDeletion.photo.thumb"
+                style="margin:auto"
+                class="thumb"
+            >
+            <p style="margin: 10px;">
+                {{ photoDeletion.photo.title }}
+            </p>
+            </div>
+            <v-card-actions>
+            <v-spacer />
+            <v-btn
+                text
+                color="primary"
+                @click="photoDeletion.open = false"
+            >
+                Annuler
+            </v-btn>
+            <v-btn
+                color="accent"
+                @click="deletePhoto()"
+            >
+                Supprimer
+            </v-btn>
+            </v-card-actions>
+        </v-card>
+        </v-dialog>
+
+
+        <!-- Aide -->
+        <v-dialog
+        v-model="help.displayed"
+        width="800px"
+        >
+        <v-card>
+            <v-card-title class="grey lighten-4">
+            <v-icon left>
+                far fa-question-circle
+            </v-icon>
+            Aide sur le déroulement du concours
+            </v-card-title>
+            <Help selected-tab="2" />
+            <v-card-actions>
+            <v-spacer />
+            <v-btn
+                text
+                color="primary"
+                @click="help.displayed = false"
+            >
+                Fermer
+            </v-btn>
+            </v-card-actions>
+        </v-card>
+        </v-dialog>
+    </div>
+</section>
 </template>
 
 
@@ -155,12 +220,14 @@ import { fr } from "date-fns/locale";
 import PhotoWidget from './components/PhotoWidget';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
+import Help from './components/Help';
 
 export default {
     name: 'Phase1',
     components: {
         PhotoWidget,
-        ImageEditor
+        ImageEditor,
+        Help
     },
     store,
     data: () => ({
@@ -176,7 +243,12 @@ export default {
         photoDeletion: {
             open: false,
             photo: null
-        }
+        },
+        help: {
+            displayed: false,
+            page: 0
+        },
+        end: null,
     }),
     computed: {
         ...mapState([
@@ -197,6 +269,9 @@ export default {
     },
     methods: {
         refreshGallery() {
+            // Fin de la phase 1
+            this.end = format(new Date(this.agpaMeta.boudaries[0].endDate), "dd MMM 'à' HH'h'mm", {locale: fr})
+
             // Récupérer la participation de l'utilisateur et les stats
             axios.get(`/api/agpa/p1`).then(
                 response => {
@@ -317,6 +392,50 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../themes/global.scss';
+
+@import '../../themes/global.scss';
+@import '../../themes/agpa.scss';
+
+#content {
+    text-align: center;
+}
+
+.phase-left-header {
+    margin: -5px 0 -10px 0;
+    cursor: pointer;
+
+    h2 {
+        font-size: 20px;
+        line-height: 20px;
+        text-align: left;
+        font-family: 'Times New Roman', Times, serif;
+    }
+    p {
+        text-align: left;
+        font-size: 15px;
+        line-height: 20px;
+        opacity: 0.5;
+        margin: 0;
+    }
+}
+.phase-right-header {
+    margin: -5px 0 -10px 0;
+    opacity: 0.5;
+    cursor: pointer;
+
+    h4 {
+        font-size: 20px;
+        line-height: 20px;
+        text-align: right;
+    }
+    p {
+        text-align: right;
+        font-size: 15px;
+        line-height: 20px;
+        margin: 0;
+    }
+}
+
 
 h2 {
     font-family: 'Tangerine', serif;
