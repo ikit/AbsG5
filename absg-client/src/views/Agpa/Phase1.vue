@@ -80,13 +80,14 @@
             <div style="display: flex; width: 100%;">
             <template v-for="(photo, idx) in photos">
                 <PhotoWidget
-                v-if="photo.categoryId == catIdx"
-                :key="idx"
-                style="display: inline-block; width: 250px; margin: 0 auto;"
-                :photo="photo"
-                @new-photo="onNewPhoto(catIdx)"
-                @edit-photo="onEditPhoto(photo)"
-                @delete-photo="onDeletePhoto(photo)"
+                    v-if="photo.categoryId == catIdx"
+                    :key="idx"
+                    style="display: inline-block; width: 250px; margin: 0 auto;"
+                    :photo="photo"
+                    @new-photo="onNewPhoto(catIdx)"
+                    @edit-photo="onEditPhoto(photo)"
+                    @delete-photo="onDeletePhoto(photo)"
+                    @click="photosGalleryDisplay(photo)""
                 />
             </template>
             </div>
@@ -295,6 +296,7 @@ export default {
                         this.agpaMeta.categories[s.categoryId].totalUsers = s.totalUsers;
                         this.agpaMeta.categories[s.categoryId].totalPhotos = s.totalPhotos;
                     }
+                    store.commit('photosGalleryReset', this.photos.filter(p => p.id > -1));
                 })
                 .catch(err => {
                     store.commit("onError", err);
@@ -357,8 +359,8 @@ export default {
                 }
             })
             .then(newPhoto => {
-                this.resetEditor();
                 this.refreshGallery();
+                this.resetEditor();
             })
             .catch(err => {
                 store.commit("onError", err);
@@ -386,7 +388,18 @@ export default {
         onDeletePhoto(photo) {
             this.photoDeletion.open = true;
             this.photoDeletion.photo = photo;
-        }
+        },
+        photosGalleryDisplay(photo) {
+            console.log("display photo", this.photos)
+            const index = this.photos.filter(p => p.id > -1).findIndex(p => p.id === photo.id);
+            if (index > -1) {
+                store.commit('photosGallerySetIndex', index);
+                store.commit('photosGalleryDisplay');
+            }
+        },
+        photosGalleryHide() {
+            store.commit('photosGalleryHide');
+        },
 
     }
 };

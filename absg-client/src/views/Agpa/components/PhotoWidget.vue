@@ -9,6 +9,7 @@
           <img
             class="thumb"
             :src="photo.thumb"
+            @click="clickOnPhoto()"
           >
         </td>
       </tr>
@@ -111,6 +112,9 @@ export default {
         },
         deletePhoto() {
             this.$emit("delete-photo");
+        },
+        clickOnPhoto() {
+            this.$emit("click");
         }
     }
 };

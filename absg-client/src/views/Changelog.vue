@@ -22,6 +22,8 @@
       <ul>
         <li>Problème de connection pour les identifiants avec accent</li>
         <li>Forum: Suppression dernier message d'un sujet sur le forum</li>
+        <li>AGPA P1: Diaporama</li>
+        <li>AGPA P1: Indicateur de chargement lors de la sauvegarde/édition d'une image</li>
       </ul>
     </v-card>
 
