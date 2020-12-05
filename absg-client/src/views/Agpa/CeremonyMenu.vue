@@ -24,7 +24,7 @@
       Vous avez encore le temps... en attendant vous pouvez revoir les anciennes cérémonies:
     </p>
 
-    <v-container fluid>
+    <v-container fluid :style="{ 'display': current.displayed ? 'none' : 'block' }">
       <v-layout
         row
         wrap
@@ -58,6 +58,7 @@
         width="100%"
         height="100%"
         controls
+        @ended="openCeremonySlideShow()"
       >
         <source
           src="/files/agpa/intro.mp4"
@@ -137,6 +138,12 @@ export default {
         startCeremony() {
             this.current.displayed = true;
             this.$refs.video.play();
+        },
+
+        openCeremonySlideShow() {
+            this.$refs.video.pause();
+            window.open(`/agpa/ceremony/${this.current.year}`, '_blank');
+            this.current.displayed = false;
         }
     }
 };
