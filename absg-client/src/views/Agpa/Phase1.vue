@@ -117,8 +117,9 @@
                 icon="fas fa-camera"
                 style="height: 300px;"
             />
-            <div v-if="photoEditor.isLoading">
-                Enregistrement en cours : {{ photoEditor.complete }}%
+            <div class="loading-indicator" v-if="photoEditor.isLoading">
+                <p v-if="photoEditor.complete < 100">Téléchargement de la photo sur le serveur : {{ photoEditor.complete }}%</p>
+                <p v-if="photoEditor.complete >= 100">Enregistrement de la photo et création des vignettes</p>
             </div>
             </v-container>
             <v-card-actions>
@@ -134,6 +135,7 @@
             <v-btn
                 color="accent"
                 :disabled="photoEditor.isLoading"
+                :loading="photoEditor.isLoading"
                 @click="savePhoto()"
             >
                 Enregistrer
@@ -326,6 +328,7 @@ export default {
                     }
                 ).catch( err => {
                     store.commit("onError", err);
+                    this.photoEditor.isLoading = false;
                 });
             } else {
                 // Edition d'une photo sans modification de l'image
@@ -435,7 +438,17 @@ export default {
         margin: 0;
     }
 }
-
+.loading-indicator {
+    margin: 10px 0px 10px 33px;
+    border-radius: 3px;
+    background: #eee;
+    text-align: center;
+    padding: 10px;
+    p {
+        margin: 0;
+        padding: 0;
+    }
+}
 
 h2 {
     font-family: 'Tangerine', serif;
