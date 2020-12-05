@@ -16,10 +16,12 @@
       <ul>
         <li>Procédure de réinitialise du mot de passe automatique pour les comptes sans mot de passe.</li>
         <li>Mise en place des notifications</li>
+        <li>Forum: création de nouveau sujet de discussion</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>
         <li>Problème de connection pour les identifiants avec accent</li>
+        <li>Forum: Suppression dernier message d'un sujet sur le forum</li>
       </ul>
     </v-card>
 

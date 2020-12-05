@@ -1,4 +1,4 @@
-import { getRepository, Between } from "typeorm";
+import { getRepository, Between, Repository } from "typeorm";
 import { ForumMessage, ForumTopic, User, Forum, LogModule } from "../entities";
 import { addMonths, format } from "date-fns";
 import * as fr from "date-fns/locale/fr";
@@ -7,13 +7,13 @@ import * as fs from "fs";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
 import { BadRequestError } from "routing-controllers";
 import { websocketService, WSMessageType } from "./WebsocketService";
-import { logger, errorLogHandler, accessLogHandler } from "../middleware/logger";
+import { logger } from "../middleware/logger";
 
 class ForumService {
-    private forumRepo = null;
-    private topicRepo = null;
-    private msgRepo = null;
-    private userRepo = null;
+    private forumRepo: Repository<Forum> = null;
+    private topicRepo: Repository<ForumTopic> = null;
+    private msgRepo: Repository<ForumMessage> = null;
+    private userRepo: Repository<User> = null;
 
     public initService() {
         this.forumRepo = getRepository(Forum);
@@ -38,7 +38,7 @@ class ForumService {
      * Renvoie la liste des forums
      */
     async getForums() {
-        const forums = await this.forumRepo
+        const forums: Forum[] = await this.forumRepo
             .createQueryBuilder("f")
             .leftJoinAndSelect("f.lastMessage", "m")
             .leftJoinAndSelect("m.poster", "p")
@@ -49,6 +49,7 @@ class ForumService {
             id: f.id,
             name: f.name,
             description: f.description,
+            archived: f.archived,
             last: {
                 username: f.lastMessage.poster.username,
                 dateLabel: format(new Date(f.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
@@ -151,7 +152,7 @@ class ForumService {
         to = new Date(to.getFullYear(), to.getMonth(), 1, 1, 0, 0);
 
         // on récupère les messages sur la période demandée
-        const data = await this.msgRepo
+        const data = await (this.msgRepo as any)
             .createQueryBuilder("m")
             .leftJoin("m.forum", "f")
             .leftJoinAndSelect("m.poster", "p")
@@ -184,22 +185,46 @@ class ForumService {
      */
     async savePost(data: any, user: any) {
         let msg = null;
+        let topic = null;
+        let forum = null;
+
+        // On récupère le forum
+        if (data.forumId) {
+            forum = await this.forumRepo.findOne({ where: { id: data.forumId } });
+        } else {
+            throw new Error("Le forum doit obligatoirement être renseigné");
+        }
+
+        // On récupère le sujet
+        if (data.topicId) {
+            topic = await this.topicRepo.findOne({ where: { id: data.topicId } });
+        } else if (data.topicTitle) {
+            topic = new ForumTopic();
+            topic.forum = forum;
+            topic.pinned = true;
+            topic.name = data.topicTitle;
+            await this.topicRepo.save(topic);
+        } else {
+            throw new Error("Veuillez indiquer le sujet ou bien lui donner un titre");
+        }
+
+        // On récupère le message
         if (data.postId) {
-            // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
             msg = await this.msgRepo.findOne({ where: { id: data.postId } });
         }
         if (!msg) {
             msg = new ForumMessage();
+            msg.forum = forum;
+            msg.topic = topic;
         }
+
         // On met à jour le message
         msg.text = data.text;
         msg.datetime = !data.postId ? new Date() : msg.datetime;
         msg.poster = user;
-        msg.forum = await this.forumRepo.findOne({ where: { id: data.forumId } });
-        msg.topic = await this.topicRepo.findOne({ where: { id: data.topicId } });
 
-        // On extrait du message les images transmise encodé en base64 afin de les enregistré en
-        // tant que fichier et économiser la taille de la base de donnée
+        // On extrait du message les images encodées en base64 afin de les enregistrer en
+        // tant que fichier et optimiser la base de donnée
         const bases64data = msg.text.match(/src="(data:image\/[^;]+;base64[^"]+)"/g);
         if (Array.isArray(bases64data) && bases64data.length > 0) {
             const currentYear = new Date().getFullYear();
@@ -222,22 +247,28 @@ class ForumService {
         await this.msgRepo.save(msg);
         // On prévient les utilisateur seulement quand il s'agit d'un nouveau message
         if (!data.postId) {
-            logger.notice(`Nouveau message ajouté par ${user.username}`, {
-                userId: user.id,
-                module: LogModule.forum,
-                data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: msg.forum.id }
-            });
+            logger.notice(
+                data.topicTitle
+                    ? `Nouvelle discussion lancée par ${user.username}`
+                    : `Nouveau message ajouté par ${user.username}`,
+                {
+                    userId: user.id,
+                    module: LogModule.forum,
+                    data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: forum.id }
+                }
+            );
         } else {
             logger.info(`${user.username} modifie le message ${msg.id}`, {
                 userId: user.id,
                 module: LogModule.forum,
-                data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: msg.forum.id }
+                data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: forum.id }
             });
         }
 
         // On met à jour le sujet et forum
         console.log("SAVE FORUM MSG", msg);
         if (msg.topic) {
+            msg.topic.firstMessage = msg.topic.firstMessage ? msg.topic.firstMessage : ({ id: msg.id } as ForumMessage);
             msg.topic.lastMessage = { id: msg.id } as ForumMessage;
             await this.topicRepo.save(msg.topic);
         }
@@ -265,10 +296,18 @@ class ForumService {
      * @param user
      */
     async deletePost(id: number, user: User) {
-        let msg = null;
+        let msg: ForumMessage = null;
+        let forumId: number = null;
+        let topicId: number = null;
+
         if (id) {
             // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
-            msg = await this.msgRepo.findOne({ where: { id: id }, relations: ["forum", "topic"] });
+            msg = await this.msgRepo.findOne({
+                where: { id: id },
+                relations: ["forum.lastMessage", "forum", "topic", "topic.firstMessage", "topic.lastMessage"]
+            });
+            forumId = msg.forum.id;
+            topicId = msg.topic ? msg.topic.id : null;
         }
         if (!msg) {
             throw new BadRequestError(`Le message avec l'identifiant n°${id} n'existe pas.`);
@@ -279,10 +318,57 @@ class ForumService {
             logger.info(`${user.username} supprime le message ${msg.id}`, {
                 userId: user.id,
                 module: LogModule.forum,
-                data: { msgId: msg.id, topicId: msg.topic ? msg.topic.id : null, forumId: msg.forum.id }
+                data: { msgId: msg.id, topicId, forumId }
             });
 
-            return this.msgRepo.remove(msg);
+            // On met à jours le forum si besoin
+            if (msg.forum.lastMessage.id === msg.id) {
+                const fMsgs = await this.msgRepo
+                    .createQueryBuilder("q")
+                    .where(`q."forumId" = ${forumId}`)
+                    .orderBy("q.datetime", "DESC")
+                    .limit(2)
+                    .getMany();
+                msg.forum.lastMessage = { id: fMsgs.filter(m => m.id != msg.id)[0].id } as ForumMessage;
+                await this.forumRepo.save(msg.forum);
+            }
+
+            // On met à jours le sujet si besoin
+            if (topicId) {
+                // On récupère la liste des messages du sujets
+                const tMsgs = await this.msgRepo
+                    .createQueryBuilder("q")
+                    .where(`q."topicId" = ${topicId} AND q.id <> ${msg.id}`)
+                    .orderBy("q.datetime", "ASC")
+                    .getMany();
+
+                if (tMsgs.length > 0) {
+                    // On met à jours les infos du sujet
+                    msg.topic.firstMessage = { id: tMsgs[0].id } as ForumMessage;
+                    msg.topic.lastMessage = { id: tMsgs[tMsgs.length - 1].id } as ForumMessage;
+                    await this.topicRepo.save(msg.topic);
+                } else {
+                    // On supprime le sujet
+                    const topic = msg.topic;
+                    msg.topic = null;
+                    await this.msgRepo.save(msg);
+                    await this.topicRepo.delete(topic);
+                }
+            } else if (msg.topic.lastMessage.id === msg.id) {
+                // Cas spécial du dernier message TBZ
+                const fMsgs = await this.msgRepo
+                    .createQueryBuilder("q")
+                    .where(`q."forumId" IS NULL`)
+                    .orderBy("q.datetime", "DESC")
+                    .limit(2)
+                    .getMany();
+                msg.topic.lastMessage = { id: fMsgs.filter(m => m.id != msg.id)[0].id } as ForumMessage;
+                await this.topicRepo.save(msg.topic);
+            }
+
+            // On supprime le message
+            await this.msgRepo.delete(msg);
+            return { forumId, topicId };
         }
         throw new BadRequestError(`Vous n'avez pas les droits nécessaire pour supprimer ce message.`);
     }

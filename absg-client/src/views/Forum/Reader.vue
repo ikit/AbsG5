@@ -269,7 +269,7 @@ export default {
             this.$refs.newMsgEditor.insert(emoji.data);
         },
 
-        // On enregistre le message
+        // Enregistre un nouveau message
         post() {
             const formData = new FormData();
             formData.append("forumId", this.forumId ? this.forumId : 2);
@@ -289,6 +289,7 @@ export default {
             });
         },
 
+        // Enregistre les modification apporté à un message
         saveMsg() {
             const formData = new FormData();
             formData.append("forumId", this.forumId ? this.forumId : 2);

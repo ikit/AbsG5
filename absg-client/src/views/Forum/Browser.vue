@@ -50,6 +50,25 @@
             single-line
             hide-details
           />
+          <v-spacer />
+          <v-btn
+            v-if="$vuetify.breakpoint.mdAndUp"
+            @click.stop="newTopic()"
+            :disabled="topicEditor.disabled"
+          >
+            <v-icon left>
+              fas fa-plus
+            </v-icon>
+            <span>Nouvelle discussion</span>
+          </v-btn>
+          <v-btn
+            v-else
+            fab
+            small
+            @click.stop="newTopic()"
+          >
+            <v-icon>fas fa-plus</v-icon>
+          </v-btn>
         </v-card-title>
 
         <v-data-table
@@ -70,6 +89,7 @@
               :to="{ path: item.id === 2 ? `/forum/tbz` : `/forum/browse/${item.id}` }"
               tag="tr"
               style="cursor: pointer"
+              :style="{ opacity: item.archived ? '0.5' : '1'}"
             >
               <td style="font-size: 1.1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
                 <v-icon>fas fa-archive</v-icon>  {{ item.name }}
@@ -118,6 +138,90 @@
         </v-data-table>
       </v-card>
     </v-container>
+
+    <v-dialog
+      v-model="topicEditor.open"
+      width="800px"
+    >
+      <v-card>
+        <v-card-title class="grey lighten-4">
+          Nouvelle discussion
+        </v-card-title>
+        <v-container
+          grid-list-sm
+          class="pa-4"
+        >
+          <v-layout
+            row
+            wrap
+          >
+            <v-flex xs12>
+              <v-autocomplete
+                v-model="topicEditor.forum"
+                prepend-icon="fas fa-archive"
+                label="Forum"
+                :items="topicEditor.forumsList"
+                item-text="name"
+                item-value="id"
+              />
+            </v-flex>
+            <v-flex xs12>
+              <v-text-field
+                v-model="topicEditor.title"
+                prepend-icon="fas fa-quote-left"
+                label="Titre de la discussion"
+              />
+            </v-flex>
+            <v-flex xs12>
+                <TextEditor
+                    ref="msgEditor"
+                    v-model="topicEditor.msg"
+                    style="max-height: 80vh"
+                />
+            </v-flex>
+
+            <VEmojiPicker
+                v-if="topicEditor.displayEmojis"
+                :emojis-by-row="10"
+                :show-search="false"
+                style="width: 100%; margin-top: 10px;"
+                @select="selectEmoji"
+            />
+          </v-layout>
+        </v-container>
+        <v-card-actions>
+            <v-tooltip
+                v-if="$vuetify.breakpoint.lgAndUp"
+                bottom
+            >
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                    style="margin: 5px 0 -5px 10px;"
+                    v-on="on"
+                    @click="switchSmilies()"
+                    >
+                    Smilies
+                    </v-btn>
+                </template>
+                <span>Voir les smilies</span>
+            </v-tooltip>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="resetDialog()"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            color="accent"
+            @click="saveTopic()"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -127,8 +231,14 @@ import store from '../../store';
 import { fr } from "date-fns/locale";
 import { differenceInMonths, format } from 'date-fns';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
+import TextEditor from '../../components/TextEditor.vue';
+import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
 
 export default {
+    components: {
+        TextEditor,
+        VEmojiPicker
+    },
     data: () => ({
         isLoading: false,
         breadcrumb: [],
@@ -144,6 +254,15 @@ export default {
             { text: 'Dernier message', value: 'last' },
         ],
         items: [],
+        topicEditor: {
+            disabled: true,
+            open: false,
+            forum: null,
+            forumsList: [],
+            title: "",
+            msg: "",
+            displayEmojis: false,
+        },
     }),
     watch: {
         $route(change) {
@@ -161,8 +280,12 @@ export default {
                 // On récupère la liste des sujets du forum
                 axios.get(`/api/forum/browse/${forumId}`).then(response => {
                     const data = parseAxiosResponse(response);
+                    console.log(data)
                     this.breadcrumb.push({ label: data.forum.name, url: `/forum/browse/${data.forum.id}` });
                     this.items = data.topics;
+                    this.topicEditor.disabled = data.forum.archived,
+                    this.topicEditor.forumsList = [data.forum];
+                    this.topicEditor.forum = data.forum;
                     this.isLoading = false;
                 });
             } else {
@@ -170,12 +293,51 @@ export default {
                 this.breadcrumb = [];
                 axios.get(`/api/forum/browse`).then(response => {
                     this.items = parseAxiosResponse(response);
+                    this.topicEditor.disabled = false,
+                    this.topicEditor.forumsList = this.items.filter(f => f.id !== 2 && !f.archived);
+                    this.topicEditor.forum = this.items[0];
                     this.isLoading = false;
                 });
             }
         },
         formatDate(date) {
             return format(new Date(date), "'le' cccc d MMM yyyy 'à' HH:mm", { locale: fr });
+        },
+
+        // On affiche ou masque les smilies
+        switchSmilies() {
+            this.topicEditor.displayEmojis = !this.topicEditor.displayEmojis;
+        },
+
+        selectEmoji(emoji) {
+            this.$refs.msgEditor.insert(emoji.data);
+        },
+
+        newTopic() {
+            this.topicEditor.open = true;
+            this.topicEditor.forumId = null;
+            this.topicEditor.title = ""
+        },
+        resetDialog() {
+            this.topicEditor.open = false;
+        },
+        saveTopic() {
+            const formData = new FormData();
+            formData.append("forumId", this.topicEditor.forum.id);
+            formData.append("topicTitle", this.topicEditor.title);
+            formData.append("text", this.topicEditor.msg);
+            axios.post(`/api/forum/post`, formData, {
+                headers: {
+                    "Content-Type" : "multipart/form-data",
+                }
+            })
+            .then( response => {
+                const msg = parseAxiosResponse(response);
+                this.$router.push({ path: `/forum/read/${msg.topic.id}`})
+            })
+            .catch( err => {
+                store.commit('onError', err);
+            });
         }
     }
 };
