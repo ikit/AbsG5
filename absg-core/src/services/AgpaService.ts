@@ -14,6 +14,7 @@ import { getRepository, Equal } from "typeorm";
 import { saveImage, shuffleArray } from "../middleware/commonHelper";
 import * as path from "path";
 import * as fs from "fs";
+import { websocketService, WSMessageType } from "./WebsocketService";
 
 class AgpaService {
     photoRepo = null;
@@ -75,6 +76,22 @@ class AgpaService {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
             return ceremonyData(year);
         }
+        return null;
+    }
+
+    /**
+     * Route appelé par le maitre de cérémonie pour notifier les autres utilisateurs 
+     * de changer de page automatiquement
+     * @param year année de la cérémonie
+     * @param slide index de la page à afficher
+     * @param hash la signature du slide
+     * @param user l'utilisateur qui fait cet appel
+     */
+    notifyMasterSlide(year: number, slide: number, hash: string, user: User) {
+        websocketService.broadcast({
+            message: WSMessageType.agpaSynchSlide,
+            payload: { year, slide, hash, user }
+        });
         return null;
     }
 

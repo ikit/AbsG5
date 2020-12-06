@@ -132,6 +132,7 @@ export async function getMetaData(year = null, force = false): Promise<any> {
         WHERE (c.to IS NULL OR c.to >= ${year}) AND c.from <= ${year}
         ORDER BY c."order"`;
     let result = await repo.query(sql);
+
     for (const row of result) {
         if (row.id > 0) {
             data.categoriesOrders.push(row.id);

@@ -73,6 +73,16 @@ export class AgpaController {
         return agpaService.getCeremonyData(year);
     }
 
+    @Get("/ceremony/:year([0-9]{4})/notifyMasterSlide/:slide([0-9]+)/:hash")
+    notifyMasterSlide(
+        @Param("year") year: number,
+        @Param("slide") slide: number,
+        @Param("hash") hash: string,
+        @CurrentUser() user
+    ) {
+        return agpaService.notifyMasterSlide(year, slide, hash, user);
+    }
+
     @Get("/palmares")
     getPalmares() {
         return agpaService.getPalmaresData();

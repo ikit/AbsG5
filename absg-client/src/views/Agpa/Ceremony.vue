@@ -9,7 +9,7 @@
           </section>
 
           <section>
-            <h3>Participation</h3>
+            <h3>Participation</h3>Reveal.layout();
             <highcharts :options="stats.diag1" />
           </section>
 
@@ -195,14 +195,18 @@
 
 <script>
 import axios from 'axios';
+import { mapState } from 'vuex';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
 import {Chart} from 'highcharts-vue';
+import * as md5 from "md5";
 import Reveal from 'reveal.js';
+import store from '../../store';
 
 export default {
-    name: 'Ceremony',
+    name: "Ceremony",
+    store,
     components: {
         highcharts: Chart
     },
@@ -210,6 +214,7 @@ export default {
         isLoading: false,
         year: 2018,
         slides: [],
+        isMaster: false,
         stats: {
             diag1: {
                 chart: {
@@ -252,12 +257,34 @@ export default {
             }
         }
     }),
+    computed: { ...mapState([
+        "user",
+        "wsMessage",
+    ])},
+    watch: {
+        wsMessage(newValue, oldValue) {
+            if (newValue.message === "agpaSynchSlide") {
+                // On va au slide du maitre de cérémonie automatiquement
+                const slideIdx = newValue.payload.slide;
+                const slideHash = newValue.payload.hash;
+                const remoteUser = newValue.payload.user;
+                if (!this.isMaster && remoteUser.id != this.user.id) {
+                    const hashIdx = this.slides.findIndex(s => s.hash === slideHash);
+                    console.log(" > update slide:", slideIdx, hashIdx)
+                    Reveal.slide(hashIdx > -1 ? hashIdx + 2 : slideIdx, 0, 0);
+                }
+            }
+        }
+    },
     mounted() {
         this.year = Number.parseInt(this.$route.params.year);
         this.initView()
     },
     methods: {
         initView() {
+            // Les admins sont maîtres de cérémonie
+            this.isMaster = !!this.user.roles.find(e => e === "admin");
+            console.log("setIsMaster", this.isMaster)
             // Reset photos list
             this.photosGalery = [];
             this.photosGalleryIndex = 0;
@@ -342,9 +369,25 @@ export default {
                             this.slides = this.slides.concat(awards.map(photo => { photo.type = "photoAward"; return photo; }));
                         }
                     }
+
+                    // POur la visio syncrhonisé des cérémonie, on ajoute à chaque slide une signature unique
+                    // pour pouvoir retrouver un slide malgrès l'ordre aléatoire de certains slide
+                    for (const s of this.slides) {
+                        s.hash = md5(JSON.stringify(s));
+                    }
                 }
+
                 this.isLoading = false;
                 Reveal.initialize({transition: "fade", progress: false, controls: false });
+
+                // On s'abonne aux événements
+                Reveal.on( 'slidechanged', event => {
+                    if (this.isMaster) {
+                        const slide = this.slides[event.indexh - 2];
+                        let hash = slide ? slide.hash : "-";
+                        axios.get(`/api/agpa/ceremony/${this.year}/notifyMasterSlide/${event.indexh}/${hash}`);
+                    }
+                });
             });
         },
 

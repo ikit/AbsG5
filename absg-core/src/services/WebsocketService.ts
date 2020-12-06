@@ -3,7 +3,8 @@ import wss from "../wss";
 export enum WSMessageType {
     notification = "notification",
     pinnedTopicsChanged = "pinnedTopicsChanged",
-    onlineUsers = "onlineUsers"
+    onlineUsers = "onlineUsers",
+    agpaSynchSlide = "agpaSynchSlide"
 }
 
 export interface WSMessage {

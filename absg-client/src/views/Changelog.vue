@@ -8,6 +8,24 @@
     > Voir la feuille de route </a>
 
 
+
+    <h2>
+      5.1
+    </h2>
+    <v-card>
+      <p>Fonctionnalités</p>
+      <ul>
+        <li>AGPA Cérémonies en ligne synchronisés</li>
+        <li>Mise en place des notifications</li>
+        <li>Forum: création de nouveau sujet de discussion</li>
+      </ul>
+      <p>Bug corrigés</p>
+      <ul>
+        <li>AGPA P1: Diaporama</li>
+        <li>AGPA P1: Indicateur de chargement lors de la sauvegarde/édition d'une image</li>
+      </ul>
+    </v-card>
+
     <h2>
       5.0
     </h2>
@@ -22,8 +40,6 @@
       <ul>
         <li>Problème de connection pour les identifiants avec accent</li>
         <li>Forum: Suppression dernier message d'un sujet sur le forum</li>
-        <li>AGPA P1: Diaporama</li>
-        <li>AGPA P1: Indicateur de chargement lors de la sauvegarde/édition d'une image</li>
       </ul>
     </v-card>
 
