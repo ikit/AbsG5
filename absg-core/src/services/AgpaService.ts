@@ -80,7 +80,7 @@ class AgpaService {
     }
 
     /**
-     * Route appelé par le maitre de cérémonie pour notifier les autres utilisateurs 
+     * Route appelé par le maitre de cérémonie pour notifier les autres utilisateurs
      * de changer de page automatiquement
      * @param year année de la cérémonie
      * @param slide index de la page à afficher
