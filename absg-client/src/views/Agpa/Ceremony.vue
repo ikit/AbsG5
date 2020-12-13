@@ -270,7 +270,6 @@ export default {
                 const remoteUser = newValue.payload.user;
                 if (!this.isMaster && remoteUser.id != this.user.id) {
                     const hashIdx = this.slides.findIndex(s => s.hash === slideHash);
-                    console.log(" > update slide:", slideIdx, hashIdx)
                     Reveal.slide(hashIdx > -1 ? hashIdx + 2 : slideIdx, 0, 0);
                 }
             }
