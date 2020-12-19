@@ -283,7 +283,6 @@ export default {
         initView() {
             // Les admins sont maîtres de cérémonie
             this.isMaster = !!this.user.roles.find(e => e === "admin");
-            console.log("setIsMaster", this.isMaster)
             // Reset photos list
             this.photosGalery = [];
             this.photosGalleryIndex = 0;

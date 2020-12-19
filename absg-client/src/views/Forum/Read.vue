@@ -75,19 +75,27 @@ export default {
         breadcrumb: [],
         pinned: false,
     }),
+    watch: {
+        $route(change) {
+            this.init();
+        }
+    },
     mounted() {
-        this.isLoading = true;
-        this.topicId = Number.parseInt(this.$route.params.topicId);
-        axios.get(`/api/forum/read/${this.topicId}`).then(response => {
-            const data = parseAxiosResponse(response);
-            this.$refs.messageReader.initTopic(data);
-
-            this.breadcrumb.push({ label: data.topic.forum.name, url: `/forum/browse/${data.topic.forum.id}` });
-            this.breadcrumb.push({ label: data.topic.name, url: `/forum/read/${data.topic.id}` });
-            this.pinned = data.topic.pinned;
-        });
+        this.init();
     },
     methods: {
+        init() {
+            this.isLoading = true;
+            this.topicId = Number.parseInt(this.$route.params.topicId);
+            axios.get(`/api/forum/read/${this.topicId}`).then(response => {
+                const data = parseAxiosResponse(response);
+                this.$refs.messageReader.initTopic(data);
+                this.breadcrumb = [];
+                this.breadcrumb.push({ label: data.topic.forum.name, url: `/forum/browse/${data.topic.forum.id}` });
+                this.breadcrumb.push({ label: data.topic.name, url: `/forum/read/${data.topic.id}` });
+                this.pinned = data.topic.pinned;
+            });
+        },
         switchPin() {
             axios.get(`/api/forum/topic/${this.topicId}/switchPin`).then(response => {
                 const topic = parseAxiosResponse(response);

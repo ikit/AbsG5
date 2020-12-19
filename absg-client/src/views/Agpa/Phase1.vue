@@ -1,6 +1,5 @@
 <template>
-
-<section id="content">
+  <section id="content">
     <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip
@@ -36,181 +35,188 @@
       />
     </div>
     <div v-if="agpaMeta">
-        <div
+      <div
         v-for="catIdx of agpaMeta.categoriesOrders"
         :key="catIdx"
         style="margin: 15px; margin-top: 50px;"
-        >
+      >
         <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
-            <img
+          <img
             :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
             width="100px"
             style="position: absolute; top: -50px; left: 275px"
-            >
-            <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
+          >
+          <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
             <span style="font-family: 'Tangerine', serif; font-size: 2em">
-                {{ agpaMeta.categories[catIdx].title }}
+              {{ agpaMeta.categories[catIdx].title }}
             </span>
             <v-spacer />
             <v-tooltip bottom>
-                <v-spacer />
-                <template #activator="{ on }">
+              <v-spacer />
+              <template #activator="{ on }">
                 <span
-                    style="line-height: 48px; margin-right: 10px;"
-                    v-on="on"
+                  style="line-height: 48px; margin-right: 10px;"
+                  v-on="on"
                 ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
-                </template>
-                <span>Nombre total de participants</span>
+              </template>
+              <span>Nombre total de participants</span>
             </v-tooltip>
                     &nbsp; &nbsp;
             <v-tooltip bottom>
-                <v-spacer />
-                <template #activator="{ on }">
+              <v-spacer />
+              <template #activator="{ on }">
                 <span
-                    style="line-height: 48px"
-                    v-on="on"
+                  style="line-height: 48px"
+                  v-on="on"
                 ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
-                </template>
-                <span>Nombre total de photos</span>
+              </template>
+              <span>Nombre total de photos</span>
             </v-tooltip>
-            </v-row>
-            <p style="font-size:0.9em; margin: 10px; text-align: center">
+          </v-row>
+          <p style="font-size:0.9em; margin: 10px; text-align: center">
             {{ agpaMeta.categories[catIdx].description }}
-            </p>
-            <div style="display: flex; width: 100%;">
+          </p>
+          <div style="display: flex; width: 100%;">
             <template v-for="(photo, idx) in photos">
-                <PhotoWidget
-                    v-if="photo.categoryId == catIdx"
-                    :key="idx"
-                    style="display: inline-block; width: 250px; margin: 0 auto;"
-                    :photo="photo"
-                    @new-photo="onNewPhoto(catIdx)"
-                    @edit-photo="onEditPhoto(photo)"
-                    @delete-photo="onDeletePhoto(photo)"
-                    @click="photosGalleryDisplay(photo)""
-                />
+              <PhotoWidget
+                v-if="photo.categoryId == catIdx"
+                :key="idx"
+                style="display: inline-block; width: 250px; margin: 0 auto;"
+                :photo="photo"
+                @new-photo="onNewPhoto(catIdx)"
+                @edit-photo="onEditPhoto(photo)"
+                @delete-photo="onDeletePhoto(photo)"
+                @click="photosGalleryDisplay(photo)"
+              />
             </template>
-            </div>
+          </div>
         </v-card>
-        </div>
+      </div>
 
-        <!-- Enregistrement/Edition photo -->
-        <v-dialog
+      <!-- Enregistrement/Edition photo -->
+      <v-dialog
         v-model="photoEditor.open"
         width="800px"
-        >
+      >
         <v-card>
-            <v-card-title class="grey lighten-4 py-4 title">
+          <v-card-title class="grey lighten-4 py-4 title">
             Nouvelle photo {{ agpaMeta.categories[photoEditor.categoryId].title }}
-            </v-card-title>
-            <v-container
+          </v-card-title>
+          <v-container
             grid-list-sm
             class="pa-4"
-            >
+          >
             <v-text-field
-                v-model="photoEditor.title"
-                prepend-icon="fas fa-feather-alt"
-                label="Titre"
+              v-model="photoEditor.title"
+              prepend-icon="fas fa-feather-alt"
+              label="Titre"
             />
             <ImageEditor
-                ref="imgEditor"
-                :former-url="photoEditor.photo ? photoEditor.photo.url : ''"
-                icon="fas fa-camera"
-                style="height: 300px;"
+              ref="imgEditor"
+              :former-url="photoEditor.photo ? photoEditor.photo.url : ''"
+              icon="fas fa-camera"
+              style="height: 300px;"
             />
-            <div class="loading-indicator" v-if="photoEditor.isLoading">
-                <p v-if="photoEditor.complete < 100">Téléchargement de la photo sur le serveur : {{ photoEditor.complete }}%</p>
-                <p v-if="photoEditor.complete >= 100">Enregistrement de la photo et création des vignettes</p>
+            <div
+              v-if="photoEditor.isLoading"
+              class="loading-indicator"
+            >
+              <p v-if="photoEditor.complete < 100">
+                Téléchargement de la photo sur le serveur : {{ photoEditor.complete }}%
+              </p>
+              <p v-if="photoEditor.complete >= 100">
+                Enregistrement de la photo et création des vignettes
+              </p>
             </div>
-            </v-container>
-            <v-card-actions>
+          </v-container>
+          <v-card-actions>
             <v-spacer />
             <v-btn
-                text
-                color="primary"
-                :disabled="photoEditor.isLoading"
-                @click="resetEditor()"
+              text
+              color="primary"
+              :disabled="photoEditor.isLoading"
+              @click="resetEditor()"
             >
-                Annuler
+              Annuler
             </v-btn>
             <v-btn
-                color="accent"
-                :disabled="photoEditor.isLoading"
-                :loading="photoEditor.isLoading"
-                @click="savePhoto()"
+              color="accent"
+              :disabled="photoEditor.isLoading"
+              :loading="photoEditor.isLoading"
+              @click="savePhoto()"
             >
-                Enregistrer
+              Enregistrer
             </v-btn>
-            </v-card-actions>
+          </v-card-actions>
         </v-card>
-        </v-dialog>
+      </v-dialog>
 
-        <!-- Suppression photo -->
-        <v-dialog
+      <!-- Suppression photo -->
+      <v-dialog
         v-model="photoDeletion.open"
         width="800px"
-        >
+      >
         <v-card v-if="photoDeletion.photo">
-            <v-card-title class="grey lighten-4">
+          <v-card-title class="grey lighten-4">
             Êtes vous sûr de vouloir supprimer cette photo ?
-            </v-card-title>
-            <div style="text-align: center; margin-top: 10px">
+          </v-card-title>
+          <div style="text-align: center; margin-top: 10px">
             <img
-                :src="photoDeletion.photo.thumb"
-                style="margin:auto"
-                class="thumb"
+              :src="photoDeletion.photo.thumb"
+              style="margin:auto"
+              class="thumb"
             >
             <p style="margin: 10px;">
-                {{ photoDeletion.photo.title }}
+              {{ photoDeletion.photo.title }}
             </p>
-            </div>
-            <v-card-actions>
+          </div>
+          <v-card-actions>
             <v-spacer />
             <v-btn
-                text
-                color="primary"
-                @click="photoDeletion.open = false"
+              text
+              color="primary"
+              @click="photoDeletion.open = false"
             >
-                Annuler
+              Annuler
             </v-btn>
             <v-btn
-                color="accent"
-                @click="deletePhoto()"
+              color="accent"
+              @click="deletePhoto()"
             >
-                Supprimer
+              Supprimer
             </v-btn>
-            </v-card-actions>
+          </v-card-actions>
         </v-card>
-        </v-dialog>
+      </v-dialog>
 
 
-        <!-- Aide -->
-        <v-dialog
+      <!-- Aide -->
+      <v-dialog
         v-model="help.displayed"
         width="800px"
-        >
+      >
         <v-card>
-            <v-card-title class="grey lighten-4">
+          <v-card-title class="grey lighten-4">
             <v-icon left>
-                far fa-question-circle
+              far fa-question-circle
             </v-icon>
             Aide sur le déroulement du concours
-            </v-card-title>
-            <Help selected-tab="2" />
-            <v-card-actions>
+          </v-card-title>
+          <Help selected-tab="2" />
+          <v-card-actions>
             <v-spacer />
             <v-btn
-                text
-                color="primary"
-                @click="help.displayed = false"
+              text
+              color="primary"
+              @click="help.displayed = false"
             >
-                Fermer
+              Fermer
             </v-btn>
-            </v-card-actions>
+          </v-card-actions>
         </v-card>
-        </v-dialog>
+      </v-dialog>
     </div>
-</section>
+  </section>
 </template>
 
 
@@ -390,7 +396,6 @@ export default {
             this.photoDeletion.photo = photo;
         },
         photosGalleryDisplay(photo) {
-            console.log("display photo", this.photos)
             const index = this.photos.filter(p => p.id > -1).findIndex(p => p.id === photo.id);
             if (index > -1) {
                 store.commit('photosGallerySetIndex', index);

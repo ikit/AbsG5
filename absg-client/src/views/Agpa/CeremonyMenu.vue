@@ -24,7 +24,10 @@
       Vous avez encore le temps... en attendant vous pouvez revoir les anciennes cérémonies:
     </p>
 
-    <v-container fluid :style="{ 'display': current.displayed ? 'none' : 'block' }">
+    <v-container
+      fluid
+      :style="{ 'display': current.displayed ? 'none' : 'block' }"
+    >
       <v-layout
         row
         wrap

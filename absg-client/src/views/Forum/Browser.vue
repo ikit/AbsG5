@@ -53,8 +53,8 @@
           <v-spacer />
           <v-btn
             v-if="$vuetify.breakpoint.mdAndUp"
-            @click.stop="newTopic()"
             :disabled="topicEditor.disabled"
+            @click.stop="newTopic()"
           >
             <v-icon left>
               fas fa-plus
@@ -173,38 +173,38 @@
               />
             </v-flex>
             <v-flex xs12>
-                <TextEditor
-                    ref="msgEditor"
-                    v-model="topicEditor.msg"
-                    style="max-height: 80vh"
-                />
+              <TextEditor
+                ref="msgEditor"
+                v-model="topicEditor.msg"
+                style="max-height: 80vh"
+              />
             </v-flex>
 
             <VEmojiPicker
-                v-if="topicEditor.displayEmojis"
-                :emojis-by-row="10"
-                :show-search="false"
-                style="width: 100%; margin-top: 10px;"
-                @select="selectEmoji"
+              v-if="topicEditor.displayEmojis"
+              :emojis-by-row="10"
+              :show-search="false"
+              style="width: 100%; margin-top: 10px;"
+              @select="selectEmoji"
             />
           </v-layout>
         </v-container>
         <v-card-actions>
-            <v-tooltip
-                v-if="$vuetify.breakpoint.lgAndUp"
-                bottom
-            >
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                    style="margin: 5px 0 -5px 10px;"
-                    v-on="on"
-                    @click="switchSmilies()"
-                    >
-                    Smilies
-                    </v-btn>
-                </template>
-                <span>Voir les smilies</span>
-            </v-tooltip>
+          <v-tooltip
+            v-if="$vuetify.breakpoint.lgAndUp"
+            bottom
+          >
+            <template #activator="{ on }">
+              <v-btn
+                style="margin: 5px 0 -5px 10px;"
+                v-on="on"
+                @click="switchSmilies()"
+              >
+                Smilies
+              </v-btn>
+            </template>
+            <span>Voir les smilies</span>
+          </v-tooltip>
           <v-spacer />
           <v-btn
             text
@@ -280,7 +280,6 @@ export default {
                 // On récupère la liste des sujets du forum
                 axios.get(`/api/forum/browse/${forumId}`).then(response => {
                     const data = parseAxiosResponse(response);
-                    console.log(data)
                     this.breadcrumb.push({ label: data.forum.name, url: `/forum/browse/${data.forum.id}` });
                     this.items = data.topics;
                     this.topicEditor.disabled = data.forum.archived,

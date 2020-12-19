@@ -1,7 +1,5 @@
 <template>
   <div>
-
-
     <v-timeline
       v-if="messages.length > 0"
       align-top
@@ -14,10 +12,10 @@
         fill-dot
         color="#fff"
       >
-        <template v-slot:icon>
+        <template #icon>
           <div>
             <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
+              <template #activator="{ on }">
                 <img
                   :src="msg.poster.avatar"
                   style="width: 50px;"
@@ -47,7 +45,7 @@
         >
           <div class="msgControls">
             <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
+              <template #activator="{ on }">
                 <a
                   v-on="on"
                   @click="edit(msg)"
@@ -57,7 +55,7 @@
             </v-tooltip>
             -
             <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
+              <template #activator="{ on }">
                 <a
                   v-on="on"
                   @click="supr(msg)"
@@ -83,7 +81,7 @@
       />
       <div>
         <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-btn
               style="margin: 5px 0 -5px 0;"
               v-on="on"
@@ -98,7 +96,7 @@
           v-if="$vuetify.breakpoint.lgAndUp"
           bottom
         >
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-btn
               style="margin: 5px 0 -5px 10px;"
               v-on="on"
@@ -159,9 +157,9 @@
           Modifier le message
         </v-card-title>
         <TextEditor
-            ref="msgEditor"
-            v-model="editMessageText"
-            style="max-height: 80vh"
+          ref="msgEditor"
+          v-model="editMessageText"
+          style="max-height: 80vh"
         />
 
         <v-card-actions>
