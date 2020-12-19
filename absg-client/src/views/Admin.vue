@@ -2,24 +2,24 @@
   <div>
     <v-tabs centered>
       <v-tab
+        v-if="isAdmin"
         :to="{path:'/admin/dashboard'}"
-        style="color: red"
       >
         <v-icon left>
           fas fa-tachometer-alt
         </v-icon> Tableau de bord
       </v-tab>
       <v-tab
+        v-if="isAdmin"
         :to="{path:'/admin/settings'}"
-        style="color: red"
       >
         <v-icon left>
           fas fa-tools
         </v-icon> Paramètres généraux
       </v-tab>
       <v-tab
+        v-if="isAdmin"
         :to="{path:'/admin/users'}"
-        style="color: red"
       >
         <v-icon left>
           fas fa-users-cog
@@ -40,9 +40,23 @@
 
 
 <script>
+import store from "../store";
+import { mapState } from "vuex";
 
 export default  {
-    data: () => ({}),
+    store,
+    data: () => ({
+        isAdmin: false
+    }),
+    computed: {
+        ...mapState([
+            "user",
+        ]),
+    },
+    mounted() {
+        console.log(this.user)
+        this.isAdmin = this.user ? this.user.roles.indexOf("admin") > -1 : false;
+    }
 };
 </script>
 

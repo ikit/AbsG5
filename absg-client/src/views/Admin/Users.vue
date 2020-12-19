@@ -12,7 +12,7 @@
           />
           <v-spacer />
           <v-btn @click="resetDialog(true)">
-            <v-icon small>
+            <v-icon small left>
               fa-plus
             </v-icon>
             Nouvel utilisateur

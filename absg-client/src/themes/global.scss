@@ -112,3 +112,12 @@ h1 {
     color: white;
     background-color: $error;
 }
+
+.row {
+    display: flex;
+    margin: 0;
+}
+
+.column {
+    flex: 1 1 auto;
+}
