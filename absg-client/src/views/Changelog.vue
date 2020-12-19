@@ -18,11 +18,13 @@
         <li>AGPA Cérémonies en ligne synchronisés</li>
         <li>Mise en place des notifications</li>
         <li>Forum: création de nouveau sujet de discussion</li>
+        <li>Notification: précision des sujets concernés par les nouveaux messages</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>
         <li>AGPA P1: Diaporama</li>
         <li>AGPA P1: Indicateur de chargement lors de la sauvegarde/édition d'une image</li>
+        <li>Forum: navigation/chargement d'un sujet à l'autre</li>
       </ul>
     </v-card>
 
