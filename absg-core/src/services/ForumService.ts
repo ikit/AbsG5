@@ -245,12 +245,13 @@ class ForumService {
             }
         }
         await this.msgRepo.save(msg);
-        // On prévient les utilisateur seulement quand il s'agit d'un nouveau message
+        // On prévient les utilisateurs seulement quand il s'agit d'un nouveau message
         if (!data.postId) {
+            const tname = topic ? topic.name : "T.B.Z. ";
             logger.notice(
                 data.topicTitle
-                    ? `Nouvelle discussion lancée par ${user.username}`
-                    : `Nouveau message ajouté par ${user.username}`,
+                    ? `Nouvelle discussion lancée par ${user.username}: ${tname}`
+                    : `Nouveau message ajouté par ${user.username} dans ${tname}`,
                 {
                     userId: user.id,
                     module: LogModule.forum,
@@ -266,7 +267,6 @@ class ForumService {
         }
 
         // On met à jour le sujet et forum
-        console.log("SAVE FORUM MSG", msg);
         if (msg.topic) {
             msg.topic.firstMessage = msg.topic.firstMessage ? msg.topic.firstMessage : ({ id: msg.id } as ForumMessage);
             msg.topic.lastMessage = { id: msg.id } as ForumMessage;
@@ -309,6 +309,7 @@ class ForumService {
             forumId = msg.forum.id;
             topicId = msg.topic ? msg.topic.id : null;
         }
+        console.log("DELETE", forumId, topicId, msg);
         if (!msg) {
             throw new BadRequestError(`Le message avec l'identifiant n°${id} n'existe pas.`);
         }
@@ -354,16 +355,6 @@ class ForumService {
                     await this.msgRepo.save(msg);
                     await this.topicRepo.delete(topic);
                 }
-            } else if (msg.topic.lastMessage.id === msg.id) {
-                // Cas spécial du dernier message TBZ
-                const fMsgs = await this.msgRepo
-                    .createQueryBuilder("q")
-                    .where(`q."forumId" IS NULL`)
-                    .orderBy("q.datetime", "DESC")
-                    .limit(2)
-                    .getMany();
-                msg.topic.lastMessage = { id: fMsgs.filter(m => m.id != msg.id)[0].id } as ForumMessage;
-                await this.topicRepo.save(msg.topic);
             }
 
             // On supprime le message
