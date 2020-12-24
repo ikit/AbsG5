@@ -187,6 +187,7 @@ export default new Vuex.Store({
             state.warning.displayed = true;
         },
         onError(state, axiosError) {
+            console.log(axiosError)
             state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
             state.error.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
             state.error.displayed = true;

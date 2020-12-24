@@ -335,14 +335,28 @@ class AgpaService {
         });
 
         // On supprime la photo du server
-        if (photo && photo.user.id === user.id) {
+        if (photo && (user.is("admin") || photo.user.id === user.id)) {
             const thumb = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/vignette_${photo.filename}`);
             const web = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/${photo.filename}`);
             const raw = path.join(process.env.PATH_FILES, `agpa/${photo.year}/${photo.filename}`);
 
-            fs.unlinkSync(thumb);
-            fs.unlinkSync(web);
-            fs.unlinkSync(raw);
+            // On essaye de supprimer les images (on ignore les erreurs potentiel si fichiers inexistant)
+            try {
+                fs.unlinkSync(thumb);
+            } catch (err) {
+                logger.warning(`Suppression photo ${id}/thumb impossible: ${JSON.stringify(err)}`, err);
+            }
+            try {
+                fs.unlinkSync(web);
+            } catch (err) {
+                logger.warning(`Suppression photo ${id}/web impossible: ${JSON.stringify(err)}`, err);
+            }
+            try {
+                fs.unlinkSync(raw);
+            } catch (err) {
+                logger.warning(`Suppression photo ${id}/raw impossible: ${JSON.stringify(err)}`, err);
+            }
+
             await this.photoRepo.remove(photo);
         }
 

@@ -262,6 +262,13 @@
           </div>
         </div>
         <v-card-actions>
+          <v-btn
+            v-if="isAdmin"
+            text
+            @click="photoDiscussion.deleteConfirmation = true"
+          >
+            Supprimer
+          </v-btn>
           <v-spacer />
           <v-btn
             text
@@ -269,6 +276,37 @@
             @click="photoDiscussion.displayed = false"
           >
             Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Photo suppression -->
+    <v-dialog
+      v-model="photoDiscussion.deleteConfirmation"
+      width="500px"
+    >
+      <v-card v-if="photoDiscussion.photo">
+        <v-card-title class="grey lighten-4">
+          Supprimer la photo ?
+        </v-card-title>
+        <p style="padding: 0 24px">
+          Êtes-vous sûr de vouloir supprimer cette photo ?
+        </p>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            @click="photoDiscussion.deleteConfirmation = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="deletePhoto()"
+          >
+            Supprimer
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -317,6 +355,7 @@ export default {
             status: "accepted",
             discussion: "",
             comment: "",
+            deleteConfirmation: false
         }
     }),
     computed: { ...mapState([
@@ -368,6 +407,7 @@ export default {
                 this.isLoading = false;
             }).catch( err => {
                 store.commit("onError", err);
+                this.isLoading = false;
             });
         },
         photosGalleryDisplay(index) {
@@ -385,6 +425,23 @@ export default {
         },
         gotoCat(catId) {
             this.$router.replace({path: `/agpa/edition?catId=${catId}`});
+        },
+
+        // Permet au admin de supprimer une photo
+        deletePhoto() {
+            axios.delete(`/api/agpa/photo/${this.photoDiscussion.photo.id}`)
+            .then(deletedPhoto => {
+                const idx = this.photosGalery.findIndex(p => p.id === deletedPhoto.id);
+                if (idx) {
+                    this.photosGalery.splice(idx, 1);
+                    store.commit('photosGalleryReset', this.photosGalery);
+                }
+                this.photoDiscussion.displayed = false;
+                this.photoDiscussion.deleteConfirmation = false;
+            })
+            .catch(err => {
+                store.commit("onError", err);
+            });
         },
         displayPhotoDiscussion(photo) {
             this.photoDiscussion.displayed = true;
