@@ -75,10 +75,5 @@
     "parserOptions": {
       "parser": "babel-eslint"
     }
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint && npm version patch --no-git-tag-version && git add package*.json"
-    }
   }
 }
