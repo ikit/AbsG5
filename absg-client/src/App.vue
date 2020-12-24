@@ -488,6 +488,7 @@ export default {
         usersOnline: [],
         menuItems: MODULES,
         version: "",
+        notificationRefreshing: false,
         notificationsHeaders: [
             { text: "Qui", value: "who" },
             { text: "Quoi", value: "what" },
@@ -647,10 +648,19 @@ export default {
             console.debug("TODO: photosGalleryAuto");
         },
         refreshNotifications() {
-            axios.get("/api/notifications").then( response => {
-                const notifications = parseAxiosResponse(response);
-                store.commit("updateNotifications", notifications);
-            })
+            if (!this.notificationRefreshing) {
+                this.notificationRefreshing = true;
+                axios.get("/api/notifications")
+                    .then( response => {
+                        const notifications = parseAxiosResponse(response);
+                        store.commit("updateNotifications", notifications);
+                        this.notificationRefreshing = false;
+                    })
+                    .catch(err => {
+                        store.commit("onError", err);
+                        this.notificationRefreshing = false;
+                    });
+            }
         },
         displayNotifications() {
             this.notifDialog = true;
