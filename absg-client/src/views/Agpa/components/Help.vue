@@ -178,10 +178,10 @@
         </p>
         <p>
           Les candidats qui votent, doivent attribuer un minimum de points dans chaque catégorie.
-          S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.
-          Un indicateur (en haut à droite) dans le formulaire de vote permet de savoir le nombre de points que l'on peut attribuer pour chaque catégorie
-          Ainsi que le nombre de point que l'on a déjà attribué. Cet indicateur passe du rouge au vert quand un nombre suffisant de points
-          a été attribués.
+            S'ils ne le font pas, pour les catégories concernées, leurs votes partiels ne seront pas pris en compte.
+            Un indicateur (en haut à droite) dans le formulaire de vote permet de savoir le nombre de points que l'on peut attribuer pour chaque catégorie
+            Ainsi que le nombre de point que l'on a déjà attribué. Cet indicateur passe du rouge au vert quand un nombre suffisant de points
+            a été attribués.
         </p>
       </div>
     </v-tab-item>
@@ -191,32 +191,32 @@
       <div class="help-content">
         <h3>Dépouillement des votes</h3>
         <p>
-          Le dépouillement va compter les votes reçues par chaque photo et établir un classement à la
-          fois au sein de la catégorie de la photo mais aussi globalement (toutes catégories confondues).
-          En cas d'égalité, le nombre total de votes reçus fait la différence (les photos ayant reçu le plus de votes passant devant en ayant reçu le moins).
-        </p>
+            Le dépouillement va compter les votes reçues par chaque photo et établir un classement à la
+            fois au sein de la catégorie de la photo mais aussi globalement (toutes catégories confondues).
+            En cas d'égalité, le nombre total de votes reçus fait la différence (les photos ayant reçu le plus de votes passant devant en ayant reçu le moins).
+          </p>
 
-        <p>
-          A partir de l'édition 2008 des AGPA, une note unique est calculée pour chaque photo.
-          Cette note dépend des deux critères de choix précédemment définis (nombre de points et nombre de votes),
-          mais également du nombre de photos de la catégorie à laquelle elle appartient et du nombre de jurés de l'édition du concours.
-          Cette variable a été créée pour permettre de comparer les photos entre elles à partir d’un chiffre unique,
-          quelques soient la catégorie ou l'édition pour lesquelles elles concourent.
-        </p>
+          <p>
+            A partir de l'édition 2008 des AGPA, une note unique est calculée pour chaque photo.
+            Cette note dépend des deux critères de choix précédemment définis (nombre de points et nombre de votes),
+            mais également du nombre de photos de la catégorie à laquelle elle appartient et du nombre de jurés de l'édition du concours.
+            Cette variable a été créée pour permettre de comparer les photos entre elles à partir d’un chiffre unique,
+            quelques soient la catégorie ou l'édition pour lesquelles elles concourent.
+          </p>
 
-        <p>
-          Remarques :
-          <ul>
-            <li>
-              Si cette note technique n'a pas vocation à être diffusée lors de la cérémonie des AGPA,
-              elle pourra être communiquée à chaque participant en faisant la demande;
-            </li>
-            <li>
-              Le palmarès des deux premières éditions ne sera pas modifié, même s’il aurait été différent avec ce mode d’évaluation,
-              qui tient compte des nombres différents de photos entre les catégories.
-            </li>
-          </ul>
-        </p>
+          <p>
+            Remarques :
+            <ul>
+              <li>
+                Si cette note technique n'a pas vocation à être diffusée lors de la cérémonie des AGPA,
+                elle pourra être communiquée à chaque participant en faisant la demande;
+              </li>
+              <li>
+                Le palmarès des deux premières éditions ne sera pas modifié, même s’il aurait été différent avec ce mode d’évaluation,
+                qui tient compte des nombres différents de photos entre les catégories.
+              </li>
+            </ul>
+          </p>
       </div>
     </v-tab-item>
 
@@ -225,9 +225,9 @@
       <div class="help-content">
         <h3>Cérémonie de remise des AGPA</h3>
         <p>
-          Le palmarès sera dévoilé au public lors d'une cérémonie organisé pour l'occasion. En dehors de l’honorifique attribution des AGPA d’or,
-          aucune récompense n’est assurée. Les photos gagnantes seront cependant durablement mises en ligne sur le site Absolument G.
-        </p>
+            Le palmarès sera dévoilé au public lors d'une cérémonie organisé pour l'occasion. En dehors de l’honorifique attribution des AGPA d’or,
+            aucune récompense n’est assurée. Les photos gagnantes seront cependant durablement mises en ligne sur le site Absolument G.
+          </p>
       </div>
     </v-tab-item>
   </v-tabs>
