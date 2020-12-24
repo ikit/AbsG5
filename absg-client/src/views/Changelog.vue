@@ -19,6 +19,7 @@
         <li>Mise en place des notifications</li>
         <li>Forum: création de nouveau sujet de discussion</li>
         <li>Notification: précision des sujets concernés par les nouveaux messages</li>
+        <li>Admin: AGPA P2 suppression de photo</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>
