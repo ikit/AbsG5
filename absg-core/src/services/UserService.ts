@@ -166,17 +166,23 @@ L'équipe système`,
     /**
      * Retourne les dernières notifications à afficher pour l'utilisateur
      */
-    public async getLastNotifications(user: User) {
+    public async getLastNotifications(user: User, sysLog = false) {
         // On récupère où en est l'utilisateur de son activité
         // user.lastTime
+        let where = "WHERE severity = 'notice'";
+        let limit = 50;
+        if (sysLog && user.is("admin")) {
+            where = "";
+            limit = 1000;
+        }
 
         // On récupère les 50 dernières notifications sur les 7 derniers jours
         const sql = `SELECT l.*, u.username
             FROM log_system l
-            INNER JOIN "user" u ON u.id = l."userId" 
-            WHERE severity = 'notice'
+            LEFT JOIN "user" u ON u.id = l."userId" 
+            ${where}
             ORDER BY l.datetime DESC
-            LIMIT 50`;
+            LIMIT ${limit}`;
         const notifs = await getRepository(LogPassag).query(sql);
         const notReads = user.activity.unreadNotifications;
         notifs.forEach(e => (e.read = notReads.indexOf(e.id) === -1));

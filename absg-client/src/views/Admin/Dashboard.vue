@@ -98,7 +98,7 @@ export default {
     },
     methods: {
         refreshLogs() {
-            axios.get("/api/notifications").then( response => {
+            axios.get("/api/admin/notifications").then( response => {
                 const notifications = parseAxiosResponse(response);
                 this.notifications = notifications;
             })

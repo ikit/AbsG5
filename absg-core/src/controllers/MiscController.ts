@@ -105,6 +105,15 @@ export class UserController {
      * Récupère les notifications d'un utilisateur
      */
     @Authorized()
+    @Get("/admin/notifications")
+    nadminNtifications(@CurrentUser() user: User) {
+        return userService.getLastNotifications(user, true);
+    }
+
+    /**
+     * Récupère les notifications d'un utilisateur
+     */
+    @Authorized()
     @Get("/notifications")
     notifications(@CurrentUser() user: User) {
         return userService.getLastNotifications(user);

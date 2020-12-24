@@ -22,14 +22,14 @@
               class="categories"
               style="width: 100%; text-align: left;"
             >
-              <tr><th>Portrait</th><td>Photos mettant en évidence un personnage unique d'au moins douze ans au moment de la prise de vue</td></tr>
-              <tr><th>Groupe et événement</th><td>Toutes photos avec au moins un personnage (enfants comme adulte) sont acceptés dans cette catégorie</td></tr>
-              <tr><th>Enfant</th><td>Photos mettant en évidence un enfant de moins de douze ans au moment de la prise de vue</td></tr>
-              <tr><th>Nature</th><td>Photos mettant en évidence un sujet principal floristique, faunistique ou naturel</td></tr>
+              <tr><th>Portrait</th><td>Photos mettant en évidence un personnage unique de plus de douze ans (âge pris lors de l'année en cours)</td></tr>
+              <tr><th>Groupe et événement</th><td>Photos de groupes avec au minimum deux individus sur la photo. Peut importe l'âge, il peut s'agir aussi bien d'enfants que d'adultes</td></tr>
+              <tr><th>Enfant</th><td>Portraits ou photos de groupe d'enfants de douze ans ou moins (âge pris lors de l'année en cours)</td></tr>
+              <tr><th>Nature</th><td>Photos mettant l'accent sur un sujet ou phénomène naturel (végétal, animal, minéral, météorologique, ...). Les paysages naturels sont aussi acceptés</td></tr>
               <tr><th>Grand angle</th><td>Tous types de paysages et panoramas</td></tr>
-              <tr><th>Manus Hominum</th><td>Photos dont le sujet principal est marqué par l'empreinte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme ...)</td></tr>
+              <tr><th>Manus Hominum</th><td>Photos dont le sujet principal est marqués par l'emprunte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme, ...)</td></tr>
               <tr><th>Spéciale</th><td>Chaque année, un thème particulier est choisi</td></tr>
-              <tr><th>Autre regard</th><td>Photos humoristiques, artistiques, décalées ou retouchées, ainsi que toutes celles n’entrant pas dans les autres catégories</td></tr>
+              <tr><th>Autre regard</th><td>Photos humoristiques, artistiques, décalées ou retouchées, ainsi que toutes celles n'ayant pas trouvées leurs places dans les autres catégories</td></tr>
             </v-simple-table>
           </v-card>
         </v-expansion-panel-content>
@@ -163,7 +163,9 @@
             les fichiers enregistrés sur le site, doit faire moins de 200Mo.
             Lors de l'enregistrement, les photos trop grosses seront redimmensionnées automatiquement par le site Absolument G. Si toutefois vous voulez gérer
             vous-mêmes le redimmensionnement, il est conseillé de fournis des photos en haute résolution, c'est à dire à minima <b>FULL HD</b> (1920 x 1080).
-            Mais du <b>4K</b> (3840 x 2160) serait préférable afin de permettre à ceux qui le souhaiterais de profiter d'une projection des photos en hautes qualités.
+            Mais du <b>4K</b> (3840 x 2160) serait préférable afin de permettre à ceux qui le souhaiterais
+            de profiter d'une projection des photos en hautes qualités ou d'en faire des tirages.
+            De plus à l'avenir, les téléphones portables et ordinateurs utiliseront couramment cette résolution.
           </p>
         </v-expansion-panel-content>
       </v-expansion-panel>
