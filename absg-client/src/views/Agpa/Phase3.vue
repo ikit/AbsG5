@@ -192,6 +192,7 @@
                 <v-tooltip bottom>
                   <template #activator="{ on }">
                     <v-btn
+                      v-if="photo.enableVotes"
                       icon
                       small
                       :disabled="isLoading"
@@ -210,6 +211,7 @@
                 <v-tooltip bottom>
                   <template #activator="{ on }">
                     <v-btn
+                      v-if="photo.enableVotes"
                       icon
                       small
                       :disabled="isLoading"
@@ -228,6 +230,7 @@
                 <v-tooltip bottom>
                   <template #activator="{ on }">
                     <v-btn
+                      v-if="photo.enableVotes"
                       icon
                       small
                       :disabled="isLoading"

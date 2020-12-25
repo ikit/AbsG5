@@ -26,6 +26,8 @@
         <li>AGPA P1: Diaporama</li>
         <li>AGPA P1: Indicateur de chargement lors de la sauvegarde/édition d'une image</li>
         <li>Forum: navigation/chargement d'un sujet à l'autre</li>
+        <li>AGPA P3: impossible de voter pour ses propres photos</li>
+        <li>AGPA P3: association fixe d'un numéro pour chaque photos (plus d'aléatoire comme en P2)</li>
       </ul>
     </v-card>
 

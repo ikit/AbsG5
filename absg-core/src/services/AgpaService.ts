@@ -193,7 +193,7 @@ class AgpaService {
         const votes = await this.catRepo.query(sql);
 
         // On récupère les photos
-        sql = `SELECT p.*
+        sql = `SELECT p.id, p.error, p.filename, p.number, p.title, p."userId", p."categoryId"
             FROM agpa_photo p
             INNER JOIN agpa_category c ON p."categoryId" = c.id
             WHERE p.year=${year}
@@ -218,22 +218,33 @@ class AgpaService {
                 result.categories[p.categoryId] = {
                     categoryId: p.categoryId,
                     photos: [],
-                    userPhotoIds: [],
                     totalPhotos: 0,
                     totalUsers: 0,
                     maxVotes: 0
                 };
             }
             result.categories[p.categoryId].photos.push(p);
-            if (p.userId === user.id) {
-                result.categories[p.categoryId].userPhotoIds.push(p.id);
-            }
         }
 
         // Pour chaque catégories
         for (const c of result.categories) {
             if (c) {
-                c.photos.sort((a, b) => a.number - b.number);
+                if (c.photos[0].number) {
+                    // Si les photos ont un numéro, on les tris en fonction de ce numéro*
+                    c.photos.sort((a, b) => a.number - b.number);
+                } else {
+                    // Sinon, on mélange les photos et on leur attribu un numéro
+                    shuffleArray(c.photos);
+                    for (let idx = 0; idx < c.photos.length; idx++) {
+                        c.photos[idx].number = idx + 1;
+                    }
+                    await this.photoRepo.save(c.photos);
+                }
+                // Pour chaque photos: on supprime l'info user, et on indique s'il s'agit d'une photo de l'utilsiateur
+                for (const p of c.photos) {
+                    p.enableVotes = p.userId != user.id && !p.error;
+                    delete p.userId;
+                }
                 c.totalPhotos = c.photos.length;
                 c.totalUsers = new Set(c.photos.map(p => p.userId)).size;
                 c.maxVotes = Math.round(c.photos.length / 2);
