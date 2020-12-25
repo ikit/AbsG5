@@ -193,7 +193,7 @@ class AgpaService {
         const votes = await this.catRepo.query(sql);
 
         // On récupère les photos
-        sql = `SELECT p.id, p.error, p.filename, p.number, p.title, p."userId", p."categoryId"
+        sql = `SELECT p.id, p.error, p.filename, p.number, p.title, p."userId", p."categoryId", p.year
             FROM agpa_photo p
             INNER JOIN agpa_category c ON p."categoryId" = c.id
             WHERE p.year=${year}
