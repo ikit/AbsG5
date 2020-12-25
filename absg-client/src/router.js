@@ -34,7 +34,7 @@ export const router = new VueRouter({
             children: [
                 {
                     path: "",
-                    redirect: "/admin/dashboard"
+                    redirect: "/admin/resetpwd"
                 },
                 {
                     path: "profile",

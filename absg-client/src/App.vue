@@ -486,7 +486,7 @@ export default {
         errDialog: false,
         drawer: null,
         usersOnline: [],
-        menuItems: MODULES,
+        menuItems: [],
         version: "",
         notificationRefreshing: false,
         notificationsHeaders: [
@@ -583,6 +583,14 @@ export default {
         init() {
             // On initialise le store
             store.dispatch("initStore");
+
+            // On initialise le menu
+            this.menuItems = MODULES;
+            if (this.user.is("admin")) {
+                const admItem = this.menuItems.find(e => e.id === "admin");
+                admItem.url = "/admin/dashboard";
+                console.log(this.menuItems)
+            }
         },
         logout() {
             logoutUser(store);

@@ -8,7 +8,7 @@ export const MODULES = [
     { id:"voyag", icon: 'fas fa-map-marked-alt', name: 'Voya G', url: '/voyag', roles: ["member"] },
     { id:"agpa", icon: 'fas fa-camera', name: 'A.G.P.A.', url: '/agpa', roles: ["member"] },
     // { id:"gcloud", icon: 'fas fa-folder-open', name: 'G-Cloud', url: '/gcloud', roles: ["member"] },
-    { id:"admin", icon: 'fas fa-cog', name: 'Config', url: '/admin', roles: ["member"]  }];
+    { id:"admin", icon: 'fas fa-cog', name: 'Config', url: '/admin', roles: ["admin"]  }];
 
 /**
  * Analyse la réponse retourné par axios, afin de traiter les cas d'erreur
