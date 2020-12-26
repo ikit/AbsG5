@@ -9,6 +9,11 @@
           fas fa-star
         </v-icon> Edition {{ agpaMeta ? agpaMeta.year : "" }}
       </v-tab>
+      <v-tab v-if="isAdmin" :to="{path:'/agpa/admin'}">
+        <v-icon left>
+          fas fa-star
+        </v-icon> Edition Supervision
+      </v-tab>
       <v-tab :to="{path:'/agpa/rules'}">
         <v-icon left>
           fas fa-scroll
@@ -43,13 +48,18 @@ import { mapState } from 'vuex';
 export default {
     store,
     data: () => ({
+        isAdmin: false
     }),
     computed: {
         ...mapState([
             'agpaMeta',
+            'user'
         ]),
     },
     mounted() {
+        if (this.user) {
+            this.isAdmin = this.user.roles.indexOf("admin") > -1;
+        }
         store.dispatch('initAGPA');
     }
 };

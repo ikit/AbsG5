@@ -404,7 +404,25 @@
     </v-dialog>
   </section>
 
-  <section v-else />
+    <section v-else>
+        <div class="p4">
+            <p>Le concours des A.G.P.A. est désormais terminé.
+                Les résultats suite au dépuillement des votes vous sera présenté lors de la cérémonie plannifiée le <span class="endDate">{{ end }}</span>.
+            </p>
+            <p>Ceux qui ne pourront pas être présent, pourront suivre la cérémonie à distance en "direct", en se connectant sur le site
+                et en allant dans la section <a href="/agpa/ceremony">Cérémonies</a> des A.G.P.A.
+                Vous pourrez y suivre le déroulement de la cérémonie comme si vous y êtiez.
+            </p>
+            <p>Lors de la cérémonie, une visioconférence sera ouverte à l'adresse
+                <a href="https://meet.jit.si/AbsolumentG" target="_blank">https://meet.jit.si/AbsolumentG</a> afin de permettre
+                à ceux qui le souhaite de profiter de l'ambiance.
+            </p>
+            <p>Enfin, sachez que toutes les cérémonies des éditions passées sont disponnibles en ligne.
+                Vous pourrez donc voir et revoir la cérémonie sur le site même si malheureusement vous ne pouviez pas être présent, ni sur place,
+                ni à distance.
+            </p>
+        </div>
+  </section>
 </template>
 
 
@@ -424,6 +442,7 @@ export default {
         isLoading: true,
         waitingScreen: false,
         isAdmin: false,
+        end: "",
 
         votes: [],
         votesCategories: [],
@@ -480,7 +499,7 @@ export default {
         }
     },
     mounted () {
-        this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
+        this.isAdmin = this.user.roles.indexOf("admin") > -1;
         if (this.agpaMeta) {
             this.refresh();
         } else {
@@ -490,6 +509,9 @@ export default {
     methods: {
         refresh() {
             this.isLoading = true;
+
+            // Fin de la phase 4
+            this.end = format(new Date(this.agpaMeta.boudaries[3].endDate), "dd MMM 'à' HH'h'mm", {locale: fr});
 
             axios.get(`/api/agpa/p4`).then(response => {
                 this.data = parseAxiosResponse(response);
@@ -535,6 +557,7 @@ export default {
                 this.isLoading = false;
             }).catch( err => {
                 store.commit("onError", err);
+                this.isLoading = false;
             });
         },
 
@@ -653,6 +676,19 @@ h2, .h2 {
         font-size: 15px;
         line-height: 20px;
         margin: 0;
+    }
+}
+.p4 {
+    p {
+        width: 500px;
+        margin: auto;
+        margin-top: 30px;
+        text-align: justify;
+    }
+    a, .endDate {
+        font-weight: bold;
+        text-decoration: none;
+        color: #26a69a;
     }
 }
 

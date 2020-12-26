@@ -176,6 +176,10 @@ export const router = new VueRouter({
                     component: () => import("./views/Agpa/Edition.vue"),
                 },
                 {
+                    path: "admin",
+                    component: () => import("./views/Agpa/Phase4.vue"),
+                },
+                {
                     path: "rules",
                     component: () => import("./views/Agpa/Rules.vue"),
                 },
