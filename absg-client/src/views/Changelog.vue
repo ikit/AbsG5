@@ -21,6 +21,7 @@
         <li>Notification: précision des sujets concernés par les nouveaux messages</li>
         <li>Admin: AGPA P2 suppression de photo</li>
         <li>Admin: AGPA monitoring</li>
+        <li>AGPA: Clôture de l'édition courante</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>

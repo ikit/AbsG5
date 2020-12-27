@@ -1,11 +1,12 @@
-import { User, LogModule, AgpaPhoto, AgpaCategory } from "../entities";
+import { User, LogModule, AgpaPhoto, AgpaCategory, AgpaAwardType } from "../entities";
 import { getMaxArchiveEdition, getCurrentEdition, getMetaData } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
 import {
     p4AgpaAttribution,
     p4CheckVotes,
     p4ComputeNotes,
-    p4DiamondAttribution
+    p4DiamondAttribution,
+    p4HonorAttribution
 } from "../middleware/agpaAlgorithmsHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
@@ -274,9 +275,80 @@ class AgpaService {
         // Attributions AGPA et création d'un "premier" palmares
         context = await p4AgpaAttribution(context);
 
-        // 4- Attribution des AGPA de diamant
+        // Attribution des AGPA de diamant
         context = await p4DiamondAttribution(context);
+
+        // Attribution des AGPA d'honneur
+        context = await p4HonorAttribution(context);
+
         return context;
+    }
+
+    /**
+     * Clos l'édition en cours si nécessaire
+     */
+    async closeEdition() {
+        const currentYear = getCurrentEdition();
+        // On récupère le contexte
+        let context = await getMetaData(currentYear, true);
+        let awards = await this.catRepo.query(`SELECT * FROM agpa_award WHERE year = ${context.year}`);
+        if (context.phase === 5 && awards.length === 0) {
+            // On calcul les awards de l'édition en cours
+            context = await getMetaData(context.year, true);
+            context = await p4CheckVotes(context);
+            context = await p4ComputeNotes(context);
+            context = await p4AgpaAttribution(context);
+            context = await p4DiamondAttribution(context);
+            context = await p4HonorAttribution(context);
+            // On récpère des agpas des catégories normales et meilleurs titre
+            for (const pid in context.photos) {
+                const p = context.photos[pid];
+                let a = Array.isArray(p.awards) ? p.awards : [];
+                a = a.map(e => ({ ...e, photoId: +pid, userId: p.userId }));
+                awards = awards.concat(a);
+            }
+            // On récupère des meilleurs photographes
+            for (const uid in context.users) {
+                const u = context.users[uid];
+                let a = Array.isArray(u.awards) ? u.awards : [];
+                a = a.filter(e => e.categoryId === -1 || e.award === AgpaAwardType.honor);
+                a = a.map(e => ({ ...e, userId: u.id }));
+                awards = awards.concat(a);
+            }
+
+            awards.sort((a, b) => {
+                return a.categoryId - b.categoryId;
+            });
+
+            // On sauvegarde les awards en base de donnée
+            let sql = [];
+            for (const a of awards) {
+                if (a.categoryId === -1) {
+                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, NULL, '${a.award}')`);
+                } else {
+                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, ${a.photoId}, '${a.award}')`);
+                }
+            }
+            this.catRepo.query(
+                `INSERT INTO agpa_award (year, "categoryId", "userId", "photoId", award) VALUES ${sql.join(",")};`
+            );
+
+            // On met à jours les résultats pour les photos de l'édition
+            sql = [];
+            for (const pid in context.photos) {
+                const p = context.photos[pid];
+                sql.push(`UPDATE agpa_photo SET 
+                    ranking=${context.photosOrder.findIndex(e => e === p.id) + 0}, 
+                    votes=${p.votes}, 
+                    "votesTitle"=${p.votesTitle}, 
+                    score=${p.score},
+                    gscore=${p.gscore}
+                    WHERE id=${p.id}`);
+            }
+            this.catRepo.query(sql.join(";"));
+        }
+
+        return awards;
     }
 
     /**

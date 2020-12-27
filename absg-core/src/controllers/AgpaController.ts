@@ -116,6 +116,15 @@ export class AgpaController {
     }
 
     /**
+     * Récupère les informations de l'utilisateur pour la phase 3
+     * @param user l'utilisateur qui effectue la demande
+     */
+    @Get("/close-edition")
+    closeEdition() {
+        return agpaService.closeEdition();
+    }
+
+    /**
      * Effectue le dépouillement des votes
      * @param user l'utilisateur qui effectue la demande
      */

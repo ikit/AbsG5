@@ -13,10 +13,19 @@
         ouverture dans
       </p>
       <Timer
+        v-if="timerEnable"
         ref="timer"
         style="margin: auto"
         @completed="startCeremony()"
       />
+      <v-btn
+        v-else
+        color="primary"
+        @click="startCeremony()"
+    >
+        <v-icon left>fas fa-play</v-icon>
+        Lancer la cérémonie
+      </v-btn>
     </v-card>
 
 
@@ -93,6 +102,7 @@ export default {
     },
     data: () => ({
         isLoading: false,
+        timerEnable: false,
 
         formerEditions: [],
         current: {
@@ -136,7 +146,12 @@ export default {
 
             this.current.ceremonyDate = p5; // new Date( new Date().getTime() + 1000000);
             this.current.year = new Date().getFullYear();
-            this.$refs.timer.init(this.current.ceremonyDate);
+            if (new Date() > this.current.ceremonyDate) {
+                this.timerEnable = false;
+            } else {
+                this.timerEnable = true;
+                this.$refs.timer.init(this.current.ceremonyDate);
+            }
         },
 
         startCeremony() {

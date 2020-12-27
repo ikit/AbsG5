@@ -31,6 +31,11 @@
       <v-tabs>
         <v-tab>
           <v-icon left>
+            far fa-image
+          </v-icon> Photos
+        </v-tab>
+        <v-tab>
+          <v-icon left>
             fas fa-vote-yea
           </v-icon> Votes
         </v-tab>
@@ -44,6 +49,56 @@
             fas fa-trophy
           </v-icon> Palmarès
         </v-tab>
+
+        <!-- Vérification des photos -->
+        <v-tab-item>
+          <h2>Participation</h2>
+
+          <v-simple-table style="text-align: left; font-size: 0.8em; margin: 10px">
+            <template #default>
+              <thead>
+                <tr style="vertical-align: baseline;">
+                  <th>Participant</th>
+                  <th
+                    v-for="catId of votesCategories"
+                    :key="catId"
+                  >
+                    {{ data.categories[catId].title }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="vUser of votes"
+                  :key="vUser.id"
+                >
+                  <td>{{ vUser.username }} <span style="opacity: 0.5">- {{ vUser.age }} ans</span></td>
+                  <td
+                    v-for="(cat, idx) of vUser.votes"
+                    :key="idx"
+                  >
+                    <a
+                      v-if="cat"
+                      style="display: block"
+                    >
+                      <i
+                        v-if="cat.valid"
+                        class="fas fa-check"
+                        style="color: #2e7d32"
+                      />
+                      <i
+                        v-else
+                        class="fas fa-exclamation-triangle"
+                        style="color: #ff8f00"
+                      />
+                      &nbsp; {{ cat.votes.length }}
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-tab-item>
 
         <!-- Vérification des votes -->
         <v-tab-item>
@@ -526,6 +581,7 @@ export default {
                                 id: user.userId,
                                 username: user.username,
                                 age: user.age,
+                                photos: Array(this.votesCategories.length),
                                 votes: Array(this.votesCategories.length).fill(null, 0, this.votesCategories.length)
                             };
                         }
@@ -549,6 +605,8 @@ export default {
                     average: Math.round(u.average),
                     rewards: this.reformatAward(u.awards)
                 })).sort((a, b) => this.data.usersOrder.findIndex(e => e === a.id) - this.data.usersOrder.findIndex(e => e === b.id));
+
+                console.log(this.data )
                 this.isLoading = false;
             }).catch( err => {
                 store.commit("onError", err);
@@ -602,9 +660,7 @@ export default {
             if (catId > -1) {
                 this.notes = this.notesAll.filter(e => e.categoryId === catId);
             } else if (catId === -3) {
-                console.log(this.notesAll)
                 this.notes = this.notesAll.filter(e => e.votesTitle > 0);
-                console.log(this.notes)
             } else {
                 this.notes = this.notesAll;
             }

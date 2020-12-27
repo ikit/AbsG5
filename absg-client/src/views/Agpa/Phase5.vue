@@ -29,6 +29,14 @@ export default {
     computed: { ...mapState([
         'agpaMeta'
     ])},
+    watch: {
+        $route(to, from) {
+            this.refresh();
+        },
+        'agpaMeta': function () {
+            this.refresh();
+        }
+    },
     mounted () {
         if (this.agpaMeta) {
             this.refresh();
@@ -38,7 +46,8 @@ export default {
     },
     methods: {
         refresh() {
-            // Fin de la phase 4
+            axios.get(`/api/agpa/close-edition`);
+            // Date de la cérémonie
             this.end = format(new Date(this.agpaMeta.boudaries[3].endDate), "dd MMM 'à' HH'h'mm", {locale: fr});
         },
     }
