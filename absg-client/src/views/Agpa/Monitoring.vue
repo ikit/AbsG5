@@ -599,8 +599,12 @@ export default {
         },
 
         updateNotesList(catId) {
-            if (catId) {
+            if (catId > -1) {
                 this.notes = this.notesAll.filter(e => e.categoryId === catId);
+            } else if (catId === -3) {
+                console.log(this.notesAll)
+                this.notes = this.notesAll.filter(e => e.votesTitle > 0);
+                console.log(this.notes)
             } else {
                 this.notes = this.notesAll;
             }

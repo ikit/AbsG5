@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { AgpaPhoto, User } from "../entities";
-import { getMetaData, getCurrentEdition, checkValidYear } from "./agpaCommonHelpers";
+import { getMetaData, getCurrentEdition, checkValidYear, getPhasesBoundaries } from "./agpaCommonHelpers";
 
 /**
  * Retourne les informations sur les anciennes éditions
@@ -8,9 +8,16 @@ import { getMetaData, getCurrentEdition, checkValidYear } from "./agpaCommonHelp
  */
 export async function archiveSummary(user: User): Promise<any> {
     // Init data
-    const maxYear = getCurrentEdition();
+    let maxYear = getCurrentEdition();
     const repo = getRepository(AgpaPhoto);
     const archivesSummary = [];
+
+    // On vérifie que l'édition en cours n'est pas déjà terminé
+    const boudaries = await getPhasesBoundaries();
+    const now = new Date();
+    if (boudaries[4].startDate < now) {
+        maxYear += 1;
+    }
 
     // On récupère les meilleures photos de chaque éditions
     const photos = new Map<number, AgpaPhoto[]>();
