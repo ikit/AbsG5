@@ -10,7 +10,7 @@ import {
     Post,
     Body
 } from "routing-controllers";
-import { AgpaPhoto } from "../entities";
+import { AgpaPhoto, User } from "../entities";
 import { agpaService } from "../services/AgpaService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
 
@@ -119,9 +119,13 @@ export class AgpaController {
      * Effectue le dépouillement des votes
      * @param user l'utilisateur qui effectue la demande
      */
-    @Get("/p4")
-    getP4Data(@CurrentUser() user) {
-        return agpaService.getP4Data(2020, user);
+    @Get("/monitoring/:year([0-9]+)")
+    monitoring(@Param("year") year: number, @CurrentUser() user: User) {
+        if (user.is("admin")) {
+            return agpaService.monitoring(year, user);
+        } else {
+            return null;
+        }
     }
 
     /**

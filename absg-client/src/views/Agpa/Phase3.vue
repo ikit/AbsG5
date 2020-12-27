@@ -346,7 +346,7 @@ export default {
             this.isLoading = true;
 
             // Fin de la phase 3
-            this.end = format(new Date(this.agpaMeta.boudaries[2].endDate), "dd MMM 'à' HH'h'mm", {locale: fr})
+            this.end = format(new Date(this.agpaMeta.boudaries[2].endDate), "dd MMM 'à' HH'h'mm", {locale: fr});
 
             axios.get(`/api/agpa/p3`).then(response => {
                 const data = parseAxiosResponse(response);

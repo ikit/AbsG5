@@ -11,7 +11,7 @@
       </v-tab>
       <v-tab v-if="isAdmin" :to="{path:'/agpa/admin'}">
         <v-icon left>
-          fas fa-star
+          fas fa-tachometer-alt
         </v-icon> Edition Supervision
       </v-tab>
       <v-tab :to="{path:'/agpa/rules'}">

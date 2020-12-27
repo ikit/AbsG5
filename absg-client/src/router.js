@@ -177,7 +177,7 @@ export const router = new VueRouter({
                 },
                 {
                     path: "admin",
-                    component: () => import("./views/Agpa/Phase4.vue"),
+                    component: () => import("./views/Agpa/Monitoring.vue"),
                 },
                 {
                     path: "rules",

@@ -254,29 +254,28 @@ class AgpaService {
     }
 
     /**
-     * Dépuillement
      * Effectue la série d'action nécessaire (étape par étape) pour calculer les points
      * de chaques de photos et leur attribuer les récompenses en départageant les exaequos
+     * Cete méthode permet aussi bien le calcul des résultats d'une édition que sa supervision
+     * en controlant que tout se passe bien.
      * @param user l'utilisateur qui en fait la demande
      */
-    async getP4Data(year: number, user: User) {
+    async monitoring(year: number, user: User) {
         let context = null;
-        if (user.is("admin")) {
-            // On récupère le contexte
-            context = await getMetaData(year, true);
+        // On récupère le contexte
+        context = await getMetaData(year, true);
 
-            // Récupérer les votes et les vérifier
-            context = await p4CheckVotes(context);
+        // Récupérer les votes et les vérifier
+        context = await p4CheckVotes(context);
 
-            // Comptabiliser les votes correctes et calculer les notes pour chaque photo
-            context = await p4ComputeNotes(context);
+        // Comptabiliser les votes correctes et calculer les notes pour chaque photo
+        context = await p4ComputeNotes(context);
 
-            // Attributions AGPA et création d'un "premier" palmares
-            context = await p4AgpaAttribution(context);
+        // Attributions AGPA et création d'un "premier" palmares
+        context = await p4AgpaAttribution(context);
 
-            // 4- Attribution des AGPA de diamant
-            context = await p4DiamondAttribution(context);
-        }
+        // 4- Attribution des AGPA de diamant
+        context = await p4DiamondAttribution(context);
         return context;
     }
 
