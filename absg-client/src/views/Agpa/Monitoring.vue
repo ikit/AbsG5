@@ -3,30 +3,6 @@
     v-if="isAdmin"
     id="content"
   >
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-      <v-row style="padding: 15px">
-        <v-tooltip bottom>
-          <template #activator="{ on }">
-            <div
-              class="phase-left-header"
-              v-on="on"
-              @click="help.displayed = true; help.page = 3"
-            >
-              <h2>Phase n°4 en cours : Délibération</h2>
-              <p>Phase n°5 Cérémonie - le {{ end }}</p>
-            </div>
-          </template>
-          <span>Besoin d'aide sur la phase actuelle du concours ?</span>
-        </v-tooltip>
-      </v-row>
-      <v-progress-linear
-        v-if="isLoading"
-        color="accent"
-        indeterminate
-        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
-      />
-    </div>
-
     <v-card style="margin: 24px">
       <v-tabs>
         <v-tab>
@@ -51,7 +27,7 @@
         </v-tab>
         <v-tab>
           <v-icon left>
-            fas fa-graph
+            fas fa-chart-pie
           </v-icon> Stats
         </v-tab>
 
@@ -188,7 +164,6 @@
             :items="notes"
             :search="notesFilter.quickFilter"
             :loading="isLoading"
-            :custom-filter="notesSearchMethod"
             loading-text="Récupération des données..."
           >
             <template #[`item.category`]="{ item }">
@@ -219,44 +194,40 @@
             </template>
 
             <template #[`item.awards`]="{ item }">
-              <template v-if="item.awards">
-                <span
-                  v-for="a of item.awards"
-                  :key="a.categoryId"
-                >
+                <span v-for="a of item.awards" :key="a.categoryId">
                   <v-tooltip bottom>
                     <template #activator="{ on }">
                       <i
-                        v-if="a.award === 5"
+                        v-if="a.award === 'diamond'"
                         class="fas fa-circle"
                         style="color: #c3f1ff"
                         v-on="on"
                       />
                       <i
-                        v-if="a.award === 4"
+                        v-if="a.award === 'gold'"
                         class="fas fa-circle"
                         style="color: #c68b00"
                         v-on="on"
                       />
                       <i
-                        v-if="a.award === 3"
+                        v-if="a.award === 'sylver'"
                         class="fas fa-circle"
                         style="color: #9b9b9b"
                         v-on="on"
                       />
                       <i
-                        v-if="a.award === 2"
+                        v-if="a.award === 'bronze'"
                         class="fas fa-circle"
                         style="color: #964c31"
                         v-on="on"
                       />
                       <i
-                        v-if="a.award === 1"
+                        v-if="a.award === 'nominated'"
                         class="far fa-circle"
                         v-on="on"
                       />
                       <i
-                        v-if="a.award === 0"
+                        v-if="a.award === 'honor'"
                         class="far fa-smile"
                         v-on="on"
                       />
@@ -264,7 +235,6 @@
                     {{ data.categories[a.categoryId].title }}
                   </v-tooltip>
                 </span>
-              </template>
             </template>
           </v-data-table>
         </v-tab-item>
@@ -375,7 +345,9 @@
 
         <!-- Stats -->
         <v-tab-item>
-          <highcharts v-if="votesGraph" :options="votesGraph" />
+            <div style="display: flex; min-height: 600px">
+                <highcharts v-if="votesGraph" style="flex: 0 1 1" :options="votesGraph" />
+            </div>
         </v-tab-item>
 
       </v-tabs>
@@ -616,7 +588,14 @@ export default {
 
                 // On reformate les notes
                 this.notesCategories = this.notesCategories.concat(categories.filter(c => c.id === -3 || c.id > 0).map(e => ({ label: e.title, id: e.id })));
-                this.notesAll = this.data.photosOrder.map(id => this.data.photos[id]);
+                this.notesAll = this.data.photosOrder.map(id => {
+                    const res = this.data.photos[id];
+                    return {
+                        ... res,
+                        quicksearch: `${res.username} ${res.title}`.toLowerCase()
+                    }
+
+                });
                 this.updateNotesList();
 
                 // On reformate le palmares par catégories
@@ -629,7 +608,14 @@ export default {
 
                 this.votesGraph = {
                     title: {
-                        text: 'Participations / Votes'
+                        text: 'Votes'
+                    },
+                    exporting: {
+                        buttons: {
+                            contextButton: {
+                                menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF']
+                            }
+                        }
                     },
 
                     accessibility: {
@@ -642,7 +628,6 @@ export default {
                         keys: ['from', 'to', 'weight'],
                         data: this.data.votesStats,
                         type: 'dependencywheel',
-                        name: 'Dependency wheel series',
                         dataLabels: {
                             color: '#333',
                             textPath: {
@@ -651,7 +636,7 @@ export default {
                                     dy: 5
                                 }
                             },
-                            distance: 10
+                            distance: 15
                         },
                         size: '95%'
                     }]
@@ -716,6 +701,17 @@ export default {
                 this.notes = this.notesAll;
             }
         },
+
+        notesSearchMethod(items, search) {
+            console.log("search", items, search)
+            if (!search) {
+                return items;
+            }
+            if (!items) {
+                return [];
+            }
+            return items.filter(e => e != null && e.quicksearch.indexOf(search.toLowerCase()) > -1);
+        }
 
     }
 };
