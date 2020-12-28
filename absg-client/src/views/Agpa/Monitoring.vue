@@ -49,6 +49,11 @@
             fas fa-trophy
           </v-icon> Palmarès
         </v-tab>
+        <v-tab>
+          <v-icon left>
+            fas fa-graph
+          </v-icon> Stats
+        </v-tab>
 
         <!-- Vérification des photos -->
         <v-tab-item>
@@ -367,6 +372,12 @@
             </template>
           </v-data-table>
         </v-tab-item>
+
+        <!-- Stats -->
+        <v-tab-item>
+          <highcharts v-if="votesGraph" :options="votesGraph" />
+        </v-tab-item>
+
       </v-tabs>
     </v-card>
 
@@ -476,11 +487,21 @@ import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import PhotoWidget from './components/PhotoWidget';
 import store from '../../store';
+import {Chart} from 'highcharts-vue';
+import Highcharts from 'highcharts';
+
+import HC_sankey from 'highcharts/modules/sankey';
+import HC_depwheel from 'highcharts/modules/dependency-wheel';
+HC_sankey(Highcharts);
+HC_depwheel(Highcharts);
 
 export default {
+    components: {
+        highcharts: Chart
+    },
     store,
     data: () => ({
-        isLoading: true,
+        isLoading: false,
         waitingScreen: false,
         isAdmin: false,
         end: "",
@@ -527,6 +548,8 @@ export default {
         palmares: [],
 
         data: null,
+
+        votesGraph: null,
     }),
     computed: { ...mapState([
         'agpaMeta',
@@ -534,9 +557,7 @@ export default {
     ])},
     watch: {
         $route(to, from) {
-            if (to != from) {
                 this.refresh();
-            }
         },
         'agpaMeta': function () {
             if (!this.isLoading && !this.end) {
@@ -606,7 +627,37 @@ export default {
                     rewards: this.reformatAward(u.awards)
                 })).sort((a, b) => this.data.usersOrder.findIndex(e => e === a.id) - this.data.usersOrder.findIndex(e => e === b.id));
 
-                console.log(this.data )
+                this.votesGraph = {
+                    title: {
+                        text: 'Participations / Votes'
+                    },
+
+                    accessibility: {
+                        point: {
+                            valueDescriptionFormat: '{index}. From {point.from} to {point.to}: {point.weight}.'
+                        }
+                    },
+
+                    series: [{
+                        keys: ['from', 'to', 'weight'],
+                        data: this.data.votesStats,
+                        type: 'dependencywheel',
+                        name: 'Dependency wheel series',
+                        dataLabels: {
+                            color: '#333',
+                            textPath: {
+                                enabled: true,
+                                attributes: {
+                                    dy: 5
+                                }
+                            },
+                            distance: 10
+                        },
+                        size: '95%'
+                    }]
+                };
+
+                console.log(this.data)
                 this.isLoading = false;
             }).catch( err => {
                 store.commit("onError", err);
@@ -664,7 +715,8 @@ export default {
             } else {
                 this.notes = this.notesAll;
             }
-        }
+        },
+
     }
 };
 </script>

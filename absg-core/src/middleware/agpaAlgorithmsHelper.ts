@@ -546,3 +546,20 @@ export async function p4HonorAttribution(ctx: any) {
     }
     return ctx;
 }
+
+
+export async function monitoringStats(ctx: any) {
+    const repo = getRepository(AgpaPhoto);
+
+    const sql = `SELECT u1.username as "from", u2.username as "to", SUM(v.score)
+        FROM public.agpa_vote v
+        INNER JOIN "user" u1 ON v."userId" = u1.id
+        INNER JOIN "agpa_photo" p ON p.id = v."photoId"
+        INNER JOIN "user" u2 ON p."userId" = u2.id
+        WHERE v.year = ${ctx.year} AND v.score > 0
+        GROUP BY "from", "to"`;
+
+    ctx.votesStats = await repo.query(sql);
+    ctx.votesStats = ctx.votesStats.map(r => [r.from, r.to, +r.sum]);
+    return ctx;
+}

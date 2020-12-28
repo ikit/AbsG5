@@ -2,6 +2,7 @@ import { User, LogModule, AgpaPhoto, AgpaCategory, AgpaAwardType } from "../enti
 import { getMaxArchiveEdition, getCurrentEdition, getMetaData } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
 import {
+    monitoringStats,
     p4AgpaAttribution,
     p4CheckVotes,
     p4ComputeNotes,
@@ -280,6 +281,9 @@ class AgpaService {
 
         // Attribution des AGPA d'honneur
         context = await p4HonorAttribution(context);
+
+        // Stats
+        context = await monitoringStats(context);
 
         return context;
     }

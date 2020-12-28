@@ -22,6 +22,7 @@
         <li>Admin: AGPA P2 suppression de photo</li>
         <li>Admin: AGPA monitoring</li>
         <li>AGPA: Clôture de l'édition courante</li>
+        <li>AGPA: Graph répartition votes</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>
