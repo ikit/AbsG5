@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { AgpaPhoto, AgpaAwardType } from "../entities";
-import { checkValidYear } from "./agpaCommonHelpers";
+import { checkValidYear, getMaxArchiveEdition } from "./agpaCommonHelpers";
 import { AgpaPalmares } from "./model/AgpaPalmares";
 
 // // PALMARES -----------------------------------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ export function palmaresPoints(award: AgpaAwardType) {
  */
 export async function palmaresData(from: number = null, to: number = null) {
     from = checkValidYear(from, 2006);
-    to = checkValidYear(to);
+    to = checkValidYear(to, getMaxArchiveEdition());
     // On récupère le contexte sql
     const repo = getRepository(AgpaPhoto);
     // On récupère les données

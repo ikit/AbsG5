@@ -18,14 +18,15 @@
         style="margin: auto"
         @completed="startCeremony()"
       />
-      <v-btn
-        v-else
-        color="primary"
-        @click="startCeremony()"
-    >
-        <v-icon left>fas fa-play</v-icon>
-        Lancer la cérémonie
-      </v-btn>
+      <div v-else style="text-align: center;">
+        <v-btn
+            color="primary"
+            @click="startCeremony()"
+            >
+            <v-icon small left>fas fa-play</v-icon>
+            Lancer la cérémonie
+        </v-btn>
+      </div>
     </v-card>
 
 
@@ -102,7 +103,7 @@ export default {
     },
     data: () => ({
         isLoading: false,
-        timerEnable: false,
+        timerEnable: true, // par défaut on l'affich pour éviter les probleme d'init avec le DOM
 
         formerEditions: [],
         current: {
@@ -157,12 +158,15 @@ export default {
         startCeremony() {
             this.current.displayed = true;
             this.$refs.video.play();
+            this.$refs.timer.stop();
         },
 
         openCeremonySlideShow() {
+            this.re
             this.$refs.video.pause();
             window.open(`/agpa/ceremony/${this.current.year}`, '_blank');
             this.current.displayed = false;
+            this.timerEnable = false;
         }
     }
 };
