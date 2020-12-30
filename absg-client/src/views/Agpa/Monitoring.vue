@@ -179,8 +179,8 @@
             </template>
 
             <template #[`item.votes`]="{ item }">
-              {{ item.votes }} <span style="opacity: 0.5">({{ item.score }} pts)</span><br>
-              <span style="color: red;">{{ item.formerStats.votes }} <span style="opacity: 0.5">({{ item.formerStats.score }} pts)</span></span>
+              {{ item.score }} pts <span style="opacity: 0.5">({{ item.votes }} votes)</span><br>
+              <span style="color: red;">{{ item.formerStats.score }} pts <span style="opacity: 0.5">({{ item.formerStats.votes }} votes)</span></span>
             </template>
 
             <template #[`item.title`]="{ item }">
@@ -346,7 +346,13 @@
         <!-- Stats -->
         <v-tab-item>
             <div style="display: flex; min-height: 600px">
+                <div style="flex: 0 1 1;">
+                    participation
+                </div>
                 <highcharts v-if="votesGraph" style="flex: 0 1 1" :options="votesGraph" />
+                <div style="flex: 0 1 1">
+                    Récompenses
+                </div>
             </div>
         </v-tab-item>
 

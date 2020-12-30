@@ -95,6 +95,8 @@ import { padNumber } from '../../middleware/CommonHelper';
 import { addDays, addSeconds, format } from 'date-fns';
 import Timer from '../../components/Timer';
 
+import idb from '../../middleware/indexDatabase';
+
 export default {
     name: 'CeremonyMenu',
     store,
@@ -134,6 +136,7 @@ export default {
             store.commit("onError", err);
         });
 
+        this.preloadIntro();
 
     },
     methods: {
@@ -167,6 +170,11 @@ export default {
             window.open(`/agpa/ceremony/${this.current.year}`, '_blank');
             this.current.displayed = false;
             this.timerEnable = false;
+        },
+
+        preloadIntro() {
+            console.log("idb", idb)
+            idb.saveCat({ test: "salut" });
         }
     }
 };
