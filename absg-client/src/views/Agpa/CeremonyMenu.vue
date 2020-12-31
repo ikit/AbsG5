@@ -128,20 +128,37 @@ export default {
     computed: {
         ...mapState([
             'settings',
-            'agpaMeta'
+            'agpaMeta',
+            'user'
         ])
     },
     watch: {
         'settings': function () {
-            setTimeout(() => this.resetTimer());
+            if (this.agpaMeta && this.settings) {
+                setTimeout(() => this.resetTimer());
+            }
+        },
+        'agpaMeta': function () {
+            if (this.agpaMeta && this.settings) {
+                setTimeout(() => this.resetTimer());
+            }
         }
     },
     mounted() {
+        this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
+        this.$vlf.createInstance({
+            storeName: 'absg5'
+        });
+
+        if (this.agpaMeta && this.settings) {
+            // On récupère la date de la cérémonie depuis les settings du site
+            setTimeout(() => this.resetTimer());
+        }
+        if (!this.agpaMeta) {
+            store.dispatch('initAGPA');
+        }
+
         this.isLoading = true;
-
-        // On récupère la date de la cérémonie depuis les settings du site
-        setTimeout(() => this.resetTimer());
-
         axios.get(`/api/agpa/archives`).then(response => {
             this.formerEditions = parseAxiosResponse(response);
             this.isLoading = false;
@@ -149,9 +166,6 @@ export default {
             store.commit("onError", err);
         });
 
-        this.$vlf.createInstance({
-            storeName: 'absg5'
-        });
 
         this.preloadIntro();
         this.preloadCeremony();

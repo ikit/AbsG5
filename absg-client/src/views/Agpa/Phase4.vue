@@ -47,7 +47,8 @@ export default {
     methods: {
         refresh() {
             // Fin de la phase 4
-            this.end = format(new Date(this.agpaMeta.boudaries[3].endDate), "dd MMM 'à' HH'h'mm", {locale: fr});
+            const date = new Date(this.agpaMeta.boudaries[3].endDate, );
+            this.end = format(date, "dd MMM 'à' HH'h'mm", {locale: fr});
         },
     }
 };
