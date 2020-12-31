@@ -215,7 +215,7 @@
                       v-model="personEditor.dateOfDeath"
                       :rules="editorRules.dateOfDeath"
                       clearable
-                      label="Date du décè"
+                      label="Date du décès"
                       prepend-icon="far fa-calendar-alt"
                       validate-on-blur
                       v-on="on"
