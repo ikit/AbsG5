@@ -78,6 +78,7 @@ class AgpaService {
         if (year >= 2006 && year <= getMaxArchiveEdition()) {
             return ceremonyData(year);
         }
+        logger.warn(`Cérémonie ${year} non disponible`);
         return null;
     }
 

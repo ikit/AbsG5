@@ -25,7 +25,7 @@ export class AgpaContext {
         const currentYear = refYear ? refYear : new Date().getFullYear();
 
         // Si pas encore init ou bien dernier reset à plus de 24h: il faut rafraichir le contexte
-        const needToRefresh = !this.lastUpdateRefDate || differenceInHours(currentYear, this.lastUpdateRefDate) >= 24;
+        const needToRefresh = true; // !this.lastUpdateRefDate || differenceInHours(currentYear, this.lastUpdateRefDate) >= 24;
 
         // On recalcul le contexte
         if (needToRefresh) {

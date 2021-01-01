@@ -7,7 +7,7 @@
         style="position: absolute; top: -100px; left: calc(100%/2 - 100px);"
       >
       <h2 style="text-align: center; font-size: 3em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
-        <span style="font-size: 2em; font-weight: normal; padding-right: 3px;">{{ agpaMeta.year - 2005 }} </span><sup>ème</sup> cérémonie des A.G.P.A.
+        <span style="font-size: 2em; font-weight: normal; padding-right: 3px;">{{ agpaMeta ? (agpaMeta.year - 2005) : "?" }} </span><sup>ème</sup> cérémonie des A.G.P.A.
       </h2>
       <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; opacity: 0.3">
         ouverture dans
@@ -165,10 +165,6 @@ export default {
         }).catch( err => {
             store.commit("onError", err);
         });
-
-
-        this.preloadIntro();
-        this.preloadCeremony();
     },
     methods: {
         resetTimer() {
@@ -189,6 +185,9 @@ export default {
                 this.timerEnable = true;
                 this.$refs.timer.init(this.current.ceremonyDate);
             }
+
+            this.preloadIntro();
+            this.preloadCeremony();
         },
 
         startCeremony() {
