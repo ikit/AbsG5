@@ -309,7 +309,6 @@ export default {
                     const catIds = [...data.categoriesOrders, "-4", "-3", "-2", "-1"]
                     for(let catId of catIds) {
                         const cat = data.categories[catId];
-                        console.log(catId, cat)
                         // Meilleurs photographes
                         if (catId == -1) {
                             this.slides.push({ type: "category", id: catId, title: cat.title});
