@@ -75,10 +75,10 @@ class AgpaService {
      * @param year l'année de la cérémonie
      */
     getCeremonyData(year: number) {
-        if (year >= 2006 && year <= getMaxArchiveEdition()) {
+        if (year >= 2006 && year <= getCurrentEdition()) {
             return ceremonyData(year);
         }
-        logger.warn(`Cérémonie ${year} non disponible`);
+        logger.warning(`Cérémonie ${year} non disponible`);
         return null;
     }
 
@@ -491,7 +491,6 @@ class AgpaService {
         // On met à jour le vote pour la photo
         else {
             const v = votes.find(v => v.photoId === photoId && v.categoryId !== -3 && v.userId === user.id);
-            console.log("UPDATE", v, vote);
             if (v) {
                 // Si vote existe déjà, alors
                 if (v.score === vote) {
@@ -507,7 +506,6 @@ class AgpaService {
             }
         }
         // On sauvegarde
-        console.log(sql);
         await this.catRepo.query(sql);
 
         // On récupère l'ensemble des votes de l'utilisateur

@@ -53,7 +53,7 @@ export class AgpaContext {
 
         // On en déduis la phase actuelle pour l'édition en cours
         for (const p of this.phases) {
-            if (date > p.startDate) {
+            if (date >= p.startDate) {
                 this.phase = p.id;
             }
         }
