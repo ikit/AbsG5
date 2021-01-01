@@ -3,6 +3,8 @@
     v-if="isAdmin"
     id="content"
   >
+
+
     <v-card style="margin: 24px">
       <v-tabs>
         <v-tab>
@@ -30,6 +32,18 @@
             fas fa-chart-pie
           </v-icon> Stats
         </v-tab>
+
+
+        <v-btn @click="closeEdition()" style="position: absolute; top: 5px; right: 5px">
+            <v-icon
+                small
+                left
+            >
+                fa-plus
+            </v-icon>
+            Close edition
+        </v-btn>
+
 
         <!-- Vérification des photos -->
         <v-tab-item>
@@ -716,6 +730,10 @@ export default {
                 return [];
             }
             return items.filter(e => e != null && e.quicksearch.indexOf(search.toLowerCase()) > -1);
+        },
+
+        closeEdition() {
+            axios.get(`/api/agpa/close-edition`);
         }
 
     }
