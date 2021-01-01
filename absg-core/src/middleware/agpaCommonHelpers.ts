@@ -173,5 +173,12 @@ export function getCurrentPhase(): number {
  * @return l'année de la dernière édition
  */
 export function getMaxArchiveEdition(): number {
+    // On vérifie que l'édition en cours n'est pas déjà terminé
+    // const boudaries = await getPhasesBoundaries();
+    // const now = new Date();
+    // if (boudaries[4].startDate < now) {
+    //     maxYear += 1;
+    // }
+    console.log('ed', getCurrentPhase());
     return getCurrentPhase() < 5 ? getCurrentEdition() - 1 : getCurrentEdition();
 }

@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { AgpaPhoto, User } from "../entities";
-import { getMetaData, getCurrentEdition, checkValidYear, getPhasesBoundaries } from "./agpaCommonHelpers";
+import { getMetaData, getCurrentEdition, checkValidYear, getPhasesBoundaries, getMaxArchiveEdition } from "./agpaCommonHelpers";
 
 /**
  * Retourne les informations sur les anciennes éditions
@@ -8,22 +8,15 @@ import { getMetaData, getCurrentEdition, checkValidYear, getPhasesBoundaries } f
  */
 export async function archiveSummary(user: User): Promise<any> {
     // Init data
-    let maxYear = getCurrentEdition();
+    const maxYear = getMaxArchiveEdition();
     const repo = getRepository(AgpaPhoto);
     const archivesSummary = [];
-
-    // On vérifie que l'édition en cours n'est pas déjà terminé
-    const boudaries = await getPhasesBoundaries();
-    const now = new Date();
-    if (boudaries[4].startDate < now) {
-        maxYear += 1;
-    }
 
     // On récupère les meilleures photos de chaque éditions
     const photos = new Map<number, AgpaPhoto[]>();
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", a."userId" from agpa_photo p
         INNER JOIN agpa_award a ON p.id = a."photoId"
-        WHERE a."categoryId" = -2 AND p.year < ${maxYear}
+        WHERE a."categoryId" = -2 AND p.year <= ${maxYear}
         ORDER BY p.year DESC, p.gscore DESC`;
     // On récupère les données
     let result = await repo.query(sql);
@@ -42,7 +35,7 @@ export async function archiveSummary(user: User): Promise<any> {
     sql = `SELECT a.year, a."userId" as id, u.username as firstname, a.award 
         FROM agpa_award a 
         INNER JOIN "user" u ON u.id = a."userId" 
-        WHERE "categoryId"=-1 AND year < ${maxYear}
+        WHERE "categoryId"=-1 AND year <= ${maxYear}
         ORDER BY "year" DESC, a."award" DESC `;
     result = await repo.query(sql);
     for (const row of result) {
@@ -57,7 +50,7 @@ export async function archiveSummary(user: User): Promise<any> {
     const palmares = new Map<number, any>();
     sql = `SELECT a.year, a.award, count(*) as total
         FROM agpa_award a
-        WHERE a."userId" = ${user.id} AND year < ${maxYear}
+        WHERE a."userId" = ${user.id} AND year <= ${maxYear}
         GROUP BY year, award
         ORDER BY a.year DESC, a.award ASC`;
     result = await repo.query(sql);
@@ -69,7 +62,7 @@ export async function archiveSummary(user: User): Promise<any> {
     }
 
     // On récupère le total de photos par années
-    sql = `SELECT year, count(*) AS photos FROM agpa_photo WHERE year < ${maxYear} GROUP BY year ORDER BY year DESC`;
+    sql = `SELECT year, count(*) AS photos FROM agpa_photo WHERE year <= ${maxYear} GROUP BY year ORDER BY year DESC`;
     result = await repo.query(sql);
     for (const row of result) {
         archivesSummary.push({
