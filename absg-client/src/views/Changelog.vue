@@ -31,6 +31,7 @@
         <li>Forum: navigation/chargement d'un sujet à l'autre</li>
         <li>AGPA P3: impossible de voter pour ses propres photos</li>
         <li>AGPA P3: association fixe d'un numéro pour chaque photos (plus d'aléatoire comme en P2)</li>
+        <li>AGPA Cérémonie: bug de l'an 2020 :)</li>
       </ul>
     </v-card>
 

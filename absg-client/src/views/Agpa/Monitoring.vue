@@ -483,7 +483,6 @@ export default {
         waitingScreen: false,
         isAdmin: false,
         end: "",
-        year: new Date().getFullYear(),
 
         votes: [],
         votesCategories: [],
@@ -562,7 +561,7 @@ export default {
             // Fin de la phase 4
             this.end = format(new Date(this.agpaMeta.boudaries[3].endDate), "dd MMM 'à' HH'h'mm", {locale: fr});
 
-            axios.get(`/api/agpa/monitoring/${this.year}`).then(response => {
+            axios.get(`/api/agpa/monitoring/${this.agpaMeta.year}`).then(response => {
                 this.data = parseAxiosResponse(response);
                 const categories = Object.values(this.data.categories);
 

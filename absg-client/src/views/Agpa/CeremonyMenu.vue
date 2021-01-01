@@ -172,7 +172,7 @@ export default {
     },
     methods: {
         resetTimer() {
-            const p1 = new Date(new Date().getFullYear(), 9, 1) // le 1er octobre à minuit
+            const p1 = new Date(this.agpaMeta.year, 9, 1) // le 1er octobre à minuit
             const p2 = addDays(p1, this.settings.agpaPhase1Duration);
             const p3 = addDays(p2, this.settings.agpaPhase2Duration);
             const p4 = addDays(p3, this.settings.agpaPhase3Duration);
