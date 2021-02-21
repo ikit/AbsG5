@@ -1,5 +1,6 @@
 import * as Jimp from "jimp";
 import * as fs from "fs";
+import * as path from "path";
 import * as nodemailer from "nodemailer";
 import { logger } from "./logger";
 
@@ -112,4 +113,32 @@ export function shuffleArray(arr: any[]) {
         arr[j] = temp;
     }
     return arr;
+}
+
+/**
+ * Dresse l'arborescence du contenu à l'endroit indiqué
+ * @param localPath le dossier local où lister le contenu
+ */
+export function fetchFolder(localPath) {
+    const res = [];
+    const files = fs.readdirSync(localPath);
+    for (const f of files) {
+        const filepath = path.resolve(localPath, f);
+        const infos = fs.statSync(filepath);
+        if (infos.isDirectory()) {
+            res.push({
+                name: f,
+                type: "folder",
+                content: fetchFolder(filepath)
+            });
+        } else {
+            res.push({
+                name: f,
+                type: path.extname(filepath),
+                size: fs.statSync(filepath).size
+            });
+        }
+    }
+
+    return res;
 }
