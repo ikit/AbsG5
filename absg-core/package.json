@@ -48,7 +48,7 @@
         "morgan": "^1.10.0",
         "multer": "^1.4.2",
         "node-cron": "^2.0.3",
-        "nodemailer": "^6.4.13",
+        "nodemailer": "^6.4.16",
         "pg": "^7.18.2",
         "promise-retry": "^1.1.1",
         "reflect-metadata": "^0.1.10",
