@@ -9,13 +9,8 @@ class GThequeService {
      * @param user l'utilisateur qui demande à voir l'arborescence
      */
     public async getGTheque(user: User) {
-
         return fetchFolder(path.resolve(process.env.PATH_FILES, "./cloud"));
     }
-
-
-
-
 }
 
 export const gthequeService = new GThequeService();
