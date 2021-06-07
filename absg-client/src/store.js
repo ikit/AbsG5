@@ -188,15 +188,18 @@ export default new Vuex.Store({
         },
         onError(state, axiosError) {
             console.log(axiosError)
-            state.error.query = `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`;
+            state.error.query = axiosError && axiosError.config ? `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}` : "";
             state.error.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss");
             state.error.displayed = true;
 
             if (axiosError.response) {
                 state.error.htmlError = `${axiosError.response.status} ${axiosError.response.statusText}`;
                 state.error.msg =  axiosError.response.data ? axiosError.response.data.message : axiosError;
-            } else {
+            } else if (axiosError.request) {
                 state.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`;
+                state.error.msg =  axiosError;
+            } else {
+                state.error.htmlError = "Probleme IHM (probablement)";
                 state.error.msg =  axiosError;
             }
         },
