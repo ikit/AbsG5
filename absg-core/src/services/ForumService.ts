@@ -309,7 +309,6 @@ class ForumService {
             forumId = msg.forum.id;
             topicId = msg.topic ? msg.topic.id : null;
         }
-        console.log("DELETE", forumId, topicId, msg);
         if (!msg) {
             throw new BadRequestError(`Le message avec l'identifiant n°${id} n'existe pas.`);
         }

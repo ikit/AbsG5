@@ -404,7 +404,6 @@ class AgpaService {
         // On met à jour le vote pour la photo
         else {
             const v = votes.find(v => v.photoId === photoId && v.categoryId !== -3 && v.userId === user.id);
-            console.log("UPDATE", v, vote);
             if (v) {
                 // Si vote existe déjà, alors
                 if (v.score === vote) {
@@ -420,7 +419,6 @@ class AgpaService {
             }
         }
         // On sauvegarde
-        console.log(sql);
         await this.catRepo.query(sql);
 
         // On récupère l'ensemble des votes de l'utilisateur
