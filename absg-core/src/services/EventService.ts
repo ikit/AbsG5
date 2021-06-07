@@ -84,8 +84,9 @@ class EventService {
         // On récupères les anniversaires
         q = `SELECT * 
             FROM person
-            WHERE date_part('month', "dateOfBirth") = ${month + 1}
-            AND ("dateOfDeath" IS NULL OR date_part('year', "dateOfDeath") >= ${year})`;
+            WHERE 
+                ("dateOfBirth" is NOT NULL AND substring("dateOfBirth" from 6 for 2)::int = ${month + 1})
+            AND ("dateOfDeath" IS NULL OR substring("dateOfDeath" from 1 for 4)::int >= ${year})`;
         const qr = await this.repo.query(q);
         if (Array.isArray(qr) && qr.length > 0) {
             result.push(
@@ -93,7 +94,9 @@ class EventService {
                     const p = new Person().fromJSON(json);
                     const e = p.sex == Sex.female ? "p'tite mère" : p.sex == Sex.male ? "p'tit père" : "";
                     return {
-                        startDate: new Date(year, p.dateOfBirth.getMonth(), p.dateOfBirth.getDate()),
+                        startDate: new Date(
+                            Date.UTC(year, +p.dateOfBirth.substr(5, 2) - 1, +p.dateOfBirth.substr(8, 2))
+                        ),
                         name: `🎂 ${p.getQuickName()}`,
                         details: `${p.getQuickName()} fête ses ${p.getAge()}!<br/>Bravo ${e}!!`,
                         type: "birthday",
@@ -105,7 +108,6 @@ class EventService {
 
         // On récupères les fêtes nationals
         result.push(...this.getLegalEvents(year, month));
-
         return result;
     }
 

@@ -96,7 +96,7 @@ class CitationService {
         }
 
         // On vérifie que l'année est correctement renseignée
-        const minYear = author.dateOfBirth ? new Date(author.dateOfBirth).getFullYear() : 1700;
+        const minYear = author.dateOfBirth ? +author.dateOfBirth.substr(0, 4) : 1700;
         citation.year = Number.parseInt(citation.year);
         if (!citation.year || citation.year < minYear || citation.year > new Date().getFullYear()) {
             throw new BadRequestError("L'année est optionnel mais doit forcement être une année valide");

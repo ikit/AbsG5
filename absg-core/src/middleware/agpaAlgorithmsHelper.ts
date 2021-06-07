@@ -133,7 +133,7 @@ export async function p4CheckVotes(ctx) {
                 stats.votes.push(vote);
                 stats.userId = vote.userId;
                 stats.username = vote.username;
-                stats.age = ctx.year - new Date(vote.dateOfBirth).getFullYear();
+                stats.age = ctx.year - vote.dateOfBirth.substr(0, 4);
                 vote.error = false;
 
                 // Vérification note du vote compris entre 1 et 2 (on accepte les vote zéro utilisé pour le meilleur titre)
