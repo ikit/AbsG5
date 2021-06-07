@@ -205,10 +205,24 @@ export const router = new VueRouter({
                 }
             ]
         },
-        // GCloud
+        // G-theque
         {
-            path: "/gcloud",
-            component: () => import("./views/GCloud.vue"),
+            path: "/gtheque",
+            component: () => import("./views/GTheque.vue"),
+            children: [
+                {
+                    path: "",
+                    redirect: "/gtheque/collections"
+                },
+                {
+                    path: "collections",
+                    component: () => import("./views/Gtheque/Theques.vue"),
+                },
+                {
+                    path: "grenier",
+                    component: () => import("./views/Gtheque/Grenier.vue"),
+                }
+            ]
         },
         // Pages uniques
         {

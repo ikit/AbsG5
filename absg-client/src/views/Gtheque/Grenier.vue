@@ -1,10 +1,8 @@
 <template>
   <div>
-    <h1>404</h1>
+    <h1>Vidéos</h1>
     <hr>
-    <p>La page demandée n'existe pas encore.</p>
-    <p>Vous trouverez ici un espace de stockage partagé entre les membres du site.</p>
-    <p>AGPA, archives et montages vidéos, documents en tout genre...</p>
+    <p>Contient la liste de toutes les vidéos de la famille (montages des anniversaires, etc)</p>
   </div>
 </template>
 
@@ -22,7 +20,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../themes/global.scss';
+@import '../../themes/global.scss';
 h1 {
     font-size: 200px;
     line-height: 400px;

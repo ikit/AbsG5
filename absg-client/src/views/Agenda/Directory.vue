@@ -177,55 +177,24 @@
               </v-col>
 
               <v-col>
-                <v-menu
-                  v-model="personEditor.dateOfBirthMenu"
-                  :close-on-content-click="true"
-                  :nudge-right="40"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="290px"
-                >
-                  <template #activator="{ on }">
-                    <v-text-field
-                      v-model="personEditor.dateOfBirth"
-                      :rules="editorRules.dateOfBirth"
-                      label="Date de naissance"
-                      prepend-icon="far fa-calendar-alt"
-                      clearable
-                      validate-on-blur
-                      v-on="on"
-                    />
-                  </template>
-                  <v-date-picker
-                    v-model="personEditor.dateOfBirth"
-                    @input="personEditor.dateOfBirthMenu = false"
-                  />
-                </v-menu>
-
-                <v-menu
-                  v-model="personEditor.dateOfDeathMenu"
-                  :close-on-content-click="true"
-                  :nudge-right="40"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="290px"
-                >
-                  <template #activator="{ on }">
-                    <v-text-field
-                      v-model="personEditor.dateOfDeath"
-                      :rules="editorRules.dateOfDeath"
-                      clearable
-                      label="Date du décè"
-                      prepend-icon="far fa-calendar-alt"
-                      validate-on-blur
-                      v-on="on"
-                    />
-                  </template>
-                  <v-date-picker
-                    v-model="personEditor.dateOfDeath"
-                    @input="personEditor.dateOfDeathMenu = false"
-                  />
-                </v-menu>
+                <v-text-field
+                  v-model="personEditor.dateOfBirth"
+                  :rules="editorRules.date"
+                  label="Date de naissance"
+                  placeholder="AAAA.MM.JJ"
+                  style="margin-left: 33px;"
+                  validate-on-blur
+                  prepend-icon="far fa-calendar-alt"
+                />
+                <v-text-field
+                  v-model="personEditor.dateOfDeath"
+                  :rules="editorRules.date"
+                  label="Date du décè"
+                  placeholder="AAAA.MM.JJ"
+                  style="margin-left: 33px;"
+                  validate-on-blur
+                  prepend-icon="far fa-calendar-alt"
+                />
 
                 <v-text-field
                   v-model="personEditor.address"
@@ -249,14 +218,6 @@
                   v-model="personEditor.job"
                   label="Dernier métier exercé"
                   prepend-icon="fas fa-briefcase"
-                />
-              </v-col>
-
-              <v-col>
-                <ImageEditor
-                  ref="imgEditor"
-                  :disabled="personEditor.isLoading"
-                  style="height: 300px; position: relative"
                 />
               </v-col>
             </v-row>
@@ -291,15 +252,11 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
-import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
-import ImageEditor from '../../components/ImageEditor.vue';
 
 export default  {
     store,
-    components: {
-        ImageEditor
-    },
     data: () => ({
         isLoading: false,
         headers: [
@@ -338,7 +295,6 @@ export default  {
             job: null,
             phone: null,
             email: null,
-            photo: null,
 
             open: false,
             isLoading: false,
@@ -347,19 +303,10 @@ export default  {
             dateOfDeathMenu: false,
         },
         editorRules: {
-            photo: [
-                value => !value || value.size < 2000000 || 'La taille de la photo doit être inférieur à 2 MB',
-            ],
-            dateOfBirth: [
+            date: [
                 value => {
-                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return !value || pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
-                }
-            ],
-            dateOfDeath: [
-                value => {
-                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return !value || pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                    const pattern = /^([0-9]{4})?(\.[0-9]{2}(\.[0-9]{2})?)?$/
+                    return !value || pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY.MM ou bien YYYY.MM.DD'
                 }
             ],
         }
@@ -367,6 +314,7 @@ export default  {
     mounted() {
         this.isLoading = true;
         axios.get(`/api/agenda/persons`).then(response => {
+
             const data = parseAxiosResponse(response);
             let idx = 0;
             this.persons = data.map(e => ({
@@ -433,11 +381,6 @@ export default  {
             this.personEditor.job = null;
             this.personEditor.phone = null;
             this.personEditor.email = null;
-            this.personEditor.photo = null;
-
-            const { imgEditor } = this.$refs;
-            imgEditor.reset();
-
             this.personEditor.complete = 0;
         },
 
@@ -456,7 +399,6 @@ export default  {
             this.personEditor.job = person.job;
             this.personEditor.phone = person.phone;
             this.personEditor.email = person.email
-            this.personEditor.photo = person.photo;
             this.personEditor.complete = 0;
         },
 
@@ -479,38 +421,12 @@ export default  {
                     title: person.name,
                 });
             }
-
-            // On met à jour la gallerie photo et ses index
-            idx = 0;
-            this.places = this.places.map(e => ({
-                ...e,
-                galleryIndex: e.thumb ? idx++ : null
-            }));
-            store.commit('photosGalleryReset', this.places.filter(e => e.thumb));
             this.isLoading = false;
         },
 
         savePerson() {
             this.personEditor.isLoading = true;
-            const { imgEditor } = this.$refs;
-
-            // On récupère l'image
-            const imgUrl = imgEditor.imageUrl();
-            let img = null;
-            if (imgUrl) {
-                axios.get(imgEditor.imageUrl(), { responseType: 'blob' }).then(
-                    response => {
-                        this.personEditor.image = response.data;
-                        this._savePersonRequest();
-                    }
-                );
-            } else {
-                this.personEditor.image = null;
-                this._savePersonRequest();
-            }
-
-        },
-        _savePersonRequest() {
+            
             // On prépare l'envoie des infos au serveur
             const formData = new FormData();
             formData.append("id", this.personEditor.id);
@@ -525,14 +441,8 @@ export default  {
             formData.append("job", this.personEditor.job);
             formData.append("phone", this.personEditor.phone);
             formData.append("email", this.personEditor.email);
-            formData.append("photo", this.personEditor.photo);
-
-            if (this.personEditor.image) {
-                formData.append("image", this.personEditor.image);
-            }
 
             // On envoie au serveur
-            const that = this;
             axios.post(`/api/agenda/person`, formData, {
                 headers: {
                     "Content-Type" : "multipart/form-data",
@@ -544,9 +454,9 @@ export default  {
             .then( response => {
                 const savedPerson = parseAxiosResponse(response);
                 // on reset l'IHM
-                that.resetDialog();
+                this.resetDialog();
                 // On ajoute ou met à jour la liste
-                that.refreshList(savedPerson);
+                this.refreshList(savedPerson);
             })
             .catch( err => {
                 store.commit('onError', err);
@@ -557,7 +467,7 @@ export default  {
         computeDateFromForm(input) {
             try {
                 if (input) {
-                    const tokens = input.split("-");
+                    const tokens = input.split(".");
                     let year = null;
                     let month = 0;
                     let day = 1;
@@ -566,12 +476,12 @@ export default  {
                         year = Number.parseInt(tokens[0], 10);
                     }
                     if (tokens.length > 1) {
-                        month = Number.parseInt(tokens[1], 10) - 1;
+                        month = Number.parseInt(tokens[1], 10);
                     }
                     if (tokens.length > 2) {
                         day = Number.parseInt(tokens[2], 10);
                     }
-                    return new Date(year, month, day);
+                    return `${year.toString().padStart(4, "0")}.${month.toString().padStart(2, "0")}.${day.toString().padStart(2, "0")}`;
                 }
             } catch (err) {}
             return null;
