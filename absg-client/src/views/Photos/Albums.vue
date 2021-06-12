@@ -1,10 +1,55 @@
 <template>
   <v-container fluid>
+    <!-- Les albums prédéfinis -->
     <v-layout
       row
       wrap
     >
-      <!-- Les albums prédéfinis -->
+      <!-- Par ordre chronologiques -->
+      <v-flex style="max-width: 400px; margin: 15px">
+        <v-card @click="openChrologie()">
+          <v-img
+            src="/files/albums/chronologie.jpg"
+            aspect-ratio="1.5"
+          >
+            <div
+              class="albumInfo"
+              style="position: absolute; bottom: 0; right: 0; left: 0; text-align: right; font-size: 0.9em; background: rgba(0,0,0, 0.5); padding: 5px; color: #fff"
+            >
+              {{ sortedPhotosCount }} photos
+            </div>
+          </v-img>
+          <v-card-subtitle>
+            Toutes les photos triées dans l'ordre chronologie.
+          </v-card-subtitle>
+          <v-menu
+            v-model="chrologie"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template #activator="{ on, attrs }">
+              <v-text-field
+                v-model="date"
+                label="Choi"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              />
+            </template>
+            <v-date-picker
+              v-model="date"
+              range
+              @input="menu2 = false"
+            />
+          </v-menu>
+        </v-card>
+      </v-flex>
+
+      <!-- Par personnes -->
       <v-flex style="max-width: 400px; margin: 15px">
         <v-card @click="openChrologie()">
           <v-img
@@ -22,14 +67,46 @@
             primary-title
             style="position: relative"
           >
-            Chronologie
+            Par personne
           </v-card-title>
           <v-card-subtitle>
-            Toutes les photos triées dans l'ordre chronologie
+            Sélectionnez une personne pour voir toutes ses photos.
           </v-card-subtitle>
         </v-card>
       </v-flex>
 
+      <!-- Par lieux -->
+      <v-flex style="max-width: 400px; margin: 15px">
+        <v-card @click="openChrologie()">
+          <v-img
+            src="/files/albums/chronologie.jpg"
+            aspect-ratio="1.5"
+          >
+            <div
+              class="albumInfo"
+              style="position: absolute; bottom: 0; right: 0; left: 0; text-align: right; font-size: 0.9em; background: rgba(0,0,0, 0.5); padding: 5px; color: #fff"
+            >
+              {{ sortedPhotosCount }} photos
+            </div>
+          </v-img>
+          <v-card-title
+            primary-title
+            style="position: relative"
+          >
+            Lieux 
+          </v-card-title>
+          <v-card-subtitle>
+            Sélectionnez un lieu pour voir toutes ses photos.
+          </v-card-subtitle>
+        </v-card>
+      </v-flex>
+    </v-layout>
+
+
+    <v-layout
+      row
+      wrap
+    >
       <v-flex
         v-for="album in albums"
         :key="album.id"

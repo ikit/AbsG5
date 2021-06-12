@@ -8,6 +8,22 @@
     > Voir la feuille de route </a>
 
 
+    <h2>
+      5.2
+    </h2>
+    <v-card>
+      <p>Fonctionnalités</p>
+      <ul>
+        <li>G-théque: nouvelle section du site pour le stockage et partages de médias et documents</li>
+        <li>Mise en place des notifications</li>
+        <li>Forum: création de nouveau sujet de discussion</li>
+        <li>Notification: précision des sujets concernés par les nouveaux messages</li>
+      </ul>
+      <p>Bug corrigés</p>
+      <ul>
+        <li>Agenda: problème avec les dates de naissance</li>
+      </ul>
+    </v-card>
 
     <h2>
       5.1
