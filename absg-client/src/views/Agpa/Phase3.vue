@@ -4,6 +4,12 @@
       <v-row style="padding: 15px">
         <v-tooltip bottom>
           <template #activator="{ on }">
+            <v-icon
+              left
+              style="margin-top:-10px; font-size: 30px"
+            >
+              far fa-question-circle
+            </v-icon>
             <div
               class="phase-left-header"
               v-on="on"
@@ -113,7 +119,9 @@
 
 
     <div v-if="category && category.categoryId === 0">
-      <h2>Résumé de vos votes par catégorie</h2>
+      <h2 class="section">
+        Résumé de vos votes par catégorie
+      </h2>
       <v-data-table
         :headers="headers"
         :items="resume"
@@ -145,7 +153,9 @@
           >{{ item.tvotes }} / 10</b>
         </template>
       </v-data-table>
-      <h2>Les photos que vous avez sélectionnées pour le meilleur titre</h2>
+      <h2 class="section">
+        Les photos que vous avez sélectionnées pour le meilleur titre
+      </h2>
     </div>
 
     <v-container fluid>
@@ -182,6 +192,7 @@
                 <v-tooltip bottom>
                   <template #activator="{ on }">
                     <v-btn
+                      v-if="photo.enableVotes"
                       icon
                       small
                       :disabled="isLoading"
@@ -200,6 +211,7 @@
                 <v-tooltip bottom>
                   <template #activator="{ on }">
                     <v-btn
+                      v-if="photo.enableVotes"
                       icon
                       small
                       :disabled="isLoading"
@@ -218,6 +230,7 @@
                 <v-tooltip bottom>
                   <template #activator="{ on }">
                     <v-btn
+                      v-if="photo.enableVotes"
                       icon
                       small
                       :disabled="isLoading"
@@ -331,6 +344,9 @@ export default {
     methods: {
         initView() {
             this.isLoading = true;
+
+            // Fin de la phase 3
+            this.end = format(new Date(this.agpaMeta.boudaries[2].endDate), "dd MMM 'à' HH'h'mm", {locale: fr});
 
             axios.get(`/api/agpa/p3`).then(response => {
                 const data = parseAxiosResponse(response);
@@ -557,8 +573,14 @@ export default {
     text-align: center;
 }
 
-h2 {
+h2.section {
     text-align: left;
+    font-weight: bold;
+    color: #37474f;
+    text-shadow: 0 1px #aaa;
+    font-size: 25px;
+    font-family: "Comfortaa", sans-serif;
+    margin: 30px 0 -20px 25px;
 }
 
 .phase-left-header {

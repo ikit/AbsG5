@@ -1,4 +1,4 @@
-import { AgpaPhoto, AgpaVote, AgpaAwardType } from "../entities";
+import { AgpaPhoto, AgpaVote, AgpaAwardType, AgpaAward } from "../entities";
 import { palmaresPoints } from "./agpaPalmaresHelper";
 import { getRepository } from "typeorm";
 
@@ -111,8 +111,7 @@ export async function p4CheckVotes(ctx) {
             const stats = {
                 userId: -1, // L'id de l'utilisateur
                 username: "", // Le nom de l'utilisateur
-                // eslint-disable-next-line prettier/prettier
-                age: 0,                         // Son age
+                age: 0, // Son age
                 votesScore: 0, // Le nombre total de points qu'il a attribué dans la catégorie
                 valid: false, // Si ses votes sont considérés comme valides pour cette catégorie
                 errors: {
@@ -303,7 +302,8 @@ export async function p4AgpaAttribution(ctx: any) {
                 average: 0, // Score moyen obtenu sur l'ensemble des photos posté de l'utilisateur
                 lower: 0, // Plus petit score obtenu par les photos de l'utilisateur
                 formerPalmares: 0, // Palmares cumulés des éditions précédantes
-                palmares: 0 // total de points obtenu au palmares de l'édition actuelle
+                palmares: 0, // total de points obtenu au palmares de l'édition actuelle
+                age: 0 // L'age de l'utilisateur
             };
         }
         if (userData[p.userId].photos.length < catNumber) {
@@ -324,11 +324,23 @@ export async function p4AgpaAttribution(ctx: any) {
         userData[uId].average = uPhotos.reduce((sum, e) => e.gscore + sum, 0) / count;
     }
 
+    // On recupère l'age des utilisateurs qui ont participé à l'édition
+    let sql = `SELECT DISTINCT (p."userId"), a."dateOfBirth" 
+        FROM agpa_photo p
+        INNER JOIN "user" u ON p."userId" = u.id
+        INNER JOIN person a ON u."personId" = a.id
+        WHERE p.year=${ctx.year}`;
+
+    let raw = await repo.query(sql);
+    for (const r of raw) {
+        userData[r.userId].age = ctx.year - new Date(r.dateOfBirth).getFullYear();
+    }
+
     ctx.users = userData;
 
     // Calcul des palmares des editions précédentes
-    const sql = `SELECT * FROM agpa_award WHERE year < ${ctx.year} ORDER BY "userId" ASC, year ASC`;
-    const raw = await repo.query(sql);
+    sql = `SELECT * FROM agpa_award WHERE year < ${ctx.year} ORDER BY "userId" ASC, year ASC`;
+    raw = await repo.query(sql);
     for (const p of raw) {
         // On ne prend en compte que les palmarès des utilisateurs qui ont participés cette année
         if (p.userId in ctx.users) {
@@ -434,7 +446,7 @@ export async function p4AgpaAttribution(ctx: any) {
         deliverAwardsPhotos(ctx.categories[-3].photos, -3, ctx);
     }
 
-    // // Palmarès "Meilleur photographie"
+    // Palmarès "Meilleur photographie"
     ctx.photosOrder.sort(sortPhotos);
     deliverAwardsPhotos(ctx.photosOrder, -2, ctx);
 
@@ -516,79 +528,38 @@ export async function p4DiamondAttribution(ctx: any) {
     return ctx;
 }
 
-// /**
-//  * closeEdition
-//  * récupère les données retournées par la méthode deliverAwards($categories) et enregistre
-//  * dans la base de données les résultats.
-//  * @param $ctx [array], le contexte des agpa
-//  * @param &$categories, les photos triées par catégories obtenue lors de l'appel à la méthode deliverAwards($categories)
-//  */
-// if ( ! function_exists('closeEdition'))
-// {
-//     function closeEdition(&$ctx, &$categories)
-//     {
+/**
+ * Attribue les agpa d'honneur aux enfants de moins de 12 ans qui ont participés.
+ * @param ctx les données retournées lors de l'étape 4 (cf p4DiamondAttribution)
+ */
+export async function p4HonorAttribution(ctx: any) {
+    for (const uid in ctx.users) {
+        const u = ctx.users[uid];
+        if (u.age < 12 && (!Array.isArray(u.awards) || u.awards.length === 0)) {
+            u.awards = [{
+                categoryId: u.photos[0].categoryId,
+                userId: u.id,
+                photoId: u.photos[0].id,
+                award: AgpaAwardType.honor
+            }];
+        }
+    }
+    return ctx;
+}
 
-//         $CI = get_instance();
 
-//     // 1- Mettre à jours les données "classement" des photos
-//         foreach ($categories as $idCat => $category)
-//         {
-//             if ($idCat < 0) continue;
-//             $leaderBoardRanking = 1;
-//             foreach($category['photos'] as $leaderBoardRanking => $photo)
-//             {
-//                 // On enregistre
-//                 $sql = 'UPDATE agpa_photos SET ranking='.($leaderBoardRanking+1)
-//                       .' WHERE photo_id='.$photo->photo_id.' LIMIT 1 ;';
-//                 $CI->db->query($sql);
-//             }
-//         }
+export async function monitoringStats(ctx: any) {
+    const repo = getRepository(AgpaPhoto);
 
-//     // 2- Enregistrer les données palmares
-//         $sql = 'INSERT INTO agpa_awards (`year`,`category_id`,`author_id`,`award`,`photo_id`) VALUES';
+    const sql = `SELECT u1.username as "from", u2.username as "to", SUM(v.score)
+        FROM public.agpa_vote v
+        INNER JOIN "user" u1 ON v."userId" = u1.id
+        INNER JOIN "agpa_photo" p ON p.id = v."photoId"
+        INNER JOIN "user" u2 ON p."userId" = u2.id
+        WHERE v.year = ${ctx.year} AND v.score > 0
+        GROUP BY "from", "to"`;
 
-//         foreach ($categories as $idCat => $category)
-//         {
-//             $max = ($idCat != -1)? min(sizeof($category['photos']), 4) : min(sizeof($category),4);
-//             $previousAward = '';
-
-//             for($i=0; $i<$max;  $i++)
-//             {
-//                 if ($idCat == -1)
-//                 {
-//                     $author = $category[$i]['IdPhotographe'];
-//                     $award  = (isset($category[$i]['award'])) ? $category[$i]['award'] : 'lice';
-//                     $photo  = 0;
-//                 }
-//                 elseif ($idCat == -2)
-//                 {
-//                     $author = $category['photos'][$i]->user_id;
-//                     $award  = (isset($category['photos'][$i]->awardPhoto)) ? $category['photos'][$i]->awardPhoto : 'lice';
-//                     $photo  = $category['photos'][$i]->photo_id;
-//                 }
-//                 elseif ($idCat == -3)
-//                 {
-//                     $author = $category['photos'][$i]->user_id;
-//                     $award  = (isset($category['photos'][$i]->awardTitle)) ? $category['photos'][$i]->awardTitle : 'lice';
-//                     $photo  = $category['photos'][$i]->photo_id;
-//                 }
-//                 else
-//                 {
-//                     $author = $category['photos'][$i]->user_id;
-//                     $award  = (isset($category['photos'][$i]->award)) ? $category['photos'][$i]->award : 'lice';
-//                     $photo  = $category['photos'][$i]->photo_id;
-//                 }
-
-//                 $sql .= "('{$ctx['current_phase_year']}','$idCat','$author','$award','$photo'),";
-//             }
-//         }
-//         // On supprime la dernière virgule en trop
-//         $sql = substr($sql,0,strlen($sql)-1);
-
-//         // Précaution, avant d'enregistrer, on supprime tout le palmares de l'année
-//         $CI->db->query('DELETE FROM agpa_awards WHERE year='.$ctx['current_phase_year']);
-
-//         // On enregistre
-//         $CI->db->query($sql);
-//     }
-// }
+    ctx.votesStats = await repo.query(sql);
+    ctx.votesStats = ctx.votesStats.map(r => [r.from, r.to, +r.sum]);
+    return ctx;
+}

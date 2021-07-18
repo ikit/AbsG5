@@ -22,10 +22,10 @@ export class AgpaContext {
      * @param refYear, l'année de référence pour le contexte (par défaut prend l'année en cours)
      */
     async checkForReset(refYear = null): Promise<AgpaContext> {
-        const currentYear = refYear ? refYear : new Date().getFullYear();
+        const currentYear = refYear ? refYear : getCurrentEdition();
 
         // Si pas encore init ou bien dernier reset à plus de 24h: il faut rafraichir le contexte
-        const needToRefresh = !this.lastUpdateRefDate || differenceInHours(currentYear, this.lastUpdateRefDate) >= 24;
+        const needToRefresh = true; // !this.lastUpdateRefDate || differenceInHours(currentYear, this.lastUpdateRefDate) >= 24;
 
         // On recalcul le contexte
         if (needToRefresh) {
@@ -53,7 +53,7 @@ export class AgpaContext {
 
         // On en déduis la phase actuelle pour l'édition en cours
         for (const p of this.phases) {
-            if (date > p.startDate) {
+            if (date >= p.startDate) {
                 this.phase = p.id;
             }
         }

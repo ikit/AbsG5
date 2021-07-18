@@ -103,6 +103,9 @@ export default {
                     this.now = Math.trunc((new Date()).getTime() / 1000);
                 }, 1000);
             }
+        },
+        stop() {
+            clearInterval(interval);
         }
     }
 }

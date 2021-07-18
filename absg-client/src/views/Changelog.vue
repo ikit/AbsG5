@@ -31,16 +31,23 @@
     <v-card>
       <p>Fonctionnalités</p>
       <ul>
-        <li>AGPA Cérémonies en ligne synchronisés</li>
-        <li>Mise en place des notifications</li>
+        <li>AGPA Cérémonie en ligne synchronisée entre les différents sites</li>
+        <li>AGPA Cérémonie: préchargement et mise en cache</li>
         <li>Forum: création de nouveau sujet de discussion</li>
         <li>Notification: précision des sujets concernés par les nouveaux messages</li>
+        <li>Admin: AGPA P2 suppression de photo</li>
+        <li>Admin: AGPA monitoring</li>
+        <li>AGPA: Clôture de l'édition courante</li>
+        <li>AGPA: Graph répartition votes</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>
         <li>AGPA P1: Diaporama</li>
         <li>AGPA P1: Indicateur de chargement lors de la sauvegarde/édition d'une image</li>
         <li>Forum: navigation/chargement d'un sujet à l'autre</li>
+        <li>AGPA P3: impossible de voter pour ses propres photos</li>
+        <li>AGPA P3: association fixe d'un numéro pour chaque photos (plus d'aléatoire comme en P2)</li>
+        <li>AGPA Cérémonie: bug de l'an 2020 :)</li>
       </ul>
     </v-card>
 

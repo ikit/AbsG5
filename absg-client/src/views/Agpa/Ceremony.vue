@@ -306,7 +306,8 @@ export default {
                     ];
 
                     // Categories
-                    for(let catId in data.categories) {
+                    const catIds = [...data.categoriesOrders, "-4", "-3", "-2", "-1"]
+                    for(let catId of catIds) {
                         const cat = data.categories[catId];
                         // Meilleurs photographes
                         if (catId == -1) {
@@ -336,7 +337,7 @@ export default {
                                 title: photo.title,
                                 username: photo.username,
                                 avatar: `/files/avatars/${padNumber(photo.userId, 3)}.png`,
-                                award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
+                                award: `/img/agpa/cupes/c${`${catId}`.replace("-", "x")}-${photo.award}.png`,
 
                             }));
                             this.slides = this.slides.concat(awards);
@@ -359,7 +360,7 @@ export default {
                                 title: photo.title,
                                 username: photo.username,
                                 avatar: `/files/avatars/${padNumber(photo.userId, 3)}.png`,
-                                award: `/img/agpa/cupes/c${catId.replace("-", "x")}-${photo.award}.png`,
+                                award: `/img/agpa/cupes/c${`${catId}`.replace("-", "x")}-${photo.award}.png`,
 
                             }));
                             awards.pop();

@@ -34,7 +34,7 @@ export const router = new VueRouter({
             children: [
                 {
                     path: "",
-                    redirect: "/admin/dashboard"
+                    redirect: "/admin/resetpwd"
                 },
                 {
                     path: "profile",
@@ -182,6 +182,10 @@ export const router = new VueRouter({
                 {
                     path: "edition",
                     component: () => import("./views/Agpa/Edition.vue"),
+                },
+                {
+                    path: "admin",
+                    component: () => import("./views/Agpa/Monitoring.vue"),
                 },
                 {
                     path: "rules",

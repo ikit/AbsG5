@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === "production") {
             console.debug("New content is downloading.");
         },
         updated () {
-            confirm("Une nouvelle version du site est disponible. Merci de recharger la page.")
+            // confirm("Une nouvelle version du site est disponible. Merci de recharger la page.")
             window.location.reload();
         },
         offline () {

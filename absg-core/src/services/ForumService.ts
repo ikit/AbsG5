@@ -304,7 +304,7 @@ class ForumService {
             // Si l'id est renseigné, on récupère l'instance en base pour la mettre à jour
             msg = await this.msgRepo.findOne({
                 where: { id: id },
-                relations: ["forum.lastMessage", "forum", "topic", "topic.firstMessage", "topic.lastMessage"]
+                relations: ["poster", "forum.lastMessage", "forum", "topic", "topic.firstMessage", "topic.lastMessage"]
             });
             forumId = msg.forum.id;
             topicId = msg.topic ? msg.topic.id : null;

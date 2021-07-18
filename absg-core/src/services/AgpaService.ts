@@ -1,11 +1,13 @@
-import { User, LogModule, AgpaPhoto, AgpaCategory } from "../entities";
+import { User, LogModule, AgpaPhoto, AgpaCategory, AgpaAwardType } from "../entities";
 import { getMaxArchiveEdition, getCurrentEdition, getMetaData } from "../middleware/agpaCommonHelpers";
 import { archiveSummary, archiveEdition, archiveCategory } from "../middleware/agpaArchiveHelper";
 import {
+    monitoringStats,
     p4AgpaAttribution,
     p4CheckVotes,
     p4ComputeNotes,
-    p4DiamondAttribution
+    p4DiamondAttribution,
+    p4HonorAttribution
 } from "../middleware/agpaAlgorithmsHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
@@ -73,9 +75,10 @@ class AgpaService {
      * @param year l'année de la cérémonie
      */
     getCeremonyData(year: number) {
-        if (year >= 2006 && year <= getMaxArchiveEdition()) {
+        if (year >= 2006 && year <= getCurrentEdition()) {
             return ceremonyData(year);
         }
+        logger.warning(`Cérémonie ${year} non disponible`);
         return null;
     }
 
@@ -193,7 +196,7 @@ class AgpaService {
         const votes = await this.catRepo.query(sql);
 
         // On récupère les photos
-        sql = `SELECT p.*
+        sql = `SELECT p.id, p.error, p.filename, p.number, p.title, p."userId", p."categoryId", p.year
             FROM agpa_photo p
             INNER JOIN agpa_category c ON p."categoryId" = c.id
             WHERE p.year=${year}
@@ -218,22 +221,33 @@ class AgpaService {
                 result.categories[p.categoryId] = {
                     categoryId: p.categoryId,
                     photos: [],
-                    userPhotoIds: [],
                     totalPhotos: 0,
                     totalUsers: 0,
                     maxVotes: 0
                 };
             }
             result.categories[p.categoryId].photos.push(p);
-            if (p.userId === user.id) {
-                result.categories[p.categoryId].userPhotoIds.push(p.id);
-            }
         }
 
         // Pour chaque catégories
         for (const c of result.categories) {
             if (c) {
-                c.photos.sort((a, b) => a.number - b.number);
+                if (c.photos[0].number) {
+                    // Si les photos ont un numéro, on les tris en fonction de ce numéro*
+                    c.photos.sort((a, b) => a.number - b.number);
+                } else {
+                    // Sinon, on mélange les photos et on leur attribu un numéro
+                    shuffleArray(c.photos);
+                    for (let idx = 0; idx < c.photos.length; idx++) {
+                        c.photos[idx].number = idx + 1;
+                    }
+                    await this.photoRepo.save(c.photos);
+                }
+                // Pour chaque photos: on supprime l'info user, et on indique s'il s'agit d'une photo de l'utilsiateur
+                for (const p of c.photos) {
+                    p.enableVotes = p.userId != user.id && !p.error;
+                    delete p.userId;
+                }
                 c.totalPhotos = c.photos.length;
                 c.totalUsers = new Set(c.photos.map(p => p.userId)).size;
                 c.maxVotes = Math.round(c.photos.length / 2);
@@ -243,30 +257,103 @@ class AgpaService {
     }
 
     /**
-     * Dépuillement
      * Effectue la série d'action nécessaire (étape par étape) pour calculer les points
      * de chaques de photos et leur attribuer les récompenses en départageant les exaequos
+     * Cete méthode permet aussi bien le calcul des résultats d'une édition que sa supervision
+     * en controlant que tout se passe bien.
      * @param user l'utilisateur qui en fait la demande
      */
-    async getP4Data(year: number, user: User) {
+    async monitoring(year: number, user: User) {
         let context = null;
-        if (user.is("admin")) {
-            // On récupère le contexte
-            context = await getMetaData(year, true);
+        // On récupère le contexte
+        context = await getMetaData(year, true);
 
-            // Récupérer les votes et les vérifier
-            context = await p4CheckVotes(context);
+        // Récupérer les votes et les vérifier
+        context = await p4CheckVotes(context);
 
-            // Comptabiliser les votes correctes et calculer les notes pour chaque photo
-            context = await p4ComputeNotes(context);
+        // Comptabiliser les votes correctes et calculer les notes pour chaque photo
+        context = await p4ComputeNotes(context);
 
-            // Attributions AGPA et création d'un "premier" palmares
-            context = await p4AgpaAttribution(context);
+        // Attributions AGPA et création d'un "premier" palmares
+        context = await p4AgpaAttribution(context);
 
-            // 4- Attribution des AGPA de diamant
-            context = await p4DiamondAttribution(context);
-        }
+        // Attribution des AGPA de diamant
+        context = await p4DiamondAttribution(context);
+
+        // Attribution des AGPA d'honneur
+        context = await p4HonorAttribution(context);
+
+        // Stats
+        context = await monitoringStats(context);
+
         return context;
+    }
+
+    /**
+     * Clos l'édition en cours si nécessaire
+     */
+    async closeEdition() {
+        const currentYear = getCurrentEdition();
+        // On récupère le contexte
+        let context = await getMetaData(currentYear, true);
+        let awards = await this.catRepo.query(`SELECT * FROM agpa_award WHERE year = ${context.year}`);
+        if (context.phase === 5 && awards.length === 0) {
+            // On calcul les awards de l'édition en cours
+            context = await getMetaData(context.year, true);
+            context = await p4CheckVotes(context);
+            context = await p4ComputeNotes(context);
+            context = await p4AgpaAttribution(context);
+            context = await p4DiamondAttribution(context);
+            context = await p4HonorAttribution(context);
+            // On récpère des agpas des catégories normales et meilleurs titre
+            for (const pid in context.photos) {
+                const p = context.photos[pid];
+                let a = Array.isArray(p.awards) ? p.awards : [];
+                a = a.map(e => ({ ...e, photoId: +pid, userId: p.userId }));
+                awards = awards.concat(a);
+            }
+            // On récupère des meilleurs photographes
+            for (const uid in context.users) {
+                const u = context.users[uid];
+                let a = Array.isArray(u.awards) ? u.awards : [];
+                a = a.filter(e => e.categoryId === -1 || e.award === AgpaAwardType.honor);
+                a = a.map(e => ({ ...e, userId: u.id }));
+                awards = awards.concat(a);
+            }
+
+            awards.sort((a, b) => {
+                return a.categoryId - b.categoryId;
+            });
+
+            // On sauvegarde les awards en base de donnée
+            let sql = [];
+            for (const a of awards) {
+                if (a.categoryId === -1) {
+                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, NULL, '${a.award}')`);
+                } else {
+                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, ${a.photoId}, '${a.award}')`);
+                }
+            }
+            this.catRepo.query(
+                `INSERT INTO agpa_award (year, "categoryId", "userId", "photoId", award) VALUES ${sql.join(",")};`
+            );
+
+            // On met à jours les résultats pour les photos de l'édition
+            sql = [];
+            for (const pid in context.photos) {
+                const p = context.photos[pid];
+                sql.push(`UPDATE agpa_photo SET 
+                    ranking=${context.photosOrder.findIndex(e => e === p.id) + 0}, 
+                    votes=${p.votes}, 
+                    "votesTitle"=${p.votesTitle}, 
+                    score=${p.score},
+                    gscore=${p.gscore}
+                    WHERE id=${p.id}`);
+            }
+            this.catRepo.query(sql.join(";"));
+        }
+
+        return awards;
     }
 
     /**
