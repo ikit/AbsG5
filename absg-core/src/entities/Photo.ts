@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column } from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { User } from "./User";
 
 @Entity()
 export class Photo {
@@ -30,4 +31,8 @@ export class Photo {
         nullable: true
     })
     family: string;
+
+    @ManyToOne(() => User)
+    @JoinColumn()
+    poster: User;
 }

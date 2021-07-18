@@ -274,7 +274,7 @@ export default {
                             "Content-Type" : "multipart/form-data",
                         },
                         onUploadProgress: progressEvent => {
-                            this.trombiEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
+                            this.trombiEditor.complete = (progressEvent.loaded / progressEvent.total * 100 || 0);
                         }
                     })
                     .then(newTrombi => {

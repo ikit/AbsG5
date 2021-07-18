@@ -1,11 +1,13 @@
 import { getRepository } from "typeorm";
-import { JsonController, Get, Authorized, Post, Body, Param, QueryParam } from "routing-controllers";
-import { Photo } from "../entities";
+import { JsonController, Get, Authorized, Post, Body, Param, QueryParam, CurrentUser } from "routing-controllers";
+import { Photo, User } from "../entities";
+import { PhotoAlbum } from "../entities/PhotoAlbum";
 
 @Authorized()
 @JsonController("/photos")
-export class UserController {
+export class PhotosController {
     private repo = getRepository(Photo);
+    private aRepo = getRepository(PhotoAlbum);
 
     /**
      * Récupère la liste des photos à trier

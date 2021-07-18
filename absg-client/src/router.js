@@ -99,6 +99,14 @@ export const router = new VueRouter({
                     component: () => import("./views/Photos/Albums.vue"),
                 },
                 {
+                    path: "albums/:albumId",
+                    component: () => import("./views/Photos/AlbumViewer.vue"),
+                },
+                {
+                    path: "albums/:albumId/edit",
+                    component: () => import("./views/Photos/AlbumEditor.vue"),
+                },
+                {
                     path: "browser",
                     component: () => import("./views/Photos/Browser.vue"),
                 },

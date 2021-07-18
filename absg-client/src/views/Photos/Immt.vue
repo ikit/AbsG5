@@ -272,7 +272,7 @@ export default {
                             "Content-Type" : "multipart/form-data",
                         },
                         onUploadProgress: progressEvent => {
-                            this.immtEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
+                            this.immtEditor.complete = (progressEvent.loaded / progressEvent.total * 100 || 0);
                         }
                     })
                     .then(newImmt => {

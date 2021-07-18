@@ -1,108 +1,29 @@
 <template>
-  <v-container fluid>
-    <!-- Les albums prédéfinis -->
-    <v-layout
-      row
-      wrap
+  <div>
+    
+    <div
+      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      style="padding: 15px"
     >
-      <!-- Par ordre chronologiques -->
-      <v-flex style="max-width: 400px; margin: 15px">
-        <v-card @click="openChrologie()">
-          <v-img
-            src="/files/albums/chronologie.jpg"
-            aspect-ratio="1.5"
-          >
-            <div
-              class="albumInfo"
-              style="position: absolute; bottom: 0; right: 0; left: 0; text-align: right; font-size: 0.9em; background: rgba(0,0,0, 0.5); padding: 5px; color: #fff"
-            >
-              {{ sortedPhotosCount }} photos
-            </div>
-          </v-img>
-          <v-card-subtitle>
-            Toutes les photos triées dans l'ordre chronologie.
-          </v-card-subtitle>
-          <v-menu
-            v-model="chrologie"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                v-model="date"
-                label="Choi"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              />
-            </template>
-            <v-date-picker
-              v-model="date"
-              range
-              @input="menu2 = false"
-            />
-          </v-menu>
-        </v-card>
-      </v-flex>
+      <router-link
+        :to="{ path: `/photos/albums` }"
+        tag="button"
+      >
+        <v-icon>fas fa-home</v-icon>
+        <span
+          v-if="$vuetify.breakpoint.lgAndUp"
+          style="margin-left: 15px"
+        >Liste des albums</span>
+      </router-link>
 
-      <!-- Par personnes -->
-      <v-flex style="max-width: 400px; margin: 15px">
-        <v-card @click="openChrologie()">
-          <v-img
-            src="/files/albums/chronologie.jpg"
-            aspect-ratio="1.5"
-          >
-            <div
-              class="albumInfo"
-              style="position: absolute; bottom: 0; right: 0; left: 0; text-align: right; font-size: 0.9em; background: rgba(0,0,0, 0.5); padding: 5px; color: #fff"
-            >
-              {{ sortedPhotosCount }} photos
-            </div>
-          </v-img>
-          <v-card-title
-            primary-title
-            style="position: relative"
-          >
-            Par personne
-          </v-card-title>
-          <v-card-subtitle>
-            Sélectionnez une personne pour voir toutes ses photos.
-          </v-card-subtitle>
-        </v-card>
-      </v-flex>
-
-      <!-- Par lieux -->
-      <v-flex style="max-width: 400px; margin: 15px">
-        <v-card @click="openChrologie()">
-          <v-img
-            src="/files/albums/chronologie.jpg"
-            aspect-ratio="1.5"
-          >
-            <div
-              class="albumInfo"
-              style="position: absolute; bottom: 0; right: 0; left: 0; text-align: right; font-size: 0.9em; background: rgba(0,0,0, 0.5); padding: 5px; color: #fff"
-            >
-              {{ sortedPhotosCount }} photos
-            </div>
-          </v-img>
-          <v-card-title
-            primary-title
-            style="position: relative"
-          >
-            Lieux 
-          </v-card-title>
-          <v-card-subtitle>
-            Sélectionnez un lieu pour voir toutes ses photos.
-          </v-card-subtitle>
-        </v-card>
-      </v-flex>
-    </v-layout>
-
-
+      <v-btn
+        style="position: absolute; right: 15px; top: 10px"
+        @click.stop="newAlbum()">
+        <v-icon left>fas fa-plus</v-icon>Nouvel album
+      </v-btn>
+    </div>
+    
+  <v-container fluid>
     <v-layout
       row
       wrap
@@ -113,12 +34,12 @@
         style="max-width: 400px; margin: 15px"
       >
         <router-link
-          :to="{path: `/photo/albums/${album.id}`}"
+          :to="{path: `/photos/albums/${album.id}`}"
           style="text-decoration: none"
         >
           <v-card>
             <v-img
-              :src="album.thumb"
+              :src="album.coverPhoto"
               aspect-ratio="1.5"
             >
               <div class="albumInfo">
@@ -133,13 +54,14 @@
               {{ album.title }}
             </v-card-title>
             <v-card-subtitle>
-              {{ album.subtitle }}
+              {{ album.comment }}
             </v-card-subtitle>
           </v-card>
         </router-link>
       </v-flex>
     </v-layout>
   </v-container>
+  </div>
 </template>
 
 
@@ -151,24 +73,36 @@ import { parseAxiosResponse } from '../../middleware/CommonHelper';
 export default {
     store,
     data: () => ({
-        sortedPhotosCount: 25,
         albums: []
     }),
+    mounted() {
+        this.listAlbums();
+    },
     methods: {
-        openChrologie() {
-            axios.get(`/api/photos/checked`).then(response => {
-                let idx = 0;
-                this.photos = parseAxiosResponse(response).map(e => ({
-                    ...e,
-                    title: `${e.date}${e.place ? " - " + e.place : ""}${ e.persons ? " - " + e.persons.join(', ') : ""}${e.comment ? " - " + e.comment : ""}`,
-                    index: idx++ }));
-                store.commit('photosGalleryReset', this.photos);
-                store.commit('photosGallerySetIndex', 0);
-                store.commit('photosGalleryDisplay');
-            }).catch( err => {
-                store.commit('onError', err);
-            });
-        }
+      /**
+       * Récupère la liste des albums
+       */
+      listAlbums() {
+          axios.get(`/api/albums`).then(response => {
+              this.albums = parseAxiosResponse(response);
+          }).catch( err => {
+              store.commit('onError', err);
+          });
+      },
+
+      /**
+       * 
+       */
+      loadPhotos(photos) {
+        let idx = 0;
+        this.photos = photos.map(e => ({
+            ...e,
+            title: `${e.date}${e.place ? " - " + e.place : ""}${ e.persons ? " - " + e.persons.join(', ') : ""}${e.comment ? " - " + e.comment : ""}`,
+            index: idx++ }));
+        store.commit('photosGalleryReset', this.photos);
+        store.commit('photosGallerySetIndex', 0);
+        store.commit('photosGalleryDisplay');
+      }
     }
 }
 </script>

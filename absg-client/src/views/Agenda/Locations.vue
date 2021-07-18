@@ -337,7 +337,7 @@ export default {
                     "Content-Type" : "multipart/form-data",
                 },
                 onUploadProgress: progressEvent => {
-                    this.placeEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
+                    this.placeEditor.complete = (progressEvent.loaded / progressEvent.total * 100 || 0);
                 }
             })
             .then(response => {

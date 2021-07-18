@@ -17,6 +17,7 @@ import {
     forumService
 } from "./services";
 import * as ormconfig from "../ormconfig";
+import { albumService } from "./services/AlbumService";
 
 createConnections(ormconfig)
     .then(() => {
@@ -31,6 +32,7 @@ createConnections(ormconfig)
         immtService.initService();
         voyagService.initService();
         userService.initService();
+        albumService.initService();
         logger.info("AbsG services initialized");
 
         // create express app

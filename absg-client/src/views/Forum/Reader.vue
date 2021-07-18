@@ -361,7 +361,7 @@ export default {
         //                 "Content-Type" : "multipart/form-data",
         //             },
         //             onUploadProgress: progressEvent => {
-        //                 event.attachment.setUploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
+        //                 event.attachment.setUploadProgress = (progressEvent.loaded / progressEvent.total * 100 || 0);
         //             }
         //         })
         //         .then( response => {

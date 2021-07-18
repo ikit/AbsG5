@@ -361,7 +361,7 @@ export default {
                     "Content-Type" : "multipart/form-data",
                 },
                 onUploadProgress: progressEvent => {
-                    this.photoEditor.complete = (progressEvent.loaded / progressEvent.total * 100 | 0);
+                    this.photoEditor.complete = (progressEvent.loaded / progressEvent.total * 100 || 0);
                 }
             })
             .then(newPhoto => {
