@@ -1,22 +1,5 @@
 <template>
   <div>
-    <div v-if="progressInfos">
-      <div class="mb-2"
-        v-for="(progressInfo, index) in progressInfos"
-        :key="index"
-      >
-        <span>{{ progressInfo.fileName }}</span>
-        <v-progress-linear
-          v-model="progressInfo.percentage"
-          color="light-blue"
-          height="25"
-          reactive
-        >
-          <strong>{{ progressInfo.percentage }} %</strong>
-        </v-progress-linear>
-      </div>
-    </div>
-
     <v-row no-gutters justify="center" align="center">
       <v-col cols="8">
         <v-file-input
@@ -25,6 +8,7 @@
           show-size
           :label="inputLabel"
           @change="selectFiles"
+
         />
       </v-col>
 
@@ -35,6 +19,22 @@
         </v-btn>
       </v-col>
     </v-row>
+    
+    <div v-if="uploadProgress.progress && uploadProgress.progress < 100">
+      <span>Récupération des fichiers... {{ uploadProgress.done || 1 }}/{{ uploadProgress.total }}</span>
+      <v-progress-linear
+        color="accent"
+        indeterminate
+      >
+      </v-progress-linear>
+    </div>
+    <div v-if="uploadProgress.progress && uploadProgress.progress === 100">
+      <span>Tous vos fichiers ont été récupérés.</span>
+      <v-progress-linear
+        color="accent"
+        value="100"      >
+      </v-progress-linear>
+    </div>
 
     <v-alert v-if="message" border="left" color="teal" outlined class="multi-line">
       {{ message }}
@@ -86,9 +86,15 @@ export default {
         }
     },
     data: () => ({
+        progressInfos: null,
         selectedFiles: undefined,
-        progress: 0,
         message: "",
+
+        uploadProgress: {
+          total: 0,
+          done: 0,
+          progress: null
+        },
 
         fileInfos: []
     }),
@@ -99,6 +105,10 @@ export default {
         },
         uploadFiles() {
             this.message = "";
+            this.uploadProgress.total = this.selectedFiles.length;
+            this.uploadProgress.done = 0;
+            this.uploadProgress.progress = 0;
+
             for (let i = 0; i < this.selectedFiles.length; i++) {
                 this.upload(i, this.selectedFiles[i]);
             }
@@ -115,13 +125,21 @@ export default {
                     "Content-Type" : "multipart/form-data",
                 },
                 onUploadProgress: progressEvent => {
-                   this.progressInfos[idx].percentage = (progressEvent.loaded / progressEvent.total * 100 || 0);
-                    console.log("onUploadProgress", progressEvent, this.progressInfos)
+                  this.progressInfos[idx].percentage = (progressEvent.loaded / progressEvent.total * 100 || 0);
+                  
+                  this.uploadProgress.progress = this.progressInfos.reduce((e, sum) => e + sum, 0);
+                  console.log("dialog.onProgress", this.uploadProgress);
+                  this.$emit("onProgress", this.uploadProgress);
+                  
                 }
             })
             .then(response => {
                 const fileResult = parseAxiosResponse(response);
                 this.progressInfos[idx].percentage = 100;
+                this.uploadProgress.progress = this.progressInfos.reduce((e, sum) => e.percentage + sum, 0);
+                this.uploadProgress.done += 1;
+                this.$emit("onProgress", this.uploadProgress);
+                console.log("dialog.onProgress", this.uploadProgress);
                 this.$emit("fileUploaded", fileResult);
                 console.log("UPLOAD DONE", fileResult);
             })

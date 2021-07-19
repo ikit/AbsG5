@@ -119,11 +119,13 @@
           inputLabel="Sélectionnez vos photos"
           inputAccept="image/*"
           :uploadUrl="uploadUrl"
+          @onProgress="onUploadProgress($event)"
           @fileUploaded="onPhotoUploaded(photo)"
         />
         <v-card-actions>
           <v-spacer />
           <v-btn
+            :disabled="uploadInProgress"
             text
             color="primary"
             @click="displayUploadDialog = false;"
@@ -152,22 +154,11 @@ export default {
     store,
     data: () => ({
         album: null,
-        displayUploadDialog: false,
         uploadUrl: "",
         isLoading: false,
         albumCover: null,
-        headers: [
-          {
-            sortable: false
-          },
-          {
-            text: 'Photo',
-            align: 'left',
-            sortable: false,
-            value: 'thumb'
-          },
-          { text: 'Posteur', value: 'user.username', sortable: false },
-        ],
+        displayUploadDialog: false,
+        uploadInProgress: false,
     }),
     mounted() {
       this.albumId = Number.parseInt(this.$route.params.albumId);
@@ -214,7 +205,14 @@ export default {
         },
 
         // Lorsqu'une nouvelle photo est uploadé, on l'ajoute à la fin de l'album
+        onUploadProgress($event) {
+          console.log("editor.onUploadProgress", $event)
+          this.uploadInProgress = $event.progress == 100;
+          console.log("progress", $event);
+        },
+
         onPhotoUploaded(photo) {
+
           this.refresh();
         },
 
