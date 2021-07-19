@@ -44,6 +44,11 @@ export default new Vuex.Store({
             query: "",
             msg: "",
             log: ""
+        },
+        // Snackbar
+        snack: {
+            displayed: false,
+            msg: "",
         }
     },
     mutations: {
@@ -176,6 +181,10 @@ export default new Vuex.Store({
 
         // ========
         // NOTIF methods
+        onSnack(state, msg) {
+            state.snack.msg = msg;
+            state.snack.displayed = true;
+        },
         onNotif(state, info) {
             state.notif.title = info[0];
             state.notif.msg = info[1];

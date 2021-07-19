@@ -462,6 +462,23 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-snackbar
+      v-model="snack.displayed"
+    >
+      {{ snack.msg }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="pink"
+          text
+          v-bind="attrs"
+          @click="snack.displayed = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -510,7 +527,8 @@ export default {
             "unreadNotifications",
             "error",
             "warning",
-            "notif"
+            "notif",
+            "snack"
         ]),
         // Gallerie photos
         photosGalleryDisplayed() {

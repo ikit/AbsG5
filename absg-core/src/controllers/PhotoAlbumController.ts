@@ -7,7 +7,8 @@ import {
     Param,
     QueryParam,
     CurrentUser,
-    UploadedFile
+    UploadedFile,
+    Body
 } from "routing-controllers";
 import { Photo, User } from "../entities";
 import { PhotoAlbum } from "../entities/PhotoAlbum";
@@ -73,12 +74,27 @@ export class PhotoAlbumController {
     }
 
     /**
+     *  Met à jour l'album
+     * @param id l'identifiant de l'album ) mettre à jour
+     * @param album les données de l'album à mettre à jours
+     */
+    @Post("/:id")
+    async saveAlbum(@Param("id") id: number, @Body() album: PhotoAlbum, @CurrentUser() user: User) {
+        if (user && album && (!album.family || album.family === user.rootFamily)) {
+            album.id = id;
+            album.photos = album.photos.map(p => p.id);
+            return this.aRepo.save(album);
+        }
+        return null;
+    }
+
+    /**
      * Enregistre une nouvelle photos dans l'album
      * @param image l'image
      * @param body d'autres informations sur l'image comme l'auteur et le titre
      */
     @Post("/:id/upload")
-    async save(@UploadedFile("file") image: any, @Param("id") id: number, @CurrentUser() user: User) {
+    async addPhoto(@UploadedFile("file") image: any, @Param("id") id: number, @CurrentUser() user: User) {
         return albumService.save(image, id, user);
     }
 }

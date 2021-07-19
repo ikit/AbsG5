@@ -27,7 +27,7 @@
         "prettier": "^1.18.2",
         "sass": "~1.32.12",
         "ts-node": "3.3.0",
-        "ts-node-dev": "^1.1.6",
+        "ts-node-dev": "^1.1.8",
         "tslint": "^5.20.0",
         "typescript": "3.3.3333"
     },
