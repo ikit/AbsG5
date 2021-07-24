@@ -26,6 +26,7 @@
     "remove": "^0.1.5",
     "reveal.js": "^4.1.1",
     "roboto-fontface": "*",
+    "save-file": "^2.3.1",
     "tiptap-vuetify": "^2.24.0",
     "v-emoji-picker": "^2.3.3",
     "vlf": "^1.1.0",

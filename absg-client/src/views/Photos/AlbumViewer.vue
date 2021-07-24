@@ -23,11 +23,6 @@
 
       <div style="position: absolute; right: 15px; top: 10px">
         <v-btn
-          @click.stop="diaporama()" style="margin-right: 15px">
-          <v-icon left>fas fa-desktop</v-icon>Diaporama
-        </v-btn>
-        
-        <v-btn
           @click.stop="download()" style="margin-right: 15px">
           <v-icon left>fas fa-download</v-icon>Télécharger
         </v-btn>
@@ -137,6 +132,7 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
+import { save as saveFile } from "save-file";
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {
@@ -146,7 +142,7 @@ export default {
         albumEditor: {
             open: false, // si oui ou non la boite de dialogue pour créer/éditer une citation est affichée
             id: null, // l'ID de l'album'
-            titre: null, // le titre
+            title: null, // le titre
             comment: null, // l'auteur de la citation (texte saisie libre mais autocomplete avec liste des auteurs existant)
         },
     }),
@@ -176,6 +172,23 @@ export default {
             store.commit('photosGallerySetIndex', index);
             store.commit('photosGalleryDisplay');
         },
+
+        // Télécharge les photos de l'album dans un zip
+        download() {
+          axios.get(`/api/albums/${this.albumId}/download`, {
+            responseType: 'blob',
+            onDownloadProgress: progressEvent => {
+              const total = parseFloat(progressEvent.currentTarget.responseHeaders['Content-Length'])
+              const current = progressEvent.currentTarget.response.length
+
+              let percentCompleted = Math.floor(current / total * 100)
+              console.log('completed: ', percentCompleted)
+            }
+          }).then((response) => {
+          saveFile(response, `Photos - ${this.album.title}.zip`)
+        }).catch(err => store.commit("onError", err));
+
+      }
     }
 }
 </script>

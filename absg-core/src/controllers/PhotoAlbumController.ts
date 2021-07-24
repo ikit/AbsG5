@@ -8,11 +8,15 @@ import {
     QueryParam,
     CurrentUser,
     UploadedFile,
-    Body
+    Body,
+    Res
 } from "routing-controllers";
 import { Photo, User } from "../entities";
 import { PhotoAlbum } from "../entities/PhotoAlbum";
 import { albumService } from "../services/AlbumService";
+import * as path from "path";
+import * as fs from "fs";
+import { logger } from "../middleware/logger";
 
 @Authorized()
 @JsonController("/albums")
@@ -86,6 +90,39 @@ export class PhotoAlbumController {
             return this.aRepo.save(album);
         }
         return null;
+    }
+
+    /**
+     * Donne toutes les infos concernant un album
+     * @param id l'identifiant de l'album
+     * @param user l'utilisateur qui fait la demande
+     */
+    @Get("/:id/download")
+    async download(@Param("id") id: number, @CurrentUser() user: User, @Res() response) {
+        try {
+            const filePath = path.join(
+                process.env.PATH_FILES,
+                "/photos/",
+                `${"absg_" + id.toString().padStart(4, "0")}/RAW.zip`
+            );
+            console.log(filePath);
+
+            if (!fs.existsSync(filePath)) {
+                // On crée le zip
+                console.log("File not exists");
+            }
+            await new Promise((resolve, reject) => {
+                response.sendFile(filePath, (err: any) => {
+                    if (err) reject(err);
+                    resolve();
+                });
+            });
+            // response.sendFile(filePath, "raw.zip");
+            return response;
+        } catch (err) {
+            logger.error("Impossible de récupérer l'archive de l'album", err);
+            throw new Error("Impossible de récupérer l'archive de l'album");
+        }
     }
 
     /**
