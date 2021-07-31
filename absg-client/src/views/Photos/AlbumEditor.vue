@@ -85,6 +85,10 @@
                 <v-btn @click="setCover(p)" class="hiddenButton" style="margin: 0 15px">
                   <v-icon left>fas fa-desktop</v-icon>Mettre en couverture
                 </v-btn>
+                <v-btn v-if="isAdmin" @click="deletePhoto(p)" class="hiddenButton" style="margin: 0 15px">
+                  <v-icon left>fas fa-trash</v-icon>
+                </v-btn>
+                
               </td>
             </tr>
           </draggable>
@@ -143,6 +147,7 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
+import { mapState } from "vuex";
 import UploadFiles from "../../components/UploadFiles";
 import draggable from 'vuedraggable';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
@@ -157,12 +162,19 @@ export default {
         album: null,
         uploadUrl: "",
         isLoading: false,
+        isAdmin: false,
         albumCover: null,
         displayUploadDialog: false,
         uploadInProgress: false,
     }),
+    computed: {
+        ...mapState([
+            "user",
+        ]),
+    },
     mounted() {
       this.albumId = Number.parseInt(this.$route.params.albumId);
+      this.isAdmin = this.user ? this.user.roles.indexOf("admin") > -1 : false;
       this.refresh();
     },
     methods: {
@@ -187,6 +199,16 @@ export default {
           this.album.coverPhoto = photo.id;
           this.albumCover = `http://localhost:5010/files/photos/absg_0001/THUMB/${this.album.coverPhoto}.jpg`;
           this.save();
+        },
+
+        deletePhoto(photo) {
+          
+          axios.delete(`/api/albums/${this.albumId}/${photo.id}`).then(response => {
+            this.refresh();
+          }).catch( err => {
+            store.commit('onError', err);
+            this.refresh();
+          });
         },
 
         dragReorder ({oldIndex, newIndex}) {

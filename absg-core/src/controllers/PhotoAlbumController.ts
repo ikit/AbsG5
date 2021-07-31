@@ -9,7 +9,8 @@ import {
     CurrentUser,
     UploadedFile,
     Body,
-    Res
+    Res,
+    Delete
 } from "routing-controllers";
 import { Photo, User } from "../entities";
 import { PhotoAlbum } from "../entities/PhotoAlbum";
@@ -133,5 +134,16 @@ export class PhotoAlbumController {
     @Post("/:id/upload")
     async addPhoto(@UploadedFile("file") image: any, @Param("id") id: number, @CurrentUser() user: User) {
         return albumService.save(image, id, user);
+    }
+
+    /**
+     * Supprime une photo de l'album
+     * @param id l'identifiant de l'album
+     * @param photoId l'identifiant de la photo
+     * @param user l'utilisateur qui fait la demande
+     */
+    @Delete("/:id/:photoId")
+    async deletePhoto(@Param("id") id: number, @Param("photoId") photoId: string, @CurrentUser() user: User) {
+        return albumService.deletePhoto(id, photoId, user);
     }
 }
