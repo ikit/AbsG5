@@ -3,36 +3,30 @@
     <v-row no-gutters justify="center" align="center">
       <v-col cols="8">
         <v-file-input
+          ref="fileInput"
+          :disabled="uploadProgress.progress"
           :accept="inputAccept"
           multiple
           show-size
           :label="inputLabel"
           @change="selectFiles"
-
         />
       </v-col>
 
       <v-col cols="4" class="pl-2">
-        <v-btn @click="uploadFiles">
+        <v-btn @click="uploadFiles" :disabled="uploadProgress.progress">
           <v-icon left>fas fa-cloud-upload-alt</v-icon>
           Envoyer
         </v-btn>
       </v-col>
     </v-row>
     
-    <div v-if="uploadProgress.progress && uploadProgress.progress < 100">
-      <span>Récupération des fichiers... {{ uploadProgress.done || 1 }}/{{ uploadProgress.total }}</span>
+    <div v-if="uploadProgress.progress">
+      <span>Enregistrement des fichiers... {{ uploadProgress.done || 1 }}/{{ uploadProgress.total }}</span>
       <v-progress-linear
         color="accent"
         indeterminate
       >
-      </v-progress-linear>
-    </div>
-    <div v-if="uploadProgress.progress && uploadProgress.progress === 100">
-      <span>Tous vos fichiers ont été récupérés.</span>
-      <v-progress-linear
-        color="accent"
-        value="100"      >
       </v-progress-linear>
     </div>
 
@@ -63,6 +57,7 @@
 
 <script>
 import axios from 'axios';
+import store from '../store';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 
 export default {
@@ -91,9 +86,9 @@ export default {
         message: "",
 
         uploadProgress: {
-          total: 0,
-          done: 0,
-          progress: null
+          total: 0, // nombre total de fichier à télécharger
+          done: 0, // nombre de fichiers téléchargés
+          progress: false // est-ce que le téléchargement est en cours ou pas
         },
 
         fileInfos: []
@@ -107,7 +102,7 @@ export default {
             this.message = "";
             this.uploadProgress.total = this.selectedFiles.length;
             this.uploadProgress.done = 0;
-            this.uploadProgress.progress = 0;
+            this.uploadProgress.progress = true;
 
             for (let i = 0; i < this.selectedFiles.length; i++) {
                 this.upload(i, this.selectedFiles[i]);
@@ -126,9 +121,7 @@ export default {
                 },
                 onUploadProgress: progressEvent => {
                   this.progressInfos[idx].percentage = (progressEvent.loaded / progressEvent.total * 100 || 0);
-                  
-                  this.uploadProgress.progress = this.progressInfos.reduce((e, sum) => e + sum, 0);
-                  console.log("dialog.onProgress", this.uploadProgress);
+                  console.log("dialog.onProgress", this.progressInfos);
                   this.$emit("onProgress", this.uploadProgress);
                   
                 }
@@ -136,12 +129,14 @@ export default {
             .then(response => {
                 const fileResult = parseAxiosResponse(response);
                 this.progressInfos[idx].percentage = 100;
-                this.uploadProgress.progress = this.progressInfos.reduce((e, sum) => e.percentage + sum, 0);
                 this.uploadProgress.done += 1;
+                this.uploadProgress.progress = this.uploadProgress.done < this.uploadProgress.total;
                 this.$emit("onProgress", this.uploadProgress);
                 console.log("dialog.onProgress", this.uploadProgress);
                 this.$emit("fileUploaded", fileResult);
                 console.log("UPLOAD DONE", fileResult);
+                this.selectedFiles = null;
+                this.$refs.fileInput.value = null;
             })
             .catch(err => {
                 this.progressInfos[idx].percentage = 0;

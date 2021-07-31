@@ -14,10 +14,7 @@
     <v-card>
       <p>Fonctionnalités</p>
       <ul>
-        <li>G-théque: nouvelle section du site pour le stockage et partages de médias et documents</li>
-        <li>Mise en place des notifications</li>
-        <li>Forum: création de nouveau sujet de discussion</li>
-        <li>Notification: précision des sujets concernés par les nouveaux messages</li>
+        <li>Album: nouvelle section du site pour la création et le partage d'album photo</li>
       </ul>
       <p>Bug corrigés</p>
       <ul>

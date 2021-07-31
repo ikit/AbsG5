@@ -122,6 +122,7 @@
           @onProgress="onUploadProgress($event)"
           @fileUploaded="onPhotoUploaded(photo)"
         />
+        
         <v-card-actions>
           <v-spacer />
           <v-btn
@@ -207,12 +208,12 @@ export default {
         // Lorsqu'une nouvelle photo est uploadé, on l'ajoute à la fin de l'album
         onUploadProgress($event) {
           console.log("editor.onUploadProgress", $event)
-          this.uploadInProgress = $event.progress == 100;
+          this.uploadInProgress = true;
           console.log("progress", $event);
         },
 
         onPhotoUploaded(photo) {
-
+          this.uploadInProgress = false;
           this.refresh();
         },
 
