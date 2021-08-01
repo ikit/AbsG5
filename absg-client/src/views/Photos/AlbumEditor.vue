@@ -33,13 +33,15 @@
       <div v-if="album" style="position: absolute; right: 15px; top: 10px">
         <v-btn
           @click.stop="displayUploadDialog = true" style="margin-right: 15px">
-          <v-icon left>fas fa-plus</v-icon>Ajouter des photos
+          <v-icon left>fas fa-plus</v-icon>
+          <span v-if="$vuetify.breakpoint.lgAndUp">Ajouter des photos</span>
         </v-btn>
         
         <v-btn
           :to="{ path: `/photos/albums/${album.id}` }"
           >
-          <v-icon left>fas fa-undo</v-icon>Retour à l'album
+          <v-icon left>fas fa-undo</v-icon>
+          <span v-if="$vuetify.breakpoint.lgAndUp">Retour à l'album</span>
         </v-btn>
       </div>
     </div>
@@ -65,34 +67,56 @@
       </div>
     </v-card>
 
-    <div v-if="album" class="v-data-table elevation-1 v-data-table--has-bottom theme--light">
-      <table cellspacing="0" cellpadding="0" style="margin: auto">
-          <draggable v-model="album.photos" group="photos" @start="drag=true" @end="drag=false; save();" style="width: 100%">
-            <tr class="sortableRow" v-for="p in album.photos" :key="p.id" style="width: 100%">
-              <td class="px-1" style="width: 50px">
-                <v-tooltip bottom>
-                  <template #activator="{ on }">
-                    <v-icon class="handler" >fas fa-grip-horizontal</v-icon>
-                  </template>
-                  <span>Déplacer la photo</span>
-                </v-tooltip>
-              </td>
-              <td style="width: 200px;">
-                <img :src="p.url" class="thumb" style="margin: auto" @click="photosGalleryDisplay(p.order)" />
-              </td>
-              <td style="padding: 0 15px;">{{ p.poster.username }}</td>
-              <td>
-                <v-btn @click="setCover(p)" class="hiddenButton" style="margin: 0 15px">
-                  <v-icon left>fas fa-desktop</v-icon>Mettre en couverture
-                </v-btn>
-                <v-btn v-if="isAdmin" @click="deletePhoto(p)" class="hiddenButton" style="margin: 0 15px">
-                  <v-icon left>fas fa-trash</v-icon>
-                </v-btn>
-                
-              </td>
-            </tr>
+    <div v-if="album">
+      <v-container fluid>
+        <v-layout row wrap>
+          <draggable v-model="album.photos" tag="v-layout" class="row wrap" group="photos" @start="drag=true" @end="drag=false; save();">
+            <v-flex
+              v-for="p in album.photos" :key="p.id" style="min-width: 250px; width: 15%; margin: 15px"
+            >
+              <div>
+                <div style="width: 100px; height: 100px; margin: auto;">
+                  <div style="width: 100px; height: 100px; display: table-cell; text-align: center; vertical-align: middle;">
+                    <img :src="p.url" class="thumb" style="margin: auto" @click="photosGalleryDisplay(p.order)" />
+                  </div>
+                </div>
+                <div style="text-align: center;">
+                  <v-tooltip bottom>
+                    <template #activator="{ on }">
+                      <v-btn icon  v-if="isAdmin" @click="photosGalleryDisplay(p)" v-on="on">
+                        <v-icon small>
+                          fas fa-pen
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Editer les informations de la photo</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template #activator="{ on }">
+                      <v-btn icon @click="setCover(p)" v-on="on" style="margin-right: 15px">
+                        <v-icon small>
+                          fas fa-desktop
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Mettre en couverture</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template #activator="{ on }">
+                      <v-btn icon  v-if="isAdmin" @click="deletePhoto(p)" v-on="on">
+                        <v-icon small>
+                          fas fa-trash
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Suprimer la photo</span>
+                  </v-tooltip>
+                </div>
+              </div>
+            </v-flex>
           </draggable>
-      </table>
+        </v-layout>
+      </v-container>
     </div>
 
     <v-dialog
@@ -185,7 +209,7 @@ export default {
               this.album = parseAxiosResponse(response);
               console.log(this.album)
               this.uploadUrl = `/api/albums/${this.albumId}/upload`;
-              this.albumCover = `http://localhost:5010/files/photos/absg_0001/THUMB/${this.album.coverPhoto}.jpg`;
+              this.albumCover = `/files/photos/absg_0001/THUMB/${this.album.coverPhoto}.jpg`;
               this.loadPhotos(this.album.photos);
               this.isLoading = false;
             }).catch( err => {
@@ -197,7 +221,7 @@ export default {
 
         setCover(photo) {
           this.album.coverPhoto = photo.id;
-          this.albumCover = `http://localhost:5010/files/photos/absg_0001/THUMB/${this.album.coverPhoto}.jpg`;
+          this.albumCover = `/files/photos/absg_0001/THUMB/${this.album.coverPhoto}.jpg`;
           this.save();
         },
 
@@ -221,7 +245,7 @@ export default {
           let idx = 0;
           this.photos = photos.map(e => ({
               ...e,
-              title: `${e.date}${e.place ? " - " + e.place : ""}${ e.persons ? " - " + e.persons.join(', ') : ""}${e.comment ? " - " + e.comment : ""}`,
+              title: `${e.date ? e.date: ""}${e.date && e.comment ? " - " : ""}${e.comment ? e.comment : ""}`,
               index: idx++ }));
           store.commit("photosGalleryReset", this.photos);
           store.commit("photosGallerySetIndex", 0);
@@ -242,6 +266,7 @@ export default {
         // Affiche la photo indiqué par sa position dans la galerie
         photosGalleryDisplay(index) {
             store.commit("photosGallerySetIndex", index);
+            store.commit('photoMetadataEditorDisplay');
             store.commit("photosGalleryDisplay");
         },
 
@@ -287,7 +312,6 @@ tr:hover {
 }
 
 .hiddenButton {
-  margin: 0 15px;
   visibility: hidden;
 }
 tr:hover .hiddenButton {

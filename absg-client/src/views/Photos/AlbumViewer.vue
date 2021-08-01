@@ -161,7 +161,7 @@ export default {
           let idx = 0;
           this.photos = photos.map(e => ({
               ...e,
-              title: `${e.date}${e.place ? " - " + e.place : ""}${ e.persons ? " - " + e.persons.join(', ') : ""}${e.comment ? " - " + e.comment : ""}`,
+              title: `${e.date ? e.date: ""}${e.date && e.comment ? " - " : ""}${e.comment ? e.comment : ""}`,
               index: idx++ }));
           store.commit('photosGalleryReset', this.photos);
           store.commit('photosGallerySetIndex', 0);
