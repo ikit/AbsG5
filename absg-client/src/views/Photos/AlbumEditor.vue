@@ -62,7 +62,6 @@
           @change="save()"
         />
 
-        <!-- 47.757381406544276, 0.06819520725092416 -->
       </div>
       <div style="text-align: center; position: absolute; top: 10px; right: 15px; width: 300px">
         <p v-if="!albumCover" style="opacity: 0.5; margin-top: 40px">Pas de photo de couverture ?</p>
@@ -84,7 +83,6 @@
                     style="width: 100px; height: 100px; display: table-cell; text-align: center; vertical-align: middle;"
                      >
                     <img :src="p.url" class="thumb"  style="margin: auto" @click="photosGalleryDisplay(p.order)" />
-                    {{ p.highlighted ? "o" : "x" }}
                   </div>
                 </div>
                 <div style="text-align: center;">
@@ -214,7 +212,6 @@ export default {
             this.isLoading = true;
             axios.get(`/api/albums/${this.albumId}`).then(response => {
               this.album = parseAxiosResponse(response);
-              console.log(this.album)
               this.uploadUrl = `/api/albums/${this.albumId}/upload`;
               this.albumCover = `/files/photos/absg_0001/THUMB/${this.album.coverPhoto}.jpg`;
               this.loadPhotos(this.album.photos);

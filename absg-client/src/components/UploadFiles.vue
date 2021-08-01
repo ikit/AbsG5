@@ -132,7 +132,6 @@ export default {
                 this.uploadProgress.progress = this.uploadProgress.done < this.uploadProgress.total;
                 this.$emit("onProgress", this.uploadProgress);
                 this.$emit("fileUploaded", fileResult);
-                console.log("UPLOAD DONE", fileResult);
                 this.selectedFiles = null;
                 this.$refs.fileInput.value = null;
             })

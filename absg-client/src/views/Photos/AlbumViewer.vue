@@ -152,7 +152,6 @@ export default {
       this.albumId = Number.parseInt(this.$route.params.albumId);
       axios.get(`/api/albums/${this.albumId}`).then(response => {
         this.album = parseAxiosResponse(response);
-        console.log(this.album);
         this.loadPhotos(this.album.photos);
       }).catch( err => {
           store.commit('onError', err);
