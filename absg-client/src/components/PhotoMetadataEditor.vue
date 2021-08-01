@@ -1,10 +1,15 @@
 <template>
   <v-card dark>
-    <v-form style="text-align: left">
-      <p style="font-familly: monospace; line-height: 35px; font-size: 20px;">
-        <v-icon style="vertical-align: middle">
-          fas fa-info-circle
-        </v-icon> ID: {{ photo.folder }} {{ photo.id }}
+    <v-form style="text-align: left; position: relative;">
+      <v-icon style="position: absolute; top: 3px; opacity: 0.5">
+        fas fa-info-circle
+      </v-icon>
+      <p style="font-familly: monospace; font-size: 10px; opacity: 0.5; margin: 0 0 0 40px">
+        <span style="font-variant: all-small-caps; width: 45px;display: inline-block;">Dossier:</span> {{ photo.folder }}
+      </p>
+      
+      <p style="font-familly: monospace; font-size: 10px; opacity: 0.5; margin: 0 0 0 40px">
+        <span style="font-variant: all-small-caps; width: 45px;display: inline-block;">Photo:</span> {{ photo.id }}
       </p>
 
       <v-textarea
