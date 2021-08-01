@@ -23,6 +23,8 @@
 
       <div style="position: absolute; right: 15px; top: 10px">
         <v-btn
+          v-if="$vuetify.breakpoint.lgAndUp"
+          disabled
           @click.stop="download()" style="margin-right: 15px">
           <v-icon left>fas fa-download</v-icon>Télécharger
         </v-btn>

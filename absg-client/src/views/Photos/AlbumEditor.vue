@@ -83,7 +83,7 @@
                 <div style="text-align: center;">
                   <v-tooltip bottom>
                     <template #activator="{ on }">
-                      <v-btn icon  v-if="isAdmin" @click="photosGalleryDisplay(p)" v-on="on">
+                      <v-btn icon  v-if="isAdmin" @click="photosGalleryDisplay(p.order)" v-on="on">
                         <v-icon small>
                           fas fa-pen
                         </v-icon>
