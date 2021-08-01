@@ -52,13 +52,17 @@
           v-model="album.title"
           prepend-icon="fas fa-quote-left"
           label="Titre de l'album"
+          @change="save()"
         />
 
         <v-text-field
           v-model="album.comment"
           prepend-icon="fas fa-quote-left"
           label="Sous-titre"
+          @change="save()"
         />
+
+        <!-- 47.757381406544276, 0.06819520725092416 -->
       </div>
       <div style="text-align: center; position: absolute; top: 10px; right: 15px; width: 300px">
         <p v-if="!albumCover" style="opacity: 0.5; margin-top: 40px">Pas de photo de couverture ?</p>
@@ -72,12 +76,15 @@
         <v-layout row wrap>
           <draggable v-model="album.photos" tag="v-layout" class="row wrap" group="photos" @start="drag=true" @end="drag=false; save();">
             <v-flex
-              v-for="p in album.photos" :key="p.id" style="min-width: 250px; width: 15%; margin: 15px"
+              v-for="p in album.photos" :key="p.id" style="min-width: 100px; margin: 15px"
             >
-              <div>
+              <div :style="{ 'background': p.highlighted ? 'bisque' : 'none' }">
                 <div style="width: 100px; height: 100px; margin: auto;">
-                  <div style="width: 100px; height: 100px; display: table-cell; text-align: center; vertical-align: middle;">
-                    <img :src="p.url" class="thumb" style="margin: auto" @click="photosGalleryDisplay(p.order)" />
+                  <div 
+                    style="width: 100px; height: 100px; display: table-cell; text-align: center; vertical-align: middle;"
+                     >
+                    <img :src="p.url" class="thumb"  style="margin: auto" @click="photosGalleryDisplay(p.order)" />
+                    {{ p.highlighted ? "o" : "x" }}
                   </div>
                 </div>
                 <div style="text-align: center;">
@@ -93,7 +100,7 @@
                   </v-tooltip>
                   <v-tooltip bottom>
                     <template #activator="{ on }">
-                      <v-btn icon @click="setCover(p)" v-on="on" style="margin-right: 15px">
+                      <v-btn icon @click="setCover(p)" v-on="on">
                         <v-icon small>
                           fas fa-desktop
                         </v-icon>
@@ -147,8 +154,7 @@
           inputLabel="Sélectionnez vos photos"
           inputAccept="image/*"
           :uploadUrl="uploadUrl"
-          @onProgress="onUploadProgress($event)"
-          @fileUploaded="onPhotoUploaded(photo)"
+          @fileUploaded="onPhotoUploaded($event)"
         />
         
         <v-card-actions>
@@ -190,6 +196,7 @@ export default {
         albumCover: null,
         displayUploadDialog: false,
         uploadInProgress: false,
+        highlightedPhotos: [],
     }),
     computed: {
         ...mapState([
@@ -226,7 +233,6 @@ export default {
         },
 
         deletePhoto(photo) {
-          
           axios.delete(`/api/albums/${this.albumId}/${photo.id}`).then(response => {
             this.refresh();
           }).catch( err => {
@@ -243,22 +249,18 @@ export default {
         // Affiche les photos à partir de la liste fournie
         loadPhotos(photos) {
           let idx = 0;
-          this.photos = photos.map(e => ({
+          this.album.photos = photos.map(e => ({
               ...e,
+              highlighted: this.highlightedPhotos.indexOf(e.id) > -1,
               title: `${e.date ? e.date: ""}${e.date && e.comment ? " - " : ""}${e.comment ? e.comment : ""}`,
               index: idx++ }));
-          store.commit("photosGalleryReset", this.photos);
+          store.commit("photosGalleryReset", this.album.photos);
           store.commit("photosGallerySetIndex", 0);
         },
 
         // Lorsqu'une nouvelle photo est uploadé, on l'ajoute à la fin de l'album
-        onUploadProgress($event) {
-          console.log("editor.onUploadProgress", $event)
-          this.uploadInProgress = true;
-          console.log("progress", $event);
-        },
-
         onPhotoUploaded(photo) {
+          this.highlightedPhotos.push(photo.id);
           this.uploadInProgress = false;
           this.refresh();
         },
@@ -298,7 +300,8 @@ export default {
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
     cursor: pointer;
-    max-height: 80px;
+    max-height: 90px;
+    max-width: 90px;
     margin: auto;
     vertical-align: middle;
 }

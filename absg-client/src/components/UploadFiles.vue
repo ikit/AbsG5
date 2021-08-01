@@ -121,7 +121,6 @@ export default {
                 },
                 onUploadProgress: progressEvent => {
                   this.progressInfos[idx].percentage = (progressEvent.loaded / progressEvent.total * 100 || 0);
-                  console.log("dialog.onProgress", this.progressInfos);
                   this.$emit("onProgress", this.uploadProgress);
                   
                 }
@@ -132,7 +131,6 @@ export default {
                 this.uploadProgress.done += 1;
                 this.uploadProgress.progress = this.uploadProgress.done < this.uploadProgress.total;
                 this.$emit("onProgress", this.uploadProgress);
-                console.log("dialog.onProgress", this.uploadProgress);
                 this.$emit("fileUploaded", fileResult);
                 console.log("UPLOAD DONE", fileResult);
                 this.selectedFiles = null;
