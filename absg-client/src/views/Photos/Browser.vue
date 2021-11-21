@@ -171,10 +171,12 @@ export default {
             store.commit('photosGalleryDisplay');
         },
         nextPage () {
-            if (this.filter.pageIndex < this.numberOfPages) this.filter.pageIndex += 1
+            if (this.filter.pageIndex < this.numberOfPages) this.filter.pageIndex += 1;
+            else this.filter.pageIndex = 1;
         },
         formerPage () {
-            if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1
+            if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1;
+            else this.filter.pageIndex = this.numberOfPages;
         }
     }
 }

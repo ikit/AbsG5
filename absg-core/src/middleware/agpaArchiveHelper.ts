@@ -1,6 +1,12 @@
 import { getRepository } from "typeorm";
 import { AgpaPhoto, User } from "../entities";
-import { getMetaData, getCurrentEdition, checkValidYear, getPhasesBoundaries, getMaxArchiveEdition } from "./agpaCommonHelpers";
+import {
+    getMetaData,
+    getCurrentEdition,
+    checkValidYear,
+    getPhasesBoundaries,
+    getMaxArchiveEdition
+} from "./agpaCommonHelpers";
 
 /**
  * Retourne les informations sur les anciennes éditions

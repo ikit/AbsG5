@@ -1,6 +1,5 @@
 <template>
   <div>
-    
     <div
       :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
       style="padding: 15px"
@@ -28,6 +27,35 @@
       row
       wrap
     >
+      <v-flex>
+        <router-link
+          :to="{path: `/photos/albums/auto`}"
+          style="text-decoration: none"
+        >
+          <v-card>
+            <v-img
+              src="https://absolumentg.fr/files/photos/absg_0002/WEB/0002_1629750602581.jpg"
+              aspect-ratio="1.5"
+            >
+              <div class="albumInfo">
+                3769 photos disponnibles
+              </div>
+            </v-img>
+
+            <v-card-title
+              primary-title
+              style="position: relative"
+            >
+              Album automatique
+            </v-card-title>
+            <v-card-subtitle>
+              Générer un album en filtrant parmi toutes les photos enregistrés
+            </v-card-subtitle>
+          </v-card>
+        </router-link>
+      </v-flex>
+
+      <!-- Les albums créés par les utilisateurs -->
       <v-flex
         v-for="album in albums"
         :key="album.id"

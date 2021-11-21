@@ -536,17 +536,18 @@ export async function p4HonorAttribution(ctx: any) {
     for (const uid in ctx.users) {
         const u = ctx.users[uid];
         if (u.age < 12 && (!Array.isArray(u.awards) || u.awards.length === 0)) {
-            u.awards = [{
-                categoryId: u.photos[0].categoryId,
-                userId: u.id,
-                photoId: u.photos[0].id,
-                award: AgpaAwardType.honor
-            }];
+            u.awards = [
+                {
+                    categoryId: u.photos[0].categoryId,
+                    userId: u.id,
+                    photoId: u.photos[0].id,
+                    award: AgpaAwardType.honor
+                }
+            ];
         }
     }
     return ctx;
 }
-
 
 export async function monitoringStats(ctx: any) {
     const repo = getRepository(AgpaPhoto);

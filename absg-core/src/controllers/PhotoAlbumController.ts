@@ -45,6 +45,59 @@ export class PhotoAlbumController {
     }
 
     /**
+     * Récupère les données pour initialiser le formulaire de création
+     * d'album automatique
+     */
+    @Get("/auto")
+    async autoAlbum() {
+        return {
+            totalPhoto: 3789,
+            persons: ["Annie Gueudelot", "Gérard Gueudelot"],
+            locations: ["Villons", "Lanslevillard", "Domaine de la Roche"],
+            from: "1976",
+            to: "2021"
+        };
+    }
+
+    /**
+     * Récupère parmi les photos triées celles qui répondent
+     * aux critères de filtre fournit
+     */
+    @Post("/auto")
+    async getAutoAlbum(filters) {
+        // On génère le filtre en fonction de ce que l'utilisateur à demandé
+        const where = [];
+        if (filters.from) {
+            where.push(`p.date >= ${filters.from}`);
+        }
+        if (filters.to) {
+            where.push(`p.date <= ${filters.to}`);
+        }
+        if (filters.places) {
+            where.push(`place in ('${filters.places.join("','")}')`);
+        }
+        if (filters.persons) {
+            const pWhere = [];
+            for (const p of filters.persons) {
+                pWhere.push(`persons::text LIKE ('%${p}%')`);
+            }
+            where.push(`(${pWhere.join(" OR ")})`);
+        }
+
+        const photos = await this.repo
+            .createQueryBuilder("p")
+            .where(where.join(" AND "))
+            .orderBy("p.date, ")
+            .getMany();
+
+        return photos.map(p => ({
+            ...p,
+            thumb: `${process.env.URL_FILES}photos/${p.folder}/THUMB/${p.id}.jpg`,
+            url: `${process.env.URL_FILES}photos/${p.folder}/WEB/${p.id}.jpg`
+        }));
+    }
+
+    /**
      * Donne toutes les infos concernant un album
      * @param id l'identifiant de l'album
      * @param user l'utilisateur qui fait la demande
@@ -112,7 +165,7 @@ export class PhotoAlbumController {
                 // On crée le zip
                 console.log("File not exists");
             }
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 response.sendFile(filePath, (err: any) => {
                     if (err) reject(err);
                     resolve();

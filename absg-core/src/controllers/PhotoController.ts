@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
-import { JsonController, Get, Authorized, Post, Body, Param, QueryParam, CurrentUser } from "routing-controllers";
-import { Photo, User } from "../entities";
+import { JsonController, Get, Authorized, Post, Body, Param, QueryParam } from "routing-controllers";
+import { Photo } from "../entities";
 import { PhotoAlbum } from "../entities/PhotoAlbum";
 
 @Authorized()
@@ -46,11 +46,6 @@ export class PhotosController {
             thumb: `${process.env.URL_FILES}photos/${p.folder}/THUMB/${p.id}.jpg`,
             url: `${process.env.URL_FILES}photos/${p.folder}/WEB/${p.id}.jpg`
         }));
-    }
-
-    @Get("/checked")
-    allChecked() {
-        return this.checked(null);
     }
 
     @Get("/checked/:family")
