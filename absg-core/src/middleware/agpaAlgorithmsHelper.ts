@@ -443,14 +443,16 @@ export async function p4AgpaAttribution(ctx: any) {
     // Palmarès "Meilleur titre" (à partir de 2011)
     if (ctx.categories[-3]) {
         ctx.categories[-3].photos = ctx.photosOrder.filter(pId => ctx.photos[pId].votesTitle > 0).sort(sortTitles);
-        deliverAwardsPhotos(ctx.categories[-3].photos, -3, ctx);
+        if (ctx.categories[-3].photos.length > 0) {
+            deliverAwardsPhotos(ctx.categories[-3].photos, -3, ctx);
+        }
     }
 
     // Palmarès "Meilleur photographie"
     ctx.photosOrder.sort(sortPhotos);
     deliverAwardsPhotos(ctx.photosOrder, -2, ctx);
 
-    // // Palmarès "Meilleur photographe"
+    // Palmarès "Meilleur photographe"
     ctx.usersOrder = Object.values(ctx.users)
         .sort(sortPhotographes)
         .map(u => (u as any).id);

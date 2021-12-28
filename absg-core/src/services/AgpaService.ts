@@ -286,6 +286,12 @@ class AgpaService {
         // Stats
         context = await monitoringStats(context);
 
+        // On ajoute aux photos les vignettes et url
+        for (const pId of Object.keys(context.photos)) {
+            const p = context.photos[pId];
+            context.photos[pId].thumb = `${process.env.URL_FILES}agpa/${p.year}/mini/vignette_${p.filename}`;
+            context.photos[pId].url = `${process.env.URL_FILES}agpa/${p.year}/mini/${p.filename}`;
+        }
         return context;
     }
 

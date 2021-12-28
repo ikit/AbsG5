@@ -53,41 +53,25 @@
             <template #default>
               <thead>
                 <tr style="vertical-align: baseline;">
-                  <th>Participant</th>
-                  <th
-                    v-for="catId of votesCategories"
-                    :key="catId"
-                  >
-                    {{ data.categories[catId].title }}
-                  </th>
+                  <th>Auteur</th>
+                  <th>Categorie</th>
+                  <th>Photo</th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="vUser of votes"
-                  :key="vUser.id"
+                  v-for="photo of photos"
+                  :key="photo.id"
                 >
-                  <td>{{ vUser.username }} <span style="opacity: 0.5">- {{ vUser.age }} ans</span></td>
-                  <td
-                    v-for="(cat, idx) of vUser.votes"
-                    :key="idx"
-                  >
-                    <a
-                      v-if="cat"
-                      style="display: block"
+                  <td>{{ photo.username }}</td>
+                  <td>{{ data.categories[photo.categoryId].title }}</td>
+                  <td>
+                    <img
+                      class="thumb"
+                      :src="photo.thumb"
+                      @click="photosGalleryDisplay(photo)"
                     >
-                      <i
-                        v-if="cat.valid"
-                        class="fas fa-check"
-                        style="color: #2e7d32"
-                      />
-                      <i
-                        v-else
-                        class="fas fa-exclamation-triangle"
-                        style="color: #ff8f00"
-                      />
-                      &nbsp; {{ cat.votes.length }}
-                    </a>
+                    {{ photo.title }}
                   </td>
                 </tr>
               </tbody>
@@ -369,7 +353,6 @@
                 </div>
             </div>
         </v-tab-item>
-
       </v-tabs>
     </v-card>
 
@@ -481,7 +464,6 @@ import PhotoWidget from './components/PhotoWidget';
 import store from '../../store';
 import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
-
 import HC_sankey from 'highcharts/modules/sankey';
 import HC_depwheel from 'highcharts/modules/dependency-wheel';
 HC_sankey(Highcharts);
@@ -497,6 +479,8 @@ export default {
         waitingScreen: false,
         isAdmin: false,
         end: "",
+
+        photos: [],
 
         votes: [],
         votesCategories: [],
@@ -578,6 +562,18 @@ export default {
             axios.get(`/api/agpa/monitoring/${this.agpaMeta.year}`).then(response => {
                 this.data = parseAxiosResponse(response);
                 const categories = Object.values(this.data.categories);
+
+                // On reformate les photos pour les présenter sous forme de tableau "users x categories"
+                this.photos.splice(0);
+                for (const pId of Object.keys(this.data.photos)) {
+                  this.photos.push(this.data.photos[pId]);
+                }
+                this.photos.sort((a,b) => {
+                  const uCompare = a.userId - b.userId;
+                  return uCompare === 0 ? a.categoryId - b.categoryId : uCompare;
+                })
+                store.commit('photosGalleryReset', this.photos);
+                console.log(this.photos)
 
                 // On reformate les votes pour les présenter sous forme de tableau "users x catégories"
                 const votes = {};
@@ -667,6 +663,14 @@ export default {
                 store.commit("onError", err);
                 this.isLoading = false;
             });
+        },
+
+        photosGalleryDisplay(photo) {
+            const index = this.photos.filter(p => p.id > -1).findIndex(p => p.id === photo.id);
+            if (index > -1) {
+                store.commit('photosGallerySetIndex', index);
+                store.commit('photosGalleryDisplay');
+            }
         },
 
         reformatAward(awards) {
