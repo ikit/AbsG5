@@ -173,7 +173,7 @@ L'équipe système`,
         let limit = 50;
         if (sysLog && user.is("admin")) {
             where = "";
-            limit = 1000;
+            limit = 500;
         }
 
         // On récupère les 50 dernières notifications sur les 7 derniers jours

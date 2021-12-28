@@ -20,26 +20,9 @@
             :class="{ 'unreadNotification': !item.read }"
             @click="onNotificationClicked(item)"
           >
-            <td>
-              <img
-                :src="item.url"
-                height="40px"
-              >
-            </td>
-            <td>
-              <div style="display: flex;">
-                <v-icon style="flex">
-                  {{ item.module.icon }}
-                </v-icon>
-                <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.message }}</span>
-              </div>
-            </td>
             <td>{{ item.dateLabel }}</td>
             <td>
-              <v-simple-checkbox
-                v-model="item.read"
-                disabled
-              />
+              {{ item.message }}
             </td>
           </tr>
         </template>
@@ -111,16 +94,16 @@ import store from "../../store";
 import axios from "axios";
 import { MODULES, parseAxiosResponse } from  "../../middleware/CommonHelper";
 import { mapState } from "vuex";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export default {
     store,
     data: () => ({
         notifications: [],
         notificationsHeaders: [
-            { text: "Qui", value: "who" },
-            { text: "Quoi", value: "what" },
-            { text: "Quand", value: "when" },
-            { text: "", value: "read" },
+            { text: "Quand" },
+            { text: "Quoi" },
         ],
     }),
     mounted() {
@@ -130,7 +113,10 @@ export default {
         refreshLogs() {
             axios.get("/api/admin/notifications").then( response => {
                 const notifications = parseAxiosResponse(response);
-                this.notifications = notifications;
+                this.notifications = notifications.map(n => ({
+                  ...n,
+                  dateLabel: format(new Date(n.datetime), "dd MMM HH'h'mm", {locale: fr}),
+                }));
             })
         },
     }
