@@ -9,7 +9,10 @@
           fas fa-star
         </v-icon> Edition {{ agpaMeta ? agpaMeta.year : "" }}
       </v-tab>
-      <v-tab v-if="isAdmin" :to="{path:'/agpa/admin'}">
+      <v-tab
+        v-if="isAdmin"
+        :to="{path:'/agpa/admin'}"
+      >
         <v-icon left>
           fas fa-tachometer-alt
         </v-icon> Supervision

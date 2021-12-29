@@ -1,21 +1,28 @@
 <template>
-    <div class="p4">
-        <p>Le concours des A.G.P.A. est désormais terminé.
-            Les résultats suite au dépouillement des votes vous seront présentés lors de la cérémonie plannifiée le <span class="endDate">01 janv. à 16h30</span>.
-        </p>
-        <p>Ceux qui ne pourront pas être présent, pourront suivre la cérémonie à distance en "direct", en se connectant sur le site
-            et en allant dans la section <a href="/agpa/ceremony">Cérémonies</a> des A.G.P.A.
-            Vous pourrez y suivre le déroulement de la cérémonie comme si vous y êtiez.
-        </p>
-        <p>Lors de la cérémonie, une visioconférence sera ouverte à l'adresse
-            <a href="https://meet.jit.si/AbsolumentG" target="_blank">https://meet.jit.si/AbsolumentG</a> afin de permettre
-            à ceux qui le souhaite de profiter de l'ambiance.
-        </p>
-        <p>Enfin, sachez que toutes les cérémonies des éditions passées sont disponnibles en ligne.
-            Vous pourrez donc voir et revoir la cérémonie sur le site même si malheureusement vous ne pouviez pas être présent, ni sur place,
-            ni à distance.
-        </p>
-    </div>
+  <div class="p4">
+    <p>
+      Le concours des A.G.P.A. est désormais terminé.
+      Les résultats suite au dépouillement des votes vous seront présentés lors de la cérémonie plannifiée le <span class="endDate">01 janv. à 16h30</span>.
+    </p>
+    <p>
+      Ceux qui ne pourront pas être présent, pourront suivre la cérémonie à distance en "direct", en se connectant sur le site
+      et en allant dans la section <a href="/agpa/ceremony">Cérémonies</a> des A.G.P.A.
+      Vous pourrez y suivre le déroulement de la cérémonie comme si vous y êtiez.
+    </p>
+    <p>
+      Lors de la cérémonie, une visioconférence sera ouverte à l'adresse
+      <a
+        href="https://meet.jit.si/AbsolumentG"
+        target="_blank"
+      >https://meet.jit.si/AbsolumentG</a> afin de permettre
+      à ceux qui le souhaite de profiter de l'ambiance.
+    </p>
+    <p>
+      Enfin, sachez que toutes les cérémonies des éditions passées sont disponnibles en ligne.
+      Vous pourrez donc voir et revoir la cérémonie sur le site même si malheureusement vous ne pouviez pas être présent, ni sur place,
+      ni à distance.
+    </p>
+  </div>
 </template>
 
 
@@ -47,7 +54,7 @@ export default {
     methods: {
         refresh() {
             // Fin de la phase 4
-            const date = new Date(this.agpaMeta.boudaries[3].endDate, );
+            const date = new Date(this.agpaMeta.boudaries[3].endDate );
             this.end = format(date, "dd MMM 'à' HH'h'mm", {locale: fr});
         },
     }

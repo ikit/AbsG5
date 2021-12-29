@@ -15,7 +15,10 @@
         >Liste des albums</span>
       </router-link>
 
-      <div v-if="album" style="display: inline-block; margin-left: 15px">
+      <div
+        v-if="album"
+        style="display: inline-block; margin-left: 15px"
+      >
         <v-icon left>
           fas fa-chevron-right
         </v-icon> {{ album.title }}
@@ -25,42 +28,47 @@
         <v-btn
           v-if="$vuetify.breakpoint.lgAndUp"
           disabled
-          @click.stop="download()" style="margin-right: 15px">
-          <v-icon left>fas fa-download</v-icon>Télécharger
+          style="margin-right: 15px"
+          @click.stop="download()"
+        >
+          <v-icon left>
+            fas fa-download
+          </v-icon>Télécharger
         </v-btn>
         
         <v-btn
           :to="{ path: `/photos/albums/${album.id}/edit` }"
-          >
-          <v-icon left>fas fa-pen</v-icon>Modifier
+        >
+          <v-icon left>
+            fas fa-pen
+          </v-icon>Modifier
         </v-btn>
       </div>
     </div>
     
-  <v-container v-if="album">
-    <v-layout
-            row
-            wrap
-          >
-            <v-flex
-              v-for="p in album.photos"
-              :key="p.id"
-              style="text-align: center;"
-            >
-              <div style="width: 250px; height: 250px; margin: auto;">
-                <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                  <img
-                    :src="p.thumb"
-                    class="thumb"
-                    :alt="p.id"
-                    @click="photosGalleryDisplay(p.order)"
-                  >
-                </div>
-              </div>
-            </v-flex>
-          </v-layout>
-        </v-container>
-  </v-container>
+    <v-container v-if="album">
+      <v-layout
+        row
+        wrap
+      >
+        <v-flex
+          v-for="p in album.photos"
+          :key="p.id"
+          style="text-align: center;"
+        >
+          <div style="width: 250px; height: 250px; margin: auto;">
+            <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+              <img
+                :src="p.thumb"
+                class="thumb"
+                :alt="p.id"
+                @click="photosGalleryDisplay(p.order)"
+              >
+            </div>
+          </div>
+        </v-flex>
+      </v-layout>
+    </v-container>
   
 
 
@@ -126,7 +134,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  
   </div>
 </template>
 

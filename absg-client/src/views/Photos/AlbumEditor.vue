@@ -15,38 +15,59 @@
         >Liste des albums</span>
       </router-link>
 
-      <div v-if="album" style="display: inline-block;">
+      <div
+        v-if="album"
+        style="display: inline-block;"
+      >
         <router-link
           :to="{ path: `/photos/albums/${album.id}` }"
           tag="button"
         >
-          <v-icon left style="margin-left: 15px">
+          <v-icon
+            left
+            style="margin-left: 15px"
+          >
             fas fa-chevron-right
           </v-icon> {{ album.title }}
         </router-link>
         
-        <v-icon left style="margin-left: 15px">
+        <v-icon
+          left
+          style="margin-left: 15px"
+        >
           fas fa-chevron-right
         </v-icon> Edition
       </div>
 
-      <div v-if="album" style="position: absolute; right: 15px; top: 10px">
+      <div
+        v-if="album"
+        style="position: absolute; right: 15px; top: 10px"
+      >
         <v-btn
-          @click.stop="displayUploadDialog = true" style="margin-right: 15px">
-          <v-icon left>fas fa-plus</v-icon>
+          style="margin-right: 15px"
+          @click.stop="displayUploadDialog = true"
+        >
+          <v-icon left>
+            fas fa-plus
+          </v-icon>
           <span v-if="$vuetify.breakpoint.lgAndUp">Ajouter des photos</span>
         </v-btn>
         
         <v-btn
           :to="{ path: `/photos/albums/${album.id}` }"
-          >
-          <v-icon left>fas fa-undo</v-icon>
+        >
+          <v-icon left>
+            fas fa-undo
+          </v-icon>
           <span v-if="$vuetify.breakpoint.lgAndUp">Retour à l'album</span>
         </v-btn>
       </div>
     </div>
     
-    <v-card v-if="album" style="position: relative; margin: 15px; padding: 15px">
+    <v-card
+      v-if="album"
+      style="position: relative; margin: 15px; padding: 15px"
+    >
       <div style="width: 70%">
         <v-text-field
           v-model="album.title"
@@ -61,34 +82,67 @@
           label="Sous-titre"
           @change="save()"
         />
-
       </div>
       <div style="text-align: center; position: absolute; top: 10px; right: 15px; width: 300px">
-        <p v-if="!albumCover" style="opacity: 0.5; margin-top: 40px">Pas de photo de couverture ?</p>
-        <img v-if="albumCover" :src="albumCover" class="thumb" style="margin: 15px"/>
-        <p v-if="albumCover">Couverture de l'album</p>
+        <p
+          v-if="!albumCover"
+          style="opacity: 0.5; margin-top: 40px"
+        >
+          Pas de photo de couverture ?
+        </p>
+        <img
+          v-if="albumCover"
+          :src="albumCover"
+          class="thumb"
+          style="margin: 15px"
+        >
+        <p v-if="albumCover">
+          Couverture de l'album
+        </p>
       </div>
     </v-card>
 
     <div v-if="album">
       <v-container fluid>
-        <v-layout row wrap>
-          <draggable v-model="album.photos" tag="v-layout" class="row wrap" group="photos" @start="drag=true" @end="drag=false; save();">
+        <v-layout
+          row
+          wrap
+        >
+          <draggable
+            v-model="album.photos"
+            tag="v-layout"
+            class="row wrap"
+            group="photos"
+            @start="drag=true"
+            @end="drag=false; save();"
+          >
             <v-flex
-              v-for="p in album.photos" :key="p.id" style="min-width: 100px; margin: 15px"
+              v-for="p in album.photos"
+              :key="p.id"
+              style="min-width: 100px; margin: 15px"
             >
               <div :style="{ 'background': p.highlighted ? 'bisque' : 'none' }">
                 <div style="width: 100px; height: 100px; margin: auto;">
                   <div 
                     style="width: 100px; height: 100px; display: table-cell; text-align: center; vertical-align: middle;"
-                     >
-                    <img :src="p.url" class="thumb"  style="margin: auto" @click="photosGalleryDisplay(p.order)" />
+                  >
+                    <img
+                      :src="p.url"
+                      class="thumb"
+                      style="margin: auto"
+                      @click="photosGalleryDisplay(p.order)"
+                    >
                   </div>
                 </div>
                 <div style="text-align: center;">
                   <v-tooltip bottom>
                     <template #activator="{ on }">
-                      <v-btn icon  v-if="isAdmin" @click="photosGalleryDisplay(p.order)" v-on="on">
+                      <v-btn
+                        v-if="isAdmin"
+                        icon
+                        @click="photosGalleryDisplay(p.order)"
+                        v-on="on"
+                      >
                         <v-icon small>
                           fas fa-pen
                         </v-icon>
@@ -98,7 +152,11 @@
                   </v-tooltip>
                   <v-tooltip bottom>
                     <template #activator="{ on }">
-                      <v-btn icon @click="setCover(p)" v-on="on">
+                      <v-btn
+                        icon
+                        @click="setCover(p)"
+                        v-on="on"
+                      >
                         <v-icon small>
                           fas fa-desktop
                         </v-icon>
@@ -108,7 +166,12 @@
                   </v-tooltip>
                   <v-tooltip bottom>
                     <template #activator="{ on }">
-                      <v-btn icon  v-if="isAdmin" @click="deletePhoto(p)" v-on="on">
+                      <v-btn
+                        v-if="isAdmin"
+                        icon
+                        @click="deletePhoto(p)"
+                        v-on="on"
+                      >
                         <v-icon small>
                           fas fa-trash
                         </v-icon>
@@ -149,9 +212,9 @@
         </v-card>
         <UploadFiles
           style="margin: 0 15px"
-          inputLabel="Sélectionnez vos photos"
-          inputAccept="image/*"
-          :uploadUrl="uploadUrl"
+          input-label="Sélectionnez vos photos"
+          input-accept="image/*"
+          :upload-url="uploadUrl"
           @fileUploaded="onPhotoUploaded($event)"
         />
         

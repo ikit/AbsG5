@@ -1,4 +1,4 @@
-import { AgpaPhoto, AgpaVote, AgpaAwardType, AgpaAward } from "../entities";
+import { AgpaPhoto, AgpaVote, AgpaAwardType } from "../entities";
 import { palmaresPoints } from "./agpaPalmaresHelper";
 import { getRepository } from "typeorm";
 
@@ -551,9 +551,65 @@ export async function p4HonorAttribution(ctx: any) {
     return ctx;
 }
 
+/**
+ * Calcul les statistiques affichées dans la section "monitoring" de l'édition des agpa
+ * @param ctx les données "contexte" de l'édition des agPA
+ * @returns
+ */
 export async function monitoringStats(ctx: any) {
     const repo = getRepository(AgpaPhoto);
 
+    // On rajoute la notion de famille aux utilisateurs
+    const users = await repo.query('SELECT * from "user"');
+    for (const u of users) {
+        if (!ctx.users[u.id]) {
+            continue;
+        }
+        ctx.users[u.id].rootFamily = u.rootFamily;
+    }
+
+    // répartitions des photos
+    const total = {
+        catId: 0,
+        name: "Total",
+        total: 0,
+        totalByAge: {
+            adults: 0,
+            childdren: 0
+        },
+        totalByFamilies: {
+            gueudelot: 0,
+            guibert: 0,
+            guyomard: 0
+        }
+    };
+    ctx.photosStats = ctx.categoriesOrders.map(e => ({
+        catId: e,
+        name: ctx.categories[e].title,
+        total: 0,
+        totalByAge: {
+            adults: 0,
+            childdren: 0
+        },
+        totalByFamilies: {
+            gueudelot: 0,
+            guibert: 0,
+            guyomard: 0
+        }
+    }));
+    for (const pId of Object.keys(ctx.photos)) {
+        const p = ctx.photos[pId];
+        const cat = ctx.photosStats.find(c => c.catId === p.categoryId);
+        cat.total += 1;
+        total.total += 1;
+        cat.totalByAge[ctx.users[p.userId].age < 12 ? "childdren" : "adults"] += 1;
+        total.totalByAge[ctx.users[p.userId].age < 12 ? "childdren" : "adults"] += 1;
+        cat.totalByFamilies[ctx.users[p.userId].rootFamily] += 1;
+        total.totalByFamilies[ctx.users[p.userId].rootFamily] += 1;
+    }
+    ctx.photosStats.push(total);
+
+    // Répartition des votes (qui vote pour qui)
     const sql = `SELECT u1.username as "from", u2.username as "to", SUM(v.score)
         FROM public.agpa_vote v
         INNER JOIN "user" u1 ON v."userId" = u1.id
@@ -564,5 +620,6 @@ export async function monitoringStats(ctx: any) {
 
     ctx.votesStats = await repo.query(sql);
     ctx.votesStats = ctx.votesStats.map(r => [r.from, r.to, +r.sum]);
+
     return ctx;
 }

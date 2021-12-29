@@ -18,29 +18,47 @@
         style="margin: auto"
         @completed="startCeremony()"
       />
-      <div v-else style="text-align: center;">
+      <div
+        v-else
+        style="text-align: center;"
+      >
         <v-btn
-            color="primary"
-            @click="startCeremony()"
-            >
-            <v-icon small left>fas fa-play</v-icon>
-            Lancer la cérémonie
+          color="primary"
+          @click="startCeremony()"
+        >
+          <v-icon
+            small
+            left
+          >
+            fas fa-play
+          </v-icon>
+          Lancer la cérémonie
         </v-btn>
       </div>
     </v-card>
 
 
-    <p v-if="prealoadInfoDisplay" class="preloadInfo">
+    <p
+      v-if="prealoadInfoDisplay"
+      class="preloadInfo"
+    >
       Vous avez encore le temps... en attendant vous pouvez revoir les anciennes cérémonies:
     </p>
 
-    <div v-else class="preloadInfo">
-        <p v-if="preloadProgress === 100">Vous êtes pret pour la cérémonie</p>
-        <p v-else>Préchargement des données pour la cérémonie: {{ preloadProgress }}%</p>
+    <div
+      v-else
+      class="preloadInfo"
+    >
+      <p v-if="preloadProgress === 100">
+        Vous êtes pret pour la cérémonie
+      </p>
+      <p v-else>
+        Préchargement des données pour la cérémonie: {{ preloadProgress }}%
+      </p>
     </div>
 
     <v-container
-        v-if="prealoadInfoDisplay"
+      v-if="prealoadInfoDisplay"
       fluid
       :style="{ 'display': current.displayed ? 'none' : 'block' }"
     >

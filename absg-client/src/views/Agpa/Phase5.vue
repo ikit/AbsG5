@@ -1,13 +1,16 @@
 <template>
-    <div class="p4">
-        <p>Le concours des A.G.P.A. est désormais terminé.
-            Rendez-vous l'année prochaine pour une nouvelle édition :)
-        </p>
-        <p>Vous pouvez revivre la cérémonie en allant dans la section <a href="/agpa/ceremony">Cérémonies</a> des A.G.P.A.
-        </p>
-        <p>L'ensemble des photos sont consultable dans la section <a href="/agpa/archives">Archives</a> des A.G.P.A.
-        </p>
-    </div>
+  <div class="p4">
+    <p>
+      Le concours des A.G.P.A. est désormais terminé.
+      Rendez-vous l'année prochaine pour une nouvelle édition :)
+    </p>
+    <p>
+      Vous pouvez revivre la cérémonie en allant dans la section <a href="/agpa/ceremony">Cérémonies</a> des A.G.P.A.
+    </p>
+    <p>
+      L'ensemble des photos sont consultable dans la section <a href="/agpa/archives">Archives</a> des A.G.P.A.
+    </p>
+  </div>
 </template>
 
 

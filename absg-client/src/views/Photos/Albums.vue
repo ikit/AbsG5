@@ -17,78 +17,81 @@
 
       <v-btn
         style="position: absolute; right: 15px; top: 10px"
-        @click.stop="newAlbum()">
-        <v-icon left>fas fa-plus</v-icon>Nouvel album
+        @click.stop="newAlbum()"
+      >
+        <v-icon left>
+          fas fa-plus
+        </v-icon>Nouvel album
       </v-btn>
     </div>
     
-  <v-container fluid>
-    <v-layout
-      row
-      wrap
-    >
-      <v-flex>
-        <router-link
-          :to="{path: `/photos/albums/auto`}"
-          style="text-decoration: none"
-        >
-          <v-card>
-            <v-img
-              src="https://absolumentg.fr/files/photos/absg_0002/WEB/0002_1629750602581.jpg"
-              aspect-ratio="1.5"
-            >
-              <div class="albumInfo">
-                3769 photos disponnibles
-              </div>
-            </v-img>
-
-            <v-card-title
-              primary-title
-              style="position: relative"
-            >
-              Album automatique
-            </v-card-title>
-            <v-card-subtitle>
-              Générer un album en filtrant parmi toutes les photos enregistrés
-            </v-card-subtitle>
-          </v-card>
-        </router-link>
-      </v-flex>
-
-      <!-- Les albums créés par les utilisateurs -->
-      <v-flex
-        v-for="album in albums"
-        :key="album.id"
-        style="max-width: 400px; margin: 15px"
+    <v-container fluid>
+      <v-layout
+        row
+        wrap
       >
-        <router-link
-          :to="{path: `/photos/albums/${album.id}`}"
-          style="text-decoration: none"
-        >
-          <v-card>
-            <v-img
-              :src="album.coverPhoto"
-              aspect-ratio="1.5"
-            >
-              <div class="albumInfo">
-                {{ album.photos.length }} photos
-              </div>
-            </v-img>
+        <v-flex>
+          <router-link
+            :to="{path: `/photos/albums/auto`}"
+            style="text-decoration: none"
+          >
+            <v-card>
+              <v-img
+                src="https://absolumentg.fr/files/photos/absg_0002/WEB/0002_1629750602581.jpg"
+                aspect-ratio="1.5"
+              >
+                <div class="albumInfo">
+                  3769 photos disponnibles
+                </div>
+              </v-img>
 
-            <v-card-title
-              primary-title
-              style="position: relative"
-            >
-              {{ album.title }}
-            </v-card-title>
-            <v-card-subtitle>
-              {{ album.comment }}
-            </v-card-subtitle>
-          </v-card>
-        </router-link>
-      </v-flex>
-    </v-layout>
-  </v-container>
+              <v-card-title
+                primary-title
+                style="position: relative"
+              >
+                Album automatique
+              </v-card-title>
+              <v-card-subtitle>
+                Générer un album en filtrant parmi toutes les photos enregistrés
+              </v-card-subtitle>
+            </v-card>
+          </router-link>
+        </v-flex>
+
+        <!-- Les albums créés par les utilisateurs -->
+        <v-flex
+          v-for="album in albums"
+          :key="album.id"
+          style="max-width: 400px; margin: 15px"
+        >
+          <router-link
+            :to="{path: `/photos/albums/${album.id}`}"
+            style="text-decoration: none"
+          >
+            <v-card>
+              <v-img
+                :src="album.coverPhoto"
+                aspect-ratio="1.5"
+              >
+                <div class="albumInfo">
+                  {{ album.photos.length }} photos
+                </div>
+              </v-img>
+
+              <v-card-title
+                primary-title
+                style="position: relative"
+              >
+                {{ album.title }}
+              </v-card-title>
+              <v-card-subtitle>
+                {{ album.comment }}
+              </v-card-subtitle>
+            </v-card>
+          </router-link>
+        </v-flex>
+      </v-layout>
+    </v-container>
   </div>
 </template>
 

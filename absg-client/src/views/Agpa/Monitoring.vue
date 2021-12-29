@@ -3,8 +3,6 @@
     v-if="isAdmin"
     id="content"
   >
-
-
     <v-card style="margin: 24px">
       <v-tabs>
         <v-tab>
@@ -34,14 +32,17 @@
         </v-tab>
 
 
-        <v-btn @click="closeEdition()" style="position: absolute; top: 5px; right: 5px">
-            <v-icon
-                small
-                left
-            >
-                fa-plus
-            </v-icon>
-            Close edition
+        <v-btn
+          style="position: absolute; top: 5px; right: 5px"
+          @click="closeEdition()"
+        >
+          <v-icon
+            small
+            left
+          >
+            fa-plus
+          </v-icon>
+          Close edition
         </v-btn>
 
 
@@ -56,6 +57,7 @@
                   <th>Auteur</th>
                   <th>Categorie</th>
                   <th>Photo</th>
+                  <th>$nbsp;</th>
                 </tr>
               </thead>
               <tbody>
@@ -66,13 +68,14 @@
                   <td>{{ photo.username }}</td>
                   <td>{{ data.categories[photo.categoryId].title }}</td>
                   <td>
-                    <img
+                    <!-- img
                       class="thumb"
                       :src="photo.thumb"
                       @click="photosGalleryDisplay(photo)"
-                    >
+                   -->
                     {{ photo.title }}
                   </td>
+                  <td style="text-align: right" />
                 </tr>
               </tbody>
             </template>
@@ -192,47 +195,50 @@
             </template>
 
             <template #[`item.awards`]="{ item }">
-                <span v-for="a of item.awards" :key="a.categoryId">
-                  <v-tooltip bottom>
-                    <template #activator="{ on }">
-                      <i
-                        v-if="a.award === 'diamond'"
-                        class="fas fa-circle"
-                        style="color: #c3f1ff"
-                        v-on="on"
-                      />
-                      <i
-                        v-if="a.award === 'gold'"
-                        class="fas fa-circle"
-                        style="color: #c68b00"
-                        v-on="on"
-                      />
-                      <i
-                        v-if="a.award === 'sylver'"
-                        class="fas fa-circle"
-                        style="color: #9b9b9b"
-                        v-on="on"
-                      />
-                      <i
-                        v-if="a.award === 'bronze'"
-                        class="fas fa-circle"
-                        style="color: #964c31"
-                        v-on="on"
-                      />
-                      <i
-                        v-if="a.award === 'nominated'"
-                        class="far fa-circle"
-                        v-on="on"
-                      />
-                      <i
-                        v-if="a.award === 'honor'"
-                        class="far fa-smile"
-                        v-on="on"
-                      />
-                    </template>
-                    {{ data.categories[a.categoryId].title }}
-                  </v-tooltip>
-                </span>
+              <span
+                v-for="a of item.awards"
+                :key="a.categoryId"
+              >
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <i
+                      v-if="a.award === 'diamond'"
+                      class="fas fa-circle"
+                      style="color: #c3f1ff"
+                      v-on="on"
+                    />
+                    <i
+                      v-if="a.award === 'gold'"
+                      class="fas fa-circle"
+                      style="color: #c68b00"
+                      v-on="on"
+                    />
+                    <i
+                      v-if="a.award === 'sylver'"
+                      class="fas fa-circle"
+                      style="color: #9b9b9b"
+                      v-on="on"
+                    />
+                    <i
+                      v-if="a.award === 'bronze'"
+                      class="fas fa-circle"
+                      style="color: #964c31"
+                      v-on="on"
+                    />
+                    <i
+                      v-if="a.award === 'nominated'"
+                      class="far fa-circle"
+                      v-on="on"
+                    />
+                    <i
+                      v-if="a.award === 'honor'"
+                      class="far fa-smile"
+                      v-on="on"
+                    />
+                  </template>
+                  {{ data.categories[a.categoryId].title }}
+                </v-tooltip>
+              </span>
             </template>
           </v-data-table>
         </v-tab-item>
@@ -343,15 +349,45 @@
 
         <!-- Stats -->
         <v-tab-item>
-            <div style="display: flex; min-height: 600px">
-                <div style="flex: 0 1 1;">
-                    participation
-                </div>
-                <highcharts v-if="votesGraph" style="flex: 0 1 1" :options="votesGraph" />
-                <div style="flex: 0 1 1">
-                    Récompenses
-                </div>
+          <h2>Participation</h2>
+          <div style="display: flex;">
+            <div style="flex: 1 0 0;">
+              <table style="width: 100%">
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>Gueudelot</td>
+                  <td>Guibert</td>
+                  <td>Guyomard</td>
+                  <td>Adultes | Enfants</td>
+                </tr>
+                <tr
+                  v-for="row in data.photosStats"
+                  :key="row.catId"
+                >
+                  <td style="text-align: right; font-weight: bold">
+                    {{ row.name }}
+                  </td>
+                  <td>{{ row.totalByFamilies.gueudelot }}</td>
+                  <td>{{ row.totalByFamilies.guibert }}</td>
+                  <td>{{ row.totalByFamilies.guyomard }}</td>
+                  <td>{{ row.totalByAge.adults }} | {{ row.totalByAge.childdren }}</td>
+                </tr>
+              </table>
             </div>
+            <div style="flex: 0 1 0;">
+              <highcharts
+                v-if="participationGraph"
+                :options="participationGraph"
+              />
+            </div>
+          </div>
+          <div>
+            <h2>Votes</h2>
+            <highcharts
+              v-if="votesGraph"
+              :options="votesGraph"
+            />
+          </div>
         </v-tab-item>
       </v-tabs>
     </v-card>
@@ -445,10 +481,10 @@
     </v-dialog>
   </section>
 
-    <section v-else>
-        <div style="text-align: center; margin-top: 20px">
-            Accès réservé aux administrateurs
-        </div>
+  <section v-else>
+    <div style="text-align: center; margin-top: 20px">
+      Accès réservé aux administrateurs
+    </div>
   </section>
 </template>
 
@@ -523,7 +559,7 @@ export default {
         palmares: [],
 
         data: null,
-
+        participationGraph: null,
         votesGraph: null,
     }),
     computed: { ...mapState([
@@ -573,7 +609,6 @@ export default {
                   return uCompare === 0 ? a.categoryId - b.categoryId : uCompare;
                 })
                 store.commit('photosGalleryReset', this.photos);
-                console.log(this.photos)
 
                 // On reformate les votes pour les présenter sous forme de tableau "users x catégories"
                 const votes = {};
@@ -621,10 +656,91 @@ export default {
                     rewards: this.reformatAward(u.awards)
                 })).sort((a, b) => this.data.usersOrder.findIndex(e => e === a.id) - this.data.usersOrder.findIndex(e => e === b.id));
 
-                this.votesGraph = {
-                    title: {
-                        text: 'Votes'
+                const pData = this.data.photosStats.filter(c => c.catId === 0)[0];
+                const pCats = this.data.photosStats.filter(c => c.catId !== 0);
+                this.participationGraph = {
+                    title: null,
+                    subtitle: null,
+                    chart: {
+                        type: 'pie',
+                        height: 300,
+                        width: 300
                     },
+                    plotOptions: {
+                        pie: {
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: false
+                            }
+                        }
+                    },
+                    accessibility: {
+                        announceNewData: {
+                            enabled: true
+                        },
+                    },
+                    series: [
+                      {
+                          name: "Famille",
+                          colorByPoint: true,
+                          data: [
+                              {
+                                  name: "Gueudelot",
+                                  y: pData.totalByFamilies.gueudelot,
+                                  drilldown: "Gueudelot"
+                              },
+                              {
+                                  name: "Guibert",
+                                  y: pData.totalByFamilies.guibert,
+                                  drilldown: "Guibert"
+                              },
+                              {
+                                  name: "Guyomard",
+                                  y: pData.totalByFamilies.guyomard,
+                                  drilldown: "Guyomard"
+                              }
+                          ]
+                      }
+                  ],
+
+                  drilldown: {
+                    series: [
+                        {
+                            name: "Gueudelot",
+                            id: "Gueudelot",
+                            data: pCats.map(c => ([
+                              c.name,
+                              c.totalByFamilies.gueudelot
+                            ]))
+                        },
+                        {
+                            name: "Guibert",
+                            id: "Guibert",
+                            data: pCats.map(c => ([
+                              c.name,
+                              c.totalByFamilies.guibert
+                            ]))
+                        },
+                        {
+                            name: "Guyomard",
+                            id: "Guyomard",
+                            data: pCats.map(c => ([
+                              c.name,
+                              c.totalByFamilies.guyomard
+                            ]))
+                        }
+                    ]
+                  },
+
+
+                    tooltip: {
+                        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y} photos</b><br/>'
+                    },
+                };
+
+                this.votesGraph = {
+                    title: null,
                     exporting: {
                         buttons: {
                             contextButton: {
