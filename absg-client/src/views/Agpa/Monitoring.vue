@@ -68,11 +68,11 @@
                   <td>{{ photo.username }}</td>
                   <td>{{ data.categories[photo.categoryId].title }}</td>
                   <td>
-                    <!-- img
+                    <img
                       class="thumb"
                       :src="photo.thumb"
                       @click="photosGalleryDisplay(photo)"
-                   -->
+                    >
                     {{ photo.title }}
                   </td>
                   <td style="text-align: right" />
