@@ -375,7 +375,7 @@ class AgpaService {
             photo = await this.photoRepo.findOne({ where: { id: Equal(photoId) }, relations: ["user", "category"] });
         } else {
             // Ces inbfos ne peuvent pas être modifié une fois que la photo a été "créée"
-            photo.year = new Date().getFullYear();
+            photo.year = getCurrentEdition();
             photo.filename = `${new Date().getTime()}.jpg`;
         }
         photoData.id = photoId ? photoId : null; // pour éviter les problèmes lors du save en DB
