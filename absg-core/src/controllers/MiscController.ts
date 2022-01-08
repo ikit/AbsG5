@@ -3,6 +3,7 @@ import { JsonController, Post, Body, Get, Authorized, CurrentUser, Param } from 
 import { citationService, immtService, userService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
+import { getCurrentEdition } from "../middleware/agpaCommonHelpers";
 
 @JsonController("")
 export class UserController {
@@ -63,12 +64,12 @@ export class UserController {
             settings[e.key] = e.value;
         }
         // On récupère les infos sur la catégorie spéciale de l'édition en cours
-        data = await this.repo.query(`SELECT * FROM agpa_category_variation WHERE year = ${new Date().getFullYear()}`);
+        data = await this.repo.query(`SELECT * FROM agpa_category_variation WHERE year = ${getCurrentEdition()}`);
         if (data.length > 0) {
             settings["agpaSpecialEdition"] = data[0];
         } else {
             settings["agpaSpecialEdition"] = {
-                year: new Date().getFullYear(),
+                year: getCurrentEdition(),
                 title: "",
                 description: ""
             };

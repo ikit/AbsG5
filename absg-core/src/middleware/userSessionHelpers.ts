@@ -6,6 +6,7 @@ import { User, LogPassag, LogSystem } from "../entities";
 import { differenceInSeconds } from "date-fns";
 import { Mutex } from "async-mutex";
 import { websocketService, WSMessageType } from "../services/WebsocketService";
+import { getCurrentEdition } from "./agpaCommonHelpers";
 
 const ACTIONS_LABELS = [
     { route: "/agenda/person", label: "Agenda - Répertoire" },
@@ -14,9 +15,9 @@ const ACTIONS_LABELS = [
     { route: "/agpa/archives", label: "A.G.P.A. - Archives" },
     { route: "/agpa/ceremony", label: "A.G.P.A. - Cérémonie" },
     { route: "/agpa/palmares", label: "A.G.P.A. - Palmarès" },
-    { route: "/agpa/p", label: "A.G.P.A. - Edition " + new Date().getFullYear() },
-    { route: "/agpa/photo", label: "A.G.P.A. - Edition " + new Date().getFullYear() },
-    { route: "/agpa/vote", label: "A.G.P.A. - Edition " + new Date().getFullYear() },
+    { route: "/agpa/p", label: "A.G.P.A. - Edition " + getCurrentEdition() },
+    { route: "/agpa/photo", label: "A.G.P.A. - Edition " + getCurrentEdition() },
+    { route: "/agpa/vote", label: "A.G.P.A. - Edition " + getCurrentEdition() },
     { route: "/agpa", label: "A.G.P.A." },
     { route: "/citations", label: "Citations" },
     { route: "/event", label: "Calendrier" },
