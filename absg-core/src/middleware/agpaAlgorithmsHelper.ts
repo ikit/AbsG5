@@ -409,20 +409,20 @@ export async function p4AgpaAttribution(ctx: any) {
         const b = ctx.photos[bId];
 
         // On trie dans l'ordre décroissant en fonction du nombre de fois où une photo a été sélectionné pour le meilleur titre
-        let res = b.scoreTitle - a.scoreTitle;
-        if (res != 0) return res;
+        let res = b.votesTitle - a.votesTitle;
+        if (res !== 0) return res;
 
         // Si exaequo, avantage à la photo ayant le plus petit score
         res = b.gscore - a.gscore;
-        if (res != 0) return res;
+        if (res !== 0) return res;
 
         // Si exaequo, avantage au photograhe ayant le moins bon palmarès sur l'édition en cours
         res = ctx.users[a.userId].palmares - ctx.users[b.userId].palmares;
-        if (res != 0) return res;
+        if (res !== 0) return res;
 
         // Si exaequo, avantage au photographe ayant le moins bon palamarès cumulé sur l'ensemble des éditions précédentes
         res = ctx.users[a.userId].formerPalmares - ctx.users[b.userId].formerPalmares;
-        if (res != 0) return res;
+        if (res !== 0) return res;
 
         // Si toujours exaequos, on tire au sort
         res = Math.random();
