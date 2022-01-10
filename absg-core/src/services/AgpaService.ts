@@ -74,8 +74,12 @@ class AgpaService {
      * Récupère les données pour une cérémonie donnée
      * @param year l'année de la cérémonie
      */
-    getCeremonyData(year: number) {
+    async getCeremonyData(year: number) {
         if (year >= 2006 && year <= getCurrentEdition()) {
+            // On clos la cérémonie par mesure de sécurité
+            if (year === getCurrentEdition()) {
+                await this.closeEdition();
+            }
             return ceremonyData(year);
         }
         logger.warning(`Cérémonie ${year} non disponible`);
@@ -303,7 +307,7 @@ class AgpaService {
         // On récupère le contexte
         let context = await getMetaData(currentYear, true);
         let awards = await this.catRepo.query(`SELECT * FROM agpa_award WHERE year = ${context.year}`);
-        if (context.phase === 5 && awards.length === 0) {
+        if (context.phase === 4 && awards.length === 0) {
             // On calcul les awards de l'édition en cours
             context = await getMetaData(context.year, true);
             context = await p4CheckVotes(context);
