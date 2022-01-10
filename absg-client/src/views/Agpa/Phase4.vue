@@ -2,7 +2,7 @@
   <div class="p4">
     <p>
       Le concours des A.G.P.A. est désormais terminé.
-      Les résultats suite au dépouillement des votes vous seront présentés lors de la cérémonie plannifiée le <span class="endDate">01 janv. à 16h30</span>.
+      Les résultats suite au dépouillement des votes vous seront présentés lors de la cérémonie plannifiée le <span class="endDate">{{ end }}</span>.
     </p>
     <p>
       Ceux qui ne pourront pas être présent, pourront suivre la cérémonie à distance en "direct", en se connectant sur le site
