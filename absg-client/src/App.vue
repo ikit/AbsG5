@@ -285,6 +285,12 @@
               >
                 {{ photoDisplayed.title }}
               </div>
+              <div
+                v-if="photoDisplayed.hasOwnProperty('username')"
+                style="text-align: center; font-style: italic; opacity: 0.5"
+              >
+                {{ photoDisplayed.username }}
+              </div>
             </div>
             <!-- L'éditeur de meta data -->
             <PhotoMetadataEditor
