@@ -286,7 +286,7 @@ export default {
                     title: place.name,
                 });
             }
-            // On met à jour la gallerie photo et ses index
+            // On met à jour la galerie photo et ses index
             idx = 0;
             this.places = this.places.map(e => ({
                 ...e,

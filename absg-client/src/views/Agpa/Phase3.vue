@@ -409,7 +409,7 @@ export default {
             this.totalVotes = 0;
             this.totalTitleVotes = this.votes.totalTitleVotes;
 
-            // Maj votes des photos de la gallerie
+            // Maj votes des photos de la galerie
             for (let idx = 0; idx < this.photosGalery.length; idx++) {
                 const p = this.photosGalery[idx];
                 let uv = 0;

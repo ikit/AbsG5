@@ -202,7 +202,7 @@
                 <v-icon left>
                   far fa-images
                 </v-icon>
-                <span v-if="$vuetify.breakpoint.mdAndUp">Gallerie</span>
+                <span v-if="$vuetify.breakpoint.mdAndUp">Galerie</span>
               </v-btn>
             </template>
             <span>Voir les photos de la catégorie {{ current.categories[catIdx].title }} </span>

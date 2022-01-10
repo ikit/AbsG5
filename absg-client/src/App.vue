@@ -530,7 +530,7 @@ export default {
             "notif",
             "snack"
         ]),
-        // Gallerie photos
+        // Galerie photos
         photosGalleryDisplayed() {
             return this.$store.state.photosGalleryDisplayed;
         },
