@@ -54,10 +54,9 @@
             <template #default>
               <thead>
                 <tr style="vertical-align: baseline;">
-                  <th>Auteur</th>
-                  <th>Categorie</th>
                   <th>Photo</th>
-                  <th>$nbsp;</th>
+                  <th>Infos</th>
+                  <th>&nbsp;</th>
                 </tr>
               </thead>
               <tbody>
@@ -65,17 +64,35 @@
                   v-for="photo of photos"
                   :key="photo.id"
                 >
-                  <td>{{ photo.username }}</td>
-                  <td>{{ data.categories[photo.categoryId].title }}</td>
                   <td>
                     <img
                       class="thumb"
                       :src="photo.thumb"
                       @click="photosGalleryDisplay(photo)"
                     >
-                    {{ photo.title }}
                   </td>
-                  <td style="text-align: right" />
+                  <td>
+                    {{ photo.title }}
+                    <br/>
+                    <span style="opacity: 0.5">{{ photo.username }}</span><br/>
+                    <span style="opacity: 0.5">{{ data.categories[photo.categoryId].title }}</span>
+                  </td>
+                  <td style="text-align: right">
+                    <v-btn
+                      icon
+                      color="primary"
+                      @click="displayPhotoEdition(photo)"
+                    >
+                      <v-icon>fas fa-pen</v-icon>
+                    </v-btn>
+                    <v-btn
+                      icon
+                      color="primary"
+                      @click="displayPhotoDetails(photo)"
+                    >
+                      <v-icon>fas fa-info-circle</v-icon>
+                    </v-btn>
+                  </td>
                 </tr>
               </tbody>
             </template>
@@ -392,6 +409,102 @@
       </v-tabs>
     </v-card>
 
+    <!-- Détails photo -->
+    <v-dialog
+      v-model="photoDetails.displayed"
+      width="800px"
+    >
+      <v-card v-if="photoDetails.photo">
+        <v-card-title class="grey lighten-4">
+          Informations sur la photo {{ photoDetails.photo.id }}
+        </v-card-title>
+        <div style="display: flex; margin: 0 24px">
+          <v-simple-table
+            v-if="photoDetails.votes.length > 0"
+              dense
+              style="text-align: left; font-size: 0.8em; margin: 10px"
+            >
+              <template #default>
+                <thead>
+                  <tr style="vertical-align: baseline;">
+                    <th>Juré</th>
+                    <th>Vote</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="vote of photoDetails.votes"
+                    :key="vote.id"
+                  >
+                    <td>
+                      {{ vote.username }}
+                    </td>
+                    <td>
+                      <i
+                        v-if="vote.categoryId === -3"
+                        class="fas fa-feather-alt"
+                      />
+                      <i
+                        v-else
+                        class="fas fa-star"
+                      >{{ vote.score }}</i>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+        </div>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="photoDetails.displayed = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Photo Edition -->
+    <v-dialog
+      v-model="photoEdition.displayed"
+      width="800px"
+    >
+      <v-card v-if="photoEdition.photo">
+        <v-card-title class="grey lighten-4">
+          Modification de la photo {{ photoEdition.photo.id }}
+        </v-card-title>
+        <div style="display: flex; margin: 0 24px">
+          todo
+        </div>
+        <v-card-actions>
+          <v-btn
+            text
+            color="primary"
+            @click="photoEdition.displayed = false"
+          >
+            Supprimer
+          </v-btn>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="photoEdition.displayed = false"
+          >
+            Annuler
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="photoEdition.displayed = false"
+          >
+            Enregistrer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Détails votes -->
     <v-dialog
@@ -517,6 +630,15 @@ export default {
         end: "",
 
         photos: [],
+        photoDetails: {
+          displayed: false,
+          votes: [],
+          photo: null
+        },
+        photoEdition: {
+          displayed: false,
+          photo: null
+        },
 
         votes: [],
         votesCategories: [],
@@ -644,7 +766,6 @@ export default {
                         ... res,
                         quicksearch: `${res.username} ${res.title}`.toLowerCase()
                     }
-
                 });
                 this.updateNotesList();
 
@@ -825,6 +946,21 @@ export default {
             return rewards;
         },
 
+        displayPhotoDetails(photo)  {
+          this.photoDetails.photo = photo;
+          // On récupère les votes de la photo
+          this.photoDetails.votes.splice(0);
+          for (const u of this.data.categories[photo.categoryId].votes) {
+            this.photoDetails.votes.push(...u.votes.filter(v => v.photoId === photo.id))
+          }
+
+          this.photoDetails.displayed = true;
+        },
+
+        displayPhotoEdition(photo) {
+          this.photoEdition.photo = photo;
+          this.photoEdition.displayed = true;
+        },
 
         displayVotesDetails(data) {
             this.voteDetails.vote = data;

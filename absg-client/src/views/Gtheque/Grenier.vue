@@ -9,12 +9,21 @@
 
 <script>
 import Vue from 'vue';
+import axios from 'axios';
+import { mapState } from 'vuex';
+import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 
 export default {
     data: () => ({
         debugToken: format(new Date(), "yyyyMMddHHmmss")
-    })
+    }),
+    mounted () {
+        axios.get(`/api/gtheque`).then(response => {
+            this.data = parseAxiosResponse(response);
+            console.log(this.data);
+        });
+    },
 }
 </script>
 
