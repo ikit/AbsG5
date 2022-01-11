@@ -11,11 +11,44 @@
         row
         wrap
       >
-        <v-flex stretch>
-          <Calendar />
+        <v-flex>
+          <v-card style="width:500px; margin: auto">
+            <v-card-title>
+              <h2>
+                Prochains événements
+                <router-link to="/agenda/events" tag="button" 
+                  style="position: absolute; right: 20px; top: 25px;">
+                  <v-icon>
+                    fas fa-pen
+                  </v-icon>
+                </router-link>
+              </h2>
+            </v-card-title>
+
+            <v-data-table
+              :headers="eventsHeaders"
+              :items="events"
+              items-per-page="10"
+              loading-text="Récupération des notifications..."
+              hide-default-footer
+              class="notifications"
+            >
+              <template #item="{item}">
+                <tr @click="onEventClick(item)">
+                  <td>
+                    <div style="display: flex;">
+                      <v-icon style="flex">far fa-calendar-alt</v-icon>
+                      <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.name }}</span>
+                    </div>
+                  </td>
+                  <td style="text-align: right; padding-right: 25px">{{ item.dateLabel }}</td>
+                </tr>
+              </template>
+            </v-data-table>
+          </v-card>
         </v-flex>
 
-        <v-flex shrink>
+        <v-flex>
           <div
             v-if="immt"
             class="immt"
@@ -133,20 +166,25 @@ import axios from 'axios';
 //import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { padNumber } from '../middleware/CommonHelper';
-import Calendar from '../components/Calendar';
 import {Chart} from 'highcharts-vue';
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 //Vue.use(VueSilentbox);
 
 export default {
     components: {
-        Calendar,
         highcharts: Chart
     },
     store,
     data: () => ({
         menu: false,
         immt: null,
+        eventsHeaders: [
+          { text: "Quoi", value: "what" },
+          { text: "Quand", value: "when", align: "right" },
+        ],
+        events: [],
         passagHistoryDialogDisplayed: false,
         historyData: {
             title: "",
@@ -239,6 +277,14 @@ export default {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
+
+                    // Les événements à venir
+                    this.events = data.events.map(e => ({
+                      ...e,
+                      dateLabel: e.endDate 
+                        ? `du ${format(new Date(e.startDate), "dd MMM", {locale: fr})} au ${format(new Date(e.endDate), "dd MMM", {locale: fr})}`
+                        : format(new Date(e.startDate), "dd MMM", {locale: fr})
+                    }));
 
                     // La photo du moment
                     if (data.immt) {

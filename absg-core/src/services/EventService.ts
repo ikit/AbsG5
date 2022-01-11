@@ -63,17 +63,22 @@ class EventService {
     }
 
     /**
-     * Renvoie les événements du mois demandé
+     * Récupère la liste des événements sur une période donnée
+     * @param startDate début de la période à prendre en compte
+     * @param endDate fin de la période à prendre en compte
+     * @returns la liste des événements
      */
-    public async getForMonth(year: number, month: number) {
-        const startDate = new Date(year, month);
-        const endDate = addMonths(startDate, 1);
+    public async getEvents(startDate: Date, endDate: Date) {
         let result = [];
+        const year = startDate.getFullYear();
+
         // On écupère les événements enregistrés par les utilisateurs
         let q = `SELECT e.*, u.username 
             FROM public.event_g e
             INNER JOIN "user" u ON e."authorId" = u.id
-            WHERE e."startDate" <= '${endDate.toISOString()}' AND (e."endDate" IS NULL OR e."endDate" >= '${startDate.toISOString()}')`;
+            WHERE (e."endDate" IS NULL AND e."startDate" >= '${startDate.toISOString()}' AND e."startDate" <= '${endDate.toISOString()}')
+            OR (e."endDate" IS NOT NULL AND e."startDate" <= '${endDate.toISOString()}' AND e."endDate" >= '${startDate.toISOString()}')
+            `;
         result.push(...(await this.repo.query(q)).map(e => ({ ...e, editable: true })));
 
         result = result.map(e => {
@@ -82,10 +87,14 @@ class EventService {
         });
 
         // On récupères les anniversaires
+        const months = [];
+        for (let m = startDate.getMonth(); m <= endDate.getMonth(); m++) {
+            months.push(m + 1);
+        }
         q = `SELECT * 
             FROM person
             WHERE 
-                ("dateOfBirth" is NOT NULL AND substring("dateOfBirth" from 6 for 2)::int = ${month + 1})
+                ("dateOfBirth" is NOT NULL AND substring("dateOfBirth" from 6 for 2)::int IN (${months.join(",")}))
             AND ("dateOfDeath" IS NULL OR substring("dateOfDeath" from 1 for 4)::int >= ${year})`;
         const qr = await this.repo.query(q);
         if (Array.isArray(qr) && qr.length > 0) {
@@ -107,8 +116,35 @@ class EventService {
         }
 
         // On récupères les fêtes nationals
-        result.push(...this.getLegalEvents(year, month));
-        return result;
+        let y = year;
+        for (const m of months) {
+            result.push(...this.getLegalEvents(y, m));
+            if (m === 11) {
+                y += 1;
+            }
+        }
+        return result.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+    }
+
+    /**
+     * Renvoie les événements du mois demandé
+     */
+    public getForMonth(year: number, month: number) {
+        const startDate = new Date(year, month);
+        const endDate = addMonths(startDate, 1);
+        return this.getEvents(startDate, endDate);
+    }
+
+    /**
+     * Récupère la liste des 20 prochains événements à venir sur les 6 prochains mois
+     * (par défaut par rapport à la date du jour)
+     * @param from la date à prendre en compte
+     */
+    public async getNextEvents(from: Date = null) {
+        const startDate = from ? from : new Date();
+        const endDate = addMonths(startDate, 2);
+        const result = await this.getEvents(startDate, endDate);
+        return result.splice(0, 20);
     }
 
     /**

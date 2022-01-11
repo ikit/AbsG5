@@ -1,6 +1,6 @@
 import { getRepository } from "typeorm";
 import { JsonController, Post, Body, Get, Authorized, CurrentUser, Param } from "routing-controllers";
-import { citationService, immtService, userService } from "../services";
+import { citationService, immtService, userService, eventService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
 import { getCurrentEdition } from "../middleware/agpaCommonHelpers";
@@ -37,7 +37,8 @@ export class UserController {
     async home() {
         const result = {
             immt: await immtService.last(),
-            passag: await userService.getPassag(subDays(addHours(new Date(), 1), 1))
+            passag: await userService.getPassag(subDays(addHours(new Date(), 1), 1)),
+            events: await eventService.getNextEvents()
         };
         return result;
     }
