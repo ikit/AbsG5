@@ -24,7 +24,7 @@
               justify="center"
             >
               <v-text-field
-                v-model="filter.request"
+                v-model="filter.search"
                 prepend-icon="fa-search"
                 placeholder="Rechercher"
                 style="max-width: 300px;"
@@ -333,7 +333,23 @@ export default {
             if (!search) {
                 return items;
             }
-            return items.filter(e => e != null && e.title.toLowerCase().indexOf(search.toLowerCase()) > -1);
+            const tokens = search.split(" ");
+            const results = [];
+            console.log(tokens, items);
+            for (const e of items) {
+              let ok = true;
+              for (const t of tokens) {
+                if (e.title.toLowerCase().indexOf(t.toLowerCase()) === -1) {
+                  ok = false;
+                  continue;
+                }
+              }
+              if (ok) {
+                results.push(e);
+              }
+            }
+            console.log(results)
+            return results;
         }
     }
 }
