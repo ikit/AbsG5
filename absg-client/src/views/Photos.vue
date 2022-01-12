@@ -14,6 +14,7 @@
           fas fa-images
         </v-icon> Albums
       </v-tab>
+      <v-tab :to="{path:'/photos/trombi'}"> <v-icon left>fas fa-user-circle</v-icon> Trombinoscope</v-tab>
       <v-tab :to="{path:'/photos/browser'}">
         <v-icon left>
           fab fa-stack-overflow

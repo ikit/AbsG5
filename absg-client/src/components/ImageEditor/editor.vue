@@ -89,8 +89,12 @@ export default {
     props: {
         data: {
             type: Object,
-            default: () => ({}),
+            default: () => ({})
         },
+        mode: {
+          type: String,
+          default: () => "free" // free or square
+        }
     },
     data: () => ({
         canvasData: null,
@@ -158,9 +162,12 @@ export default {
                 return;
             }
 
+console.log(this.mode)
             this.cropper = new Cropper(this.$refs.image, {
                 autoCrop: false,
                 dragMode: 'move',
+                viewMode: this.mode === "free" ? "2" : "3",
+                aspectRatio: this.mode === "free" ? undefined : 1,
                 background: false,
 
                 crop: ({ detail }) => {

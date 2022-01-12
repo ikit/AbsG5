@@ -31,8 +31,6 @@
               />
               <v-spacer />
 
-
-
               <v-btn
                 icon
                 small
@@ -55,23 +53,37 @@
 
               <v-spacer />
 
-              <v-btn
-                v-if="$vuetify.breakpoint.lgAndUp"
-                @click.stop="resetDialog(true)"
-              >
-                <v-icon left>
-                  fas fa-plus
-                </v-icon>
-                <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
-              </v-btn>
-              <v-btn
-                v-else
-                fab
-                small
-                @click.stop="resetDialog(true)"
-              >
-                <v-icon>fas fa-plus</v-icon>
-              </v-btn>
+              <v-btn-toggle :disabled="isLoading">
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <v-btn @click.stop="switchLayout()">
+                      <v-icon v-if="layoutMode === 'GRID'">fas fa-th</v-icon>
+                      <v-icon v-if="layoutMode === 'TABLE'">fas fa-table</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Changer la disposition des photos</span>
+                </v-tooltip>
+                
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <v-btn @click.stop="switchSorting()">
+                      <v-icon v-if="sortMode === 'ASC'">fas fa-sort-numeric-down</v-icon>
+                      <v-icon v-if="sortMode === 'DESC'">fas fa-sort-numeric-down-alt</v-icon>
+                      <v-icon v-if="sortMode === 'RAND'">fas fa-dice</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Changer l'ordre des photo</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template #activator="{ on }">
+                    <v-btn @click.stop="resetDialog(true)">
+                      <v-icon>fas fa-plus</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Enregistrer une nouvelle photo</span>
+                </v-tooltip>
+              </v-btn-toggle>
             </v-row>
           </div>
         </template>
@@ -90,7 +102,7 @@
                 :key="p.id"
               >
                 <v-img
-                  width="150px"
+                  width="200px"
                   height="200px"
                   class="thumb"
                   :src="p.thumb"
@@ -154,6 +166,7 @@
             ref="imgEditor"
             icon="fas fa-camera"
             style="height: 300px;"
+            mode="square"
           />
           <div v-if="trombiEditor.isLoading">
             Enregistrement en cours : {{ trombiEditor.complete }}%
@@ -199,6 +212,8 @@ export default {
         photos: [],
         displayedhotos: [],
         persons: [],
+        layoutMode: "GRID",
+        sortMode: "ASC",
         filter: {
             type: "nom",
             search: null,
@@ -247,6 +262,20 @@ export default {
         });
     },
     methods: {
+        switchLayout() {
+          const modes = ["GRID", "TABLE"];
+          let idx = modes.indexOf(this.layoutMode) + 1;
+          idx = idx === modes.length ? 0 : idx;
+          this.layoutMode = modes[idx];
+        },
+
+        switchSorting() {
+          const modes = ["ASC", "DESC", "RAND"];
+          let idx = modes.indexOf(this.sortMode) + 1;
+          idx = idx === modes.length ? 0 : idx;
+          this.sortMode = modes[idx];
+        },
+
         resetDialog (open = false) {
             this.trombiEditor.open = open;
             this.trombiEditor.date = null;
@@ -257,7 +286,6 @@ export default {
         },
         saveTrombi: function () {
             const { imgEditor } = this.$refs;
-
             this.trombiEditor.isLoading = true;
 
             // On récupère l'image
@@ -295,7 +323,8 @@ export default {
             if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1
         },
         photosGalleryDisplay(index) {
-            store.commit('photosGalleryReset', this.photos.filter(e => e != null && e.title.toLowerCase().indexOf(this.filter.search.toLowerCase()) > -1));
+          console.log(this.photos)
+            store.commit('photosGalleryReset', this.photos);
             store.commit('photosGallerySetIndex', index);
             store.commit('photosGalleryDisplay');
         },

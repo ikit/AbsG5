@@ -11,6 +11,7 @@
         v-if="data.loaded"
         ref="editor"
         :data="data"
+        :mode="mode"
       />
       <Loader
         v-else
@@ -55,6 +56,10 @@ export default {
         disabled: {
             type: Boolean,
             default: () => false
+        },
+        mode: {
+          type: String,
+          default: () => "free" // free or square
         }
     },
     data() {

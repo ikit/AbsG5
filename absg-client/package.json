@@ -32,6 +32,7 @@
     "vlf": "^1.1.0",
     "vue": "^2.6.14",
     "vue-affix": "^0.5.2",
+    "vue-avatar-cropper": "^5.0.2",
     "vue-native-websocket": "^2.0.14",
     "vue-router": "^2.0.0",
     "vue-silentbox": "^0.1.9",
