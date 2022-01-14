@@ -7,7 +7,7 @@ export const MODULES = [
     { id:"event", icon: 'fas fa-calendar-alt', name: 'Calendrier', url: null, roles: ["member"] },
     // { id:"voyag", icon: 'fas fa-map-marked-alt', name: 'Voya G', url: '/voyag', roles: ["member"] },
     { id:"agpa", icon: 'fas fa-camera', name: 'A.G.P.A.', url: '/agpa', roles: ["member"] },
-    { id:"gtheque", icon: 'fas fa-folder-open', name: 'G-thèque', url: '/gtheque', roles: ["member"] },
+    // { id:"gtheque", icon: 'fas fa-folder-open', name: 'G-thèque', url: '/gtheque', roles: ["member"] },
     { id:"admin", icon: 'fas fa-cog', name: 'Config', url: '/admin', roles: ["admin"]  }];
 
 /**

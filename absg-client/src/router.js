@@ -95,10 +95,6 @@ export const router = new VueRouter({
                     component: () => import("./views/Photos/Immt.vue"),
                 },
                 {
-                    path: "trombi",
-                    component: () => import("./views/Photos/Trombi.vue"),
-                },
-                {
                     path: "albums",
                     component: () => import("./views/Photos/Albums.vue"),
                 },
@@ -163,6 +159,10 @@ export const router = new VueRouter({
                 {
                     path: "events",
                     component: () => import("./views/Agenda/Events.vue"),
+                },
+                {
+                    path: "trombi",
+                    component: () => import("./views/Agenda/Trombi.vue"),
                 },
                 {
                     path: "genealogy",

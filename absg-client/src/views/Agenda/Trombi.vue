@@ -137,30 +137,15 @@
             item-text="fullname"
           />
 
-          <v-menu
-            v-model="trombiEditor.dateOfTrombiMenu"
-            :close-on-content-click="true"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="290px"
-          >
-            <template #activator="{ on }">
-              <v-text-field
-                v-model="trombiEditor.date"
-                :rules="editorRules.date"
-                clearable
-                label="Quand"
-                prepend-icon="far fa-calendar-alt"
-                validate-on-blur
-                v-on="on"
-              />
-            </template>
-            <v-date-picker
-              v-model="trombiEditor.date"
-              @input="dateOfTrombiMenu = false"
-            />
-          </v-menu>
+          
+          <v-text-field
+            v-model="trombiEditor.date"
+            :rules="editorRules.date"
+            label="Quand"
+            placeholder="AAAA.MM.JJ"
+            validate-on-blur
+            prepend-icon="far fa-calendar-alt"
+          />
 
           <ImageEditor
             ref="imgEditor"
@@ -210,7 +195,6 @@ export default {
     data: () => ({
         isLoading: false,
         photos: [],
-        displayedhotos: [],
         persons: [],
         layoutMode: "GRID",
         sortMode: "ASC",
@@ -274,6 +258,18 @@ export default {
           let idx = modes.indexOf(this.sortMode) + 1;
           idx = idx === modes.length ? 0 : idx;
           this.sortMode = modes[idx];
+
+          switch(this.sortMode) {
+            case "ASC":
+              this.photos.sort((a, b) =>  new Date(a.date).getTime() - new Date(b.date).getTime());
+              break;
+            case "DESC":
+              this.photos.sort((a, b) =>  new Date(b.date).getTime() - new Date(a.date).getTime());
+              break;
+            case "RAND":
+              this.photos.sort(() => 0.5 - Math.random());
+              break;
+          }
         },
 
         resetDialog (open = false) {
@@ -284,12 +280,12 @@ export default {
             const { imgEditor } = this.$refs;
             imgEditor.reset();
         },
-        saveTrombi: function () {
+        saveTrombi: async function () {
             const { imgEditor } = this.$refs;
             this.trombiEditor.isLoading = true;
 
             // On récupère l'image
-            axios.get(imgEditor.imageUrl(), { responseType: 'blob' }).then(
+            axios.get(await imgEditor.imageUrl(), { responseType: 'blob' }).then(
                 response => {
                     const formData = new FormData();
                     formData.append("date", this.trombiEditor.date);
@@ -323,7 +319,6 @@ export default {
             if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1
         },
         photosGalleryDisplay(index) {
-          console.log(this.photos)
             store.commit('photosGalleryReset', this.photos);
             store.commit('photosGallerySetIndex', index);
             store.commit('photosGalleryDisplay');
@@ -335,7 +330,6 @@ export default {
             }
             const tokens = search.split(" ");
             const results = [];
-            console.log(tokens, items);
             for (const e of items) {
               let ok = true;
               for (const t of tokens) {
@@ -348,7 +342,6 @@ export default {
                 results.push(e);
               }
             }
-            console.log(results)
             return results;
         }
     }
