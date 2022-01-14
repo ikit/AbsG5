@@ -543,6 +543,9 @@ dd {
         list-style-image: url('/img/agpa/puce.png');
     }
 }
+ul {
+  margin-left: 23px;
+}
 
 
 .categories {
