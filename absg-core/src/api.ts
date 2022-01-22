@@ -14,7 +14,8 @@ import {
     voyagService,
     eventService,
     userService,
-    forumService
+    forumService,
+    gthequeService
 } from "./services";
 import * as ormconfig from "../ormconfig";
 import { albumService } from "./services/AlbumService";
@@ -33,6 +34,7 @@ createConnections(ormconfig)
         voyagService.initService();
         userService.initService();
         albumService.initService();
+        gthequeService.initService();
         logger.info("AbsG services initialized");
 
         // create express app

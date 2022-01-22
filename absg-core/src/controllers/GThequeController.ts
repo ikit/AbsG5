@@ -13,4 +13,12 @@ export class GThequeController {
     getGTheque(@CurrentUser() user: User) {
         return gthequeService.getGTheque(user);
     }
+    
+    /**
+     * Retourne la liste des collections disponible
+     */
+     @Get("/collections")
+     getCollections() {
+         return gthequeService.getCollection();
+     }
 }
