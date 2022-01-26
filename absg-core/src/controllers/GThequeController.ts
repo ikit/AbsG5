@@ -1,6 +1,7 @@
 import { JsonController, Get, Authorized, CurrentUser } from "routing-controllers";
 import { User } from "../entities";
-
+import { fetchFolder } from "../middleware/commonHelper";
+import * as path from "path";
 import { gthequeService } from "../services";
 
 @Authorized()
@@ -17,8 +18,18 @@ export class GThequeController {
     /**
      * Retourne la liste des collections disponible
      */
-     @Get("/collections")
-     getCollections() {
-         return gthequeService.getCollection();
-     }
+    @Get("/collections")
+    getCollections() {
+        return gthequeService.getCollections();
+    }
+
+    /**
+     * Retourne l'arbirescence de tout les fichiers présent dans le grenier
+     */
+    @Get("/grenary")
+    getGrenary() {
+        const r = gthequeService.getGrenaryFiles();
+        console.log(r[0].content);
+        return r;
+    }
 }

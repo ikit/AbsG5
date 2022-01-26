@@ -116,6 +116,22 @@ export function shuffleArray(arr: any[]) {
 }
 
 /**
+ * Retourne la taille en octet dans un format lisible pour un humain
+ * @param fileSizeInBytes taille exprimée en octets
+ * @returns taille exprimé de façon lible (par exemple "187.4 Mo")
+ */
+export function readableFileSize(fileSizeInBytes) {
+    let i = -1;
+    const byteUnits = [" Ko", " Mo", " Go", " To", " Po", " Eo", " Zo", " Yo"];
+    do {
+        fileSizeInBytes = fileSizeInBytes / 1024;
+        i++;
+    } while (fileSizeInBytes > 1024);
+
+    return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+}
+
+/**
  * Dresse l'arborescence du contenu à l'endroit indiqué
  * @param localPath le dossier local où lister le contenu
  */
@@ -133,9 +149,9 @@ export function fetchFolder(localPath) {
             });
         } else {
             res.push({
-                name: f,
+                name: path.basename(f, path.extname(filepath)),
                 type: path.extname(filepath),
-                size: fs.statSync(filepath).size
+                size: readableFileSize(fs.statSync(filepath).size)
             });
         }
     }

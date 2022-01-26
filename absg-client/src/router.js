@@ -233,6 +233,10 @@ export const router = new VueRouter({
                 {
                     path: "grenier",
                     component: () => import("./views/Gtheque/Grenier.vue"),
+                },
+                {
+                    path: "grenier/*",
+                    component: () => import("./views/Gtheque/Grenier.vue"),
                 }
             ]
         },

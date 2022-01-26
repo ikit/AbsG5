@@ -51,11 +51,23 @@
               </ul>
             </dd>
             <dt>2007</dt>
-            <dd>La version 2007 du règlement reprend ces principes en y intégrant les évolutions suggérées par les participants à l’issue de la première édition des AGPA;</dd>
+            <dd>
+              <ul>
+                <li>La version 2007 du règlement reprend ces principes en y intégrant les évolutions suggérées par les participants à l’issue de la première édition des AGPA;</li>
+              </ul>
+            </dd>
             <dt>2008</dt>
-            <dd>Suite à de nouvelles suggestions des participants, la version 2008 du règlement a également évolué sur certains points (affichage du titre des photos, règles de comparaison des photos de catégories différentes, critères d’attribution de l’AGPA d’Or du meilleur photographe);</dd>
+            <dd>
+              <ul>
+                <li>Suite à de nouvelles suggestions des participants, la version 2008 du règlement a également évolué sur certains points (affichage du titre des photos, règles de comparaison des photos de catégories différentes, critères d’attribution de l’AGPA d’Or du meilleur photographe);</li>
+              </ul>
+            </dd>
             <dt>2012</dt>
-            <dd>Ajout des catégories Enfants et Spéciale (dont le thème sera choisi chaque année par les participants).</dd>
+            <dd>
+              <ul>
+                <li>Ajout des catégories Enfants et Spéciale (dont le thème sera choisi chaque année par les participants).</li>
+              </ul>
+            </dd>
             <dt>2013</dt>
             <dd>
               <ul>
@@ -64,7 +76,11 @@
               </ul>
             </dd>
             <dt>2016</dt>
-            <dd>Précision concernant les votes des enfants, qui désormais ont le droit de voter, mais dont les votes ne sont pas pris en compte pour le calcul des récompenses.</dd>
+            <dd>
+              <ul>
+                <li>Précision concernant les votes des enfants, qui désormais ont le droit de voter, mais dont les votes ne sont pas pris en compte pour le calcul des récompenses.</li>
+              </ul>
+            </dd>
             <dt>2019</dt>
             <dd>
               <ul>
@@ -537,14 +553,16 @@ dd {
     border-left: 3px solid #ddd;
     padding-left: 10px;
 
+
+    ul {
+      margin-left: 0;
+    }
+
     li {
         margin-left: -23px;
         padding-left: 0;
         list-style-image: url('/img/agpa/puce.png');
     }
-}
-ul {
-  margin-left: 23px;
 }
 
 
