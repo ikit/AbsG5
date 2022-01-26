@@ -95,7 +95,7 @@
     </v-container>
 
     <v-dialog
-      v-model="collectionEditor.open"
+      v-model="serieEditor.open"
       width="600px"
     >
       <v-card>
@@ -107,13 +107,33 @@
           class="pa-4"
         >
           <v-combobox
-            v-model="collectionEditor.title"
-            :items="collectionEditor.existingCollections"
+            v-model="serieEditor.title"
+            :items="serieEditor.availableSeries"
             label="Titre de la série"
             prepend-icon="fas fa-tag"
             item-text="title"
-            :disabled="collectionEditor.isLoading"
+            :disabled="serieEditor.isLoading"
+            @change="onSerieTitleChanged()"
           />
+          
+          <v-data-table
+            :items="serieEditor.items"
+            v-sortable-data-table
+            @sorted="saveOrder"
+            item-key="number"
+          >
+            <template #item="{ item }">
+              <tr>
+                <td>{{ item.number }}</td>
+                <td>{{ item.title }}</td>
+                <td>
+                  <v-btn @click.stop="editItem(item)">
+                    <v-icon>fas fa-pen</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </template>
+          </v-data-table>
         <!--
           <v-text-field
             v-model="trombiEditor.date"
@@ -130,14 +150,14 @@
           <v-btn
             text
             color="primary"
-            :disabled="collectionEditor.isLoading"
+            :disabled="serieEditor.isLoading"
             @click="resetDialog()"
           >
             Annuler
           </v-btn>
           <v-btn
             color="accent"
-            :disabled="collectionEditor.isLoading"
+            :disabled="serieEditor.isLoading"
             @click="addNewCollecion()"
           >
             Enregistrer
@@ -172,13 +192,8 @@ export default {
             type: "nom",
             search: null,
         },
-        collectionEditor: {
-          existingCollections: [
-            { title: "Achille Talon (Intégrales)", id: 1 },
-            { title: "De Cape et de Crocs", id: 2 },
-            { title: "Garulfo", id: 3 },
-            { title: "Spirou et Fantasio (Intégrales)", id: 4 },
-          ],
+        serieEditor: {
+          availableSeries: [],
           title: "",
           items: [],
           open: false,
@@ -186,6 +201,8 @@ export default {
         }
     }),
     mounted () {
+      const path = this.$route.params.path;
+      console.log("Path: " + path)
       setTimeout(() => this.changeCollection("COMIC"));
       axios.get(`/api/gtheque/`).then(response => {
           this.collections = parseAxiosResponse(response).map(e => ({
@@ -226,10 +243,23 @@ export default {
         console.log("Télécharger les donnéess");
       },
       resetDialog: function(open = false) {
-        this.collectionEditor.open = open;
+        this.serieEditor.open = open;
+      },
+      onSerieTitleChanged: function() {
+        if (typeof this.serieEditor.title == "string") {
+          // Nouvelle collection
+          this.serieEditor.id = null;
+          this.serieEditor.items = [];
+        } else if (typeof this.serieEditor.title == "object") {
+          // Edition d'une série existante
+          this.serieEditor.items = this.serieEditor.title.items ? this.serieEditor.title.items : [];
+          this.serieEditor.id = this.serieEditor.title.id;
+          this.serieEditor.title = this.serieEditor.title.title;
+        }
+        console.log(this.serieEditor);
       },
       addNewCollecion: function() {
-        console.log(this.collectionEditor)
+        console.log(this.serieEditor)
       }
     }
 }
