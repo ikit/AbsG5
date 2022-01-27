@@ -35,14 +35,13 @@
         <v-flex
           v-for="item in files"
           :key="item.name"
-          style="max-width: 400px; margin: 15px"
+          style="width: 300px; max-width: 300px; margin: 15px"
         >
           <router-link
             v-if="item.type === 'folder'"
             :to="{path: `/gtheque/grenier/${item.path}`}"
-            style="text-decoration: none"
           >
-            <v-card>
+            <v-card style="display: block; ">
               <v-img
                 :src="item.thumb"
                 aspect-ratio="1.5"
@@ -59,25 +58,25 @@
               </v-card-subtitle>
             </v-card>
           </router-link>
-          <v-card 
-            v-else
-            @click.prevent="download(item)"
-          >
-            <v-img
-              :src="item.thumb"
-              aspect-ratio="1.5"
-            />
 
-            <v-card-title
-              primary-title
-              style="position: relative"
-            >
-              {{ item.name }}
-            </v-card-title>
-            <v-card-subtitle>
-              {{ item.type }} - {{ item.size }}
-            </v-card-subtitle>
-        </v-card>
+          <a v-else :href="item.url">
+            <v-card>
+              <v-img
+                :src="item.thumb"
+                aspect-ratio="1.5"
+              />
+
+              <v-card-title
+                primary-title
+                style="position: relative"
+              >
+                {{ item.name }}
+              </v-card-title>
+              <v-card-subtitle>
+                {{ item.type }} - {{ item.size }}
+              </v-card-subtitle>
+            </v-card>
+          </a>
         </v-flex>
       </v-layout>
     </v-container>
@@ -134,15 +133,15 @@ export default {
             }
             this.files = Array.isArray(result) ? result : result.content;
         },
-        download(item) {
-          console.log("dowload", item);
-          axios.get(item.url, { responseType: 'blob' })
-            .then(response => {
-              console.log(response);
-              const blob = new Blob([response.data], { type: `application/${item.type.substr(1)}` });
-              saveAs(blob, `${item.name}${item.type}`);
-            }).catch(console.error)
-        }
+        // download(item) {
+        //   console.log("dowload", item);
+        //   axios.get(item.url, { responseType: 'blob' })
+        //     .then(response => {
+        //       console.log(response);
+        //       const blob = new Blob([response.data], { type: `application/${item.type.substr(1)}` });
+        //       saveAs(blob, `${item.name}${item.type}`);
+        //     }).catch(console.error)
+        // }
     }
 }
 </script>
