@@ -18,7 +18,6 @@ export enum LogModule {
     event = "event",
     agpa = "agpa",
     forum = "forum",
-    grenary = "grenary",
     gtheque = "gtheque"
 }
 

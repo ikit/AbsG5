@@ -37,7 +37,7 @@ export class GThequeController {
     @Post("/grenary/click-on-media")
     clickOnMedia(@Body() media: any, @CurrentUser() user: User) {
         // On ne log l'info que pour les admins pour les stats d'utilisation du grenier
-        logger.info(`${user.username} visualise ${media.url}`, { userId: user.id, module: LogModule.grenary });
+        logger.info(`${user.username} visualise ${media.url}`, { userId: user.id, module: LogModule.gtheque });
         return true;
     }
 }
