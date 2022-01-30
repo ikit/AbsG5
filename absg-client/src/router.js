@@ -224,7 +224,7 @@ export const router = new VueRouter({
             children: [
                 {
                     path: "",
-                    redirect: "/gtheque/collections"
+                    redirect: "/gtheque/grenier"
                 },
                 {
                     path: "collections",
