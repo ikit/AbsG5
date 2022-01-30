@@ -60,11 +60,16 @@
             </v-card>
           </router-link>
 
-          <a v-else target="_blank" :href="item.url" style="text-decoration: none">
+          <a 
+            v-else 
+            target="_blank" 
+            :href="item.url"
+            @click="logClickOnMedia(item)"
+            style="text-decoration: none">
             <v-card>
               <v-img
                 :src="item.thumb"
-                aspect-ratio="1.5"
+                aspect-ratio="1.7"
               />
 
               <v-card-title
@@ -132,6 +137,10 @@ export default {
               
             }
             this.files = Array.isArray(result) ? result : result.content;
+        },
+
+        logClickOnMedia(item) {
+          axios.post(`/api/gtheque/grenary/click-on-media`, item);
         }
     }
 }
