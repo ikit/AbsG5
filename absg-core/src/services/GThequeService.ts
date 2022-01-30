@@ -1,5 +1,4 @@
 import { User } from "../entities";
-import * as fs from "fs";
 import * as path from "path";
 import { fetchFolder } from "../middleware/commonHelper";
 import { GThequeCollection } from "../entities/GThequeCollection";
@@ -62,8 +61,28 @@ class GThequeService {
     public getGrenaryFiles() {
         const localFiles = fetchFolder(path.join(process.env.PATH_FILES, "cloud"));
 
+        const sortFolder = list => {
+            return list
+                .filter(f => f !== null)
+                .sort((a, b) => {
+                    console.log(a, b)
+                    // On trie par ordre les dossier avant les fichiers
+                    if (a.type === "folder" && b.type !== "folder") {
+                        return -1;
+                    }
+                    if (a.type !== "folder" && b.type === "folder") {
+                        return 1;
+                    }
+                    if (a.type === "foler" && b.type === "folder") {
+                        return a.name.localeCompare(b.name);
+                    }
+                    // Pour les fichiers on tri par ordre chronologique puis par titre croissant
+                    return a.date !== b.date ? a.date.localeCompare(b.date) : a.name.localeCompare(b.name);
+                });
+        };
+
         // méthode récursive pour l'analye et la mise en forme de l'arborescence
-       const parseFolder = (item, list, rootPath) => {
+        const parseFolder = (item, list, rootPath) => {
             if (item.name.startsWith("_")) {
                 return null; // dossier/fichier technique a ignorer
             }
@@ -85,7 +104,7 @@ class GThequeService {
                 return {
                     name: item.name,
                     type: item.type,
-                    content,
+                    content: sortFolder(content),
                     path: "/" + localPath,
                     thumb
                 };
@@ -100,14 +119,18 @@ class GThequeService {
             }
 
             const url = urljoin(process.env.URL_FILES, "cloud", rootPath, item.name + item.type);
+            const tokens = item.name.split(" - ");
+            item.date = tokens[0];
+            item.author = tokens[1];
+            item.name = tokens.splice(2).join(" - ");
             return {
                 ...item,
                 thumb,
                 url
             };
-        }
+        };
 
-        return localFiles.map(f => parseFolder(f, localFiles, "")).filter(f => f !== null);
+        return sortFolder(localFiles.map(f => parseFolder(f, localFiles, "")));
     }
 }
 

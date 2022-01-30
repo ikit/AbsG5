@@ -35,11 +35,12 @@
         <v-flex
           v-for="item in files"
           :key="item.name"
-          style="width: 300px; max-width: 300px; margin: 15px"
+          style="width: 300px; max-width: 300px; margin: 15px;"
         >
           <router-link
             v-if="item.type === 'folder'"
             :to="{path: `/gtheque/grenier/${item.path}`}"
+            style="text-decoration: none"
           >
             <v-card style="display: block; ">
               <v-img
@@ -59,7 +60,7 @@
             </v-card>
           </router-link>
 
-          <a v-else :href="item.url">
+          <a v-else target="_blank" :href="item.url" style="text-decoration: none">
             <v-card>
               <v-img
                 :src="item.thumb"
@@ -73,7 +74,7 @@
                 {{ item.name }}
               </v-card-title>
               <v-card-subtitle>
-                {{ item.type }} - {{ item.size }}
+                {{ item.date }} par {{ item.author }} - {{ item.size }}
               </v-card-subtitle>
             </v-card>
           </a>
@@ -90,7 +91,6 @@ import axios from 'axios';
 import { mapState } from 'vuex';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
-import { saveAs } from 'file-saver';
 
 export default {
     data: () => ({
@@ -132,16 +132,7 @@ export default {
               
             }
             this.files = Array.isArray(result) ? result : result.content;
-        },
-        // download(item) {
-        //   console.log("dowload", item);
-        //   axios.get(item.url, { responseType: 'blob' })
-        //     .then(response => {
-        //       console.log(response);
-        //       const blob = new Blob([response.data], { type: `application/${item.type.substr(1)}` });
-        //       saveAs(blob, `${item.name}${item.type}`);
-        //     }).catch(console.error)
-        // }
+        }
     }
 }
 </script>
