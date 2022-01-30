@@ -4,15 +4,15 @@
       centered
       class="fixed-tabs-bar"
     >
-      <v-tab :to="{path:'/gtheque/collections'}">
-        <v-icon left>
-          fas fa-book
-        </v-icon> Collections
-      </v-tab>
       <v-tab :to="{path:'/gtheque/grenier'}">
         <v-icon left>
           fas fa-star
         </v-icon> Grenier
+      </v-tab>
+      <v-tab v-if="isAdmin" :to="{path:'/gtheque/collections'}">
+        <v-icon left>
+          fas fa-book
+        </v-icon> Collections
       </v-tab>
     </v-tabs>
 
@@ -27,8 +27,18 @@ import { format } from 'date-fns';
 
 export default {
     data: () => ({
-        debugToken: format(new Date(), "yyyyMMddHHmmss")
-    })
+        isAdmin: false
+    }),
+    computed: {
+        ...mapState([
+            'user'
+        ]),
+    },
+    mounted() {
+        if (this.user) {
+            this.isAdmin = this.user.roles.indexOf("admin") > -1;
+        }
+    }
 }
 </script>
 
