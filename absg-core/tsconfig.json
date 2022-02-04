@@ -9,6 +9,10 @@
         "experimentalDecorators": true,
         "sourceMap": false,
         "resolveJsonModule": true,
-        "skipLibCheck": true
-    }
+        "skipLibCheck": true,
+    },
+    "exclude": [
+      "node_modules",
+      "typings"
+    ]
 }

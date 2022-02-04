@@ -1,7 +1,7 @@
 import { getRepository, Between, Repository } from "typeorm";
 import { ForumMessage, ForumTopic, User, Forum, LogModule } from "../entities";
 import { addMonths, format } from "date-fns";
-import * as fr from "date-fns/locale/fr";
+import { fr } from 'date-fns/locale';
 import * as path from "path";
 import * as fs from "fs";
 import { saveImage, decodeBase64Image } from "../middleware/commonHelper";
