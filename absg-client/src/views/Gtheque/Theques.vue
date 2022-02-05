@@ -71,7 +71,7 @@
             {{ c.title }}
             <v-spacer />
             {{ c.count }}/{{ c.total }}
-            <i class="fas fa-circle" :class="c.cssStatus"/>
+            <i class="fas fa-circle" style="flex: none" :class="c.cssStatus"/>
           </v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-tooltip
@@ -116,12 +116,40 @@
             @change="onSerieTitleChanged()"
           />
           
-          <v-data-table
+          <v-data-table 
+            :headers="serieEditor.headers" 
             :items="serieEditor.items"
-            v-sortable-data-table
-            @sorted="saveOrder"
             item-key="number"
-          >
+            v-sortable-data-table
+            @sorted="saveOrder">
+            <template v-slot:body="{ items, headers }">
+              <tbody>
+                <tr v-for="(item,idx,k) in items" :key="idx">
+                  <td v-for="(header,key) in headers" :key="key">
+                    <v-edit-dialog
+                      :return-value.sync="item[header.value]"
+                      @save="save"
+                      @cancel="cancel"
+                      @open="open"
+                      @close="close"
+                      large
+                    > {{item[header.value]}}
+                      <template v-slot:input>
+                        <v-text-field
+                          v-model="item[header.value]"
+                          label="Edit"
+                          single-line
+                        ></v-text-field>
+                      </template>
+                    </v-edit-dialog>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-data-table>
+
+        <!--
+          <v-data-table>
             <template #item="{ item }">
               <tr>
                 <td>{{ item.number }}</td>
@@ -134,7 +162,7 @@
               </tr>
             </template>
           </v-data-table>
-        <!--
+
           <v-text-field
             v-model="trombiEditor.date"
             :rules="editorRules.date"
@@ -146,6 +174,14 @@
         -->
         </v-container>
         <v-card-actions>
+          <v-btn
+            text
+            color="primary"
+            :disabled="serieEditor.isLoading"
+            @click="addItem()"
+          >
+            Ajouter item
+          </v-btn>
           <v-spacer />
           <v-btn
             text
@@ -198,6 +234,11 @@ export default {
           items: [],
           open: false,
           isLoading: false,
+          headers: [
+            { text: "Numéro", value: "number" },
+            { text: "Titre", value: "title" },
+            { text: "Vignette", value: "url" }
+          ]
         }
     }),
     mounted () {
@@ -260,7 +301,18 @@ export default {
       },
       addNewCollecion: function() {
         console.log(this.serieEditor)
-      }
+      },
+    save() {},
+    cancel() {},
+    open() {},
+    close() {},
+    addItem() {
+      this.serieEditor.items.push({
+        number: `${this.serieEditor.items.length + 1}`,
+        title: "",
+        url: ""
+      })
+    }
     }
 }
 </script>
