@@ -218,8 +218,8 @@ L'équipe système`,
         const sql = `SELECT l.*, u.username
             FROM log_passag l
             INNER JOIN "user" u ON u.id = l."userId" 
-            WHERE l."datetime" BETWEEN '${format(from, "YYYY-MM-DD HH:mm")}:00' 
-            AND '${format(to, "YYYY-MM-DD HH:mm")}:00'
+            WHERE l."datetime" BETWEEN '${format(from, "yyyy-MM-dd HH:mm")}:00' 
+            AND '${format(to, "yyyy-MM-dd HH:mm")}:00'
             ORDER BY l.datetime ASC`;
         return getRepository(LogPassag).query(sql);
     }
@@ -234,7 +234,7 @@ L'équipe système`,
         from = from && from < to ? from : new Date(to.getFullYear() - 1, to.getMonth(), 1);
         const deltaDays = differenceInDays(to, from);
         const sql = `SELECT d.date, count(DISTINCT l."userId")
-            FROM (SELECT to_char(date_trunc('day', ('${format(to, "YYYY-MM-DD")}'::date - offs)), 'YYYY-MM-DD') AS date
+            FROM (SELECT to_char(date_trunc('day', ('${format(to, "yyyy-MM-dd")}'::date - offs)), 'YYYY-MM-DD') AS date
                 FROM generate_series(0, ${deltaDays}, 1) AS offs
                 ) d
             LEFT OUTER JOIN log_passag l ON d.date = to_char(date_trunc('day', l.datetime), 'YYYY-MM-DD')

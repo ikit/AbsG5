@@ -52,7 +52,7 @@ class ForumService {
             archived: f.archived,
             last: {
                 username: f.lastMessage.poster.username,
-                dateLabel: format(new Date(f.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
+                dateLabel: format(new Date(f.lastMessage.datetime), "EEEE d MMM yyyy à HH:mm", { locale: fr }),
                 avatar: `/files/avatars/${f.lastMessage.poster.id.toString().padStart(3, "0")}.png`
             }
         }));
@@ -85,12 +85,12 @@ class ForumService {
                 name: t.name,
                 first: {
                     username: t.firstMessage.poster.username,
-                    dateLabel: format(new Date(t.firstMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr })
+                    dateLabel: format(new Date(t.firstMessage.datetime), "EEEE d MMM yyyy à HH:mm", { locale: fr })
                 },
                 last: {
                     id: t.lastMessage.id,
                     username: t.lastMessage.poster.username,
-                    dateLabel: format(new Date(t.lastMessage.datetime), "dddd D MMM YYYY à HH:mm", { locale: fr }),
+                    dateLabel: format(new Date(t.lastMessage.datetime), "EEEE d MMM yyyy à HH:mm", { locale: fr }),
                     avatar: `/files/avatars/${t.lastMessage.poster.id.toString().padStart(3, "0")}.png`
                 }
             }))
@@ -124,9 +124,9 @@ class ForumService {
             posts: posts.map(e => ({
                 ...e,
                 text: this.parseMessageText(e.text),
-                dateLabel: format(new Date(e.datetime), "dddd D MMM YYYY", { locale: fr }),
+                dateLabel: format(new Date(e.datetime), "EEEE d MMM yyyy", { locale: fr }),
                 timeLabel: format(new Date(e.datetime), "HH:mm", { locale: fr }),
-                shortLabel: format(new Date(e.datetime), "le D MMM YYYY à HH:mm", { locale: fr }),
+                shortLabel: format(new Date(e.datetime), "'le 'd MMM yyyy à HH:mm", { locale: fr }),
                 poster: {
                     id: e.poster.id,
                     rootFamily: e.poster.rootFamily,
@@ -167,7 +167,7 @@ class ForumService {
             posts: data.map(e => ({
                 ...e,
                 text: this.parseMessageText(e.text),
-                dateLabel: format(new Date(e.datetime), "dddd D à HH:mm", { locale: fr }),
+                dateLabel: format(new Date(e.datetime), "EEEE d à HH:mm", { locale: fr }),
                 poster: {
                     id: e.poster.id,
                     rootFamily: e.poster.rootFamily,
@@ -280,7 +280,7 @@ class ForumService {
         return {
             ...msg,
             text: this.parseMessageText(msg.text),
-            dateLabel: format(new Date(msg.datetime), "dddd D à HH:mm", { locale: fr }),
+            dateLabel: format(new Date(msg.datetime), "EEEE d à HH:mm", { locale: fr }),
             poster: {
                 id: msg.poster.id,
                 rootFamily: msg.poster.rootFamily,

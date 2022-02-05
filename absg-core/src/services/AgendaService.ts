@@ -179,7 +179,7 @@ class AgendaService {
         if (image && trombiData && trombiData.person && trombiData.date) {
             const p = new Person().fromJSON(JSON.parse(trombiData.person));
             const d = new Date(trombiData.date);
-            const filename = `${p.id}_${format(d, "YYYYMMDD")}.jpg`;
+            const filename = `${p.id}_${format(d, "yyyyMMdd")}.jpg`;
             const title = `${p.getFullname()} - ${d.getFullYear()} - ${p.getAge(d.getFullYear())}`;
 
             const thumb = path.join(process.env.PATH_FILES, `trombi/mini/${filename}`);
