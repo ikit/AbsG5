@@ -29,7 +29,7 @@
           
           <v-tooltip bottom>
             <template #activator="{ on }">
-              <v-btn @click.stop="displayStats()" v-on="on">
+              <v-btn disabled @click.stop="displayStats()" v-on="on">
                 <v-icon>fas fa-chart-pie</v-icon>
               </v-btn>
             </template>
@@ -101,7 +101,7 @@
         >
           <v-combobox
             v-model="trombiEditor.person"
-            :items="trombis"
+            :items="persons"
             label="Qui"
             prepend-icon="fas fa-user"
             item-text="fullname"
