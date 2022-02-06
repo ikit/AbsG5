@@ -146,10 +146,16 @@ class AgendaService {
             .getMany();
         const persons = {};
         for (const p of personsData) {
-            persons[p.id] = new Person().fromJSON(p);
+            // On ognore les personnes qui n'ont pas de date de naissance (Zaffa par exemple)
+            if (!!p.dateOfBirth) {
+                persons[p.id] = new Person().fromJSON(p);
+                persons[p.id].trombis = [];
+                persons[p.id].fullname = persons[p.id].getFullname();
+                const maxDate = persons[p.id].dateOfDeath ? new Date(persons[p.id].dateOfDeath) : new Date();
+                persons[p.id].max = maxDate.getFullYear() - new Date(persons[p.id].dateOfBirth).getFullYear();
+            }
         }
 
-        const filesList = [];
         const folderPath = path.join(process.env.PATH_FILES, "trombi");
         const files = await fs.readdirSync(folderPath);
         files.forEach(file => {
@@ -158,28 +164,29 @@ class AgendaService {
                 if (tokens.length === 2 && persons.hasOwnProperty(tokens[0])) {
                     const pid = tokens[0];
                     const year = Number.parseInt(tokens[1].substr(0, 4));
-                    const month = Number.parseInt(tokens[1].substr(4, 2));
-                    const day = Number.parseInt(tokens[1].substr(6));
                     const p = persons[pid];
-                    filesList.push({
-                        pid,
-                        date: new Date(year, month, day),
+                    p.trombis.push({
+                        date: year,
                         title: `${p.getFullname()} - ${year} - ${p.getAge(year)}`,
                         thumb: `${process.env.URL_FILES}trombi/mini/${file}`,
                         url: `${process.env.URL_FILES}trombi/${file}`
-                    });
+                    })
                 }
             }
         });
         // On retourne la liste "mélangée"
-        return filesList.sort(() => 0.5 - Math.random());
+        return Object.keys(persons).map(e => persons[e]).sort((a, b) => { 
+            const fn = a.firstname.localeCompare(b.firstname);
+            const ln = a.lastname.localeCompare(b.lastname);
+            return ln !== 0 ? ln : fn;
+        });
     }
 
     async saveTrombi(trombiData: any, image: any, user: User) {
         if (image && trombiData && trombiData.person && trombiData.date) {
             const p = new Person().fromJSON(JSON.parse(trombiData.person));
             const d = new Date(trombiData.date);
-            const filename = `${p.id}_${format(d, "yyyyMMdd")}.jpg`;
+            const filename = `${p.id}_${format(d, "yyyy")}.jpg`;
             const title = `${p.getFullname()} - ${d.getFullYear()} - ${p.getAge(d.getFullYear())}`;
 
             const thumb = path.join(process.env.PATH_FILES, `trombi/mini/${filename}`);

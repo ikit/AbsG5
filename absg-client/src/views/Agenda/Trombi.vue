@@ -1,119 +1,89 @@
 <template>
   <div>
-    <v-container
-      fluid
-      grid-list-md
-      style="padding:0"
-    >
-      <v-data-iterator
-        :items="photos"
-        :items-per-page="filter.pageSize"
-        :page="filter.pageIndex"
-        :search="filter.search"
-        :custom-filter="searchMethod"
-        loading-text="Récupération des données..."
-        no-data-text="Aucune photo enregistré dans le trombinoscope."
-        no-results-text="Aucune photo trouvée."
-        hide-default-footer
+    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+      <v-row
+        style="margin: 0"
+        align="center"
+        justify="center"
       >
-        <template #header>
-          <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-            <v-row
-              style="margin: 0"
-              align="center"
-              justify="center"
-            >
-              <v-text-field
-                v-model="filter.search"
-                prepend-icon="fa-search"
-                placeholder="Rechercher"
-                style="max-width: 300px;"
-              />
-              <v-spacer />
+        <v-text-field
+          v-model="filter.search"
+          prepend-icon="fa-search"
+          placeholder="Rechercher"
+          style="max-width: 300px;"
+          @change="applyFilter()"
+        />
 
-              <v-btn
-                icon
-                small
-                :disabled="isLoading"
-                @click="formerPage"
-              >
-                <v-icon>fa-chevron-left</v-icon>
+        <v-spacer />
+
+        <v-btn-toggle :disabled="isLoading">
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn @click.stop="switchHidden()" v-on="on">
+                <v-icon v-if="filter.hideEmpty">fas fa-portrait</v-icon>
+                <v-icon v-else>fas fa-user-friends</v-icon>
               </v-btn>
-              <span class="grey--text">
-                Page {{ filter.pageIndex }} / {{ numberOfPages }}
-              </span>
-              <v-btn
-                icon
-                small
-                :disabled="isLoading"
-                @click="nextPage"
-              >
-                <v-icon>fa-chevron-right</v-icon>
+            </template>
+            <span>Afficher/Masquer les personnes sans trombi</span>
+          </v-tooltip>
+          
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn @click.stop="displayStats()" v-on="on">
+                <v-icon>fas fa-chart-pie</v-icon>
               </v-btn>
+            </template>
+            <span>Voir les statistiques</span>
+          </v-tooltip>
 
-              <v-spacer />
+          <v-tooltip bottom>
+            <template #activator="{ on }">
+              <v-btn @click.stop="resetDialog(true)" v-on="on">
+                <v-icon>fas fa-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Enregistrer une nouvelle photo</span>
+          </v-tooltip>
+        </v-btn-toggle>
+      </v-row>
+    </div>
 
-              <v-btn-toggle :disabled="isLoading">
-                <v-tooltip bottom>
-                  <template #activator="{ on }">
-                    <v-btn @click.stop="switchLayout()">
-                      <v-icon v-if="layoutMode === 'GRID'">fas fa-th</v-icon>
-                      <v-icon v-if="layoutMode === 'TABLE'">fas fa-table</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Changer la disposition des photos</span>
-                </v-tooltip>
-                
-                <v-tooltip bottom>
-                  <template #activator="{ on }">
-                    <v-btn @click.stop="switchSorting()">
-                      <v-icon v-if="sortMode === 'ASC'">fas fa-sort-numeric-down</v-icon>
-                      <v-icon v-if="sortMode === 'DESC'">fas fa-sort-numeric-down-alt</v-icon>
-                      <v-icon v-if="sortMode === 'RAND'">fas fa-dice</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Changer l'ordre des photo</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                  <template #activator="{ on }">
-                    <v-btn @click.stop="resetDialog(true)">
-                      <v-icon>fas fa-plus</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Enregistrer une nouvelle photo</span>
-                </v-tooltip>
-              </v-btn-toggle>
-            </v-row>
-          </div>
-        </template>
-
-        <template #default="props">
-          <v-container
-            fluid
-            grid-list-sm
-          >
-            <v-layout
-              row
-              wrap
+    <v-container>
+      <v-expansion-panels
+        v-model="panel"
+        multiple
+        class="albumCollection"
+      >
+        <v-expansion-panel
+          v-for="p of displayedPersons"
+          :key="p.id"
+          :disabled="p.displayedTrombis.length === 0"
+        >
+          <v-expansion-panel-header>
+            {{ p.fullname }}
+            <v-spacer />
+            {{ p.trombis.length }}/{{ p.max }}
+            <i class="fas fa-portrait" :class="p.cssStatus" style="margin-left: 10px; margin-right: 10px; flex: none"/>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-tooltip
+              v-for="t of p.displayedTrombis"
+              :key="t.url"
+              bottom
             >
-              <v-flex
-                v-for="(p, index) in props.items"
-                :key="p.id"
-              >
-                <v-img
-                  width="200px"
-                  height="200px"
+              <template #activator="{ on }">
+                <img
                   class="thumb"
-                  :src="p.thumb"
-                  :alt="p.id"
-                  @click="photosGalleryDisplay(index + (filter.pageIndex - 1) * filter.pageSize)"
+                  :src="t.thumb"
+                  v-on="on"
+                  @click="photosGalleryDisplay(t.index)"
                 />
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </template>
-      </v-data-iterator>
+              </template>
+              <span>{{ t.title }}</span>
+            </v-tooltip>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-container>
 
 
@@ -131,7 +101,7 @@
         >
           <v-combobox
             v-model="trombiEditor.person"
-            :items="persons"
+            :items="trombis"
             label="Qui"
             prepend-icon="fas fa-user"
             item-text="fullname"
@@ -142,7 +112,7 @@
             v-model="trombiEditor.date"
             :rules="editorRules.date"
             label="Quand"
-            placeholder="AAAA.MM.JJ"
+            placeholder="Année de la photo"
             validate-on-blur
             prepend-icon="far fa-calendar-alt"
           />
@@ -194,15 +164,13 @@ export default {
     store,
     data: () => ({
         isLoading: false,
-        photos: [],
         persons: [],
+        displayedPersons: [],
         layoutMode: "GRID",
         sortMode: "ASC",
         filter: {
-            type: "nom",
+            hideEmpty: true,
             search: null,
-            pageIndex: 1,
-            pageSize: 50,
         },
         trombiEditor: {
             open: false,
@@ -210,8 +178,6 @@ export default {
             person: null,
             isLoading: false,
             complete: 0,
-
-            dateOfTrombiMenu: false,
         },
         editorRules: {
             photo: [
@@ -219,8 +185,8 @@ export default {
             ],
             date: [
                 value => {
-                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return !value || pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+                    const pattern = /^[0-9]{4}$/
+                    return !value || pattern.test(value) || 'La valeur doit être une année valide: YYYY'
                 }
             ],
         }
@@ -233,19 +199,33 @@ export default {
     },
     mounted () {
         this.isLoading = true;
-        // On récupère la liste des personnes et des lieux de l'agenda pour l'aide à la saisie
-        if (this.persons.length === 0) {
-            axios.get(`/api/agenda/persons`).then(response => {
-                this.persons = parseAxiosResponse(response).filter(e => e.lastname && e.firstname);
-            });
-        }
         // On récupère la liste des photos
         axios.get(`/api/agenda/trombi/`).then(response => {
-            this.photos = parseAxiosResponse(response);
+            this.persons = parseAxiosResponse(response).map(e => ({
+              ...e,
+              cssStatus: this.computeCssStatus(e)
+            }));
+            this.applyFilter();
+
             this.isLoading = false;
         });
     },
     methods: {
+      computeCssStatus: function (p) {
+        let res = "colStatus ";
+        const count = p.trombis.length;
+        const total = p.max;
+        if (count === total) {
+          res += "col100";
+        } else if (count > total / 2) {
+          res += "col50";
+        } else if (count > 0) {
+          res += "col1";
+        } else {
+          res += "col0";
+        }
+        return res;
+      },
         switchLayout() {
           const modes = ["GRID", "TABLE"];
           let idx = modes.indexOf(this.layoutMode) + 1;
@@ -302,8 +282,10 @@ export default {
                         }
                     })
                     .then(newTrombi => {
-                        // On ajoute l'image au début de la liste
-                        this.photos.unshift(parseAxiosResponse(newTrombi));
+                        // On ajoute l'image à la fin
+                        debugger;
+                        const p = this.trombis.find(p => p.id === newTrombi.pid);
+                        p.trombis.push(newTrombi)
                         this.resetDialog();
                     })
                     .catch(err => {
@@ -312,37 +294,56 @@ export default {
                 }
             );
         },
-        nextPage () {
-            if (this.filter.pageIndex < this.numberOfPages) this.filter.pageIndex += 1
-        },
-        formerPage () {
-            if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1
-        },
+        
+        
         photosGalleryDisplay(index) {
-            store.commit('photosGalleryReset', this.photos);
+          console.log("photosGalleryDisplay", index)
             store.commit('photosGallerySetIndex', index);
             store.commit('photosGalleryDisplay');
         },
 
-        searchMethod(items, search) {
-            if (!search) {
-                return items;
-            }
-            const tokens = search.split(" ");
-            const results = [];
-            for (const e of items) {
+        switchHidden() {
+          this.filter.hideEmpty = !this.filter.hideEmpty;
+          this.applyFilter();
+        },
+
+        applyFilter() {
+          console.log("applyFilter")
+          this.displayedPersons = this.filter.hideEmpty ? this.persons.filter(p => p.trombis.length > 0) : this.persons;
+          const tokens = this.filter.search ? this.filter.search.split(" ") : [];
+          let index = 0;
+          for (const person of this.displayedPersons) {
+            person.displayedTrombis = [];
+            for (const p of person.trombis) {
               let ok = true;
               for (const t of tokens) {
-                if (e.title.toLowerCase().indexOf(t.toLowerCase()) === -1) {
+                if (p.title.toLowerCase().indexOf(t.toLowerCase()) === -1) {
                   ok = false;
-                  continue;
+                  break;
                 }
               }
               if (ok) {
-                results.push(e);
+                person.displayedTrombis.push({
+                  ...p,
+                  index
+                });
+                index++;
               }
             }
-            return results;
+          }
+
+          if (this.filter.hideEmpty) {
+            this.displayedPersons = this.displayedPersons.filter(p => p.displayedTrombis.length > 0);
+          }
+
+          const photos = [];
+          for (const p of this.displayedPersons) {
+            for (const t of p.displayedTrombis) {
+              photos.push(t);
+            }
+          }
+          store.commit('photosGalleryReset', photos);
+          console.log(photos)
         }
     }
 }
@@ -358,7 +359,23 @@ export default {
     background: white;
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+    width: 100px;
+    height: 100px;
+    margin-right: 5px;
+    margin-bottom: 5px;
     cursor: pointer;
 }
 
+.col100 {
+  color: #06A300;
+}
+.col50 {
+  color: #FFA500;
+}
+.col1 {
+  color: #E00A16;
+}
+.col0 {
+  color: #9E9E9E;
+}
 </style>
