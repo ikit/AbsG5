@@ -45,14 +45,14 @@ export class Person {
     @Column({ nullable: true, comment: "Email" })
     email: string;
 
-    @Column({ comment: "Photo de la personne", nullable: true })
-    photo: string;
+    @Column({ comment: "La maison mère à laquelle est rattéché la personne (gueudelot, guibert, guyo)", nullable: true })
+    rootFamily: string;
 
     @Column("json", { nullable: true, comment: "Dernière coordonnée GPS connu pour la personne (VoyaG)" })
     lastLocation: any;
 
     @Column("json", { nullable: true, comment: "Liste des photos du trombinoscope concernant la personne" })
-    trombi: any;
+    trombis: any[];
 
     fromJSON(json: any): Person {
         Object.assign(this, json);
@@ -63,6 +63,36 @@ export class Person {
             }
         }
         return this;
+    }
+
+    /**
+     * Trouve parmi la liste des photos du trombinoscope le concernant, la photo la plus proche
+     * de l'année demandé (respecte la chronologie, donc la photo ne peut pas être plus récente)
+     * renvoie null le trombi est vide
+     * renvoi la photo la plus récente si l'année n'est pas précisée
+     * @param year l'année de la photo recherchée
+     * @returns la photo si existe, sinon null
+     */
+    getPhoto(year: number = null): any {
+        if (!year) {
+            year = new Date().getFullYear();
+        }
+
+        if (Array.isArray(this.trombis) && this.trombis.length > 0) {
+            let lastPhoto = this.trombis[0];
+            for (const p of this.trombis) {
+                
+                if (p.year > year) {
+                    break;
+                }
+                if (p.year >= lastPhoto.year) {
+                    lastPhoto = p;
+                }
+            }
+            return lastPhoto;
+        }
+
+        return null;
     }
 
     getQuickName(): string {
@@ -99,41 +129,5 @@ export class Person {
             }
         }
         return age;
-    }
-
-    // Trouve parmi la liste des photos du trombinoscope le concernant, la photo la plus proche
-    // de l'année demandé (respecte la chronologie, donc la photo ne peut pas être plus récente)
-    // Si aucune trombi trouvé, prend la photo de l'annuaire
-    getPhotos(year: number = null): string[] {
-        let filename = null;
-        let folder = null;
-        if (!year) {
-            year = new Date().getFullYear();
-        }
-
-        if (Array.isArray(this.trombi)) {
-            folder = "trombi/";
-            let filenameYear = 0;
-            for (const t of this.trombi) {
-                const ty = Number.parseInt(t.substring(0, 4));
-                if (ty > year) {
-                    break;
-                }
-                if (ty >= filenameYear) {
-                    filenameYear = ty;
-                    filename = `${this.id}_${t}.jpg`;
-                }
-            }
-        }
-
-        if (!filename) {
-            filename = this.photo;
-            folder = "persons/";
-        }
-
-        return [
-            `${process.env.URL_FILES}${folder}mini/${filename ? filename : "no-photo.png"}`,
-            `${process.env.URL_FILES}${folder}${filename ? filename : "no-photo.png"}`
-        ];
     }
 }

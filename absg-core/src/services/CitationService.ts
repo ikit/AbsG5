@@ -41,7 +41,7 @@ class CitationService {
             .getMany();
         return citations.map(e => {
             const c = new Citation().fromJSON(e);
-            const photos = c.author ? c.author.getPhotos(c.year) : [null, null];
+            const photo = c.author ? c.author.getPhoto(c.year) : null;
             return {
                 id: c.id,
                 citation: c.citation,
@@ -49,8 +49,8 @@ class CitationService {
                 author: {
                     id: c.author.id,
                     fullname: c.author.getFullname(),
-                    thumb: photos[0],
-                    large: photos[1]
+                    thumb: photo ? photo.thumb: null,
+                    large: photo ? photo.url : null
                 }
             };
         });

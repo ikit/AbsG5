@@ -9,8 +9,16 @@ export class AgendaController {
      * Récupère la liste complète des personnes dans l'agenda
      */
     @Get("/persons")
-    listPersons() {
-        return agendaService.listPersons();
+    async listPersons() {
+        const persons = await agendaService.listPersons()
+        return persons.map(p => {
+            const maxDate = p.dateOfDeath ? new Date(p.dateOfDeath) : new Date();
+            return {
+                ...p,
+                trombis: Array.isArray(p.trombis) ? p.trombis : [],
+                trombiMax: maxDate.getFullYear() - new Date(p.dateOfBirth).getFullYear()
+            }
+        });
     }
 
     /**
@@ -20,8 +28,8 @@ export class AgendaController {
      * @param session les informations sur l'utilisateur qui effectue la demande
      */
     @Post("/person")
-    savePerson(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() session: any) {
-        return agendaService.savePerson(body, image, session);
+    savePerson(@Body() body: any, @CurrentUser() session: any) {
+        return agendaService.savePerson(body, session);
     }
 
     /**

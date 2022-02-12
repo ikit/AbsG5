@@ -299,8 +299,6 @@ export default  {
             open: false,
             isLoading: false,
             complete: 0,
-            dateOfBirthMenu: false,
-            dateOfDeathMenu: false,
         },
         editorRules: {
             date: [

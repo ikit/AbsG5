@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 import { Person, User, LogModule, Place } from "../entities";
 import { logger } from "../middleware/logger";
 import * as fs from "fs";
@@ -7,8 +7,8 @@ import { saveImage } from "../middleware/commonHelper";
 import { format } from "date-fns";
 
 class AgendaService {
-    private personsRepo = null;
-    private placesRepo = null;
+    private personsRepo: Repository<Person> = null;
+    private placesRepo: Repository<Place> = null;
 
     public initService() {
         this.personsRepo = getRepository(Person);
@@ -24,13 +24,13 @@ class AgendaService {
             .orderBy("p.lastname")
             .addOrderBy("p.firstname")
             .getMany();
-        return persons.map(e => {
-            const p = new Person().fromJSON(e);
+        return persons.map(p => {
+            const photo = p.getPhoto();
             return {
                 ...p,
                 fullname: p.getFullname(),
-                thumb: p.photo ? `${process.env.URL_FILES}persons/mini/${p.photo}` : null,
-                url: p.photo ? `${process.env.URL_FILES}persons/${p.photo}` : null
+                thumb: photo ? photo.thumb : null,
+                url: photo ? photo.url : null
             };
         });
     }
@@ -38,10 +38,9 @@ class AgendaService {
     /**
      * Crée ou modifie (si l'id est renseigné) une entrée de répertoire
      * @param personData l'entrée du répertoire
-     * @param image l'image pour illustrer la personne dans le répertoire
      * @param user l'utilisateur qui demande l'action
      */
-    public async savePerson(personData: any, image: any, user: User) {
+    public async savePerson(personData: any, user: User) {
         const personId = Number.parseInt(personData.id);
         let person = new Person();
         if (personId) {
@@ -50,15 +49,6 @@ class AgendaService {
         personData.id = personId ? personId : null; // pour éviter les problèmes lors du save en DB
         person.fromJSON(personData);
         person = await this.personsRepo.save(person);
-
-        if (image) {
-            const thumb = path.join(process.env.PATH_FILES, `persons/mini/${person.id}.jpg`);
-            const web = path.join(process.env.PATH_FILES, `persons/${person.id}.jpg`);
-            await saveImage(image.buffer, thumb, web, null);
-
-            person.photo = `${person.id}.jpg`;
-            this.personsRepo.save(person);
-        }
 
         logger.notice(
             personId
@@ -69,11 +59,7 @@ class AgendaService {
                 module: LogModule.agenda
             }
         );
-        return {
-            ...person,
-            thumb: person.photo ? `${process.env.URL_FILES}persons/${person.photo}` : null,
-            url: person.photo ? `${process.env.URL_FILES}persons/${person.photo}` : null
-        };
+        return person;
     }
 
     /**
@@ -139,18 +125,19 @@ class AgendaService {
      */
     async listTrombi() {
         // On récupère la liste des personnes du répertoire
-        const personsData = await this.personsRepo
+        return this.personsRepo
             .createQueryBuilder("p")
             .orderBy("p.lastname")
             .addOrderBy("p.firstname")
             .getMany();
+
+            /*
         const persons = {};
         for (const p of personsData) {
-            // On ognore les personnes qui n'ont pas de date de naissance (Zaffa par exemple)
+            // On ignore les personnes qui n'ont pas de date de naissance (Zaffa par exemple)
             if (!!p.dateOfBirth) {
-                persons[p.id] = new Person().fromJSON(p);
+                persons[p.id] = p;
                 persons[p.id].trombis = [];
-                persons[p.id].fullname = persons[p.id].getFullname();
                 const maxDate = persons[p.id].dateOfDeath ? new Date(persons[p.id].dateOfDeath) : new Date();
                 persons[p.id].max = maxDate.getFullYear() - new Date(persons[p.id].dateOfBirth).getFullYear();
             }
@@ -163,7 +150,7 @@ class AgendaService {
                 const tokens = file.substring(0, file.length - 4).split("_");
                 if (tokens.length === 2 && persons.hasOwnProperty(tokens[0])) {
                     const pid = tokens[0];
-                    const year = Number.parseInt(tokens[1].substr(0, 4));
+                    const year = Number.parseInt(tokens[1]);
                     const p = persons[pid];
                     p.trombis.push({
                         date: year,
@@ -174,36 +161,47 @@ class AgendaService {
                 }
             }
         });
-        // On retourne la liste "mélangée"
+
+        await this.personsRepo.save(personsData);
+        // On retourne la liste
         return Object.keys(persons).map(e => persons[e]).sort((a, b) => { 
             const fn = a.firstname.localeCompare(b.firstname);
             const ln = a.lastname.localeCompare(b.lastname);
             return ln !== 0 ? ln : fn;
         });
+        */
     }
 
     async saveTrombi(trombiData: any, image: any, user: User) {
         if (image && trombiData && trombiData.person && trombiData.date) {
-            const p = new Person().fromJSON(JSON.parse(trombiData.person));
-            const d = new Date(trombiData.date);
-            const filename = `${p.id}_${format(d, "yyyy")}.jpg`;
-            const title = `${p.getFullname()} - ${d.getFullYear()} - ${p.getAge(d.getFullYear())}`;
+            const p = await this.personsRepo.findOne(trombiData.person.id);
+            const year = trombiData.date;
+            const filename = `${p.id}_${year}.jpg`;
+            const title = `${p.getFullname()} - ${year} - ${p.getAge(year)}`;
 
+            // On sauvegarde l'image
             const thumb = path.join(process.env.PATH_FILES, `trombi/mini/${filename}`);
             const url = path.join(process.env.PATH_FILES, `trombi/${filename}`);
             await saveImage(image.buffer, thumb, url, null);
+
+            // On met à jour la base de donnée
+            const data = {
+                year,
+                title,
+                thumb: `${process.env.URL_FILES}trombi/mini/${filename}`,
+                url: `${process.env.URL_FILES}trombi/${filename}`
+            };
+            if (!p.trombis.some(e => e.year === year)) {
+                p.trombis.push(data);
+                p.trombis.sort((a, b) => a.year - b.year);
+                await this.personsRepo.save(p);
+            }
 
             logger.notice(`Nouvelle trombinette "${title}" a été ajoutée par ${user.username}`, {
                 userId: user.id,
                 module: LogModule.agenda
             });
-            return {
-                pid: p.id,
-                date: d,
-                title,
-                thumb: `${process.env.URL_FILES}trombi/mini/${filename}`,
-                url: `${process.env.URL_FILES}trombi/${filename}`
-            };
+            return data;
         }
         return null;
     }
