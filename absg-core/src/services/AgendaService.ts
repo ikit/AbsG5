@@ -120,6 +120,52 @@ class AgendaService {
         };
     }
 
+    /**
+     * Recalcul pour chaque personne la liste des trombis à partir des photos enregistrées
+     */
+    async restoreTrombi() {
+        // On récupère la liste des personnes du répertoire
+        const personsData = await this.personsRepo
+            .createQueryBuilder("p")
+            .orderBy("p.lastname")
+            .addOrderBy("p.firstname")
+            .getMany();
+
+            
+        const persons = {};
+        for (const p of personsData) {
+            // On ignore les personnes qui n'ont pas de date de naissance (Zaffa par exemple)
+            if (!!p.dateOfBirth) {
+                persons[p.id] = p;
+                persons[p.id].trombis = [];
+                const maxDate = persons[p.id].dateOfDeath ? new Date(persons[p.id].dateOfDeath) : new Date();
+                persons[p.id].max = maxDate.getFullYear() - new Date(persons[p.id].dateOfBirth).getFullYear();
+            }
+        }
+
+        const folderPath = path.join(process.env.PATH_FILES, "trombi");
+        const files = await fs.readdirSync(folderPath);
+        files.forEach(file => {
+            if (fs.statSync(path.join(folderPath, file)).isFile() && file.endsWith("jpg")) {
+                const tokens = file.substring(0, file.length - 4).split("_");
+                if (tokens.length === 2 && persons.hasOwnProperty(tokens[0])) {
+                    const pid = tokens[0];
+                    const year = Number.parseInt(tokens[1]);
+                    const p = persons[pid];
+                    p.trombis.push({
+                        date: year,
+                        title: `${p.getFullname()} - ${year} - ${p.getAge(year)}`,
+                        thumb: `${process.env.URL_FILES}trombi/mini/${file}`,
+                        url: `${process.env.URL_FILES}trombi/${file}`
+                    })
+                }
+            }
+        });
+
+        await this.personsRepo.save(personsData);
+        return personsData;
+    }
+
     async saveTrombi(trombiData: any, image: any, user: User) {
         if (image && trombiData && trombiData.person && trombiData.date) {
             const p = await this.personsRepo.findOne(trombiData.person.id);
