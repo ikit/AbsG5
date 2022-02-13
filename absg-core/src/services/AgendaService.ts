@@ -125,13 +125,13 @@ class AgendaService {
      */
     async listTrombi() {
         // On récupère la liste des personnes du répertoire
-        return this.personsRepo
+        const personsData = await this.personsRepo
             .createQueryBuilder("p")
             .orderBy("p.lastname")
             .addOrderBy("p.firstname")
             .getMany();
 
-            /*
+            
         const persons = {};
         for (const p of personsData) {
             // On ignore les personnes qui n'ont pas de date de naissance (Zaffa par exemple)
@@ -169,7 +169,6 @@ class AgendaService {
             const ln = a.lastname.localeCompare(b.lastname);
             return ln !== 0 ? ln : fn;
         });
-        */
     }
 
     async saveTrombi(trombiData: any, image: any, user: User) {
