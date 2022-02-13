@@ -81,13 +81,10 @@ export class Person {
         if (Array.isArray(this.trombis) && this.trombis.length > 0) {
             let lastPhoto = this.trombis[0];
             for (const p of this.trombis) {
-                
                 if (p.year > year) {
                     break;
                 }
-                if (p.year >= lastPhoto.year) {
-                    lastPhoto = p;
-                }
+                lastPhoto = p;
             }
             return lastPhoto;
         }
