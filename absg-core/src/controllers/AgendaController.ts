@@ -52,14 +52,6 @@ export class AgendaController {
     }
 
     /**
-     * Récupère la liste complète des photos du trombinoscope
-     */
-    @Get("/trombi")
-    async listTrombi() {
-        return await agendaService.listTrombi();
-    }
-
-    /**
      * Crée ou modifie (si l'id et la date sotn les mêmes) une photo du trombinoscope
      * @param image l'image uploadé si défini
      * @param body les informations sur la photo
