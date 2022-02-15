@@ -310,22 +310,7 @@ export default  {
         }
     }),
     mounted() {
-        this.isLoading = true;
-        axios.get(`/api/agenda/persons`).then(response => {
-
-            const data = parseAxiosResponse(response);
-            let idx = 0;
-            this.persons = data.map(e => ({
-                ...e,
-                name: `${e.lastname} ${e.firstname} ${e.firstname2} ${e.surname}`,
-                age: this.computeAge(e),
-                title: e.name,
-                galleryIndex: e.thumb ? idx++ : null
-            }));
-            idx = 0;
-            store.commit('photosGalleryReset', this.persons.filter(e => e.thumb));
-            this.isLoading = false;
-        });
+        this.refreshList();
     },
     methods: {
         computeAge(person) {
@@ -400,61 +385,35 @@ export default  {
             this.personEditor.complete = 0;
         },
 
-        refreshList(person) {
+        refreshList() {
             this.isLoading = true;
-            let idx = this.persons.findIndex(e => e.id === person.id);
-            if (idx > -1) {
-                const newEntry = {
-                    ...person,
-                    name: `${person.lastname} ${person.firstname} ${person.firstname2} ${person.surname}`,
-                    age: this.computeAge(person),
-                    title: person.name,
-                };
-                this.persons.splice(idx, 1, newEntry)
-            } else {
-                this.persons.push({
-                    ...person,
-                    name: `${person.lastname} ${person.firstname} ${person.firstname2} ${person.surname}`,
-                    age: this.computeAge(person),
-                    title: person.name,
-                });
-            }
-            this.isLoading = false;
+            axios.get(`/api/agenda/persons`).then(response => {
+                const data = parseAxiosResponse(response);
+                let idx = 0;
+                this.persons = data.map(e => ({
+                    ...e,
+                    name: `${e.lastname} ${e.firstname} ${e.firstname2} ${e.surname}`,
+                    age: this.computeAge(e),
+                    title: e.name,
+                    galleryIndex: e.thumb ? idx++ : null
+                }));
+                idx = 0;
+                store.commit('photosGalleryReset', this.persons.filter(e => e.thumb));
+                this.isLoading = false;
+            });
         },
 
         savePerson() {
             this.personEditor.isLoading = true;
-            
-            // On prépare l'envoie des infos au serveur
-            const formData = new FormData();
-            formData.append("id", this.personEditor.id);
-            formData.append("lastname", this.personEditor.lastname);
-            formData.append("firstname", this.personEditor.firstname);
-            formData.append("firstname2", this.personEditor.firstname2);
-            formData.append("surname", this.personEditor.surname);
-            formData.append("sex", this.personEditor.sex);
-            formData.append("dateOfBirth", this.computeDateFromForm(this.personEditor.dateOfBirth));
-            formData.append("dateOfDeath", this.computeDateFromForm(this.personEditor.dateOfDeath));
-            formData.append("address", this.personEditor.address);
-            formData.append("job", this.personEditor.job);
-            formData.append("phone", this.personEditor.phone);
-            formData.append("email", this.personEditor.email);
 
             // On envoie au serveur
-            axios.post(`/api/agenda/person`, formData, {
-                headers: {
-                    "Content-Type" : "multipart/form-data",
-                },
-                onUploadProgress: progressEvent => {
-                    this.personEditor.complete = (progressEvent.loaded / progressEvent.total * 100 || 0);
-                }
-            })
+            axios.post(`/api/agenda/person`, this.personEditor)
             .then( response => {
                 const savedPerson = parseAxiosResponse(response);
                 // on reset l'IHM
                 this.resetDialog();
                 // On ajoute ou met à jour la liste
-                this.refreshList(savedPerson);
+                this.refreshList();
             })
             .catch( err => {
                 store.commit('onError', err);
