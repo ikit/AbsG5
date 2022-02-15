@@ -167,8 +167,9 @@ class AgendaService {
     }
 
     async saveTrombi(trombiData: any, image: any, user: User) {
-        if (image && trombiData && trombiData.person && trombiData.date) {
-            const p = await this.personsRepo.findOne(trombiData.person.id);
+        const pData = JSON.parse(trombiData.person);
+        if (image && pData && pData.id && trombiData.date) {
+            const p = await this.personsRepo.findOne(pData.id);
             const year = trombiData.date;
             const filename = `${p.id}_${year}.jpg`;
             const title = `${p.getFullname()} - ${year} - ${p.getAge(year)}`;

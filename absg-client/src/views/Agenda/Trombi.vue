@@ -379,8 +379,8 @@ export default {
             .then(response => {
               const newTrombi = parseAxiosResponse(response);
               // On ajoute l'image à la fin
-              const p = this.persons.find(p => p.id === newTrombi.pid);
-              p.trombis.push(newTrombi)
+              this.trombiEditor.person.trombis.push(newTrombi);
+              this.applyFilter();
               this.resetDialog();
             })
             .catch(err => {
