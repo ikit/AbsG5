@@ -153,7 +153,7 @@ class AgendaService {
                     const year = Number.parseInt(tokens[1]);
                     const p = persons[pid];
                     p.trombis.push({
-                        date: year,
+                        year,
                         title: `${p.getFullname()} - ${year} - ${p.getAge(year)}`,
                         thumb: `${process.env.URL_FILES}trombi/mini/${file}`,
                         url: `${process.env.URL_FILES}trombi/${file}`
