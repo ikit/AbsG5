@@ -149,60 +149,54 @@
 
     <v-dialog
       v-model="stats.open"
-      width="600px"
     >
       <v-card>
         <v-card-title class="grey lighten-4 py-4 title">
-          Nouvelle trombinette
+          Statistiques
         </v-card-title>
-        <v-container
-          grid-list-sm
-          class="pa-4"
-        >
-          <v-combobox
-            v-model="trombiEditor.person"
-            :items="persons"
-            :rules="editorRules.person"
-            label="Qui"
-            prepend-icon="fas fa-user"
-            item-text="fullname"
-          />
-          
-          <v-text-field
-            v-model="trombiEditor.date"
-            :rules="editorRules.date"
-            label="Quand"
-            placeholder="Année de la photo"
-            validate-on-blur
-            prepend-icon="far fa-calendar-alt"
-          />
-
-          <ImageEditor
-            ref="imgEditor"
-            icon="fas fa-camera"
-            style="height: 300px;"
-            mode="square"
-          />
-          <div v-if="trombiEditor.isLoading">
-            Enregistrement en cours : {{ trombiEditor.complete }}%
+        <div style="display: flex;">
+          <div style="flex: 1 0 0;">
+            <table class="stats-table">
+              <tr>
+                <td>&nbsp;</td>
+                <td>0%</td>
+                <td>&lt; 50%</td>
+                <td>&gt; 50%</td>
+                <td>100%</td>
+                <td>Total</td>
+              </tr>
+              <tr
+                v-for="row in stats.overview"
+                :key="row.title"
+              >
+                <td>
+                  {{ row.title }}
+                </td>
+                <td>{{ row.col0 }}</td>
+                <td>{{ row.col1 }}</td>
+                <td>{{ row.col50 }}</td>
+                <td>{{ row.col100 }}</td>
+                <td>{{ row.total }}</td>
+              </tr>
+            </table>
           </div>
-        </v-container>
-        <v-card-actions>
+          <div style="flex: 0 1 0;">
+            <highcharts
+            v-if="stats.overviewGraph"
+              :options="stats.overviewGraph"
+            />
+          </div>
+        </div>
+          
+        <v-card-actions class="grey lighten-4 py-4 title">
           <v-spacer />
           <v-btn
             text
             color="primary"
             :disabled="trombiEditor.isLoading"
-            @click="resetDialog()"
+            @click="stats.open = false"
           >
-            Annuler
-          </v-btn>
-          <v-btn
-            color="accent"
-            :disabled="trombiEditor.isLoading"
-            @click="saveTrombi()"
-          >
-            Enregistrer
+            Fermer
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -215,10 +209,17 @@ import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
+import {Chart} from 'highcharts-vue';
+import Highcharts from 'highcharts';
+import HC_sankey from 'highcharts/modules/sankey';
+import HC_depwheel from 'highcharts/modules/dependency-wheel';
+HC_sankey(Highcharts);
+HC_depwheel(Highcharts);
 
 export default {
     components: {
-      ImageEditor
+      ImageEditor,
+      highcharts: Chart
     },
     store,
     data: () => ({
@@ -261,7 +262,8 @@ export default {
             "Complet à < 50%",
             "Sans photo"
           ],
-          overview: []
+          overview: [],
+          overviewGraph: null,
         }
     }),
 
@@ -340,16 +342,78 @@ export default {
       },
 
       displayStats() {
-        console.log("displayStats", this.persons);
         this.stats.overview = [
-          { title: "Gueudelot", c100: 0, c50: 0, c1: 0, c0: 0, total: 0 },
-          { title: "Guibert", c100: 0, c50: 0, c1: 0, c0: 0, total: 0 },
-          { title: "Guyomard", c100: 0, c50: 0, c1: 0, c0: 0, total: 0 },
-          { title: "Total", c100: 0, c50: 0, c1: 0, c0: 0, total: 0 }
+          { title: "Gueudelot", col100: 0, col50: 0, col1: 0, col0: 0, total: 0 },
+          { title: "Guibert", col100: 0, col50: 0, col1: 0, col0: 0, total: 0 },
+          { title: "Guyomard", col100: 0, col50: 0, col1: 0, col0: 0, total: 0 },
+          { title: "Autres", col100: 0, col50: 0, col1: 0, col0: 0, total: 0 },
+          { title: "Total", col100: 0, col50: 0, col1: 0, col0: 0, total: 0 }
         ];
         for (const p of this.persons) {
-          const row = this.stats.overview.find(e => e.title.toLowerCase() === p.rootFamily);
+          const row = this.stats.overview.find(e => e.title.toLowerCase() === (p.rootFamily ?? "autres"));
+          const status = p.cssStatus.split(" ")[1]
+          row[status] += 1;
+          row.total += 1;
+          this.stats.overview[4][status] += 1;
+          this.stats.overview[4].total += 1;
         }
+        this.stats.overviewGraph = {
+          title: null,
+          subtitle: null,
+          chart: {
+              type: 'bar'
+          },
+          xAxis: {
+              categories: ['Gueudelot', 'Guibert', 'Guyomard', 'Autres']
+          },
+          yAxis: {
+              min: 0,
+              title: null
+          },
+          legend: {
+              reversed: true
+          },
+          plotOptions: {
+              series: {
+                  stacking: 'normal'
+              }
+          },
+          colors: ['#06A300', '#FFA500', '#E00A16', '#9E9E9E'],
+          series: [{
+              name: '100%',
+              data: [
+                this.stats.overview[0].col100,
+                this.stats.overview[1].col100, 
+                this.stats.overview[2].col100, 
+                this.stats.overview[3].col100
+              ]
+            }, {
+              name: '> 50%',
+              data: [
+                this.stats.overview[0].col50,
+                this.stats.overview[1].col50, 
+                this.stats.overview[2].col50, 
+                this.stats.overview[3].col50
+              ]
+            }, {
+              name: '< 50%',
+              data: [
+                this.stats.overview[0].col1,
+                this.stats.overview[1].col1, 
+                this.stats.overview[2].col1, 
+                this.stats.overview[3].col1
+              ]
+            }, {
+              name: '0%',
+              data: [
+                this.stats.overview[0].col0,
+                this.stats.overview[1].col0, 
+                this.stats.overview[2].col0, 
+                this.stats.overview[3].col0
+              ]
+            }]
+        };
+        this.stats.open = true;
       },
 
       saveTrombi: async function () {
@@ -468,5 +532,29 @@ export default {
 }
 .col0 {
   color: #9E9E9E;
+}
+
+.stats-table {
+  border: 1px solid #ddd;
+  width: 90%;
+  margin: 10px;
+  text-align: center;
+  border-spacing: 0;
+  td {
+    padding: 2px 5px;
+  }
+  tr:first-child {
+    background: #eee;
+    font-weight: bold;
+    td {
+      border-bottom: 1px solid #ddd;
+    }
+  }
+  tr {
+    td:first-child {
+      text-align: right;
+      font-weight: bold
+    }
+  }
 }
 </style>
