@@ -123,7 +123,10 @@ class EventService {
                 y += 1;
             }
         }
-        return result.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+        return result
+            .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+            .filter(e => !e.endDate && e.startDate.getTime() >= startDate.getTime()
+                || e.endDate && e.endDate.getTime() <= endDate.getTime());
     }
 
     /**
@@ -141,7 +144,9 @@ class EventService {
      * @param from la date à prendre en compte
      */
     public async getNextEvents(from: Date = null) {
-        const startDate = from ? from : new Date();
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startDate = from ? new Date(from.getFullYear(), from.getMonth(), from.getDate()) : today;
         const endDate = addMonths(startDate, 2);
         const result = await this.getEvents(startDate, endDate);
         return result.splice(0, 20);
