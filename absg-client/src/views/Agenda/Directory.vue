@@ -174,6 +174,15 @@
                   item-text="label"
                   item-value="id"
                 />
+
+                <v-select
+                  v-model="personEditor.rootFamily"
+                  :items="rootFamilies"
+                  prepend-icon="fas fa-crown"
+                  label="Maison mère"
+                  item-text="label"
+                  item-value="id"
+                />
               </v-col>
 
               <v-col>
@@ -182,7 +191,6 @@
                   :rules="editorRules.date"
                   label="Date de naissance"
                   placeholder="AAAA.MM.JJ"
-                  style="margin-left: 33px;"
                   validate-on-blur
                   prepend-icon="far fa-calendar-alt"
                 />
@@ -191,7 +199,6 @@
                   :rules="editorRules.date"
                   label="Date du décè"
                   placeholder="AAAA.MM.JJ"
-                  style="margin-left: 33px;"
                   validate-on-blur
                   prepend-icon="far fa-calendar-alt"
                 />
@@ -273,7 +280,7 @@ export default  {
             { id: "male", label: "Homme" },
             { id: "female", label: "Femme" }
         ],
-        rootFamillies: [
+        rootFamilies: [
             { id: null, label: "Aucune" },
             { id: "gueudelot", label: "Gueudelot" },
             { id: "guibert", label: "Guibert" },
@@ -295,6 +302,7 @@ export default  {
             job: null,
             phone: null,
             email: null,
+            rootFamily: null,
 
             open: false,
             isLoading: false,
@@ -358,6 +366,7 @@ export default  {
             this.personEditor.firstname2 = null;
             this.personEditor.surname = null;
             this.personEditor.sex = null;
+            this.personEditor.rootFamily = null;
             this.personEditor.dateOfBirth = null;
             this.personEditor.dateOfDeath = null;
             this.personEditor.address = null;
@@ -376,6 +385,7 @@ export default  {
             this.personEditor.firstname2 = person.firstname2;
             this.personEditor.surname = person.surname;
             this.personEditor.sex = person.sex;
+            this.personEditor.rootFamily = person.rootFamily;
             this.personEditor.dateOfBirth = person.dateOfBirth;
             this.personEditor.dateOfDeath = person.dateOfDeath;
             this.personEditor.address = person.address;
