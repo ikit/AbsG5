@@ -64,6 +64,8 @@ export async function saveImage(file, thumbPath, webPath, originalPath) {
     }
     // On déplace dans le répertoire ORIGINAL
     if (originalPath) {
+        // On crée le répertoire si besoin
+        fs.mkdirSync(path.dirname(originalPath), { recursive: true });
         fs.writeFileSync(originalPath, file);
     }
 }

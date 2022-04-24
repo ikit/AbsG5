@@ -34,7 +34,8 @@ export class PhotoAlbumController {
         const albums = await this.aRepo
             .createQueryBuilder("a")
             .where(`a.family IS  NULL OR a.family = '${user.rootFamily}'`)
-            .orderBy("a.order")
+            .orderBy("a.order", "ASC")
+            .addOrderBy("a.id", "DESC")
             .getMany();
         return albums.map(a => ({
             ...a,
@@ -130,6 +131,19 @@ export class PhotoAlbumController {
 
         return album;
     }
+
+    
+    /**
+     * Crée un nouvel album
+     * @param album les données de l'album à mettre à jours
+     */
+     @Post("/")
+     async newAlbum(@Body() album: PhotoAlbum, @CurrentUser() user: User) {
+         if (user && album) {
+             return this.aRepo.save(album);
+         }
+         return null;
+     }
 
     /**
      *  Met à jour l'album

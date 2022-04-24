@@ -1,104 +1,84 @@
 <template>
-  <v-container
-    fluid
-    grid-list-md
-    style="padding:0"
-  >
-    <v-data-iterator
-      :items="photos"
-      :items-per-page="filter.pageSize"
-      :page="filter.pageIndex"
-      :search="filter.search"
-      :expanded="expandedPhotos"
-      loading-text="Récupération des photos..."
-      no-data-text="Aucune photo à trier."
-      no-results-text="Aucune photo trouvée."
-      hide-default-footer
+  <div>
+    <div
+      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      style="padding: 15px"
     >
-      <template #header>
-        <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
-          <v-row
-            style="margin: 0"
-            align="center"
-            justify="center"
-          >
-            <v-text-field
-              v-model="filter.search"
-              prepend-icon="fa-search"
-              placeholder="Rechercher"
-              style="max-width: 300px;"
-            />
-            <v-spacer />
+      <router-link
+        :to="{ path: `/photos/albums` }"
+        tag="button"
+      >
+        <v-icon>fas fa-home</v-icon>
+        <span
+          v-if="$vuetify.breakpoint.lgAndUp"
+          style="margin-left: 15px"
+        >Liste des albums</span>
+      </router-link>
 
-            <v-select
-              v-model="filter.saved"
-              :items="filter.saved"
-              label="Favoris"
-              prepend-icon="fas fa-bars"
-              style="max-width: 300px;"
-              @change="loadCollection($event)"
-            />
+      <div
+        style="display: inline-block; margin-left: 15px"
+      >
+        <v-icon left>
+          fas fa-chevron-right
+        </v-icon> Album auto (configuration)
+      </div>
+    </div>
 
-            <v-spacer />
+    <v-card style="margin: 20px">
+        <v-card-title class="grey lighten-4">
+          Configuration de l'album
+          <div style="position: absolute; right: 15px; top: 10px">
             <v-btn
-              icon
-              small
-              :disabled="isLoading"
-              @click="formerPage"
+              disabled
+              @click.stop="download()"
             >
-              <v-icon>fa-chevron-left</v-icon>
+              <v-icon left>
+                fas fa-star
+              </v-icon>Favoris
             </v-btn>
-            <span class="grey--text">
-              {{ filter.pageIndex }} / {{ numberOfPages }}
-            </span>
-            <v-btn
-              icon
-              small
-              :disabled="isLoading"
-              @click="nextPage"
-            >
-              <v-icon>fa-chevron-right</v-icon>
-            </v-btn>
-          </v-row>
-          <div
-            class="grey--text"
-            style="font-size: 0.9em; display: block; position: absolute; right: 15px; bottom: 0;"
-          >
-            {{ photos.length }} photos
+          </div>
+        </v-card-title>
+        <div style="display: flex">
+          <div class="grey lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
+            <b>Personnes</b><br/>
+            <span style="opacity: 0.5; font-size: 0._em">Sélectionner les photos en fonction des personnes qui sont dessus.</span>
+          </div>
+          <div style="flex-grow: 1; padding: 10px; border-bottom: 1px solid #eee">
+            Tout le monde
           </div>
         </div>
-      </template>
+        <div style="display: flex">
+          <div class="grey lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
+            <b>Lieux</b><br/>
+            <span style="opacity: 0.5; font-size: 0._em">Sélectionner les photos en fonction des lieux.</span>
+          </div>
+          <div style="flex-grow: 1; padding: 10px; border-bottom: 1px solid #eee">
+            Partout
+          </div>
+        </div>
+        <div style="display: flex">
+          <div class="grey lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
+            <b>Date</b><br/>
+            <span style="opacity: 0.5; font-size: 0._em">Sélectionner les photos en fonction de la date de prise de vue</span>
+          </div>
+          <div style="flex-grow: 1; padding: 10px; border-bottom: 1px solid #eee">
+            N'importe quand
+          </div>
+        </div>
 
-      <template #default="props">
-        <v-container
-          fluid
-          grid-list-sm
-        >
-          <v-layout
-            row
-            wrap
-          >
-            <v-flex
-              v-for="p in props.items"
-              :key="p.id"
-              style="text-align: center;"
-            >
-              <div style="width: 250px; height: 250px; margin: auto;">
-                <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
-                  <img
-                    :src="p.thumb"
-                    class="thumb"
-                    :alt="p.id"
-                    @click="photosGalleryDisplay(p.index)"
-                  >
-                </div>
-              </div>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </template>
-    </v-data-iterator>
-  </v-container>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn>
+            <v-icon left>
+              fas fa-eye
+            </v-icon>
+            Voir les photos
+          </v-btn>
+        </v-card-actions>
+    </v-card>
+
+
+  </div>
 </template>
 
 
@@ -146,7 +126,7 @@ export default {
     methods: {
       initFilters() {
         console.log("init")
-        axios.get("/api/photos/albums/auto").then(response => {
+        axios.get("/api/albums/auto").then(response => {
                 console.log("isLoaded");
                 // let idx = 0;
                 // this.photos = parseAxiosResponse(response).map(e => ({ ...e, index: idx++ }));

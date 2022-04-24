@@ -217,10 +217,11 @@ export default {
         types: [
           { key: "COMIC", label: "Bandes dessinées", icon: "fas fa-book" },
           { key: "BOOK", label: "Romans", icon: "fas fa-book" },
-          { key: "WINE", label: "Cave", icon: "fas fa-wine-glass-alt" },
           { key: "MANGA", label: "Manga", icon: "fas fa-book" },
+          { key: "VINYL", lavel: "Vinyls", icon: "fas fa-compact-disc" },
           { key: "BOARDGAME", label: "Jeux de sociétés", icon: "fas fa-chess-knight" },
-          { key: "LEGO", label: "Légo", icon: "fas fa-cubes" }
+          { key: "LEGO", label: "Légo", icon: "fas fa-cubes" },
+          { key: "WINE", label: "Cave", icon: "fas fa-wine-glass-alt" },
         ],
         selectedType: null,
         filter: {

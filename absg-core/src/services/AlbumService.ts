@@ -44,6 +44,9 @@ class AlbumService {
         await this.pRepo.save(photo);
 
         // On met à jour l'album
+        if (!Array.isArray(album.photos)) {
+            album.photos = [];
+        }
         album.photos.push(id);
         await this.aRepo.save(album);
 
