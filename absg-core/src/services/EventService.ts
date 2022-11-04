@@ -88,9 +88,12 @@ class EventService {
 
         // On récupères les anniversaires
         const months = [];
-        for (let m = startDate.getMonth(); m <= endDate.getMonth(); m++) {
-            months.push(m + 1);
+        let currentDate = startDate;
+        while (currentDate < endDate) {
+            months.push(currentDate.getMonth() + 1);
+            currentDate = addMonths(currentDate, 1);
         }
+        
         q = `SELECT * 
             FROM person
             WHERE 
