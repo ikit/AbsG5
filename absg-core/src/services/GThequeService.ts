@@ -65,7 +65,6 @@ class GThequeService {
             return list
                 .filter(f => f !== null)
                 .sort((a, b) => {
-                    console.log(a, b)
                     // On trie par ordre les dossier avant les fichiers
                     if (a.type === "folder" && b.type !== "folder") {
                         return -1;

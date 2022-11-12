@@ -173,11 +173,10 @@ export class PhotoAlbumController {
                 "/photos/",
                 `${"absg_" + id.toString().padStart(4, "0")}/RAW.zip`
             );
-            console.log(filePath);
 
             if (!fs.existsSync(filePath)) {
                 // On crée le zip
-                console.log("File not exists");
+                console.log("TODO File not exists");
             }
             await new Promise<void>((resolve, reject) => {
                 response.sendFile(filePath, (err: any) => {

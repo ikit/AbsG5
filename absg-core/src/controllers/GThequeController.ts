@@ -30,7 +30,6 @@ export class GThequeController {
     @Get("/grenary")
     getGrenary() {
         const r = gthequeService.getGrenaryFiles();
-        console.log(r[0].content);
         return r;
     }
 

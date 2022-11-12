@@ -22,6 +22,7 @@
           prepend-icon="fa-search"
           placeholder="Rechercher"
           style="max-width: 300px;"
+          @change="applyFilter()"
         />
 
         <v-spacer />
@@ -64,7 +65,7 @@
         class="albumCollection"
       >
         <v-expansion-panel
-          v-for="c of collections"
+          v-for="c of displayedCollections"
           :key="c.id"
         >
           <v-expansion-panel-header>
@@ -214,11 +215,12 @@ import { format } from 'date-fns';
 export default {
     data: () => ({
         collections: [],
+        displayedCollections: [],
         types: [
           { key: "COMIC", label: "Bandes dessinées", icon: "fas fa-book" },
           { key: "BOOK", label: "Romans", icon: "fas fa-book" },
           { key: "MANGA", label: "Manga", icon: "fas fa-book" },
-          { key: "VINYL", lavel: "Vinyls", icon: "fas fa-compact-disc" },
+          { key: "VINYL", label: "Vinyls", icon: "fas fa-compact-disc" },
           { key: "BOARDGAME", label: "Jeux de sociétés", icon: "fas fa-chess-knight" },
           { key: "LEGO", label: "Légo", icon: "fas fa-cubes" },
           { key: "WINE", label: "Cave", icon: "fas fa-wine-glass-alt" },
@@ -245,12 +247,12 @@ export default {
     mounted () {
       const path = this.$route.params.path;
       console.log("Path: " + path)
-      setTimeout(() => this.changeCollection("COMIC"));
       axios.get(`/api/gtheque/`).then(response => {
           this.collections = parseAxiosResponse(response).map(e => ({
             ...e,
             cssStatus: this.computeCssStatus(e)
           }));
+          this.changeCollection("COMIC");
           console.log(this.collections);
       });
     },
@@ -270,9 +272,17 @@ export default {
       },
       changeCollection: function(colKey) {
         this.selectedType = this.types.find(t => t.key === colKey);
+        this.applyFilter();
+      },
+      applyFilter: function() {
+        const tokens = this.filter.search ? this.filter.search.split(" ").map(t => t.toLowerCase()) : [];
+        this.displayedCollections = this.collections.filter(c => 
+          c.type === this.selectedType.key && 
+          (tokens.length === 0 || tokens.some(t => c.title.toLowerCase().indexOf(t) >= 0)
+        ));
       },
       switchItem: function (item) {
-        item.ok = !item.ok;
+        item.ok = !item.ok; 
         for (const c of this.collections) {
           c.count = c.items.filter(i => i.ok).length;
           c.cssStatus = this.computeCssStatus(c)
