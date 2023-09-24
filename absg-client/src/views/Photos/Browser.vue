@@ -5,7 +5,7 @@
     style="padding:0"
   >
     <v-data-iterator
-      :items="photos"
+      :items="displayedPhotos"
       :items-per-page="filter.pageSize"
       :page="filter.pageIndex"
       :search="filter.search"
@@ -29,15 +29,17 @@
               style="max-width: 300px;"
             />
             <v-spacer />
+            <v-btn-toggle :disabled="isLoading">
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn @click.stop="switchViewDoublon()" v-on="on">
+                    <v-icon>{{ filter.viewDoublon ? "fa-solid fa-eye" : "fa-solid fa-eye-slash" }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>Voir les photos signalées comme doublon</span>
+              </v-tooltip>
+            </v-btn-toggle>
 
-            <v-select
-              v-model="filter.collection"
-              :items="filter.collections"
-              label="Photos"
-              prepend-icon="fas fa-bars"
-              style="max-width: 300px;"
-              @change="loadCollection($event)"
-            />
 
             <v-spacer />
             <v-btn
@@ -49,7 +51,11 @@
               <v-icon>fa-chevron-left</v-icon>
             </v-btn>
             <span class="grey--text">
-              {{ filter.pageIndex }} / {{ numberOfPages }}
+              <v-text-field
+                v-model="filter.pageIndex"
+                style="max-width: 30px; display: inline-block;"
+                @input="gotoPage()"
+              /> / {{ numberOfPages }}
             </span>
             <v-btn
               icon
@@ -111,12 +117,12 @@ export default {
     store,
     data: () => ({
         isLoading: false,
-        photos: [], // La liste des photos à trier
+        photos: [], // La liste de toutes les photos
+        displayedPhotos: [], // La liste des photos pré-filtrée fournis à l'iterator
         expandedPhotos: [],
         filter: {
             search: null, // recherche multicritère
-            collection: "A trier",
-            collections: ["A trier", "Date manquante", "Personnes manquantes", "Lieu manquant"],
+            viewDoublon: false, // est-ce qu'on affiche aussi les photos signalées comme doublons
             pageIndex: 1, // page courante affichée
             pageSize: 24, // nombre de photos affichées par page
         },
@@ -144,21 +150,14 @@ export default {
         this.loadCollection()
     },
     methods: {
-        loadCollection(collection = null) {
+        loadCollection() {
             this.isLoading = true;
-            let url = `/api/photos/to-check`;
-            if (collection === this.filter.collections[1]) {
-                url += "?collection=date"
-            } else if (collection === this.filter.collections[2]) {
-                url += "?collection=person"
-            } else if (collection === this.filter.collections[3]) {
-                url += "?collection=place"
-            }
-
-            axios.get(url).then(response => {
+            axios.get(`/api/photos/all`).then(response => {
                 let idx = 0;
                 this.photos = parseAxiosResponse(response).map(e => ({ ...e, index: idx++ }));
-                store.commit('photosGalleryReset', this.photos);
+                this.displayedPhotos = this.photos.filter(p => !p.doublon || this.filter.viewDoublon );
+                this.filter.pageIndex = 1;
+                store.commit('photosGalleryReset', this.displayedPhotos );
                 this.isLoading = false;
             }).catch( err => {
                 store.commit('onError', err);
@@ -177,6 +176,18 @@ export default {
         formerPage () {
             if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1;
             else this.filter.pageIndex = this.numberOfPages;
+        },
+        gotoPage () {
+            this.filter.pageIndex = pageIndex;
+            if (this.filter.pageIndex > this.numberOfPages) this.filter.pageIndex = this.numberOfPages;
+            if (this.filter.pageIndex < 1) this.filter.pageIndex = 1;
+            
+        },
+        switchViewDoublon() {
+          debugger;
+          this.filter.viewDoublon = !this.filter.viewDoublon;
+          this.displayedPhotos = this.photos.filter(p => !p.doublon || this.filter.viewDoublon );
+          store.commit('photosGalleryReset', this.displayedPhotos);
         }
     }
 }

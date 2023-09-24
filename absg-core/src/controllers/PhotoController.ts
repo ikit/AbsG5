@@ -10,35 +10,16 @@ export class PhotosController {
     private aRepo = getRepository(PhotoAlbum);
 
     /**
-     * Récupère la liste des photos à trier
+     * Récupère la liste des photos pour l'explorateur
      */
-    @Get("/to-check")
+    @Get("/all")
     async toCheck(@QueryParam("collection") collection: string) {
-        // On gère le filtre en fonction de la collection demandé:
-        // - date: toutes les photos dont la date est manquante
-        // - person: toutes les photos où personnes n'est indiqué
-        // - place: toutes les photos où le lieux n'est pas indiqué
-        // => par défaut: renvoie toutes les photos où aucunes des 3 infos n'est pas renseigné
-        let filter = null;
-        switch (collection) {
-            case "date":
-                filter = "p.date IS NULL";
-                break;
-            case "person":
-                filter = "p.persons IS NULL";
-                break;
-            case "place":
-                filter = "p.place IS NULL";
-                break;
-            default:
-                filter = "p.date IS NULL AND p.persons IS NULL AND p.place IS NULL";
-        }
-
         // On récupère les photos à checker
+        // Par défaut on les trie par ordre chronologique (celles sans dates sont à la fin par ordre d'id)
         const photos = await this.repo
             .createQueryBuilder("p")
-            .where(filter)
-            .orderBy("p.id")
+            .orderBy("p.date", "ASC")
+            .addOrderBy("p.id", "ASC")
             .getMany();
 
         return photos.map(p => ({

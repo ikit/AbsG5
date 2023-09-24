@@ -54,6 +54,11 @@
         style="padding: 0; margin-left: 34px; margin-top: 0;"
       />
 
+      <v-checkbox
+        v-model="photo.doublon"
+        label="Marquer comme doublon"
+      ></v-checkbox>
+
 
       <div style="text-align: center">
         <v-btn
