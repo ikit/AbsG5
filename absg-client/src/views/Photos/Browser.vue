@@ -5,11 +5,10 @@
     style="padding:0"
   >
     <v-data-iterator
-      :items="displayedPhotos"
-      :items-per-page="filter.pageSize"
-      :page="filter.pageIndex"
+      :items="sorted.displayed"
+      :items-per-page="sorted.pageSize"
+      :page="sorted.idx"
       :search="filter.search"
-      :expanded="expandedPhotos"
       loading-text="Récupération des photos..."
       no-data-text="Aucune photo à trier."
       no-results-text="Aucune photo trouvée."
@@ -26,17 +25,72 @@
               v-model="filter.search"
               prepend-icon="fa-search"
               placeholder="Rechercher"
-              style="max-width: 300px;"
+              style="max-width: 300px; margin-right: 16px"
+            />
+            <v-text-field
+              v-model="filter.search"
+              prepend-icon="fa-calendar-alt"
+              placeholder="De YYYY-MM-DD"
+              style="max-width: 200px;"
+            />
+            &nbsp;-&nbsp;
+            <v-text-field
+              v-model="filter.search"
+              placeholder="à YYYY-MM-DD"
+              style="max-width: 200px;"
             />
             <v-spacer />
-            <v-btn-toggle :disabled="isLoading">
+            <v-btn-toggle :disabled="isLoading" v-model="displayMode">
               <v-tooltip bottom>
                 <template #activator="{ on }">
-                  <v-btn @click.stop="switchViewDoublon()" v-on="on">
-                    <v-icon>{{ filter.viewDoublon ? "fa-solid fa-eye" : "fa-solid fa-eye-slash" }}</v-icon>
+                  <v-btn @click.stop="displaygrid()" v-on="on" value="list">
+                    <v-icon>fa-th</v-icon>
                   </v-btn>
                 </template>
-                <span>Voir les photos signalées comme doublon</span>
+                <span>Classer les photos dans l'ordre chronologique</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn @click.stop="displayTimeline()" v-on="on" value="chrono">
+                    <v-icon>fa-calendar-alt</v-icon>
+                  </v-btn>
+                </template>
+                <span>Classer les photos dans l'ordre chronologique</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn @click.stop="displayTrombi()" v-on="on" value="person">
+                    <v-icon>fa-user</v-icon>
+                  </v-btn>
+                </template>
+                <span>Identifier les personnes sur les photos</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn @click.stop="displayLocation()" v-on="on" value="location">
+                    <v-icon>fa-map-marked-alt</v-icon>
+                  </v-btn>
+                </template>
+                <span>Identifier les lieux sur les photos</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn @click.stop="displayTrash()" v-on="on" value="trash">
+                    <v-icon>fa-trash</v-icon>
+                  </v-btn>
+                </template>
+                <span>Voir les photos supprimées</span>
+              </v-tooltip>
+            </v-btn-toggle>
+            &nbsp;
+            <v-btn-toggle>
+              <v-tooltip bottom>
+                <template #activator="{ on }">
+                  <v-btn @click.stop="displayStats()" v-on="on">
+                    <v-icon>fa-chart-pie</v-icon>
+                  </v-btn>
+                </template>
+                <span>Voir les statistiques</span>
               </v-tooltip>
             </v-btn-toggle>
 
@@ -70,13 +124,14 @@
             class="grey--text"
             style="font-size: 0.9em; display: block; position: absolute; right: 15px; bottom: 0;"
           >
-            {{ photos.length }} photos
+            {{ sorted.photos.length }} photos
           </div>
         </div>
       </template>
 
       <template #default="props">
         <v-container
+          v-if="displayMode = 'list'"
           fluid
           grid-list-sm
         >
@@ -99,9 +154,12 @@
                   >
                 </div>
               </div>
+              {{ p.date }}
             </v-flex>
           </v-layout>
         </v-container>
+
+        
       </template>
     </v-data-iterator>
   </v-container>
@@ -116,80 +174,106 @@ import { parseAxiosResponse } from '../../middleware/CommonHelper';
 export default {
     store,
     data: () => ({
-        isLoading: false,
-        photos: [], // La liste de toutes les photos
-        displayedPhotos: [], // La liste des photos pré-filtrée fournis à l'iterator
-        expandedPhotos: [],
-        filter: {
-            search: null, // recherche multicritère
-            viewDoublon: false, // est-ce qu'on affiche aussi les photos signalées comme doublons
-            pageIndex: 1, // page courante affichée
-            pageSize: 24, // nombre de photos affichées par page
-        },
-        rules: {
-            from: [
-                value => {
-                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
-                }
-            ],
-            to: [
-                value => {
-                    const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
-                    return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
-                }
-            ],
-        }
+      isLoading: false,
+      displayMode: "chrono", // mode d'affichage sélectionné (list, chrono, person, location, trash)
+      allPhotos: [], // La liste de toutes les photos
+      // Les photos triées (avec date)
+      sorted: {
+        photos: [],
+        displayed: [],
+        idx: 0,
+        pageSize: 20,
+      },
+      // les photos à trier (sans date)
+      toSort: {
+        photos: [],
+        displayed: [],
+        idx: 0,
+        pageSize: 20,
+        numberOfPages: 0,
+      },
+      // Les photos signalé comme doublons et masquées
+      trash: {
+        photos: [],
+        displayed: [],
+        idx: 0,
+        pageSize: 20,
+        numberOfPages: 0,
+      },
+      filter: {
+          search: null, // recherche multicritère
+          date: null, // la date de la photo principale affichée
+      },
+      rules: {
+          date: [
+              value => {
+                  const pattern = /^([0-9]{4})?(-[0-9]{2}(-[0-9]{2})?)?$/
+                  return pattern.test(value) || 'La valeur doit être une date valide: YYYY ou bien YYYY-MM ou bien YYYY-MM-DD'
+              }
+          ]
+      }
     }),
-    computed: {
-        numberOfPages () {
-            return Math.ceil(this.photos.length / this.filter.pageSize)
-        }
-    },
+    // computed: {
+    //     numberOfPages () {
+    //         return Math.ceil(this.photos.length / this.filter.pageSize)
+    //     }
+    // },
     mounted() {
         this.loadCollection()
     },
     methods: {
-        loadCollection() {
-            this.isLoading = true;
-            axios.get(`/api/photos/all`).then(response => {
-                let idx = 0;
-                this.photos = parseAxiosResponse(response).map(e => ({ ...e, index: idx++ }));
-                this.displayedPhotos = this.photos.filter(p => !p.doublon || this.filter.viewDoublon );
-                this.filter.pageIndex = 1;
-                store.commit('photosGalleryReset', this.displayedPhotos );
-                this.isLoading = false;
-            }).catch( err => {
-                store.commit('onError', err);
-                this.isLoading = false;
-            });
-        },
-        photosGalleryDisplay(index) {
-            store.commit('photosGallerySetIndex', index);
-            store.commit('photoMetadataEditorDisplay');
-            store.commit('photosGalleryDisplay');
-        },
-        nextPage () {
-            if (this.filter.pageIndex < this.numberOfPages) this.filter.pageIndex += 1;
-            else this.filter.pageIndex = 1;
-        },
-        formerPage () {
-            if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1;
-            else this.filter.pageIndex = this.numberOfPages;
-        },
-        gotoPage () {
-            this.filter.pageIndex = pageIndex;
-            if (this.filter.pageIndex > this.numberOfPages) this.filter.pageIndex = this.numberOfPages;
-            if (this.filter.pageIndex < 1) this.filter.pageIndex = 1;
-            
-        },
-        switchViewDoublon() {
-          debugger;
-          this.filter.viewDoublon = !this.filter.viewDoublon;
-          this.displayedPhotos = this.photos.filter(p => !p.doublon || this.filter.viewDoublon );
-          store.commit('photosGalleryReset', this.displayedPhotos);
-        }
+      updateFilterDateFromPhotoIdx() {
+        this.filter.date = this.sorted.photos[this.sorted.idx].date;
+      },
+      updatePhotoIdxFromDate() {
+        this.sorted.idx = this.sorted.photos.findIndex(p => p.date.startsWith(this.filter.date));
+      },
+
+    loadCollection() {
+        this.isLoading = true;
+        axios.get(`/api/photos/all`).then(response => {
+            let idx = 0;
+            this.allPhotos = parseAxiosResponse(response);
+            this.sorted.photos = this.allPhotos.filter(p => p.date && !p.doublon).map(e => ({ ...e, index: idx++ }));
+            this.sorted.displayed = this.sorted.photos.slice(this.sorted.idx, this.sorted.pageSize);
+            this.sorted.idx = 0;
+            this.toSort.photos = this.allPhotos.filter(p => !p.date && !p.doublon).map(e => ({ ...e, index: idx++ }));
+            this.toSort.idx = 0;
+            this.toSort.numberOfPages = Math.ceil(this.toSort.photos.length / this.toSort.pageSize);
+            this.trash.photos = this.allPhotos.filter(p => p.doublon).map(e => ({ ...e, index: idx++ }));
+            this.trash.idx = 0;
+            this.trash.numberOfPages = Math.ceil(this.trash.photos.length / this.trash.pageSize);
+            this.updateFilterDateFromPhotoIdx();
+            store.commit('photosGalleryReset', this.photosSorted );
+            this.isLoading = false;
+        }).catch( err => {
+            store.commit('onError', err);
+            this.isLoading = false;
+        });
+    },
+    photosGalleryDisplay(index) {
+        store.commit('photosGallerySetIndex', index);
+        store.commit('photoMetadataEditorDisplay');
+        store.commit('photosGalleryDisplay');
+    },
+    nextPage () {
+        if (this.filter.pageIndex < this.numberOfPages) this.filter.pageIndex += 1;
+        else this.filter.pageIndex = 1;
+    },
+    formerPage () {
+        if (this.filter.pageIndex > 1) this.filter.pageIndex -= 1;
+        else this.filter.pageIndex = this.numberOfPages;
+    },
+    gotoPage () {
+        this.filter.pageIndex = pageIndex;
+        if (this.filter.pageIndex > this.numberOfPages) this.filter.pageIndex = this.numberOfPages;
+        if (this.filter.pageIndex < 1) this.filter.pageIndex = 1;
+    },
+    displayTrash() {
+      debugger;
+      console.log("todo");
     }
+  }
 }
 </script>
 

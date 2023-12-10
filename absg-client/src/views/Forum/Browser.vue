@@ -231,14 +231,8 @@ import store from '../../store';
 import { fr } from "date-fns/locale";
 import { differenceInMonths, format } from 'date-fns';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
-import TextEditor from '../../components/TextEditor.vue';
-import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
 
 export default {
-    components: {
-        TextEditor,
-        VEmojiPicker
-    },
     data: () => ({
         isLoading: false,
         breadcrumb: [],

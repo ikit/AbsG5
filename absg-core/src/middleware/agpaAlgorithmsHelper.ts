@@ -11,15 +11,20 @@ import { getRepository } from "typeorm";
  * @param ctx le context de donnée à mettre à jours
  */
 function deliverAwardsPhotos(pIds: number[], catId: number, ctx: any) {
+    // Si pas assez de photos dans la catégories, on n'attribut pas d'AGPA
+    if (pIds.length < 4) {
+        return ;
+    }
+
     // On vérifie si tout est correctement initialisé
     for (let idx = 0; idx < 4; idx++) {
-        if (!ctx.photos[pIds[idx]].awards) {
+        if (!ctx.photos[pIds[idx]]?.awards) {
             ctx.photos[pIds[idx]].awards = [];
         }
     }
 
     // On attribut simplement les agpa or, diamant et bronze aux 1ere, deuxième et troisième photos
-    if (
+    if (pIds.length >= 2 &&
         ctx.photos[pIds[0]].userId === ctx.photos[pIds[1]].userId &&
         ctx.photos[pIds[0]].score === ctx.photos[pIds[1]].score
     ) {
@@ -49,6 +54,11 @@ function deliverAwardsPhotos(pIds: number[], catId: number, ctx: any) {
  * @param ctx le context de donnée à mettre à jours
  */
 function deliverAwardsPhotographes(pIds: number[], ctx: any) {
+    // Si pas assez de photos dans la catégories, on n'attribut pas d'AGPA
+    if (pIds.length < 4) {
+        return ;
+    }
+    
     // On attribut simplement les agpa or, diamant et bronze aux 1er, deuxième et troisième photographes
     ctx.users[pIds[0]].award = AgpaAwardType.gold;
     ctx.users[pIds[1]].award = AgpaAwardType.sylver;

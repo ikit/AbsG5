@@ -258,10 +258,6 @@ export const router = new VueRouter({
             component: () => import("./views/Admin/NewPassword.vue"),
         },
         {
-            path: "/voyag",
-            component: () => import("./views/VoyaG.vue"),
-        },
-        {
             path: "/changelog",
             component: Changelog
         },

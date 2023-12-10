@@ -163,7 +163,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import store from '../store';
 import axios from 'axios';
-//import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { padNumber } from '../middleware/CommonHelper';
 import {Chart} from 'highcharts-vue';

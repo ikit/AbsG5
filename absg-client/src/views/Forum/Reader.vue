@@ -189,14 +189,9 @@ import store from '../../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
 import TextEditor from '../../components/TextEditor.vue';
-import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
 
 export default {
     name: 'Reader',
-    components: {
-        TextEditor,
-        VEmojiPicker
-    },
     props: {
         readOnly: {
             type: Boolean,
