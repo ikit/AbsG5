@@ -1,28 +1,30 @@
-# Rollback Script for AbsG5 Migration
+# Rollback Migration Script for AbsG5
 # This script rolls back the migration to the pre-migration state
 
 param(
-    [Parameter(Mandatory=$true)]
-    [string]$BackupPath,
-    
-    [switch]$Force,
-    [switch]$SkipDatabase,
-    [switch]$SkipCode
+    [string]$BackupFile,
+    [string]$GitTag = "v5.2.0-pre-migration",
+    [switch]$DatabaseOnly,
+    [switch]$CodeOnly,
+    [switch]$Force
 )
 
-Write-Host "==================================" -ForegroundColor Cyan
-Write-Host "AbsG5 Migration Rollback Script" -ForegroundColor Cyan
-Write-Host "==================================" -ForegroundColor Cyan
+Write-Host "`n=== AbsG5 Migration Rollback ===" -ForegroundColor Cyan
 Write-Host ""
 
-# Safety check
+# Warning
 if (-not $Force) {
     Write-Host "WARNING: This will rollback the migration!" -ForegroundColor Red
-    Write-Host "         - Code will be reverted to master branch" -ForegroundColor Yellow
-    Write-Host "         - Database will be restored from backup" -ForegroundColor Yellow
-    Write-Host "         - All migration changes will be lost" -ForegroundColor Yellow
+    Write-Host "This action will:" -ForegroundColor Yellow
+    if (-not $CodeOnly) {
+        Write-Host "  - Restore the database from backup" -ForegroundColor Yellow
+    }
+    if (-not $DatabaseOnly) {
+        Write-Host "  - Reset code to tag: $GitTag" -ForegroundColor Yellow
+    }
     Write-Host ""
     $confirmation = Read-Host "Are you sure you want to continue? (yes/no)"
+    
     if ($confirmation -ne "yes") {
         Write-Host "Rollback cancelled." -ForegroundColor Yellow
         exit 0
@@ -31,147 +33,123 @@ if (-not $Force) {
 
 $rollbackSuccess = $true
 
-# Step 1: Code Rollback
-if (-not $SkipCode) {
-    Write-Host ""
-    Write-Host "[1/3] Rolling back code changes..." -ForegroundColor Yellow
+# Rollback database
+if (-not $CodeOnly) {
+    Write-Host "`n--- Database Rollback ---" -ForegroundColor Cyan
     
-    # Check current branch
-    $currentBranch = git branch --show-current
-    Write-Host "  Current branch: $currentBranch" -ForegroundColor Gray
-    
-    if ($currentBranch -eq "migration/modernization-stack") {
-        # Stash any uncommitted changes
-        Write-Host "  Stashing uncommitted changes..." -ForegroundColor Gray
-        git stash save "Rollback stash $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" 2>&1 | Out-Null
-        
-        # Switch to master
-        Write-Host "  Switching to master branch..." -ForegroundColor Gray
-        git checkout master 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "✓ Switched to master branch" -ForegroundColor Green
-        } else {
-            Write-Host "✗ Error: Could not switch to master branch" -ForegroundColor Red
-            $rollbackSuccess = $false
-        }
-    } else {
-        Write-Host "  Already on master branch" -ForegroundColor Gray
-    }
-    
-    # Restore dependencies
-    if ($rollbackSuccess) {
-        Write-Host ""
-        Write-Host "  Restoring backend dependencies..." -ForegroundColor Gray
-        Push-Location absg-core
-        npm ci 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "  ✓ Backend dependencies restored" -ForegroundColor Green
-        } else {
-            Write-Host "  ✗ Error restoring backend dependencies" -ForegroundColor Red
-            $rollbackSuccess = $false
-        }
-        Pop-Location
-        
-        Write-Host "  Restoring frontend dependencies..." -ForegroundColor Gray
-        Push-Location absg-client
-        npm ci 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "  ✓ Frontend dependencies restored" -ForegroundColor Green
-        } else {
-            Write-Host "  ✗ Error restoring frontend dependencies" -ForegroundColor Red
-            $rollbackSuccess = $false
-        }
-        Pop-Location
-    }
-} else {
-    Write-Host ""
-    Write-Host "[1/3] Skipping code rollback" -ForegroundColor Yellow
-}
-
-# Step 2: Database Rollback
-if (-not $SkipDatabase) {
-    Write-Host ""
-    Write-Host "[2/3] Rolling back database..." -ForegroundColor Yellow
-    
-    # Validate backup path
-    if (-not (Test-Path $BackupPath)) {
-        Write-Host "✗ Error: Backup path not found: $BackupPath" -ForegroundColor Red
-        $rollbackSuccess = $false
-    } else {
-        # Find backup file
-        $backupFile = Get-ChildItem -Path $BackupPath -Filter "absg5_full.backup" -ErrorAction SilentlyContinue
-        if (-not $backupFile) {
-            $backupFile = Get-ChildItem -Path $BackupPath -Filter "absg5_full.sql" -ErrorAction SilentlyContinue
-        }
-        
-        if ($backupFile) {
-            Write-Host "  Found backup: $($backupFile.Name)" -ForegroundColor Gray
+    if (-not $BackupFile) {
+        # Try to find the most recent backup
+        $backupDir = ".\backups"
+        if (Test-Path $backupDir) {
+            $latestBackup = Get-ChildItem -Path $backupDir -Filter "absg5_backup_*.sql" | 
+                            Sort-Object LastWriteTime -Descending | 
+                            Select-Object -First 1
             
-            # Call restore script
-            $restoreScript = Join-Path $PSScriptRoot "restore-database.ps1"
-            if (Test-Path $restoreScript) {
-                & $restoreScript -BackupFile $backupFile.FullName -Force -DropExisting
-                if ($LASTEXITCODE -eq 0) {
-                    Write-Host "✓ Database restored from backup" -ForegroundColor Green
-                } else {
-                    Write-Host "✗ Error: Database restoration failed" -ForegroundColor Red
-                    $rollbackSuccess = $false
-                }
+            if ($latestBackup) {
+                $BackupFile = $latestBackup.FullName
+                Write-Host "Using most recent backup: $BackupFile" -ForegroundColor Green
             } else {
-                Write-Host "✗ Error: Restore script not found" -ForegroundColor Red
+                Write-Host "ERROR: No backup file found in $backupDir" -ForegroundColor Red
                 $rollbackSuccess = $false
             }
         } else {
-            Write-Host "✗ Error: No backup file found in $BackupPath" -ForegroundColor Red
+            Write-Host "ERROR: Backup directory not found: $backupDir" -ForegroundColor Red
             $rollbackSuccess = $false
         }
     }
-} else {
-    Write-Host ""
-    Write-Host "[2/3] Skipping database rollback" -ForegroundColor Yellow
+    
+    if ($BackupFile -and (Test-Path $BackupFile)) {
+        Write-Host "Restoring database from: $BackupFile" -ForegroundColor Yellow
+        
+        try {
+            & .\scripts\restore-database.ps1 -BackupFile $BackupFile -Force
+            
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "✓ Database restored successfully" -ForegroundColor Green
+            } else {
+                Write-Host "✗ Database restore failed" -ForegroundColor Red
+                $rollbackSuccess = $false
+            }
+        } catch {
+            Write-Host "✗ Database restore failed: $($_.Exception.Message)" -ForegroundColor Red
+            $rollbackSuccess = $false
+        }
+    }
 }
 
-# Step 3: Verification
-Write-Host ""
-Write-Host "[3/3] Verifying rollback..." -ForegroundColor Yellow
-
-# Check git branch
-$currentBranch = git branch --show-current
-if ($currentBranch -eq "master" -or $currentBranch -eq "main") {
-    Write-Host "✓ On correct branch: $currentBranch" -ForegroundColor Green
-} else {
-    Write-Host "⚠ Warning: Not on master branch (current: $currentBranch)" -ForegroundColor Yellow
+# Rollback code
+if (-not $DatabaseOnly) {
+    Write-Host "`n--- Code Rollback ---" -ForegroundColor Cyan
+    
+    # Check if we're in a git repository
+    try {
+        $gitStatus = & git status 2>&1
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "ERROR: Not in a git repository" -ForegroundColor Red
+            $rollbackSuccess = $false
+        } else {
+            # Check if tag exists
+            $tagExists = & git tag -l $GitTag
+            
+            if (-not $tagExists) {
+                Write-Host "ERROR: Git tag '$GitTag' not found" -ForegroundColor Red
+                Write-Host "Available tags:" -ForegroundColor Yellow
+                & git tag -l
+                $rollbackSuccess = $false
+            } else {
+                Write-Host "Checking out tag: $GitTag" -ForegroundColor Yellow
+                
+                # Stash any uncommitted changes
+                Write-Host "Stashing uncommitted changes..." -ForegroundColor Yellow
+                & git stash push -m "Pre-rollback stash $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+                
+                # Checkout the tag
+                & git checkout $GitTag
+                
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "✓ Code rolled back to $GitTag" -ForegroundColor Green
+                    
+                    # Reinstall dependencies
+                    Write-Host "`nReinstalling backend dependencies..." -ForegroundColor Yellow
+                    Push-Location absg-core
+                    & npm install
+                    Pop-Location
+                    
+                    Write-Host "Reinstalling frontend dependencies..." -ForegroundColor Yellow
+                    Push-Location absg-client
+                    & npm install
+                    Pop-Location
+                    
+                    Write-Host "✓ Dependencies reinstalled" -ForegroundColor Green
+                } else {
+                    Write-Host "✗ Failed to checkout tag $GitTag" -ForegroundColor Red
+                    $rollbackSuccess = $false
+                }
+            }
+        }
+    } catch {
+        Write-Host "✗ Code rollback failed: $($_.Exception.Message)" -ForegroundColor Red
+        $rollbackSuccess = $false
+    }
 }
-
-# Check Node.js version (should be old version)
-$nodeVersion = node --version
-Write-Host "  Node.js version: $nodeVersion" -ForegroundColor Gray
 
 # Summary
-Write-Host ""
-Write-Host "==================================" -ForegroundColor Cyan
-if ($rollbackSuccess) {
-    Write-Host "Rollback Complete!" -ForegroundColor Green
-} else {
-    Write-Host "Rollback Completed with Errors" -ForegroundColor Yellow
-}
-Write-Host "==================================" -ForegroundColor Cyan
-Write-Host ""
+Write-Host "`n=== Rollback Summary ===" -ForegroundColor Cyan
 
 if ($rollbackSuccess) {
-    Write-Host "System has been rolled back to pre-migration state" -ForegroundColor White
+    Write-Host "✓ Rollback completed successfully!" -ForegroundColor Green
     Write-Host ""
-    Write-Host "Next Steps:" -ForegroundColor Yellow
-    Write-Host "  1. Verify application starts correctly" -ForegroundColor Gray
-    Write-Host "  2. Test critical functionality" -ForegroundColor Gray
-    Write-Host "  3. Review rollback logs for any issues" -ForegroundColor Gray
-    Write-Host "  4. Investigate migration failure causes" -ForegroundColor Gray
+    Write-Host "Next steps:" -ForegroundColor Yellow
+    Write-Host "  1. Verify the application is working correctly"
+    Write-Host "  2. Check database integrity"
+    Write-Host "  3. Review logs for any issues"
+    Write-Host ""
+    Write-Host "To restart the migration:" -ForegroundColor Yellow
+    Write-Host "  git checkout migration/modernization-stack"
+    exit 0
 } else {
-    Write-Host "Rollback encountered errors!" -ForegroundColor Red
-    Write-Host ""
-    Write-Host "Action Required:" -ForegroundColor Yellow
-    Write-Host "  1. Review error messages above" -ForegroundColor Gray
-    Write-Host "  2. Manually verify system state" -ForegroundColor Gray
-    Write-Host "  3. Contact support if needed" -ForegroundColor Gray
+    Write-Host "✗ Rollback completed with errors" -ForegroundColor Red
+    Write-Host "Please review the errors above and take corrective action." -ForegroundColor Yellow
+    exit 1
 }
-Write-Host ""

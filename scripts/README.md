@@ -1,258 +1,211 @@
-# Migration Scripts - AbsG5 Modernization
+# Migration Scripts
 
-This directory contains PowerShell scripts to facilitate the migration process, including backup, restoration, and rollback procedures.
-
-## Prerequisites
-
-- PowerShell 5.1 or higher
-- PostgreSQL client tools (pg_dump, pg_restore, psql) in PATH
-- Git installed and configured
-- Node.js and npm installed
-- Access to the database with appropriate credentials
-- `.env` file configured with database connection details
-
-## Environment Variables
-
-Ensure your `.env` file (or `absg-core/.env`) contains:
-
-```env
-DB_TYPE_DEFAULT=postgres
-DB_HOST_DEFAULT=localhost
-DB_PORT_DEFAULT=5432
-DB_USER_DEFAULT=your_db_user
-DB_PASSWORD_DEFAULT=your_db_password
-DB_NAME_DEFAULT=absg5
-```
+This directory contains PowerShell scripts to help with the AbsG5 modernization migration.
 
 ## Scripts Overview
 
 ### 1. backup-database.ps1
-
-Creates a comprehensive backup of the PostgreSQL database before migration.
+Creates a complete backup of the PostgreSQL database before migration.
 
 **Usage:**
 ```powershell
-# Basic usage (creates backup in ./backups directory)
 .\scripts\backup-database.ps1
-
-# Specify custom backup directory
-.\scripts\backup-database.ps1 -BackupDir "C:\backups\absg5"
-
-# Skip verification step (faster)
-.\scripts\backup-database.ps1 -SkipVerification
 ```
 
-**What it does:**
-- Creates timestamped backup directory
-- Generates full database backup (custom format)
-- Generates SQL format backup (human-readable)
-- Generates schema-only backup
-- Creates backup manifest with metadata
-- Verifies backup integrity (optional)
+**Parameters:**
+- `-BackupDir` - Directory to store backups (default: `.\backups`)
+- `-DbName` - Database name (default: `absg5`)
+- `-DbUser` - PostgreSQL user (default: `postgres`)
+- `-DbHost` - Database host (default: `localhost`)
+- `-DbPort` - Database port (default: `5432`)
+
+**Example:**
+```powershell
+.\scripts\backup-database.ps1 -BackupDir "C:\backups\absg5" -DbName "absg5_prod"
+```
 
 **Output:**
-```
-backups/
-  └── pre-migration-20251122-143022/
-      ├── absg5_full.backup      # Custom format (for pg_restore)
-      ├── absg5_full.sql         # SQL format (for psql)
-      ├── absg5_schema.sql       # Schema only
-      └── BACKUP_MANIFEST.txt    # Backup metadata
-```
+- Creates a timestamped SQL backup file
+- Generates a JSON manifest with backup metadata
+- Verifies backup file integrity
 
 ### 2. restore-database.ps1
-
 Restores a PostgreSQL database from a backup file.
 
 **Usage:**
 ```powershell
-# Restore from custom format backup
-.\scripts\restore-database.ps1 -BackupFile "backups\pre-migration-20251122-143022\absg5_full.backup" -DropExisting -Force
-
-# Restore from SQL format backup
-.\scripts\restore-database.ps1 -BackupFile "backups\pre-migration-20251122-143022\absg5_full.sql" -DropExisting
-
-# Restore without dropping existing database (merge mode)
-.\scripts\restore-database.ps1 -BackupFile "backups\pre-migration-20251122-143022\absg5_full.backup"
+.\scripts\restore-database.ps1 -BackupFile ".\backups\absg5_backup_20251122_143000.sql"
 ```
 
 **Parameters:**
-- `-BackupFile` (required): Path to backup file
-- `-DropExisting`: Drop and recreate database before restore
-- `-Force`: Skip confirmation prompt
+- `-BackupFile` - Path to backup file (required)
+- `-DbName` - Database name (default: `absg5`)
+- `-DbUser` - PostgreSQL user (default: `postgres`)
+- `-DbHost` - Database host (default: `localhost`)
+- `-DbPort` - Database port (default: `5432`)
+- `-Force` - Skip confirmation prompt
 
-**Warning:** This will replace all data in the target database!
+**Example:**
+```powershell
+# With confirmation
+.\scripts\restore-database.ps1 -BackupFile ".\backups\absg5_backup_20251122_143000.sql"
+
+# Without confirmation (use with caution!)
+.\scripts\restore-database.ps1 -BackupFile ".\backups\absg5_backup_20251122_143000.sql" -Force
+```
+
+**Warning:** This script will DROP and recreate the database, destroying all current data!
 
 ### 3. rollback-migration.ps1
-
-Performs a complete rollback of the migration, including code and database.
+Rolls back the migration to the pre-migration state.
 
 **Usage:**
 ```powershell
-# Full rollback (code + database)
-.\scripts\rollback-migration.ps1 -BackupPath "backups\pre-migration-20251122-143022" -Force
-
-# Rollback code only
-.\scripts\rollback-migration.ps1 -BackupPath "backups\pre-migration-20251122-143022" -SkipDatabase -Force
-
-# Rollback database only
-.\scripts\rollback-migration.ps1 -BackupPath "backups\pre-migration-20251122-143022" -SkipCode -Force
+.\scripts\rollback-migration.ps1
 ```
 
 **Parameters:**
-- `-BackupPath` (required): Path to backup directory
-- `-Force`: Skip confirmation prompt
-- `-SkipDatabase`: Skip database rollback
-- `-SkipCode`: Skip code rollback
+- `-BackupFile` - Specific backup file to restore (optional, uses latest if not specified)
+- `-GitTag` - Git tag to rollback to (default: `v5.2.0-pre-migration`)
+- `-DatabaseOnly` - Only rollback database, keep code changes
+- `-CodeOnly` - Only rollback code, keep database changes
+- `-Force` - Skip confirmation prompt
 
-**What it does:**
-- Switches git branch back to master
-- Restores npm dependencies
-- Restores database from backup
-- Verifies rollback success
+**Examples:**
+```powershell
+# Full rollback (database + code)
+.\scripts\rollback-migration.ps1
+
+# Rollback database only
+.\scripts\rollback-migration.ps1 -DatabaseOnly
+
+# Rollback code only
+.\scripts\rollback-migration.ps1 -CodeOnly
+
+# Rollback to specific backup
+.\scripts\rollback-migration.ps1 -BackupFile ".\backups\absg5_backup_20251122_143000.sql"
+```
+
+## Prerequisites
+
+### PostgreSQL Client Tools
+All scripts require PostgreSQL client tools (`pg_dump`, `psql`) to be installed and available in PATH.
+
+**Installation:**
+- Windows: Download from https://www.postgresql.org/download/windows/
+- Or install via package manager: `choco install postgresql` (Chocolatey)
+
+**Verify installation:**
+```powershell
+pg_dump --version
+psql --version
+```
+
+### Git
+The rollback script requires Git to be installed for code rollback functionality.
+
+**Verify installation:**
+```powershell
+git --version
+```
 
 ## Migration Workflow
 
-### Phase 1: Preparation
+### Before Migration
 
-1. **Create backup:**
+1. **Create a backup:**
    ```powershell
    .\scripts\backup-database.ps1
    ```
 
-2. **Verify backup:**
-   - Check backup files exist
-   - Review BACKUP_MANIFEST.txt
-   - Test restoration in staging environment
-
-3. **Document backup location:**
+2. **Tag current version:**
    ```powershell
-   # Note the backup path for rollback
-   # Example: backups/pre-migration-20251122-143022
+   git tag -a v5.2.0-pre-migration -m "Stable version before modernization"
+   git push origin v5.2.0-pre-migration
    ```
 
-### Phase 2: Migration
-
-1. **Ensure you're on migration branch:**
+3. **Create migration branch:**
    ```powershell
-   git branch  # Should show: migration/modernization-stack
+   git checkout -b migration/modernization-stack
    ```
 
-2. **Proceed with migration tasks** (see tasks.md)
+### During Migration
 
-### Phase 3: Rollback (if needed)
+- Keep regular backups at each phase completion
+- Test rollback procedures in development environment
+- Document any issues or deviations from plan
 
-1. **Immediate rollback:**
+### If Rollback Needed
+
+1. **Stop the application**
+
+2. **Run rollback script:**
    ```powershell
-   .\scripts\rollback-migration.ps1 -BackupPath "backups\pre-migration-20251122-143022" -Force
+   .\scripts\rollback-migration.ps1
    ```
 
-2. **Verify rollback:**
-   - Check git branch is master
-   - Test application startup
-   - Verify database data
-
-## Testing Backup/Restore
-
-Before migration, test the backup and restore process:
-
-```powershell
-# 1. Create a test backup
-.\scripts\backup-database.ps1 -BackupDir "backups\test"
-
-# 2. Create a test database
-createdb -U postgres absg5_test
-
-# 3. Restore to test database (modify .env temporarily)
-# Change DB_NAME_DEFAULT to absg5_test in .env
-.\scripts\restore-database.ps1 -BackupFile "backups\test\...\absg5_full.backup" -DropExisting -Force
-
-# 4. Verify test database
-psql -U postgres -d absg5_test -c "SELECT COUNT(*) FROM \"user\";"
-
-# 5. Clean up
-dropdb -U postgres absg5_test
-```
-
-## Troubleshooting
-
-### "pg_dump: command not found"
-
-**Solution:** Add PostgreSQL bin directory to PATH:
-```powershell
-$env:PATH += ";C:\Program Files\PostgreSQL\16\bin"
-```
-
-### "Cannot connect to database"
-
-**Solution:** 
-1. Verify PostgreSQL is running
-2. Check .env file has correct credentials
-3. Test connection manually:
-   ```powershell
-   psql -h localhost -U your_user -d absg5
-   ```
-
-### "Permission denied"
-
-**Solution:** 
-1. Run PowerShell as Administrator
-2. Or adjust execution policy:
-   ```powershell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   ```
-
-### Backup file is too large
-
-**Solution:**
-1. Use compression:
-   ```powershell
-   # After backup, compress the files
-   Compress-Archive -Path "backups\pre-migration-*" -DestinationPath "backups\backup.zip"
-   ```
-
-2. Or use pg_dump compression:
-   ```powershell
-   pg_dump -Z 9 -F c -f backup.backup.gz absg5
-   ```
-
-### Restore is very slow
-
-**Solution:**
-1. Disable triggers during restore:
-   ```powershell
-   pg_restore --disable-triggers ...
-   ```
-
-2. Increase PostgreSQL work_mem temporarily
-
-## Best Practices
-
-1. **Always create a backup before migration**
-2. **Test backup restoration in staging first**
-3. **Keep multiple backup copies** (local + remote)
-4. **Document backup locations** in migration notes
-5. **Verify backup integrity** before proceeding
-6. **Monitor disk space** during backup/restore
-7. **Use timestamped backups** to track versions
-8. **Keep backups for at least 30 days** after successful migration
+3. **Verify rollback:**
+   - Check database integrity
+   - Test application functionality
+   - Review logs
 
 ## Security Notes
 
-- Backup files contain sensitive data - store securely
-- Never commit backup files to git
-- Use encrypted storage for backup archives
-- Restrict access to backup directories
-- Clear PGPASSWORD from environment after use (scripts do this automatically)
+### Password Handling
+Scripts will prompt for PostgreSQL password if not set in environment variable `PGPASSWORD`.
+
+**Option 1: Interactive prompt (recommended)**
+```powershell
+.\scripts\backup-database.ps1
+# Will prompt for password
+```
+
+**Option 2: Environment variable (less secure)**
+```powershell
+$env:PGPASSWORD = "your_password"
+.\scripts\backup-database.ps1
+$env:PGPASSWORD = $null  # Clear after use
+```
+
+**Never commit passwords to version control!**
+
+## Backup Best Practices
+
+1. **Regular backups**: Create backups before each migration phase
+2. **Verify backups**: Always verify backup files are not empty
+3. **Test restores**: Periodically test restore procedures
+4. **Off-site storage**: Store critical backups in a separate location
+5. **Retention policy**: Keep multiple backup versions (at least 3-5)
+
+## Troubleshooting
+
+### "pg_dump not found"
+- Install PostgreSQL client tools
+- Add PostgreSQL bin directory to PATH
+- Restart PowerShell after installation
+
+### "Permission denied"
+- Check PostgreSQL user permissions
+- Verify database exists
+- Check firewall settings
+
+### "Database is being accessed by other users"
+- Stop application servers
+- Close all database connections
+- Use `-Force` parameter (with caution)
+
+### "Backup file is empty"
+- Check disk space
+- Verify database has data
+- Check PostgreSQL logs for errors
 
 ## Support
 
 For issues or questions:
-1. Check troubleshooting section above
-2. Review migration documentation in `.kiro/specs/modernization-stack/`
-3. Contact the migration team
+1. Check the migration documentation in `.kiro/specs/modernization-stack/`
+2. Review PostgreSQL logs
+3. Consult the team lead
 
 ---
 
-**Last Updated:** 2025-11-22  
-**Version:** 1.0
+**Last Updated**: 2025-11-22

@@ -1,199 +1,118 @@
 # Database Backup Script for AbsG5 Migration
-# This script creates a comprehensive backup of the PostgreSQL database
+# This script creates a complete backup of the PostgreSQL database before migration
 
 param(
-    [string]$BackupDir = "backups",
-    [switch]$SkipVerification
+    [string]$BackupDir = ".\backups",
+    [string]$DbName = "absg5",
+    [string]$DbUser = "postgres",
+    [string]$DbHost = "localhost",
+    [int]$DbPort = 5432
 )
 
-# Load environment variables
-if (Test-Path ".env") {
-    Get-Content ".env" | ForEach-Object {
-        if ($_ -match '^([^=]+)=(.*)$') {
-            $name = $matches[1]
-            $value = $matches[2]
-            [Environment]::SetEnvironmentVariable($name, $value, "Process")
-        }
+# Create backup directory if it doesn't exist
+if (-not (Test-Path $BackupDir)) {
+    New-Item -ItemType Directory -Path $BackupDir | Out-Null
+    Write-Host "Created backup directory: $BackupDir" -ForegroundColor Green
+}
+
+# Generate timestamp for backup file
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$backupFile = Join-Path $BackupDir "absg5_backup_$timestamp.sql"
+
+Write-Host "`n=== AbsG5 Database Backup ===" -ForegroundColor Cyan
+Write-Host "Database: $DbName"
+Write-Host "Host: $DbHost:$DbPort"
+Write-Host "User: $DbUser"
+Write-Host "Backup file: $backupFile"
+Write-Host ""
+
+# Check if pg_dump is available
+try {
+    $pgDumpVersion = & pg_dump --version 2>&1
+    Write-Host "PostgreSQL tools found: $pgDumpVersion" -ForegroundColor Green
+} catch {
+    Write-Host "ERROR: pg_dump not found. Please install PostgreSQL client tools." -ForegroundColor Red
+    Write-Host "Download from: https://www.postgresql.org/download/" -ForegroundColor Yellow
+    exit 1
+}
+
+# Perform backup
+Write-Host "Starting backup..." -ForegroundColor Yellow
+
+try {
+    # Set PGPASSWORD environment variable (prompt user if not set)
+    if (-not $env:PGPASSWORD) {
+        $securePassword = Read-Host "Enter PostgreSQL password for user '$DbUser'" -AsSecureString
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword)
+        $env:PGPASSWORD = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     }
-}
 
-# Configuration
-$timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$backupPath = Join-Path $BackupDir "pre-migration-$timestamp"
+    # Execute pg_dump
+    $pgDumpArgs = @(
+        "-h", $DbHost,
+        "-p", $DbPort,
+        "-U", $DbUser,
+        "-F", "p",  # Plain text format
+        "-b",       # Include large objects
+        "-v",       # Verbose
+        "-f", $backupFile,
+        $DbName
+    )
 
-Write-Host "==================================" -ForegroundColor Cyan
-Write-Host "AbsG5 Database Backup Script" -ForegroundColor Cyan
-Write-Host "==================================" -ForegroundColor Cyan
-Write-Host ""
+    & pg_dump @pgDumpArgs
 
-# Create backup directory
-Write-Host "[1/6] Creating backup directory..." -ForegroundColor Yellow
-if (-not (Test-Path $backupPath)) {
-    New-Item -ItemType Directory -Force -Path $backupPath | Out-Null
-    Write-Host "✓ Created: $backupPath" -ForegroundColor Green
-} else {
-    Write-Host "✓ Directory exists: $backupPath" -ForegroundColor Green
-}
-
-# Check PostgreSQL connection
-Write-Host ""
-Write-Host "[2/6] Checking database connection..." -ForegroundColor Yellow
-$dbHost = $env:DB_HOST_DEFAULT
-$dbPort = $env:DB_PORT_DEFAULT
-$dbUser = $env:DB_USER_DEFAULT
-$dbName = $env:DB_NAME_DEFAULT
-
-if (-not $dbHost -or -not $dbPort -or -not $dbUser -or -not $dbName) {
-    Write-Host "✗ Error: Database environment variables not set" -ForegroundColor Red
-    Write-Host "  Please ensure .env file exists with DB_HOST_DEFAULT, DB_PORT_DEFAULT, DB_USER_DEFAULT, DB_NAME_DEFAULT" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host "  Host: $dbHost" -ForegroundColor Gray
-Write-Host "  Port: $dbPort" -ForegroundColor Gray
-Write-Host "  Database: $dbName" -ForegroundColor Gray
-Write-Host "  User: $dbUser" -ForegroundColor Gray
-
-# Test connection
-$env:PGPASSWORD = $env:DB_PASSWORD_DEFAULT
-$testConnection = psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -c "SELECT version();" 2>&1
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "✗ Error: Cannot connect to database" -ForegroundColor Red
-    Write-Host "  $testConnection" -ForegroundColor Red
-    exit 1
-}
-Write-Host "✓ Database connection successful" -ForegroundColor Green
-
-# Full database backup (custom format)
-Write-Host ""
-Write-Host "[3/6] Creating full database backup (custom format)..." -ForegroundColor Yellow
-$fullBackupFile = Join-Path $backupPath "absg5_full.backup"
-pg_dump -h $dbHost -p $dbPort -U $dbUser -F c -b -v -f $fullBackupFile $dbName 2>&1 | Out-Null
-if ($LASTEXITCODE -eq 0) {
-    $fileSize = (Get-Item $fullBackupFile).Length / 1MB
-    Write-Host "✓ Full backup created: $fullBackupFile ($([math]::Round($fileSize, 2)) MB)" -ForegroundColor Green
-} else {
-    Write-Host "✗ Error creating full backup" -ForegroundColor Red
-    exit 1
-}
-
-# SQL format backup
-Write-Host ""
-Write-Host "[4/6] Creating SQL format backup..." -ForegroundColor Yellow
-$sqlBackupFile = Join-Path $backupPath "absg5_full.sql"
-pg_dump -h $dbHost -p $dbPort -U $dbUser -F p -b -v -f $sqlBackupFile $dbName 2>&1 | Out-Null
-if ($LASTEXITCODE -eq 0) {
-    $fileSize = (Get-Item $sqlBackupFile).Length / 1MB
-    Write-Host "✓ SQL backup created: $sqlBackupFile ($([math]::Round($fileSize, 2)) MB)" -ForegroundColor Green
-} else {
-    Write-Host "✗ Error creating SQL backup" -ForegroundColor Red
-    exit 1
-}
-
-# Schema only backup
-Write-Host ""
-Write-Host "[5/6] Creating schema-only backup..." -ForegroundColor Yellow
-$schemaBackupFile = Join-Path $backupPath "absg5_schema.sql"
-pg_dump -h $dbHost -p $dbPort -U $dbUser -s -f $schemaBackupFile $dbName 2>&1 | Out-Null
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "✓ Schema backup created: $schemaBackupFile" -ForegroundColor Green
-} else {
-    Write-Host "✗ Error creating schema backup" -ForegroundColor Red
-}
-
-# Create backup manifest
-Write-Host ""
-Write-Host "[6/6] Creating backup manifest..." -ForegroundColor Yellow
-$manifestFile = Join-Path $backupPath "BACKUP_MANIFEST.txt"
-$gitBranch = git branch --show-current
-$gitCommit = git rev-parse HEAD
-$nodeVersion = node --version
-$pgVersion = psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -t -c "SELECT version();" | Out-String
-
-$manifest = @"
-AbsG5 Database Backup Manifest
-================================
-
-Backup Information
-------------------
-Created: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
-Backup Directory: $backupPath
-Backup Type: Pre-Migration Full Backup
-
-Database Information
---------------------
-Host: $dbHost
-Port: $dbPort
-Database: $dbName
-User: $dbUser
-PostgreSQL Version: $($pgVersion.Trim())
-
-Application Information
------------------------
-Git Branch: $gitBranch
-Git Commit: $gitCommit
-Node.js Version: $nodeVersion
-
-Backup Files
-------------
-Full Backup (Custom): absg5_full.backup
-Full Backup (SQL): absg5_full.sql
-Schema Only: absg5_schema.sql
-
-Backup Statistics
------------------
-Full Backup Size: $([math]::Round((Get-Item $fullBackupFile).Length / 1MB, 2)) MB
-SQL Backup Size: $([math]::Round((Get-Item $sqlBackupFile).Length / 1MB, 2)) MB
-Schema Backup Size: $([math]::Round((Get-Item $schemaBackupFile).Length / 1KB, 2)) KB
-
-Restoration Instructions
-------------------------
-To restore this backup, use:
-  pg_restore -h <host> -p <port> -U <user> -d <database> -v $fullBackupFile
-
-Or for SQL format:
-  psql -h <host> -p <port> -U <user> -d <database> -f $sqlBackupFile
-
-Verification
-------------
-To verify backup integrity:
-  pg_restore -l $fullBackupFile
-
-================================
-"@
-
-$manifest | Out-File -FilePath $manifestFile -Encoding UTF8
-Write-Host "✓ Manifest created: $manifestFile" -ForegroundColor Green
-
-# Verify backup (optional)
-if (-not $SkipVerification) {
-    Write-Host ""
-    Write-Host "[Verification] Verifying backup integrity..." -ForegroundColor Yellow
-    $verifyOutput = pg_restore -l $fullBackupFile 2>&1
     if ($LASTEXITCODE -eq 0) {
-        $tableCount = ($verifyOutput | Select-String "TABLE DATA").Count
-        Write-Host "✓ Backup verified successfully" -ForegroundColor Green
-        Write-Host "  Tables found: $tableCount" -ForegroundColor Gray
+        Write-Host "`nBackup completed successfully!" -ForegroundColor Green
+        
+        # Get backup file size
+        $fileSize = (Get-Item $backupFile).Length
+        $fileSizeMB = [math]::Round($fileSize / 1MB, 2)
+        
+        Write-Host "`nBackup Details:" -ForegroundColor Cyan
+        Write-Host "  File: $backupFile"
+        Write-Host "  Size: $fileSizeMB MB"
+        Write-Host "  Timestamp: $timestamp"
+        
+        # Verify backup file is not empty
+        if ($fileSize -gt 0) {
+            Write-Host "`n✓ Backup file verified (non-empty)" -ForegroundColor Green
+        } else {
+            Write-Host "`n✗ WARNING: Backup file is empty!" -ForegroundColor Red
+            exit 1
+        }
+        
+        # Create a backup manifest
+        $manifestFile = Join-Path $BackupDir "backup_manifest.json"
+        $manifest = @{
+            timestamp = $timestamp
+            database = $DbName
+            host = $DbHost
+            port = $DbPort
+            user = $DbUser
+            backupFile = $backupFile
+            fileSizeMB = $fileSizeMB
+            pgVersion = $pgDumpVersion
+        } | ConvertTo-Json
+        
+        $manifest | Out-File -FilePath $manifestFile -Encoding UTF8
+        Write-Host "  Manifest: $manifestFile" -ForegroundColor Cyan
+        
+        Write-Host "`n=== Backup Complete ===" -ForegroundColor Green
+        Write-Host "To restore this backup, run:" -ForegroundColor Yellow
+        Write-Host "  .\scripts\restore-database.ps1 -BackupFile '$backupFile'" -ForegroundColor White
+        
     } else {
-        Write-Host "✗ Warning: Backup verification failed" -ForegroundColor Yellow
-        Write-Host "  Backup may still be valid, but manual verification recommended" -ForegroundColor Yellow
+        Write-Host "`nERROR: Backup failed with exit code $LASTEXITCODE" -ForegroundColor Red
+        exit 1
     }
+    
+} catch {
+    Write-Host "`nERROR: Backup failed" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    exit 1
+} finally {
+    # Clear password from environment
+    $env:PGPASSWORD = $null
 }
 
-# Summary
-Write-Host ""
-Write-Host "==================================" -ForegroundColor Cyan
-Write-Host "Backup Complete!" -ForegroundColor Green
-Write-Host "==================================" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "Backup Location: $backupPath" -ForegroundColor White
-Write-Host ""
-Write-Host "Next Steps:" -ForegroundColor Yellow
-Write-Host "  1. Verify backup files exist and have reasonable sizes" -ForegroundColor Gray
-Write-Host "  2. Test restoration in a staging environment" -ForegroundColor Gray
-Write-Host "  3. Store backup in a secure location" -ForegroundColor Gray
-Write-Host "  4. Proceed with migration" -ForegroundColor Gray
-Write-Host ""
-
-# Clear password from environment
-$env:PGPASSWORD = $null
+exit 0

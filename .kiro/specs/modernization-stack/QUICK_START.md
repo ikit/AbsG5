@@ -1,130 +1,294 @@
-# Quick Start - Migration Preparation
+# Quick Start Guide - AbsG5 Modernization
 
-This guide provides quick commands to prepare for the AbsG5 modernization migration.
+## 🚀 Getting Started
 
-## ✅ Completed Steps
+This guide will help you begin the AbsG5 modernization migration.
 
-- [x] Created migration branch: `migration/modernization-stack`
-- [x] Documented current system configuration
-- [x] Created backup scripts
-- [x] Created restore scripts
-- [x] Created rollback scripts
-- [x] Updated .gitignore for backups
+## Prerequisites Checklist
 
-## 📋 Pre-Migration Checklist
+Before starting, ensure you have:
 
-Before proceeding with the migration, complete these steps:
+- [ ] **Node.js 20.x LTS** installed
+  ```powershell
+  node --version  # Should show v20.x.x
+  ```
 
-### 1. Verify Environment
+- [ ] **PostgreSQL 16.x** installed (for testing)
+  ```powershell
+  psql --version  # Should show 16.x
+  ```
+
+- [ ] **Git** configured
+  ```powershell
+  git --version
+  ```
+
+- [ ] **Code editor** ready (VS Code recommended)
+
+- [ ] **Database access** credentials available
+
+## Step 1: Prepare Your Environment
+
+### 1.1 Create Migration Branch
 
 ```powershell
+# Navigate to project root
+cd C:\Users\ogueu\Documents\git\AbsG5\AbsG5
+
+# Create and switch to migration branch
+git checkout -b migration/modernization-stack
+
+# Push to remote
+git push -u origin migration/modernization-stack
+```
+
+### 1.2 Tag Current Version
+
+```powershell
+# Tag the current stable version
+git tag -a v5.2.0-pre-migration -m "Stable version before modernization"
+
+# Push tag to remote
+git push origin v5.2.0-pre-migration
+```
+
+### 1.3 Create Database Backup
+
+```powershell
+# Run backup script
+.\scripts\backup-database.ps1
+
+# Verify backup was created
+dir .\backups
+```
+
+**Expected output:**
+```
+absg5_backup_20251122_HHMMSS.sql
+backup_manifest.json
+```
+
+## Step 2: Verify Current State
+
+### 2.1 Check Backend
+
+```powershell
+cd absg-core
+
 # Check Node.js version
 node --version
 
-# Check npm version
-npm --version
+# Install current dependencies
+npm install
 
-# Check PostgreSQL version
-psql --version
-
-# Check Git status
-git status
-git branch  # Should show: migration/modernization-stack
+# Try to start (should work with old versions)
+npm run dev
 ```
 
-### 2. Configure Environment Variables
-
-Ensure `.env` file exists with database credentials:
-
-```env
-DB_TYPE_DEFAULT=postgres
-DB_HOST_DEFAULT=localhost
-DB_PORT_DEFAULT=5432
-DB_USER_DEFAULT=your_db_user
-DB_PASSWORD_DEFAULT=your_db_password
-DB_NAME_DEFAULT=absg5
-```
-
-### 3. Create Database Backup
+### 2.2 Check Frontend
 
 ```powershell
-# Create backup (REQUIRED before migration)
-.\scripts\backup-database.ps1
+cd ..\absg-client
 
-# Note the backup path from output
-# Example: backups/pre-migration-20251122-143022
+# Install current dependencies
+npm install
+
+# Try to start (should work with old versions)
+npm run dev
 ```
 
-### 4. Verify Backup
+### 2.3 Run Security Audit
 
 ```powershell
-# Check backup files exist
-Get-ChildItem backups\pre-migration-* -Recurse
+# Backend audit
+cd ..\absg-core
+npm audit
 
-# Review backup manifest
-Get-Content backups\pre-migration-*\BACKUP_MANIFEST.txt
+# Frontend audit
+cd ..\absg-client
+npm audit
 ```
 
-### 5. Test Backup Restoration (Recommended)
+**Note:** You should see multiple vulnerabilities - this is expected and will be fixed during migration.
+
+## Step 3: Begin Phase 1 - Backend Foundation
+
+### 3.1 Update Backend package.json
+
+Open `absg-core/package.json` and prepare to update:
+
+**Current versions:**
+```json
+{
+  "devDependencies": {
+    "@types/node": "^17.0.14",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "typeorm": "^0.2.41",
+    "express": "^4.17.2",
+    "bcrypt": "^5.0.1",
+    "jsonwebtoken": "^8.5.1"
+  }
+}
+```
+
+**Target versions (Phase 1):**
+```json
+{
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "typeorm": "^0.3.17",
+    "express": "^4.19.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
+```
+
+### 3.2 Follow Task List
+
+Open `.kiro/specs/modernization-stack/tasks.md` and follow tasks in order:
+
+1. ✅ Task 1: Prepare migration environment (you're doing this now!)
+2. ⏭️ Task 2: Update Node.js and TypeScript configuration
+3. ⏭️ Task 3: Migrate TypeORM from 0.2.x to 0.3.x
+4. ⏭️ Task 4: Update security-critical dependencies
+5. ... and so on
+
+## Step 4: Testing Strategy
+
+### 4.1 After Each Task
 
 ```powershell
-# Test in staging environment or test database
-# See scripts/README.md for detailed instructions
+# Backend
+cd absg-core
+npm run build  # Should compile without errors
+npm run dev    # Should start without errors
+
+# Frontend (later phases)
+cd absg-client
+npm run build  # Should build without errors
+npm run dev    # Should start without errors
 ```
 
-## 🚀 Ready to Migrate
-
-Once all checklist items are complete:
-
-1. **Review the migration plan:**
-   - Read: `.kiro/specs/modernization-stack/requirements.md`
-   - Read: `.kiro/specs/modernization-stack/design.md`
-   - Read: `.kiro/specs/modernization-stack/tasks.md`
-
-2. **Start with Task 2:**
-   ```
-   Task 2: Update Node.js and TypeScript configuration
-   ```
-
-3. **Keep backup path handy for rollback:**
-   ```
-   Backup: backups/pre-migration-YYYYMMDD-HHMMSS
-   ```
-
-## 🔄 If Rollback Needed
+### 4.2 Run Tests
 
 ```powershell
-# Full rollback (code + database)
-.\scripts\rollback-migration.ps1 -BackupPath "backups\pre-migration-YYYYMMDD-HHMMSS" -Force
+# Backend tests
+cd absg-core
+npm test
+
+# Frontend tests
+cd absg-client
+npm test
 ```
 
-## 📚 Documentation
+## Step 5: Rollback (If Needed)
 
-- **Full preparation guide:** `.kiro/specs/modernization-stack/MIGRATION_PREPARATION.md`
-- **Script documentation:** `scripts/README.md`
-- **Requirements:** `.kiro/specs/modernization-stack/requirements.md`
-- **Design:** `.kiro/specs/modernization-stack/design.md`
-- **Tasks:** `.kiro/specs/modernization-stack/tasks.md`
+If something goes wrong:
 
-## ⚠️ Important Notes
+```powershell
+# Full rollback (database + code)
+.\scripts\rollback-migration.ps1
 
-1. **Backup is mandatory** - Do not skip this step
-2. **Test in staging first** if possible
-3. **Keep backup for 30+ days** after successful migration
-4. **Document any issues** encountered during migration
-5. **Have rollback plan ready** before starting
+# Or database only
+.\scripts\rollback-migration.ps1 -DatabaseOnly
 
-## 🆘 Emergency Contacts
+# Or code only
+.\scripts\rollback-migration.ps1 -CodeOnly
+```
 
-If you encounter critical issues during migration:
+## Phase Completion Checklist
 
-1. Stop the migration immediately
-2. Run rollback script
-3. Document the issue
-4. Contact migration team
+### Phase 1: Backend Foundation ✓
+- [ ] Node.js 20.x running
+- [ ] TypeScript 5.x compiling
+- [ ] TypeORM 0.3.x working
+- [ ] Security vulnerabilities fixed
+- [ ] All backend tests passing
+- [ ] Backend starts without errors
+
+### Phase 2: Database Migration ✓
+- [ ] PostgreSQL 16.x installed
+- [ ] Database migrations tested
+- [ ] Data integrity verified
+- [ ] Backup/restore working
+
+### Phase 3: Frontend Core ✓
+- [ ] Vue 3 running
+- [ ] Vite building
+- [ ] Pinia stores working
+- [ ] Vue Router 4 working
+
+### Phase 4: Frontend UI ✓
+- [ ] Vuetify 3 integrated
+- [ ] All components migrated
+- [ ] UI consistent
+- [ ] All pages rendering
+
+### Phase 5: Testing ✓
+- [ ] All tests passing
+- [ ] Security audit clean
+- [ ] Performance acceptable
+- [ ] Manual testing complete
+
+### Phase 6: Deployment ✓
+- [ ] Documentation updated
+- [ ] Deployment scripts ready
+- [ ] Production deployed
+- [ ] Monitoring active
+
+## Common Issues & Solutions
+
+### Issue: "Cannot find module 'typeorm'"
+**Solution:** Run `npm install` in the backend directory
+
+### Issue: "TypeScript compilation errors"
+**Solution:** Check tsconfig.json matches the design document specifications
+
+### Issue: "Database connection failed"
+**Solution:** Verify PostgreSQL is running and credentials are correct
+
+### Issue: "npm audit shows vulnerabilities"
+**Solution:** This is expected initially - they will be fixed in Phase 1, Task 4
+
+## Getting Help
+
+1. **Review Documentation:**
+   - Requirements: `.kiro/specs/modernization-stack/requirements.md`
+   - Design: `.kiro/specs/modernization-stack/design.md`
+   - Tasks: `.kiro/specs/modernization-stack/tasks.md`
+
+2. **Check Migration Preparation:**
+   - `.kiro/specs/modernization-stack/MIGRATION_PREPARATION.md`
+
+3. **Review Scripts:**
+   - `scripts/README.md`
+
+## Next Steps
+
+You're now ready to begin! Start with:
+
+1. ✅ Complete Step 1-2 above (environment preparation)
+2. 📋 Open `.kiro/specs/modernization-stack/tasks.md`
+3. 🚀 Begin Task 2: "Update Node.js and TypeScript configuration"
+
+Good luck with the migration! 🎉
 
 ---
 
-**Status:** Preparation Complete ✅  
-**Next Step:** Task 2 - Update Node.js and TypeScript configuration  
-**Date:** 2025-11-22
+**Remember:**
+- Take it one phase at a time
+- Test thoroughly after each task
+- Keep regular backups
+- Don't hesitate to rollback if needed
+- Document any issues or deviations
+
+**Last Updated**: 2025-11-22

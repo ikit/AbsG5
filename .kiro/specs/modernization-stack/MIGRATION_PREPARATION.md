@@ -1,349 +1,176 @@
-# Migration Preparation - AbsG5 Modernization Stack
+# Migration Preparation Checklist
 
-**Date:** 2025-11-22  
-**Branch:** migration/modernization-stack  
-**Status:** Preparation Phase
-
-## Current System Configuration
+## Current State Documentation
 
 ### Backend (absg-core)
-
-#### Core Dependencies
-- **Node.js:** 14.x-16.x (to be verified in production)
-- **TypeScript:** 4.5.5
-- **Express:** 4.17.2
-- **TypeORM:** 0.2.41
-- **PostgreSQL Driver (pg):** 8.7.3
-
-#### Security-Critical Dependencies
-- **bcrypt:** 5.0.1
-- **jsonwebtoken:** 8.5.1 ⚠️ VULNERABLE (CVE-2022-23529)
-- **express-fileupload:** 1.3.1
-
-#### Other Key Dependencies
-- **winston:** 3.5.1
-- **ws:** 8.4.2
-- **date-fns:** 2.28.0
-- **axios:** Not in backend package.json
-
-#### TypeScript Configuration
-```json
-{
-  "target": "es5",
-  "module": "commonjs",
-  "lib": ["es5", "es6"],
-  "experimentalDecorators": true,
-  "emitDecoratorMetadata": true
-}
-```
+- **Node.js**: 14.x-16.x (EOL)
+- **TypeScript**: 4.5.5
+- **TypeORM**: 0.2.41
+- **Express**: 4.17.2
+- **PostgreSQL**: 9.7+ (EOL)
 
 ### Frontend (absg-client)
+- **Vue.js**: 2.6.14
+- **Vuetify**: 2.6.3
+- **Vuex**: 3.6.2
+- **Vue Router**: 2.0.0
+- **Build Tool**: Vue CLI (Webpack)
 
-#### Core Dependencies
-- **Vue.js:** 2.6.14
-- **Vuetify:** 2.6.3
-- **Vuex:** 3.6.2
-- **Vue Router:** 2.0.0
-- **Vue CLI:** 4.5.15 (build tool)
+### Security Vulnerabilities Identified
+- ⚠️ **axios**: 0.21.4 (Multiple CVEs)
+- ⚠️ **jsonwebtoken**: 8.5.1 (CVE-2022-23529)
+- ⚠️ **express**: 4.17.2 (Security patches needed)
 
-#### Security-Critical Dependencies
-- **axios:** 0.21.4 ⚠️ VULNERABLE (Multiple CVEs)
+## Pre-Migration Tasks
 
-#### UI Libraries
-- **highcharts:** 9.3.3
-- **highcharts-vue:** 1.4.0
-- **leaflet:** 1.7.1
-- **vue2-leaflet:** 2.7.1
-- **vuedraggable:** 2.24.3
-- **tiptap-vuetify:** 2.24.0
-- **cropperjs:** 1.5.12
-
-#### Other Dependencies
-- **date-fns:** 2.28.0
-- **vue-native-websocket:** 2.0.15
-
-### Database
-
-#### Current Configuration (from ormconfig.js)
-- **Type:** PostgreSQL
-- **Version:** To be verified (likely 9.7-13.x based on pg_dump path)
-- **PostGIS:** Version to be verified
-- **Synchronize:** true (⚠️ should be false in production)
-- **Logging:** false
-
-## Target System Configuration
-
-### Backend (absg-core)
-- **Node.js:** 20.x LTS
-- **TypeScript:** 5.x
-- **Express:** 4.19.x
-- **TypeORM:** 0.3.x
-- **PostgreSQL Driver (pg):** 8.12.x
-- **bcrypt:** 5.1.x
-- **jsonwebtoken:** 9.0.x
-- **ws:** 8.18.x
-- **date-fns:** 3.x
-- **winston:** 3.11.x
-
-### Frontend (absg-client)
-- **Vue.js:** 3.4.x
-- **Vuetify:** 3.5.x
-- **Pinia:** 2.x (replaces Vuex)
-- **Vue Router:** 4.x
-- **Vite:** 5.x (replaces Vue CLI)
-- **axios:** 1.7.x
-- **highcharts:** 11.x
-- **date-fns:** 3.x
-
-### Database
-- **PostgreSQL:** 16.x
-- **PostGIS:** 3.4.x
-
-## Pre-Migration Checklist
-
-- [x] Create migration branch: `migration/modernization-stack`
-- [ ] Document current Node.js version in production
-- [ ] Document current PostgreSQL version in production
-- [ ] Create full database backup
-- [ ] Test database backup restoration
-- [ ] Document all environment variables
-- [ ] Create rollback procedures
-- [ ] Set up staging environment for testing
-
-## Database Backup Procedures
-
-### 1. Full Database Backup
-
-#### Using pg_dump (Recommended)
+### 1. Create Migration Branch
 ```bash
-# Set backup directory
-$BACKUP_DIR = "backups/pre-migration-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-New-Item -ItemType Directory -Force -Path $BACKUP_DIR
-
-# Full database backup
-pg_dump -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT -F c -b -v -f "$BACKUP_DIR/absg5_full.backup" $env:DB_NAME_DEFAULT
-
-# Plain SQL format (for easier inspection)
-pg_dump -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT -F p -b -v -f "$BACKUP_DIR/absg5_full.sql" $env:DB_NAME_DEFAULT
-
-# Schema only backup
-pg_dump -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT -s -f "$BACKUP_DIR/absg5_schema.sql" $env:DB_NAME_DEFAULT
-
-# Data only backup
-pg_dump -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT -a -f "$BACKUP_DIR/absg5_data.sql" $env:DB_NAME_DEFAULT
+git checkout -b migration/modernization-stack
+git push -u origin migration/modernization-stack
 ```
 
-#### Verify Backup
-```bash
-# Check backup file size
-Get-Item "$BACKUP_DIR/absg5_full.backup" | Select-Object Name, Length, LastWriteTime
+### 2. Document Current Configuration
 
-# List backup contents
-pg_restore -l "$BACKUP_DIR/absg5_full.backup"
+#### Backend Configuration Files
+- [ ] `absg-core/package.json` - Dependencies documented
+- [ ] `absg-core/tsconfig.json` - TypeScript config documented
+- [ ] `absg-core/ormconfig.js` - Database config documented
+- [ ] `absg-core/.env.example` - Environment variables documented
+
+#### Frontend Configuration Files
+- [ ] `absg-client/package.json` - Dependencies documented
+- [ ] `absg-client/vue.config.js` - Build config documented
+- [ ] `absg-client/.eslintrc.js` - Linting config documented
+
+### 3. Database Backup
+
+#### Create Backup Script
+Location: `scripts/backup-database.ps1`
+
+#### Backup Checklist
+- [ ] Full database dump created
+- [ ] Backup file verified (can be restored)
+- [ ] Backup stored in safe location
+- [ ] Backup size documented
+- [ ] Backup timestamp recorded
+
+### 4. Version Control Tags
+
+#### Tag Current Stable Version
+```bash
+git tag -a v5.2.0-pre-migration -m "Stable version before modernization"
+git push origin v5.2.0-pre-migration
 ```
 
-### 2. Application Files Backup
+### 5. Rollback Procedures
 
+#### Create Rollback Scripts
+- [ ] Database restore script created
+- [ ] Application rollback script created
+- [ ] Docker rollback procedure documented
+- [ ] Rollback tested in development
+
+### 6. Development Environment Setup
+
+#### Required Tools
+- [ ] Node.js 20.x LTS installed
+- [ ] PostgreSQL 16.x installed (for testing)
+- [ ] Git configured
+- [ ] Code editor ready (VS Code recommended)
+
+#### Verify Installation
 ```bash
-# Backup current application code
-$APP_BACKUP_DIR = "backups/app-pre-migration-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-New-Item -ItemType Directory -Force -Path $APP_BACKUP_DIR
-
-# Copy application directories
-Copy-Item -Recurse absg-core "$APP_BACKUP_DIR/absg-core"
-Copy-Item -Recurse absg-client "$APP_BACKUP_DIR/absg-client"
-
-# Backup configuration files
-Copy-Item .env "$APP_BACKUP_DIR/.env" -ErrorAction SilentlyContinue
-Copy-Item absg-core/.env "$APP_BACKUP_DIR/absg-core.env" -ErrorAction SilentlyContinue
-Copy-Item absg-client/.env "$APP_BACKUP_DIR/absg-client.env" -ErrorAction SilentlyContinue
-
-# Create backup manifest
-@"
-Backup Created: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
-Git Branch: $(git branch --show-current)
-Git Commit: $(git rev-parse HEAD)
-Node Version: $(node --version)
-NPM Version: $(npm --version)
-"@ | Out-File "$APP_BACKUP_DIR/MANIFEST.txt"
+node --version  # Should show v20.x.x
+npm --version   # Should show 10.x.x
+psql --version  # Should show 16.x
 ```
 
-### 3. Docker Volumes Backup (if using Docker)
+## Migration Readiness Checklist
 
-```bash
-# List Docker volumes
-docker volume ls
+### Code Repository
+- [x] Migration branch created
+- [x] Current version tagged
+- [ ] All changes committed
+- [ ] Working directory clean
 
-# Backup PostgreSQL data volume
-docker run --rm -v absg5_postgres_data:/data -v ${PWD}/backups:/backup alpine tar czf /backup/postgres_data_$(Get-Date -Format 'yyyyMMdd-HHmmss').tar.gz -C /data .
+### Documentation
+- [x] Current state documented
+- [x] Requirements defined
+- [x] Design document created
+- [x] Implementation plan ready
 
-# Backup uploaded files volume (if exists)
-docker run --rm -v absg5_uploads:/data -v ${PWD}/backups:/backup alpine tar czf /backup/uploads_$(Get-Date -Format 'yyyyMMdd-HHmmss').tar.gz -C /data .
-```
+### Backup & Recovery
+- [ ] Database backup created
+- [ ] Backup verified
+- [ ] Rollback scripts ready
+- [ ] Recovery procedure tested
 
-## Database Restoration Procedures
+### Team Preparation
+- [ ] Team notified of migration
+- [ ] Migration timeline communicated
+- [ ] Roles and responsibilities assigned
+- [ ] Communication channels established
 
-### 1. Restore from Custom Format Backup
-
-```bash
-# Drop existing database (CAUTION!)
-dropdb -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT $env:DB_NAME_DEFAULT
-
-# Create new database
-createdb -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT $env:DB_NAME_DEFAULT
-
-# Restore from backup
-pg_restore -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT -d $env:DB_NAME_DEFAULT -v "$BACKUP_DIR/absg5_full.backup"
-```
-
-### 2. Restore from SQL Format Backup
-
-```bash
-# Drop and recreate database
-dropdb -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT $env:DB_NAME_DEFAULT
-createdb -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT $env:DB_NAME_DEFAULT
-
-# Restore from SQL file
-psql -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT -d $env:DB_NAME_DEFAULT -f "$BACKUP_DIR/absg5_full.sql"
-```
-
-### 3. Verify Restoration
-
-```bash
-# Connect to database and verify
-psql -U $env:DB_USER_DEFAULT -h $env:DB_HOST_DEFAULT -p $env:DB_PORT_DEFAULT -d $env:DB_NAME_DEFAULT
-
-# Run verification queries
-SELECT COUNT(*) FROM "user";
-SELECT COUNT(*) FROM photo;
-SELECT COUNT(*) FROM forum_topic;
-# ... add more verification queries as needed
-```
-
-## Application Rollback Procedures
-
-### 1. Git Rollback
-
-```bash
-# View current branch
-git branch
-
-# Return to main/master branch
-git checkout master
-
-# If changes were merged, revert the merge commit
-git revert -m 1 <merge-commit-hash>
-
-# Or reset to before migration (DESTRUCTIVE)
-git reset --hard <commit-before-migration>
-```
-
-### 2. Dependency Rollback
-
-```bash
-# Backend rollback
-cd absg-core
-git checkout master -- package.json package-lock.json
-npm ci
-
-# Frontend rollback
-cd ../absg-client
-git checkout master -- package.json package-lock.json
-npm ci
-```
-
-### 3. Database Rollback
-
-```bash
-# Restore from pre-migration backup
-# See "Database Restoration Procedures" above
-```
-
-### 4. Docker Rollback (if using Docker)
-
-```bash
-# Stop current containers
-docker-compose down
-
-# Checkout previous docker-compose configuration
-git checkout master -- docker-compose.yml install/docker-compose-base.yml
-
-# Pull previous images
-docker-compose pull
-
-# Start with previous configuration
-docker-compose up -d
-```
-
-## Migration Risk Assessment
+## Risk Assessment
 
 ### High Risk Areas
-1. **TypeORM 0.2.x → 0.3.x**: Major breaking changes in API
-2. **Vue 2 → Vue 3**: Significant component API changes
-3. **Vuex → Pinia**: Complete state management rewrite
-4. **PostgreSQL upgrade**: Potential data migration issues
+1. **TypeORM 0.2.x → 0.3.x**: Major API changes
+2. **Vue 2 → Vue 3**: Significant breaking changes
+3. **Vuetify 2 → 3**: Complete rewrite
+4. **Database migration**: Data integrity critical
 
-### Medium Risk Areas
-1. **Node.js 14/16 → 20**: Generally backward compatible
-2. **Express 4.17 → 4.19**: Minor version, mostly security patches
-3. **Vuetify 2 → 3**: UI component changes
+### Mitigation Strategies
+1. **Incremental migration**: Phase-by-phase approach
+2. **Comprehensive testing**: Test each phase thoroughly
+3. **Rollback capability**: Always maintain rollback option
+4. **Parallel environments**: Keep old version running during migration
 
-### Low Risk Areas
-1. **TypeScript 4.5 → 5.x**: Good backward compatibility
-2. **Vue Router 2 → 4**: Well-documented migration path
-3. **Dependency updates**: Most are minor/patch versions
+## Success Criteria
 
-## Rollback Decision Criteria
+### Phase 1 Complete When:
+- [ ] Backend runs on Node.js 20.x
+- [ ] TypeORM 0.3.x working
+- [ ] All security vulnerabilities fixed
+- [ ] All backend tests passing
 
-### Immediate Rollback Triggers
-- Database corruption or data loss
-- Authentication system failure
-- Critical functionality completely broken
-- Security vulnerability introduced
-- Performance degradation > 50%
+### Phase 2 Complete When:
+- [ ] PostgreSQL 16.x running
+- [ ] All migrations tested
+- [ ] Data integrity verified
+- [ ] Backup/restore procedures working
 
-### Acceptable Issues (Fix Forward)
-- Minor UI inconsistencies
-- Non-critical feature bugs
-- Performance degradation < 20%
-- Deprecation warnings
-- Test failures in non-critical paths
+### Phase 3 Complete When:
+- [ ] Vue 3 running
+- [ ] Vite build working
+- [ ] Pinia stores functional
+- [ ] Vue Router 4 working
 
-## Communication Plan
+### Phase 4 Complete When:
+- [ ] Vuetify 3 integrated
+- [ ] All UI components migrated
+- [ ] UI/UX consistent
+- [ ] All pages rendering
 
-### Before Migration
-- [ ] Notify all stakeholders of migration timeline
-- [ ] Schedule maintenance window
-- [ ] Prepare status page updates
+### Phase 5 Complete When:
+- [ ] All tests passing
+- [ ] Security audit clean
+- [ ] Performance benchmarks met
+- [ ] Manual testing complete
 
-### During Migration
-- [ ] Post status updates every hour
-- [ ] Document any issues encountered
-- [ ] Keep rollback option ready
-
-### After Migration
-- [ ] Verify all critical functionality
-- [ ] Monitor error logs for 24 hours
-- [ ] Collect user feedback
-- [ ] Document lessons learned
-
-## Emergency Contacts
-
-- **Database Administrator:** [To be filled]
-- **DevOps Lead:** [To be filled]
-- **Project Manager:** [To be filled]
-- **On-Call Developer:** [To be filled]
+### Phase 6 Complete When:
+- [ ] Documentation updated
+- [ ] Deployment scripts ready
+- [ ] Production deployment successful
+- [ ] Monitoring active
 
 ## Next Steps
 
-1. Execute database backup procedures
-2. Test backup restoration in staging environment
-3. Document production environment details
-4. Begin Phase 1: Backend Foundation migration
-5. Set up continuous monitoring during migration
+1. Review this checklist with the team
+2. Execute pre-migration tasks
+3. Begin Phase 1: Backend Foundation
+4. Monitor progress and adjust as needed
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2025-11-22  
-**Maintained By:** Migration Team
+**Last Updated**: 2025-11-22
+**Status**: Ready to begin
