@@ -1,4 +1,4 @@
-import * as morgan from "morgan";
+import morgan from "morgan";
 import { format, createLogger, transports, config, addColors } from "winston";
 import { format as formatDate } from "date-fns";
 import { PgLogger } from "./pgLogger";

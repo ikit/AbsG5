@@ -6,6 +6,10 @@ import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import * as express from "express";
 import * as fileUpload from "express-fileupload";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import {
     agpaService,
     citationService,
@@ -44,6 +48,30 @@ AppDataSource.initialize()
             currentUserChecker
         });
 
+        // Security middleware
+        app.use(helmet({
+            contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
+            crossOriginEmbedderPolicy: false
+        }));
+
+        // CORS configuration
+        app.use(cors({
+            origin: process.env.CORS_ORIGIN || "*",
+            credentials: true
+        }));
+
+        // Rate limiting
+        const limiter = rateLimit({
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: 100, // Limit each IP to 100 requests per windowMs
+            standardHeaders: true,
+            legacyHeaders: false,
+        });
+        app.use("/api/", limiter);
+
+        // Cookie parser
+        app.use(cookieParser());
+
         if (process.env.NODE_ENV === "development") {
             app.use("/files", express.static(process.env.PATH_FILES));
         }
@@ -51,7 +79,8 @@ AppDataSource.initialize()
         // enable files upload
         app.use(
             fileUpload({
-                createParentPath: true
+                createParentPath: true,
+                limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
             })
         );
 

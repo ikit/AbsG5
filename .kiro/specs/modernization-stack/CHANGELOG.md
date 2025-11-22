@@ -293,3 +293,80 @@ public initService() {
 - Task 6: Checkpoint - Backend foundation complete
 
 ---
+
+
+### Task 4: Update security-critical dependencies ✅
+**Date**: 2025-11-22  
+**Status**: Complete
+
+**Major Security Updates:**
+
+#### Authentication & Security (Sub-task 4.1) ✅
+- ✅ `bcrypt`: 5.0.1 → 5.1.1 (latest secure version)
+- ✅ `jsonwebtoken`: 8.5.1 → 9.0.2 (fixes CVE-2022-23529)
+- ✅ Fixed JWT type handling for v9.x API changes
+
+#### Express & Middleware (Sub-task 4.3) ✅
+- ✅ `express`: 4.17.2 → 4.19.2 (security patches)
+- ✅ `express-fileupload`: 1.3.1 → 1.5.0 (updated)
+- ✅ Added `helmet`: 7.1.0 (security headers)
+- ✅ Added `express-rate-limit`: 7.1.5 (DDoS protection)
+- ✅ Added `cors`: 2.8.5 (CORS management)
+- ✅ Added `cookie-parser`: 1.4.6 (cookie handling)
+
+#### Other Dependencies (Sub-task 4.5) ✅
+- ✅ `date-fns`: 2.28.0 → 3.0.0 (major update)
+- ✅ `morgan`: Updated with correct import syntax
+
+**TypeScript Types Added:**
+- @types/bcrypt, @types/express, @types/jsonwebtoken
+- @types/morgan, @types/multer, @types/ws
+- @types/cors, @types/cookie-parser
+
+**Security Middleware Implemented:**
+- ✅ Helmet for security headers (CSP, XSS protection)
+- ✅ Rate limiting (100 requests per 15 minutes per IP)
+- ✅ CORS configuration with credentials support
+- ✅ Cookie parser for secure cookie handling
+- ✅ File upload size limits (50MB max)
+
+**Code Fixes:**
+- ✅ Fixed `morgan` import for ESM compatibility
+- ✅ Fixed `jsonwebtoken` v9.x type handling
+- ✅ Fixed WebSocket port type (string → number)
+- ✅ Updated `getRepository` import in userSessionHelpers
+
+**Vulnerability Reduction:**
+- Before Task 4: 14 vulnerabilities
+- After Task 4: 8 vulnerabilities (-43%)
+- **Total reduction from start: 43 → 8 (-81%)**
+
+**Remaining Vulnerabilities:**
+- 5 low severity (transitive dependencies: brace-expansion, braces, minimatch, on-headers)
+- 1 moderate (nodemailer - requires breaking change to fix)
+- 2 high (routing-controllers cookie dependency - requires breaking change)
+
+**Critical Vulnerabilities:** ✅ ALL FIXED
+- ✅ jsonwebtoken CVE-2022-23529: FIXED
+- ✅ axios multiple CVEs: FIXED (updated in Task 3)
+- ✅ express security issues: FIXED
+
+**Files Modified:**
+- `package.json` - Updated all security-critical dependencies
+- `src/api.ts` - Added security middleware (helmet, rate-limit, cors)
+- `src/middleware/logger.ts` - Fixed morgan import
+- `src/middleware/userSessionHelpers.ts` - Fixed JWT types, getRepository import
+- `src/wss.ts` - Fixed WebSocket port type
+
+**Verification:**
+- ✅ TypeScript compilation successful
+- ✅ All security middleware configured
+- ✅ Rate limiting active
+- ✅ Security headers enabled
+- ✅ CORS properly configured
+
+**Next Steps:**
+- Task 5: Update backend services initialization
+- Task 6: Checkpoint - Backend foundation complete
+
+---

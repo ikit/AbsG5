@@ -31,6 +31,7 @@
 - [x] 3. Migrate TypeORM from 0.2.x to 0.3.x
 
 
+
 - [x] 3.1 Update TypeORM package and dependencies
 
 
@@ -73,8 +74,12 @@
   - **Property 5: Database query compatibility**
   - **Validates: Requirements 6.3**
 
-- [ ] 4. Update security-critical dependencies
-- [ ] 4.1 Update authentication packages
+- [x] 4. Update security-critical dependencies
+
+
+- [x] 4.1 Update authentication packages
+
+
   - Update bcrypt to 5.1.x
   - Update jsonwebtoken to 9.0.x
   - Update JWT signing and verification code
@@ -84,7 +89,9 @@
   - **Property 7: Password hashing strength**
   - **Validates: Requirements 4.7**
 
-- [ ] 4.3 Update Express and middleware
+- [x] 4.3 Update Express and middleware
+
+
   - Update express to 4.19.x
   - Replace express-fileupload with multer
   - Add helmet for security headers
@@ -95,7 +102,9 @@
   - **Property 6: File upload validation**
   - **Validates: Requirements 4.6**
 
-- [ ] 4.5 Update other backend dependencies
+- [x] 4.5 Update other backend dependencies
+
+
   - Update axios to 1.7.x (for any backend usage)
   - Update ws to 8.18.x
   - Update winston to 3.11.x

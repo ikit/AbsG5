@@ -1,7 +1,7 @@
 import * as WebSocket from "ws";
 import { logger } from "./middleware/logger";
 
-const port = process.env.WS_PORT;
+const port = parseInt(process.env.WS_PORT || "5012", 10);
 const wss = new WebSocket.Server({ port });
 
 wss.on("connection", () => {
