@@ -1,6 +1,6 @@
 require("dotenv").config();
 import "reflect-metadata";
-import { createConnections } from "typeorm";
+import { AppDataSource } from "./data-source";
 import { createExpressServer } from "routing-controllers";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
@@ -17,12 +17,11 @@ import {
     forumService,
     gthequeService
 } from "./services";
-import * as ormconfig from "../ormconfig";
 import { albumService } from "./services/AlbumService";
 
-createConnections(ormconfig)
+AppDataSource.initialize()
     .then(() => {
-        logger.info("ORM connection created");
+        logger.info("TypeORM DataSource initialized successfully");
 
         // Une fois la connection créé, on peut initialialiser les services
         agendaService.initService();

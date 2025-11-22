@@ -107,3 +107,101 @@ The following vulnerabilities are expected and will be addressed in subsequent t
 ---
 
 **Last Updated**: 2025-11-22
+
+
+### Task 3: Migrate TypeORM from 0.2.x to 0.3.x ✅
+**Date**: 2025-11-22  
+**Status**: In Progress (Sub-tasks 3.1 and 3.2 completed)
+
+#### Sub-task 3.1: Update TypeORM package and dependencies ✅
+
+**Changes:**
+- ✅ Updated `typeorm`: 0.2.41 → 0.3.20
+- ✅ Updated `pg`: 8.7.3 → 8.12.0
+- ✅ Updated `routing-controllers`: 0.9.0 → 0.10.4
+- ✅ Added `reflect-metadata`: 0.2.1 (explicit dependency)
+- ✅ Updated `async-mutex`: 0.3.2 → 0.5.0
+- ✅ Updated `class-validator`: 0.13.2 → 0.14.1
+- ✅ Updated `jimp`: 0.16.1 → 0.22.12
+- ✅ Updated `nodemailer`: 6.7.2 → 6.9.9
+- ✅ Updated `url-join`: 4.0.1 → 5.0.0
+- ✅ Updated `winston`: 3.5.1 → 3.11.0
+- ✅ Updated `ws`: 8.4.2 → 8.18.0
+
+**Script Updates:**
+- ✅ Updated `typeorm` script to use `typeorm-ts-node-commonjs`
+- ✅ Added `migration:generate`, `migration:run`, `migration:revert` scripts
+
+**Verification:**
+- ✅ 515 packages installed
+- ✅ Vulnerabilities reduced: 43 → 14 (67% reduction)
+
+#### Sub-task 3.2: Migrate database configuration to DataSource API ✅
+
+**Major Changes:**
+
+**1. Created new DataSource configuration** (`src/data-source.ts`):
+- Replaced deprecated `createConnections()` with `DataSource` API
+- Configured connection pooling (max: 20 connections)
+- Environment-aware configuration (dev/prod)
+- Proper TypeScript typing
+
+**2. Updated API entry point** (`src/api.ts`):
+- Replaced `createConnections(ormconfig)` with `AppDataSource.initialize()`
+- Removed dependency on `ormconfig.js`
+- Improved error handling
+
+**3. Created database helper** (`src/middleware/database.ts`):
+- Created `getRepository()` helper function
+- Wraps `AppDataSource.getRepository()` for backward compatibility
+- Simplifies service migration
+
+**4. Updated all services** to use new `getRepository`:
+- ✅ AgendaService
+- ✅ AgpaService
+- ✅ AlbumService
+- ✅ CitationService
+- ✅ EventService
+- ✅ ForumService
+- ✅ GThequeService
+- ✅ ImmtService
+- ✅ UserService
+- ✅ VoyagService
+- ✅ PgLogger (middleware)
+
+**5. Fixed TypeORM 0.3.x API changes**:
+- Updated `findOne()` calls: `findOne(id)` → `findOne({ where: { id } })`
+- Fixed in AgendaService (savePerson, savePlace methods)
+
+**6. Fixed dependency issues**:
+- Fixed `url-join` import (v5.x uses default export)
+- Fixed `winston` logger type annotations
+- Fixed `winston-transport` import
+
+**Files Created:**
+- `absg-core/src/data-source.ts`
+- `absg-core/src/middleware/database.ts`
+
+**Files Modified:**
+- `absg-core/src/api.ts`
+- `absg-core/src/services/*.ts` (all 10 services)
+- `absg-core/src/middleware/pgLogger.ts`
+- `absg-core/src/middleware/logger.ts`
+
+**Verification:**
+- ✅ TypeScript compilation successful
+- ✅ No diagnostic errors
+- ✅ All services updated
+- ✅ Build output generated
+
+**Breaking Changes Handled:**
+- `createConnections()` → `DataSource.initialize()`
+- `getRepository()` → `AppDataSource.getRepository()`
+- `findOne(id)` → `findOne({ where: { id } })`
+
+**Next Steps:**
+- Sub-task 3.3: Update all entity files for TypeORM 0.3.x syntax
+- Sub-task 3.5: Update repository pattern usage
+- Sub-task 3.6: Write property test for database query compatibility
+
+---

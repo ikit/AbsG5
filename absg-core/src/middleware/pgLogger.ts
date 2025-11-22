@@ -1,5 +1,5 @@
 import Transport from "winston-transport";
-import { getRepository } from "typeorm";
+import { getRepository } from "./database";
 import { LogSystem, LogSeverity } from "../entities";
 import { websocketService, WSMessageType } from "../services/WebsocketService";
 

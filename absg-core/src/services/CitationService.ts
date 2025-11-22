@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { Citation, User, Person, LogModule } from "../entities";
 import { isNumber, isString } from "util";
 import { logger } from "../middleware/logger";

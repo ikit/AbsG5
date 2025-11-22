@@ -17,7 +17,9 @@
   - Set up rollback procedures
   - _Requirements: 10.2, 10.3_
 
-- [-] 2. Update Node.js and TypeScript configuration
+- [x] 2. Update Node.js and TypeScript configuration
+
+
 
   - Update package.json to require Node.js 20.x LTS
   - Update TypeScript to 5.x
@@ -26,14 +28,19 @@
   - Test compilation with new TypeScript version
   - _Requirements: 1.1, 1.2, 7.1_
 
-- [ ] 3. Migrate TypeORM from 0.2.x to 0.3.x
-- [ ] 3.1 Update TypeORM package and dependencies
+- [-] 3. Migrate TypeORM from 0.2.x to 0.3.x
+
+- [x] 3.1 Update TypeORM package and dependencies
+
+
   - Update typeorm to 0.3.x
   - Update pg driver to 8.12.x
   - Update reflect-metadata if needed
   - _Requirements: 1.3, 2.3_
 
-- [ ] 3.2 Migrate database configuration to DataSource API
+- [x] 3.2 Migrate database configuration to DataSource API
+
+
   - Replace createConnections with DataSource
   - Update ormconfig.js to DataSource configuration
   - Update connection initialization in api.ts

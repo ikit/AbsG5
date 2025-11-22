@@ -1,4 +1,5 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { Person, User, LogModule, Place } from "../entities";
 import { logger } from "../middleware/logger";
 import * as fs from "fs";
@@ -44,7 +45,7 @@ class AgendaService {
         const personId = Number.parseInt(personData.id);
         let person = new Person();
         if (personId) {
-            person = await this.personsRepo.findOne(personId);
+            person = await this.personsRepo.findOne({ where: { id: personId } });
         }
         personData.id = personId ? personId : null; // pour éviter les problèmes lors du save en DB
         person.fromJSON(personData);
@@ -89,7 +90,7 @@ class AgendaService {
         const placeId = Number.parseInt(placeData.id);
         let place = new Place();
         if (placeId) {
-            place = await this.placesRepo.findOne(placeId);
+            place = await this.placesRepo.findOne({ where: { id: placeId } });
         }
         placeData.id = placeId ? placeId : null; // pour éviter les problèmes lors du save en DB
         place.fromJSON(placeData);

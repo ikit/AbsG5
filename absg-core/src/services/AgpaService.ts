@@ -12,7 +12,8 @@ import {
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { logger } from "../middleware/logger";
-import { getRepository, Equal } from "typeorm";
+import { Equal } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { saveImage, shuffleArray } from "../middleware/commonHelper";
 import * as path from "path";
 import * as fs from "fs";

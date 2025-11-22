@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { getDayOfYear } from "date-fns";
 import { Immt, User, LogModule } from "../entities";
 import * as path from "path";

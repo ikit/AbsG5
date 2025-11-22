@@ -1,4 +1,5 @@
-import { getRepository, Between, Repository } from "typeorm";
+import { Between, Repository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { ForumMessage, ForumTopic, User, Forum, LogModule } from "../entities";
 import { addMonths, format } from "date-fns";
 import { fr } from 'date-fns/locale';

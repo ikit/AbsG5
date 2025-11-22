@@ -1,4 +1,5 @@
-import { getRepository, Equal } from "typeorm";
+import { Equal } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { User, LogPassag, Person } from "../entities";
 import { format, differenceInDays } from "date-fns";
 import { cleanString, sendEmail } from "../middleware/commonHelper";

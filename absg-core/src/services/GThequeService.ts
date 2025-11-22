@@ -2,9 +2,10 @@ import { User } from "../entities";
 import * as path from "path";
 import { fetchFolder } from "../middleware/commonHelper";
 import { GThequeCollection } from "../entities/GThequeCollection";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { GTheque } from "../entities/GTheque";
-import * as urljoin from "url-join";
+import urljoin from "url-join";
 
 class GThequeService {
     private collectionRepo: Repository<GThequeCollection> = null;
