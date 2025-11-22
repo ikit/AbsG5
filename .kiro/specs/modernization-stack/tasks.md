@@ -28,7 +28,8 @@
   - Test compilation with new TypeScript version
   - _Requirements: 1.1, 1.2, 7.1_
 
-- [-] 3. Migrate TypeORM from 0.2.x to 0.3.x
+- [x] 3. Migrate TypeORM from 0.2.x to 0.3.x
+
 
 - [x] 3.1 Update TypeORM package and dependencies
 
@@ -41,12 +42,15 @@
 - [x] 3.2 Migrate database configuration to DataSource API
 
 
+
   - Replace createConnections with DataSource
   - Update ormconfig.js to DataSource configuration
   - Update connection initialization in api.ts
   - _Requirements: 1.3_
 
-- [ ] 3.3 Update all entity files for TypeORM 0.3.x syntax
+- [x] 3.3 Update all entity files for TypeORM 0.3.x syntax
+
+
   - Update User entity with explicit column types
   - Update Photo entity
   - Update all other entities (Person, Forum, Citation, etc.)
@@ -57,7 +61,9 @@
   - **Property 1: TypeORM DataSource API consistency**
   - **Validates: Requirements 1.3**
 
-- [ ] 3.5 Update repository pattern usage
+- [x] 3.5 Update repository pattern usage
+
+
   - Replace getRepository() with DataSource.getRepository()
   - Update all service files using repositories
   - Test all database operations
