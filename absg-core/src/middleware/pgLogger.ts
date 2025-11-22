@@ -1,14 +1,14 @@
-import * as Transport from "winston-transport";
+import Transport from "winston-transport";
 import { getRepository } from "typeorm";
 import { LogSystem, LogSeverity } from "../entities";
 import { websocketService, WSMessageType } from "../services/WebsocketService";
 
 export class PgLogger extends Transport {
-    constructor(opts) {
+    constructor(opts: any) {
         super(opts);
     }
 
-    log(info, callback) {
+    log(info: any, callback: () => void) {
         setImmediate(() => {
             this.emit("logged", info);
         });
