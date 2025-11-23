@@ -64,18 +64,16 @@
             v-for="(file, index) in fileInfos"
             :key="index"
           >
-            <v-list-item-content>
-              <v-list-item-title class="mb-3">
-                <a :href="file.url">{{ file.name }}</a>
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                <img
-                  :src="file.url"
-                  :alt="file.name"
-                  height="80px"
-                >
-              </v-list-item-subtitle>
-            </v-list-item-content>
+            <v-list-item-title class="mb-3">
+              <a :href="file.url">{{ file.name }}</a>
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              <img
+                :src="file.url"
+                :alt="file.name"
+                height="80px"
+              >
+            </v-list-item-subtitle>
           </v-list-item>
         </v-list-item-group>
       </v-list>

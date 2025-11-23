@@ -1,6 +1,6 @@
 <template>
   <section id="content">
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip bottom>
           <template #activator="{ on }">
@@ -13,7 +13,7 @@
               <v-icon left>
                 fas fa-chevron-left
               </v-icon>
-              <span v-if="$vuetify.breakpoint.mdAndUp">Retour</span>
+              <span v-if="$vuetify.display.mdAndUp">Retour</span>
             </v-btn>
           </template>
           <span>Retour au sommaire de l'édition</span>
@@ -102,11 +102,11 @@
         v-if="current"
         fluid
       >
-        <v-layout
+        <v-row
           row
           wrap
         >
-          <v-flex
+          <v-col
             v-for="(photo, index) in photosGalery"
             :key="photo.id"
             style="min-width: 250px; width: 15%; margin: 15px"
@@ -138,8 +138,8 @@
                 </div>
               </v-card>
             </div>
-          </v-flex>
-        </v-layout>
+          </v-col>
+        </v-row>
       </v-container>
     </div>
   </section>

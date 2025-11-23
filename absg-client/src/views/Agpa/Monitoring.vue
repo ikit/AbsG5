@@ -170,7 +170,7 @@
             <v-select
               :items="notesCategories"
               label="Catégorie"
-              item-text="label"
+              item-title="label"
               item-value="id"
               style="width: 200px"
               @change="updateNotesList($event)"
@@ -609,7 +609,7 @@ import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middle
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget';
+import PhotoWidget from './components/PhotoWidget.vue';
 import store from '../../store';
 import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';

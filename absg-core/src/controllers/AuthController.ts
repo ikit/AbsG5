@@ -1,14 +1,16 @@
-import { getRepository } from "typeorm";
 import { JsonController, Post, Body, BadRequestError, Delete, CurrentUser, Get, Authorized } from "routing-controllers";
 import { User } from "../entities";
 import { logger } from "../middleware/logger";
 import { cleanString } from "../middleware/commonHelper";
 import { checkPassword, createToken } from "../middleware";
 import { userService } from "../services";
+import { AppDataSource } from "../data-source";
 
 @JsonController("/auth")
 export class AuthController {
-    private userRepo = getRepository(User);
+    private get userRepo() {
+        return AppDataSource.getRepository(User);
+    }
 
     @Post("/login")
     async login(@Body() payload) {

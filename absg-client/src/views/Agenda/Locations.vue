@@ -12,7 +12,7 @@
           />
           <v-spacer />
           <v-btn
-            v-if="$vuetify.breakpoint.lgAndUp"
+            v-if="$vuetify.display.lgAndUp"
             @click="resetDialog(true)"
           >
             <v-icon left>
@@ -41,7 +41,7 @@
         >
           <template #[`item.name`]="{ item }">
             <div
-              v-if="item.thumb && $vuetify.breakpoint.lgAndUp"
+              v-if="item.thumb && $vuetify.display.lgAndUp"
               class="thumb"
             >
               <img
@@ -50,7 +50,7 @@
               >
             </div>
             <div
-              v-if="!item.thumb && $vuetify.breakpoint.lgAndUp"
+              v-if="!item.thumb && $vuetify.display.lgAndUp"
               class="noThumb"
             >
               <v-icon small>

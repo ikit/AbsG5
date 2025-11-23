@@ -6,7 +6,7 @@
     >
       <v-card-title>
         <v-menu
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           ref="dateMenu"
           v-model="selectDateMenu"
           :close-on-content-click="false"
@@ -206,7 +206,7 @@
                 v-model="eventEditor.type"
                 :items="eventTypes"
                 label="Catégorie d'événement"
-                item-text="label"
+                item-title="label"
                 item-value="id"
               />
             </v-col>

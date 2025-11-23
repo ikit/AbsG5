@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row
         style="margin: 0"
         align="center"
@@ -113,7 +113,7 @@
             :rules="editorRules.person"
             label="Qui"
             prepend-icon="fas fa-user"
-            item-text="fullname"
+            item-title="fullname"
           />
           
           <v-text-field

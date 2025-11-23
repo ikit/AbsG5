@@ -1,27 +1,23 @@
-import Vue from "vue";
-import VueRouter from "vue-router"
-import Home from "./views/Home.vue";
-import E404 from "./views/E404.vue";
-import Changelog from "./views/Changelog.vue";
-import Login from "./views/User/Login.vue";
-import axios from "axios";
-import store from "./store";
-import { checkAutentication, logoutUser, logUser } from "./middleware/AuthHelper";
+import { createRouter, createWebHistory } from "vue-router"
+import Home from "./views/Home.vue"
+import E404 from "./views/E404.vue"
+import Changelog from "./views/Changelog.vue"
+import Login from "./views/User/Login.vue"
+import axios from "axios"
+import store from "./store"
+import { checkAutentication, logoutUser, logUser } from "./middleware/AuthHelper"
 
-Vue.use(VueRouter);
-
-export const router = new VueRouter({
-    mode: "history",
+export const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
 	scrollBehavior(to, from, savedPosition) {
 		if (to.hash) {
-			return { selector: to.hash }
+			return { el: to.hash }
 		} else if (savedPosition) {
-    		return savedPosition;
+    		return savedPosition
     	} else {
-			return { x: 0, y: 0 }
+			return { top: 0, left: 0 }
 		}
     },
-    base: process.env.BASE_URL,
     routes: [
         {
             path: "/",
@@ -257,10 +253,11 @@ export const router = new VueRouter({
             path: "/resetpwd",
             component: () => import("./views/Admin/NewPassword.vue"),
         },
-        {
-            path: "/voyag",
-            component: () => import("./views/VoyaG.vue"),
-        },
+        // VoyaG removed - leaflet dependency removed
+        // {
+        //     path: "/voyag",
+        //     component: () => import("./views/VoyaG.vue"),
+        // },
         {
             path: "/changelog",
             component: Changelog
@@ -272,30 +269,30 @@ export const router = new VueRouter({
             component: E404
         },
         {
-            path: "*",
+            path: "/:pathMatch(.*)*",
             redirect: "/404"
         }
     ]
-});
+})
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
     // Si la page nécessite une authent ou non
-    const publicPages = ["/login", "/forgotten"];
+    const publicPages = ["/login", "/forgotten"]
     if (publicPages.includes(to.path)) {
-        return next();
+        return true
     }
 
     // Si session de secours
     const rescueSession = to.query.session
     if (rescueSession) {
         logUser(store, { id: -1, rescue: true, token: decodeURI(rescueSession) })
-        return next("/resetpwd");
+        return "/resetpwd"
     }
 
     // Si pas d"authent, on redirige vers la page de login
-    const user = checkAutentication(store);
+    const user = checkAutentication(store)
     if (!user) {
-        return next("/login");
+        return "/login"
     }
 
 
@@ -305,11 +302,10 @@ router.beforeEach((to, from, next) => {
 
     // // Si accès restreint et pas le role, on redirige vers l"accueil
     if (rescueSession) {
-
-        return next("/resetpwd");
+        return "/resetpwd"
     }
 
-    next();
+    return true
   })
 
 

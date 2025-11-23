@@ -1,20 +1,20 @@
 <template>
   <div>
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row
         style="padding: 15px"
         align="center"
         justify="center"
       >
         <v-tooltip
-          v-if="$vuetify.breakpoint.mdAndUp"
+          v-if="$vuetify.display.mdAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               text
               :disabled="isLoading || (currentYear == 2004 && currentMonth == 0)"
-              v-on="on"
+              v-bind="props"
               @click="go(2004, 0)"
             >
               Janvier 2004
@@ -97,14 +97,14 @@
         </div>
 
         <v-tooltip
-          v-if="$vuetify.breakpoint.mdAndUp"
+          v-if="$vuetify.display.mdAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               text
               :disabled="isLoading || (currentYear === todayYear && currentMonth === todayMonth)"
-              v-on="on"
+              v-bind="props"
               @click="go(todayYear, todayMonth, true)"
             >
               Aujourd'hui
@@ -127,7 +127,7 @@ import axios from 'axios';
 import store from '../../store';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { addMonths, addYears } from 'date-fns';
-import Reader from "./Reader";
+import Reader from "./Reader.vue";
 
 export default {
     components: {

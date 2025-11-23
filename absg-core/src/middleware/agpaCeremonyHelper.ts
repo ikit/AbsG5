@@ -1,5 +1,5 @@
-import { getRepository } from "typeorm";
 import { AgpaPhoto } from "../entities";
+import { getRepository } from "./database";
 import { getMetaData } from "./agpaCommonHelpers";
 
 /**

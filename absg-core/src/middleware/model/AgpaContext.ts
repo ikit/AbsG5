@@ -1,5 +1,5 @@
 import { AgpaCategory, AgpaPhoto } from "../../entities";
-import { getRepository } from "typeorm";
+import { getRepository } from "../database";
 import { AgpaPhase } from "./AgpaPhase";
 import { differenceInHours } from "date-fns";
 import { getPhasesBoundaries, getCurrentEdition, agpaCtx } from "../agpaCommonHelpers";

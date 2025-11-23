@@ -1,13 +1,15 @@
-import { getRepository } from "typeorm";
 import { JsonController, Get, Authorized, CurrentUser } from "routing-controllers";
 import { User } from "../entities";
 
 import { voyagService } from "../services";
+import { AppDataSource } from "../data-source";
 
 @Authorized()
 @JsonController("/voyag")
 export class VoyagController {
-    private userRepo = getRepository(User);
+    private get userRepo() {
+        return AppDataSource.getRepository(User);
+    }
 
     /**
      * Récupère les données initiales de la section voyaG:

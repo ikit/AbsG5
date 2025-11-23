@@ -1,7 +1,7 @@
 import { addDays, addSeconds } from "date-fns";
 import { AgpaPhoto, Parameter } from "../entities";
 import { AgpaContext } from "./model/AgpaContext";
-import { getRepository } from "typeorm";
+import { getRepository } from "./database";
 import { AgpaPhase } from "./model/AgpaPhase";
 
 export const agpaCtx = new AgpaContext();

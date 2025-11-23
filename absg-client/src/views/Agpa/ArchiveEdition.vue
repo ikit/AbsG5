@@ -1,17 +1,17 @@
 <template>
   <section id="content">
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip
-          v-if="$vuetify.breakpoint.mdAndUp"
+          v-if="$vuetify.display.mdAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               depressed
               small
               :to="{path: '/agpa/archives/' }"
-              v-on="on"
+              v-bind="props"
             >
               <v-icon left>
                 fas fa-chevron-left
@@ -202,7 +202,7 @@
                 <v-icon left>
                   far fa-images
                 </v-icon>
-                <span v-if="$vuetify.breakpoint.mdAndUp">Galerie</span>
+                <span v-if="$vuetify.display.mdAndUp">Galerie</span>
               </v-btn>
             </template>
             <span>Voir les photos de la catégorie {{ current.categories[catIdx].title }} </span>

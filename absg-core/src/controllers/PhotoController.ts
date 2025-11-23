@@ -1,13 +1,17 @@
-import { getRepository } from "typeorm";
 import { JsonController, Get, Authorized, Post, Body, Param, QueryParam } from "routing-controllers";
 import { Photo } from "../entities";
 import { PhotoAlbum } from "../entities/PhotoAlbum";
+import { AppDataSource } from "../data-source";
 
 @Authorized()
 @JsonController("/photos")
 export class PhotosController {
-    private repo = getRepository(Photo);
-    private aRepo = getRepository(PhotoAlbum);
+    private get repo() {
+        return AppDataSource.getRepository(Photo);
+    }
+    private get aRepo() {
+        return AppDataSource.getRepository(PhotoAlbum);
+    }
 
     /**
      * Récupère la liste des photos pour l'explorateur

@@ -7,11 +7,8 @@
       fluid
       grid-list-xl
     >
-      <v-layout
-        row
-        wrap
-      >
-        <v-flex>
+      <v-row>
+        <v-col>
           <v-card style="width:500px; margin: auto">
             <v-card-title>
               <h2>
@@ -46,9 +43,9 @@
               </template>
             </v-data-table>
           </v-card>
-        </v-flex>
+        </v-col>
 
-        <v-flex>
+        <v-col>
           <div
             v-if="immt"
             class="immt"
@@ -63,13 +60,10 @@
             </div>
             <p>{{ immt.title }}</p>
           </div>
-        </v-flex>
-      </v-layout>
-      <v-layout
-        row
-        wrap
-      >
-        <v-flex>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
           <v-card>
             <v-card-title>
               <h2>
@@ -87,27 +81,24 @@
             </v-card-title>
 
             <v-list class="passage overflow-auto">
-              <template v-for="item in passage">
+              <template v-for="item in passage" :key="item.title">
                 <v-list-item
-                  :key="item.title"
                   ripple
                 >
                   <div class="date">
                     {{ item.time }}
                   </div>
-                  <template v-for="(user, i2) in item.passage">
+                  <template v-for="(user, i2) in item.passage" :key="i2">
                     <v-tooltip
-                      :key="i2"
                       bottom
                     >
-                      <template #activator="{ on }">
+                      <template #activator="{ props }">
                         <img
-                          :key="i2"
                           :src="user.avatar"
                           :alt="user.username"
                           height="40px"
-                          onError="this.src='/files/avatars/000.png';"
-                          v-on="on"
+                          @error="(e) => e.target.src='/files/avatars/000.png'"
+                          v-bind="props"
                         >
                       </template>
                       <span>{{ user.username }}</span>
@@ -117,18 +108,15 @@
               </template>
             </v-list>
           </v-card>
-        </v-flex>
-      </v-layout>
-      <v-layout
-        row
-        wrap
-      >
+        </v-col>
+      </v-row>
+      <v-row>
         <div
           id="coke"
           data-src="/img/cube.jpg"
           data-depth-src="/img/cube-depth.jpg"
         />
-      </v-layout>
+      </v-row>
     </v-container>
 
 

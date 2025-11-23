@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <router-link
@@ -10,7 +10,7 @@
       >
         <v-icon>fas fa-home</v-icon>
         <span
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           style="margin-left: 15px"
         >Liste des albums</span>
       </router-link>
@@ -26,7 +26,7 @@
 
       <div style="position: absolute; right: 15px; top: 10px">
         <v-btn
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           disabled
           style="margin-right: 15px"
           @click.stop="download()"
@@ -47,11 +47,11 @@
     </div>
     
     <v-container v-if="album">
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex
+        <v-col
           v-for="p in album.photos"
           :key="p.id"
           style="text-align: center;"
@@ -66,8 +66,8 @@
               >
             </div>
           </div>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
   
 
@@ -84,25 +84,25 @@
           grid-list-sm
           class="pa-4"
         >
-          <v-layout
+          <v-row
             row
             wrap
           >
-            <v-flex xs12>
+            <v-col cols="12">
               <v-text-field
                 v-model="albumEditor.title"
                 prepend-icon="fas fa-user"
                 label="Titre de l'album"
               />
-            </v-flex>
-            <v-flex xs12>
+            </v-col>
+            <v-col cols="12">
               <v-text-field
                 v-model="albumEditor.comment"
                 prepend-icon="fas fa-quote-left"
                 label="Optionnel"
               />
-            </v-flex>
-            <v-flex xs12>
+            </v-col>
+            <v-col cols="12">
               <v-card>
                 <div style="position: relative;">
                   <v-icon style="position: absolute; top: 18px; left: 22px;">
@@ -113,8 +113,8 @@
                   </p>
                 </div>
               </v-card>
-            </v-flex>
-          </v-layout>
+            </v-col>
+          </v-row>
         </v-container>
         <v-card-actions>
           <v-spacer />

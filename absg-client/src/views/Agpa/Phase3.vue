@@ -1,6 +1,6 @@
 <template>
   <section id="content">
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip bottom>
           <template #activator="{ on }">
@@ -159,11 +159,11 @@
     </div>
 
     <v-container fluid>
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex
+        <v-col
           v-for="(photo, index) in photosGalery"
           :key="photo.id"
           style="min-width: 250px; width: 15%; margin: 15px"
@@ -248,8 +248,8 @@
               </div>
             </v-card>
           </div>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
 
     <!-- Aide -->
@@ -285,9 +285,9 @@ import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middle
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget';
+import PhotoWidget from './components/PhotoWidget.vue';
 import store from '../../store';
-import Help from './components/Help';
+import Help from './components/Help.vue';
 
 export default {
     components: {

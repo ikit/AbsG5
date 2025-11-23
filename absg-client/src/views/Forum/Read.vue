@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <v-btn
@@ -64,7 +64,7 @@ import axios from 'axios';
 import store from '../../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
-import Reader from "./Reader";
+import Reader from "./Reader.vue";
 
 export default {
     components: {

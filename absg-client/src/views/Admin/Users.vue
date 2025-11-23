@@ -50,7 +50,7 @@
               v-if="item.isActive"
               small
               class="mr-2"
-              color="green"
+              color="success"
               @click="switchUserActivity(item)"
             >
               fas fa-check-circle
@@ -59,7 +59,7 @@
               v-if="!item.isActive"
               small
               class="mr-2"
-              color="red"
+              color="error"
               @click="switchUserActivity(item)"
             >
               fas fa-times-circle
@@ -126,7 +126,7 @@
                 chips
                 label="Rôles"
                 multiple
-                item-text="label"
+                item-title="label"
                 item-value="id"
               />
             </v-col>
@@ -150,7 +150,7 @@
                 v-model="userEditor.person.sex"
                 :items="sexes"
                 label="Sexe"
-                item-text="label"
+                item-title="label"
                 item-value="id"
               />
 
@@ -158,7 +158,7 @@
                 v-model="userEditor.rootFamily"
                 :items="rootFamillies"
                 label="Maison mère"
-                item-text="label"
+                item-title="label"
                 item-value="id"
               />
             </v-col>

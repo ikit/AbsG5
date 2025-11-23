@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row
         style="margin: 0"
         align="center"
@@ -12,7 +12,7 @@
           :items="types"
           style="width: 150px; margin-right: 30px"
           label="Collection"
-          item-text="label"
+          item-title="label"
           item-value="key"
           @change="changeCollection($event)"
         />
@@ -112,7 +112,7 @@
             :items="serieEditor.availableSeries"
             label="Titre de la série"
             prepend-icon="fas fa-tag"
-            item-text="title"
+            item-title="title"
             :disabled="serieEditor.isLoading"
             @change="onSerieTitleChanged()"
           />

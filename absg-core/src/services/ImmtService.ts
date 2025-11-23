@@ -17,7 +17,10 @@ class ImmtService {
      * Renvoie la dernière image du moment en date
      */
     public async last() {
-        return await this.immtsRepo.findOne({ order: { year: "DESC", day: "DESC" } });
+        return await this.immtsRepo.findOne({ 
+            where: {},
+            order: { year: "DESC", day: "DESC" } 
+        });
     }
 
     /**

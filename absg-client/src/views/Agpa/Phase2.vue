@@ -1,12 +1,12 @@
 <template>
   <section id="content">
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip
-          v-if="$vuetify.breakpoint.mdAndUp"
+          v-if="$vuetify.display.mdAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-icon
               left
               style="margin-top:-10px; font-size: 30px"
@@ -15,7 +15,7 @@
             </v-icon>
             <div
               class="phase-left-header"
-              v-on="on"
+              v-bind="props"
               @click="help.displayed = true; help.page = 3"
             >
               <h2>Phase n°2 en cours : Vérification</h2>
@@ -96,11 +96,11 @@
     </div>
 
     <v-container fluid>
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex
+        <v-col
           v-for="(photo, index) in photosGalery"
           :key="photo.id"
           style="min-width: 250px; width: 15%; margin: 15px"
@@ -153,8 +153,8 @@
               </div>
             </v-card>
           </div>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
 
     <!-- Aide -->
@@ -222,7 +222,7 @@
             <v-select
               :items="status"
               :value="photoDiscussion.status"
-              item-text="text"
+              item-title="text"
               item-value="value"
               solo
               style="height: 50px; margin-left: 10px; width: 150px;"
@@ -322,10 +322,10 @@ import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middle
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget';
+import PhotoWidget from './components/PhotoWidget.vue';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
-import Help from './components/Help';
+import Help from './components/Help.vue';
 
 export default {
     components: {

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card style="width: 400px; padding:50px; margin: auto; margin-top: 100px; position: relative">
-      <v-form v-model="valid">
+      <v-form ref="loginForm">
         <div>
           <v-text-field
             v-model="username"
@@ -30,7 +30,7 @@
         <div style="text-align: center">
           <v-btn
             color="accent"
-            :disabled="!valid"
+            :disabled="!isFormValid"
             @click="login()"
           >
             Se connecter
@@ -64,11 +64,17 @@ import { logUser } from "../../middleware/AuthHelper";
 export default {
     name: "Login",
     data: () => ({
-        valid: false,
         username: "",
         password: "",
         error: "",
     }),
+    computed: {
+        isFormValid() {
+            // Simple validation: both fields must be filled
+            return this.username && this.username.length > 0 && 
+                   this.password && this.password.length > 0;
+        }
+    },
     mounted() {
         localStorage.removeItem('user');
     },

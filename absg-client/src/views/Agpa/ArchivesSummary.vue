@@ -4,11 +4,11 @@
     fluid
     style="text-align: center;"
   >
-    <v-layout
+    <v-row
       row
       wrap
     >
-      <v-flex
+      <v-col
         v-for="edition in summary"
         :key="edition.year"
         style="width: 400px; max-width: 400px; margin: 15px"
@@ -98,8 +98,8 @@
             </v-card-actions>
           </v-card>
         </router-link>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

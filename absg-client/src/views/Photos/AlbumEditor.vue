@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <router-link
@@ -10,7 +10,7 @@
       >
         <v-icon>fas fa-home</v-icon>
         <span
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           style="margin-left: 15px"
         >Liste des albums</span>
       </router-link>
@@ -50,7 +50,7 @@
           <v-icon left>
             fas fa-plus
           </v-icon>
-          <span v-if="$vuetify.breakpoint.lgAndUp">Ajouter des photos</span>
+          <span v-if="$vuetify.display.lgAndUp">Ajouter des photos</span>
         </v-btn>
         
         <v-btn
@@ -59,7 +59,7 @@
           <v-icon left>
             fas fa-undo
           </v-icon>
-          <span v-if="$vuetify.breakpoint.lgAndUp">Retour à l'album</span>
+          <span v-if="$vuetify.display.lgAndUp">Retour à l'album</span>
         </v-btn>
       </div>
     </div>
@@ -104,7 +104,7 @@
 
     <div v-if="album">
       <v-container fluid>
-        <v-layout
+        <v-row
           row
           wrap
         >
@@ -116,7 +116,7 @@
             @start="drag=true"
             @end="drag=false; save();"
           >
-            <v-flex
+            <v-col
               v-for="p in album.photos"
               :key="p.id"
               style="min-width: 100px; margin: 15px"
@@ -181,9 +181,9 @@
                   </v-tooltip>
                 </div>
               </div>
-            </v-flex>
+            </v-col>
           </draggable>
-        </v-layout>
+        </v-row>
       </v-container>
     </div>
 
@@ -239,7 +239,7 @@
 import axios from 'axios';
 import store from '../../store';
 import { mapState } from "vuex";
-import UploadFiles from "../../components/UploadFiles";
+import UploadFiles from "../../components/UploadFiles.vue";
 import draggable from 'vuedraggable';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 

@@ -92,11 +92,11 @@ import { mapState } from 'vuex';
 import { getModuleInfo, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
-import Phase1 from './Phase1';
-import Phase2 from './Phase2';
-import Phase3 from './Phase3';
-import Phase4 from './Phase4';
-import Phase5 from './Phase5';
+import Phase1 from './Phase1.vue';
+import Phase2 from './Phase2.vue';
+import Phase3 from './Phase3.vue';
+import Phase4 from './Phase4.vue';
+import Phase5 from './Phase5.vue';
 
 export default {
     components: {

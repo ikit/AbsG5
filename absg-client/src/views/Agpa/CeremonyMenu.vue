@@ -62,11 +62,11 @@
       fluid
       :style="{ 'display': current.displayed ? 'none' : 'block' }"
     >
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex
+        <v-col
           v-for="edition in formerEditions"
           :key="edition.year"
           style="min-width: 250px; width: 250px; margin: 15px"
@@ -84,8 +84,8 @@
               <p style=" margin: 0; text-align: center; font-size: 3em; font-weight: bold; font-family: 'Tangerine', serif; opacity: 0.5; line-height: 1em;">{{ edition.year }}</p>
             </v-card>
           </a>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
 
     <div :class="{ ceremony: current.displayed, hiddenCeremony: !current.displayed }">
@@ -98,10 +98,11 @@
         preload="auto"
         @ended="openCeremonySlideShow()"
       >
-        <source
+        <!-- TODO: Restaurer après migration - fichier manquant -->
+        <!-- <source
           src="/files/agpa/intro.mp4"
           type="video/mp4"
-        >
+        > -->
         Your browser does not support the video tag.
       </video>
     </div>
@@ -117,7 +118,7 @@ import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
 import { addDays, addSeconds, format } from 'date-fns';
-import Timer from '../../components/Timer';
+import Timer from '../../components/Timer.vue';
 
 import Vue from 'vue';
 import Vlf from 'vlf';
@@ -223,7 +224,10 @@ export default {
         },
 
         preloadIntro() {
-            const that = this;
+            // TODO: Restaurer après migration - fichier intro.mp4 manquant
+            // Temporairement désactivé pendant la migration
+            this.introReady();
+            /* const that = this;
             that.$vlf.getItem("ceremonyIntro").then(
                 data => {
                     if (!data) {
@@ -266,7 +270,7 @@ export default {
                     }
                     that.introReady();
                 }
-            )
+            ) */
         },
 
         preloadCeremony() {

@@ -1,6 +1,7 @@
 <template>
   <v-tabs
-    v-model="selectedTab"
+    :model-value="selectedTab"
+    @update:model-value="$emit('update:selectedTab', $event)"
     centered
   >
     <v-tab key="1">
@@ -247,6 +248,7 @@ export default {
             default: 0
         }
     },
+    emits: ['update:selectedTab'],
     computed: {
         ...mapState([
             'agpaMeta',

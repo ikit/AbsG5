@@ -1,11 +1,11 @@
 require("dotenv").config();
 import "reflect-metadata";
 import { AppDataSource } from "./data-source";
-import { createExpressServer } from "routing-controllers";
+import { useExpressServer } from "routing-controllers";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
-import * as express from "express";
-import * as fileUpload from "express-fileupload";
+import express from "express";
+import fileUpload from "express-fileupload";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import cors from "cors";
@@ -40,22 +40,17 @@ AppDataSource.initialize()
         gthequeService.initService();
         logger.info("AbsG services initialized");
 
-        // create express app
-        const app = createExpressServer({
-            routePrefix: "/api",
-            controllers: [__dirname + "/controllers/*.ts", __dirname + "/controllers/*.js"],
-            authorizationChecker: jwtAuthorizationChecker,
-            currentUserChecker
-        });
+        // Create base Express app first
+        const expressApp = express();
 
-        // Security middleware
-        app.use(helmet({
+        // Security middleware (must be first)
+        expressApp.use(helmet({
             contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
             crossOriginEmbedderPolicy: false
         }));
 
         // CORS configuration
-        app.use(cors({
+        expressApp.use(cors({
             origin: process.env.CORS_ORIGIN || "*",
             credentials: true
         }));
@@ -67,27 +62,39 @@ AppDataSource.initialize()
             standardHeaders: true,
             legacyHeaders: false,
         });
-        app.use("/api/", limiter);
+        expressApp.use("/api/", limiter);
 
         // Cookie parser
-        app.use(cookieParser());
+        expressApp.use(cookieParser());
 
-        if (process.env.NODE_ENV === "development") {
-            app.use("/files", express.static(process.env.PATH_FILES));
-        }
+        // Body parsers
+        expressApp.use(express.json({ limit: "50mb" }));
+        expressApp.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-        // enable files upload
-        app.use(
+        // File upload
+        expressApp.use(
             fileUpload({
                 createParentPath: true,
                 limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
             })
         );
 
-        app.use(express.json({ limit: "50mb" }));
-        app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-        app.use(accessLogHandler()); // access logs
-        app.use(errorLogHandler()); // error logs
+        // Static files in development
+        if (process.env.NODE_ENV === "development") {
+            expressApp.use("/files", express.static(process.env.PATH_FILES));
+        }
+
+        // Logging middleware
+        expressApp.use(accessLogHandler());
+        expressApp.use(errorLogHandler());
+
+        // Now add routing-controllers to the existing app
+        const app = useExpressServer(expressApp, {
+            routePrefix: "/api",
+            controllers: [__dirname + "/controllers/*.ts", __dirname + "/controllers/*.js"],
+            authorizationChecker: jwtAuthorizationChecker,
+            currentUserChecker
+        });
 
         // start express server
         app.listen(process.env.API_PORT);

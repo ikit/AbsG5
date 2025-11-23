@@ -1,4 +1,3 @@
-import { getRepository } from "typeorm";
 import {
     JsonController,
     Param,
@@ -13,11 +12,14 @@ import {
 import { AgpaPhoto, User } from "../entities";
 import { agpaService } from "../services/AgpaService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
+import { AppDataSource } from "../data-source";
 
 @Authorized()
 @JsonController("/agpa")
 export class AgpaController {
-    private photosRepo = getRepository(AgpaPhoto);
+    private get photosRepo() {
+        return AppDataSource.getRepository(AgpaPhoto);
+    }
 
     /**
      * Récupère les données d'initialisation des AGPA (contexte, metadata, ...)

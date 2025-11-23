@@ -1,4 +1,3 @@
-import { getRepository } from "typeorm";
 import {
     JsonController,
     Get,
@@ -18,12 +17,17 @@ import { albumService } from "../services/AlbumService";
 import * as path from "path";
 import * as fs from "fs";
 import { logger } from "../middleware/logger";
+import { AppDataSource } from "../data-source";
 
 @Authorized()
 @JsonController("/albums")
 export class PhotoAlbumController {
-    private repo = getRepository(Photo);
-    private aRepo = getRepository(PhotoAlbum);
+    private get repo() {
+        return AppDataSource.getRepository(Photo);
+    }
+    private get aRepo() {
+        return AppDataSource.getRepository(PhotoAlbum);
+    }
 
     /**
      * Récupère la liste des albums

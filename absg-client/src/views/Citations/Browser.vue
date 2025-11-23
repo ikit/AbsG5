@@ -12,7 +12,7 @@
           />
           <v-spacer />
           <v-btn
-            v-if="$vuetify.breakpoint.mdAndUp"
+            v-if="$vuetify.display.mdAndUp"
             @click.stop="resetDialog(true)"
           >
             <v-icon left>
@@ -43,7 +43,7 @@
           <template #[`item.citation`]="{ item }">
             <div style="display: flex; vertical-align: middle">
               <v-avatar
-                v-if="$vuetify.breakpoint.lgAndUp"
+                v-if="$vuetify.display.lgAndUp"
                 size="36px"
                 style="flex: 0 1 1"
               >
@@ -102,35 +102,35 @@
           grid-list-sm
           class="pa-4"
         >
-          <v-layout
+          <v-row
             row
             wrap
           >
-            <v-flex xs12>
+            <v-col cols="12">
               <v-autocomplete
                 v-model="citationEditor.author"
                 prepend-icon="fas fa-user"
                 label="Autheur de la citation"
                 :items="persons"
-                item-text="fullname"
+                item-title="fullname"
                 item-value="id"
               />
-            </v-flex>
-            <v-flex xs12>
+            </v-col>
+            <v-col cols="12">
               <v-text-field
                 v-model="citationEditor.citation"
                 prepend-icon="fas fa-quote-left"
                 label="La citation"
               />
-            </v-flex>
-            <v-flex xs12>
+            </v-col>
+            <v-col cols="12">
               <v-text-field
                 v-model="citationEditor.year"
                 prepend-icon="fas fa-calendar-alt"
                 label="Année de référence (où la citation a été dite)"
               />
-            </v-flex>
-            <v-flex xs12>
+            </v-col>
+            <v-col cols="12">
               <v-card>
                 <div style="position: relative;">
                   <v-icon style="position: absolute; top: 18px; left: 22px;">
@@ -141,8 +141,8 @@
                   </p>
                 </div>
               </v-card>
-            </v-flex>
-          </v-layout>
+            </v-col>
+          </v-row>
         </v-container>
         <v-card-actions>
           <v-spacer />
@@ -316,8 +316,8 @@ export default {
                 return item;
             }
             return item != null && (
-                item.citation.toLowerCase().indexOf(search.toLowerCase()) > -1
-                || item.author.fullname.toLowerCase().indexOf(search.toLowerCase()) > -1
+                (item.citation && item.citation.toLowerCase().indexOf(search.toLowerCase()) > -1)
+                || (item.author && item.author.fullname && item.author.fullname.toLowerCase().indexOf(search.toLowerCase()) > -1)
             );
         }
     }

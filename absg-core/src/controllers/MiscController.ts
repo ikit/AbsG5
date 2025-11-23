@@ -1,13 +1,15 @@
-import { getRepository } from "typeorm";
 import { JsonController, Post, Body, Get, Authorized, CurrentUser, Param } from "routing-controllers";
 import { citationService, immtService, userService, eventService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
 import { getCurrentEdition } from "../middleware/agpaCommonHelpers";
+import { AppDataSource } from "../data-source";
 
 @JsonController("")
 export class UserController {
-    private repo = getRepository(Parameter);
+    private get repo() {
+        return AppDataSource.getRepository(Parameter);
+    }
 
     /**
      * Récupère l'ensemble des informations de la page d'accueil:

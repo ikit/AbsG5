@@ -27,7 +27,7 @@
 
             <div
               class="msgDetails"
-              :style="{ display: $vuetify.breakpoint.lgAndUp ? 'block' : 'none' }"
+              :style="{ display: $vuetify.display.lgAndUp ? 'block' : 'none' }"
             >
               <span class="name">{{ msg.poster.username }}</span>
               <span class="date">le {{ msg.dateLabel }}</span>
@@ -64,16 +64,14 @@
               <span>Supprimer le message</span>
             </v-tooltip>
           </div>
-          <v-list-item-content>
-            <div v-html="msg.text" />
-          </v-list-item-content>
+          <div v-html="msg.text" />
         </v-card>
       </v-timeline-item>
     </v-timeline>
 
     <v-card
       v-if="topicId && !isLoading && !readOnly"
-      :class="{ largeEditor: $vuetify.breakpoint.lgAndUp, compactEditor: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ largeEditor: $vuetify.display.lgAndUp, compactEditor: !$vuetify.display.lgAndUp }"
     >
       <TextEditor
         ref="newMsgEditor"
@@ -93,7 +91,7 @@
           <span>Poster votre nouveau message sur le forum</span>
         </v-tooltip>
         <v-tooltip
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           bottom
         >
           <template #activator="{ on }">
@@ -189,7 +187,8 @@ import store from '../../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
 import TextEditor from '../../components/TextEditor.vue';
-import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
+import VEmojiPicker from 'vue3-emoji-picker';
+import 'vue3-emoji-picker/css';
 
 export default {
     name: 'Reader',

@@ -1,6 +1,6 @@
 import { AgpaPhoto, AgpaVote, AgpaAwardType } from "../entities";
 import { palmaresPoints } from "./agpaPalmaresHelper";
-import { getRepository } from "typeorm";
+import { getRepository } from "./database";
 
 /**
  * Attribution des AGPA (or, argent et bronze) pour une liste de photos donnée
