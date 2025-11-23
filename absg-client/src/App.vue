@@ -569,7 +569,7 @@ export default {
             if (newValue.message === "onlineUsers") {
                 // on met à jours la liste des utilisateurs en ligne
                 const now = new Date().getTime();
-                this.usersOnline = newValue.payload.filter(e => e.id != this.user.id).map(e => ({
+                this.usersOnline = newValue.payload.filter(e => e && e.id != this.user.id).map(e => ({
                     ...e,
                     avatarUrl: `/files/avatars/${e.id.toString().padStart(3, '0')}.png`,
                     opacity: now - new Date(e.lastTime).getTime() <= 300000 ? 0.9 : 0.5 // 300000 = 5 minutes

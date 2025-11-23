@@ -388,7 +388,7 @@ class AgpaService {
         photo.title = photoData.title ? photoData.title : photo.title;
         photo.categoryId = photoData.catId ? photoData.catId : photo.category.id;
         photo.error = photoData.error ? JSON.parse(photoData.error) : photo.error;
-        photo.category = await this.catRepo.findOne(photo.categoryId);
+        photo.category = await this.catRepo.findOne({ where: { id: photo.categoryId } });
 
         photo = await this.photoRepo.save(photo);
 

@@ -34,7 +34,6 @@
           :headers="headers"
           :items="citations"
           :search="filter.search"
-          :custom-filter="searchMethod"
           loading-text="Récupération des citations..."
           no-data-text="Aucune citation enregistrée."
           no-results-text="Aucune citation trouvée."
@@ -207,9 +206,9 @@ export default {
     data: () => ({
         isLoading: false, // Est-ce qu'on est en train de charger la liste des citations ou non
         headers: [
-            { text: `Citation`, value: 'citation' },
-            { text: `Auteur`, value: 'author' },
-            { text: '', value: 'actions', align: 'end' },
+            { title: `Citation`, key: 'citation' },
+            { title: `Auteur`, key: 'author' },
+            { title: '', key: 'actions', align: 'end', sortable: false },
         ],
         citations: [],
         persons: [],
@@ -241,14 +240,17 @@ export default {
         });
 
         // On récupère la liste des citations
-        axios.get(`/api/citations/list`).then(response => {
-            this.citations = parseAxiosResponse(response);
-            this.isLoading = false;
-        }).catch( err => {
-            store.commit('onError', err);
-        });
+        this.loadCitations();
     },
     methods: {
+        loadCitations() {
+            axios.get(`/api/citations/list`).then(response => {
+                this.citations = parseAxiosResponse(response);
+                this.isLoading = false;
+            }).catch( err => {
+                store.commit('onError', err);
+            });
+        },
         resetDialog (open = false) {
             this.citationEditor.open = open;
             this.citationEditor.id = null;
@@ -267,21 +269,22 @@ export default {
             // On vérifie si tout est bien renseigné
             this.citationEditor.isLoading = true;
 
+            // Préparer les données à envoyer (sans les propriétés UI)
+            const data = {
+                id: this.citationEditor.id,
+                citation: this.citationEditor.citation,
+                author: this.citationEditor.author,
+                year: this.citationEditor.year
+            };
+
             // On envoie au serveur
-            axios.post(`/api/citations/`, this.citationEditor).then(
-                citation => {
+            axios.post(`/api/citations/`, data).then(
+                response => {
                     // on ferme la boite de dialogue
                     this.resetDialog();
 
-                    // On met à jour l'IHM
-                    const idx = this.citations.findIndex(e => e.id === citation.id);
-                    if (idx > -1) {
-                        // Maj citation existante
-                        this.citations.splice(idx, 1, citation)
-                    } else {
-                        // ajout de la nouvelle citation
-                        this.citations.push(citation);
-                    }
+                    // Recharger toute la liste pour avoir les données complètes
+                    this.loadCitations();
                 },
                 err => {
                     store.commit('onError', err);
@@ -293,17 +296,15 @@ export default {
             this.citationDeletion.citation = item;
         },
         deleteCitation: function () {
-            axios.delete(`/api/citations/${this.citationDeletion.citation.id}`).then(
-                removedCitation => {
-                    // On met à jour l'IHM
+            const citationId = this.citationDeletion.citation.id;
+            axios.delete(`/api/citations/${citationId}`).then(
+                response => {
+                    // On ferme la boite de dialogue
                     this.citationDeletion.citation = null;
                     this.citationDeletion.open = false;
 
-                    const idx = this.citations.findIndex(e => e.id === removedCitation.id);
-                    if (idx > -1) {
-                        // Maj citation existante
-                        this.citations.splice(idx, 1)
-                    }
+                    // Recharger la liste
+                    this.loadCitations();
                 },
                 err => {
                     store.commit('onError', err);
@@ -313,7 +314,7 @@ export default {
 
         searchMethod(value, search, item) {
             if (!search) {
-                return item;
+                return true;
             }
             return item != null && (
                 (item.citation && item.citation.toLowerCase().indexOf(search.toLowerCase()) > -1)

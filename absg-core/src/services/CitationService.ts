@@ -85,7 +85,7 @@ class CitationService {
             throw new BadRequestError("Merci de renseigner l'auteur");
         }
         // On vérifie qu'on connait bien l'auteur
-        const author = await this.personsRepo.findOne(citation.author);
+        const author = await this.personsRepo.findOne({ where: { id: citation.author } });
         if (!author) {
             throw new BadRequestError("L'auteur de la citation doit être de la famille (enregistré dans l'annuaire)");
         }
@@ -124,7 +124,7 @@ class CitationService {
      */
     public async remove(user: User, id: number) {
         // TODO: retrieve user info to check permission to delete
-        const citation = await this.citationsRepo.findOne(id);
+        const citation = await this.citationsRepo.findOne({ where: { id } });
         if (!citation) {
             throw new BadRequestError(`La citation n°${id} n'existe pas.`);
         }
