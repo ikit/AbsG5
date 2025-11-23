@@ -378,7 +378,7 @@
                   <td>Adultes | Enfants</td>
                 </tr>
                 <tr
-                  v-for="row in data.photosStats"
+                  v-for="row in (data && data.photosStats) || []"
                   :key="row.catId"
                 >
                   <td style="text-align: right; font-weight: bold">
@@ -680,7 +680,13 @@ export default {
         },
         palmares: [],
 
-        data: null,
+        data: {
+            categories: {},
+            photosStats: [],
+            usersOrder: [],
+            votesStats: [],
+            categoriesOrders: []
+        },
         participationGraph: null,
         votesGraph: null,
     }),
@@ -719,6 +725,14 @@ export default {
 
             axios.get(`/api/agpa/monitoring/${this.agpaMeta.year}`).then(response => {
                 this.data = parseAxiosResponse(response);
+                
+                // Vérifier que les données sont valides
+                if (!this.data || !this.data.categories) {
+                    console.error('Invalid monitoring data received:', this.data);
+                    this.isLoading = false;
+                    return;
+                }
+                
                 const categories = Object.values(this.data.categories);
 
                 // On reformate les photos pour les présenter sous forme de tableau "users x categories"

@@ -22,6 +22,9 @@ export default defineConfig({
       },
     }),
   ],
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -32,6 +35,12 @@ export default defineConfig({
   },
   server: {
     port: 8080,
+    fs: {
+      strict: false
+    },
+    watch: {
+      usePolling: false,
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5010',
@@ -46,6 +55,10 @@ export default defineConfig({
         ws: true,
       },
     }
+  },
+  optimizeDeps: {
+    include: ['vuetify', 'vue', 'vue-router', 'pinia', 'axios'],
+    exclude: ['@vue/compat']
   },
   build: {
     outDir: 'dist',

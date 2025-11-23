@@ -67,17 +67,19 @@ AppDataSource.initialize()
         // Cookie parser
         expressApp.use(cookieParser());
 
-        // Body parsers
-        expressApp.use(express.json({ limit: "50mb" }));
-        expressApp.use(express.urlencoded({ extended: true, limit: "50mb" }));
-
-        // File upload
+        // File upload (must be before body parsers)
         expressApp.use(
             fileUpload({
                 createParentPath: true,
                 limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
+                useTempFiles: false,
+                debug: process.env.NODE_ENV === "development"
             })
         );
+
+        // Body parsers
+        expressApp.use(express.json({ limit: "50mb" }));
+        expressApp.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
         // Static files in development
         if (process.env.NODE_ENV === "development") {
