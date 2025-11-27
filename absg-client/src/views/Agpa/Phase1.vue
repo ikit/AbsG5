@@ -40,7 +40,7 @@
         :key="catIdx"
         style="margin: 15px; margin-top: 50px;"
       >
-        <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+        <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0; overflow: visible;">
           <img
             :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
             width="100px"
@@ -53,10 +53,10 @@
             <v-spacer />
             <v-tooltip bottom>
               <v-spacer />
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <span
                   style="line-height: 48px; margin-right: 10px;"
-                  v-on="on"
+                  v-bind="props"
                 ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
               </template>
               <span>Nombre total de participants</span>
@@ -64,10 +64,10 @@
                     &nbsp; &nbsp;
             <v-tooltip bottom>
               <v-spacer />
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <span
                   style="line-height: 48px"
-                  v-on="on"
+                  v-bind="props"
                 ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
               </template>
               <span>Nombre total de photos</span>
@@ -240,6 +240,7 @@ export default {
     },
     store,
     data: () => ({
+        isLoading: false,
         photos: {},
         photoEditor: {
             open: false,

@@ -102,7 +102,7 @@
         :key="catIdx"
         style="margin: 15px; margin-top: 50px; flex-wrap: nowrap;"
       >
-        <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+        <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0; overflow: visible;">
           <img
             :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
             width="100px"

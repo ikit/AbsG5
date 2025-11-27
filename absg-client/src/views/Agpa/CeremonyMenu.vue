@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card style="margin: 20px auto; margin-top: 100px; width: 600px; display: relative; padding: 40px 10px 40px 10px;">
+    <v-card style="margin: 20px auto; margin-top: 100px; width: 600px; display: relative; padding: 40px 10px 40px 10px; overflow: visible;">
       <img
         src="/img/agpa/cupesMaxi/c1.png"
         width="200px"

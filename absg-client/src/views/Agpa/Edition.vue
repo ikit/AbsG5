@@ -3,12 +3,12 @@
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
     <v-card
       v-if="currentMonth > 0 && currentMonth < 9"
-      style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px;"
+      style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px; overflow: visible;"
     >
       <img
         src="/img/agpa/cupesMaxi/c1.png"
         height="100px"
-        style="position: absolute; top: -50px; left: calc(50% - 56px)"
+        style="position: absolute; top: -50px; left: calc(50% - 56px); z-index: 1;"
       >
       <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
         L'édition <span style="font-size: 2em; font-weight: normal; padding-right: 3px;"> {{ currentYear }}</span> des A.G.P.A. n'a pas encore démarrée.
