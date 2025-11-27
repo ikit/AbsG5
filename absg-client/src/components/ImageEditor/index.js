@@ -1,6 +1,6 @@
-import Vue from 'vue';
+// Components are now registered locally in ImageEditor.vue
+// No need for global registration in Vue 3
 import Editor from './editor.vue';
 import Loader from './loader.vue';
 
-Vue.component(Editor.name, Editor);
-Vue.component(Loader.name, Loader);
+export { Editor, Loader };

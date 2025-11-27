@@ -31,8 +31,8 @@
             <v-spacer />
             <v-btn-toggle :disabled="isLoading">
               <v-tooltip bottom>
-                <template #activator="{ on }">
-                  <v-btn @click.stop="switchViewDoublon()" v-on="on">
+                <template #activator="{ props }">
+                  <v-btn @click.stop="switchViewDoublon()" v-bind="props">
                     <v-icon>{{ filter.viewDoublon ? "fa-solid fa-eye" : "fa-solid fa-eye-slash" }}</v-icon>
                   </v-btn>
                 </template>

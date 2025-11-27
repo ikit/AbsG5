@@ -25,12 +25,12 @@
 
         <div>
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 icon
                 small
                 :disabled="isLoading || currentYear < 2015"
-                v-on="on"
+                v-bind="props"
                 @click="goByMonths(-12)"
               >
                 <v-icon>fas fa-angle-double-left</v-icon>
@@ -39,12 +39,12 @@
             <span>Revenir un an en arrière</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 icon
                 small
                 :disabled="isLoading || currentYear < 2004 || (currentYear == 2004 && currentMonth == 0)"
-                v-on="on"
+                v-bind="props"
                 @click="goByMonths(-1)"
               >
                 <v-icon>fa-chevron-left</v-icon>
@@ -54,12 +54,12 @@
           </v-tooltip>
 
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 text
                 width="200px"
                 :disabled="isLoading"
-                v-on="on"
+                v-bind="props"
               >
                 {{ monthLabels[currentMonth] }} {{ currentYear }}
               </v-btn>
@@ -67,12 +67,12 @@
             <span>Modifier directement la date en cours</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 icon
                 small
                 :disabled="isLoading || currentYear > todayYear || (currentYear == todayYear && currentMonth == todayMonth)"
-                v-on="on"
+                v-bind="props"
                 @click="goByMonths(1)"
               >
                 <v-icon>fa-chevron-right</v-icon>
@@ -81,12 +81,12 @@
             <span>Aller au mois suivant</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 icon
                 small
                 :disabled="isLoading || currentYear >= todayYear || (currentYear == todayYear -1 && currentMonth > todayMonth)"
-                v-on="on"
+                v-bind="props"
                 @click="goByMonths(12)"
               >
                 <v-icon>fas fa-angle-double-right</v-icon>
@@ -117,7 +117,7 @@
 
     <Reader
       ref="messageReader"
-      topic-id="-1"
+      :topic-id="-1"
     />
   </div>
 </template>
@@ -134,6 +134,7 @@ export default {
         Reader
     },
     data: () => ({
+        isLoading: false,
         monthLabels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
         todayYear: 0,
         todayMonth: 0,

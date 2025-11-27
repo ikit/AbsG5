@@ -32,13 +32,13 @@
         v-if="topicId && topicId > 0"
         bottom
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-btn
             icon
             small
             :color="pinned ? 'accent' : 'default'"
             style="margin-left: 20px"
-            v-on="on"
+            v-bind="props"
             @click.stop="switchPin()"
           >
             <v-icon>fas fa-thumbtack</v-icon>
@@ -74,6 +74,7 @@ export default {
         isLoading: false,
         breadcrumb: [],
         pinned: false,
+        topicId: null,
     }),
     watch: {
         $route(change) {
