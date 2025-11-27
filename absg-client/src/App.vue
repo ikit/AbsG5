@@ -109,6 +109,7 @@
               :src="u.avatarUrl"
               :style="{ opacity: u.opacity }"
               v-bind="props"
+              @error="(e) => e.target.style.display = 'none'"
             >
           </template>
           <span>{{ u.username }} - {{ u.activity }}</span>
@@ -139,6 +140,7 @@
             <img
               :src="user.avatarUrl"
               style="height: 40px;"
+              @error="(e) => e.target.style.display = 'none'"
             >
           </v-btn>
         </template>
@@ -569,16 +571,18 @@ export default {
             if (newValue.message === "onlineUsers") {
                 // on met à jours la liste des utilisateurs en ligne
                 const now = new Date().getTime();
-                this.usersOnline = newValue.payload.filter(e => e && e.id != this.user.id).map(e => ({
+                this.usersOnline = newValue.payload.filter(e => e && e.id && e.id > 0 && this.user && e.id != this.user.id).map(e => ({
                     ...e,
                     avatarUrl: `/files/avatars/${e.id.toString().padStart(3, '0')}.png`,
                     opacity: now - new Date(e.lastTime).getTime() <= 300000 ? 0.9 : 0.5 // 300000 = 5 minutes
                 })).sort((a,b) => new Date(a.lastTime).getTime() < new Date(b.lastTime).getTime());
                 // console.log(this.usersOnline.reduce((p, e) => (`${p}> ${e.id}:${e.username} `), ""))
                 // On met à jour l'indicateur de notifications pour l'utilisateur
-                const activity = newValue.payload.find(e => e.id === this.user.id);
-                if (activity && activity.unreadNotifications.length > this.unreadNotifications) {
-                    this.refreshNotifications();
+                if (this.user) {
+                    const activity = newValue.payload.find(e => e.id === this.user.id);
+                    if (activity && activity.unreadNotifications.length > this.unreadNotifications) {
+                        this.refreshNotifications();
+                    }
                 }
             }
         }

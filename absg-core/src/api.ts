@@ -5,7 +5,7 @@ import { useExpressServer } from "routing-controllers";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import express from "express";
-import fileUpload from "express-fileupload";
+const fileUpload = require("express-fileupload");
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import cors from "cors";

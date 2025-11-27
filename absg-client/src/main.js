@@ -10,6 +10,7 @@ import 'roboto-fontface/css/roboto/roboto-fontface.css'
 // Configure Vue 3 compatibility mode
 configureCompat({
   MODE: 2, // Vue 2 mode with warnings
+  INSTANCE_ATTRS_CLASS_STYLE: 'suppress-warning', // Suppress Vuetify 3 warnings
   GLOBAL_MOUNT: false,
   GLOBAL_EXTEND: false,
   GLOBAL_PROTOTYPE: false,
