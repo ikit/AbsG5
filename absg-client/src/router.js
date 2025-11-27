@@ -157,10 +157,6 @@ export const router = createRouter({
                     component: () => import("./views/Agenda/Locations.vue"),
                 },
                 {
-                    path: "events",
-                    component: () => import("./views/Agenda/Events.vue"),
-                },
-                {
                     path: "trombi",
                     component: () => import("./views/Agenda/Trombi.vue"),
                 },

@@ -214,42 +214,7 @@ export default {
             }
         }
     }),
-    computed: {
-        // Méthode pour la calendrier
-        title () {
-            const { start, end } = this
-            if (!start || !end) {
-            return ''
-            }
 
-            const startMonth = this.monthFormatter(start)
-            const endMonth = this.monthFormatter(end)
-            const suffixMonth = startMonth === endMonth ? '' : endMonth
-
-            const startYear = start.year
-            const endYear = end.year
-            const suffixYear = startYear === endYear ? '' : endYear
-
-            const startDay = start.day + this.nth(start.day)
-            const endDay = end.day + this.nth(end.day)
-
-            switch (this.type) {
-            case 'month':
-                return `${startMonth} ${startYear}`
-            case 'week':
-            case '4day':
-                return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
-            case 'day':
-                return `${startMonth} ${startDay} ${startYear}`
-            }
-            return ''
-        },
-        monthFormatter () {
-            return this.$refs.calendar.getFormatter({
-            timeZone: 'UTC', month: 'long',
-            })
-        },
-    },
     watch: {
         menu (val) {
             val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));
