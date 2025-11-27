@@ -68,29 +68,29 @@
           v-for="c of displayedCollections"
           :key="c.id"
         >
-          <v-expansion-panel-header>
+          <v-expansion-panel-title>
             {{ c.title }}
             <v-spacer />
             {{ c.count }}/{{ c.total }}
             <i class="fas fa-circle" style="flex: none" :class="c.cssStatus"/>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
             <v-tooltip
               v-for="i of c.items"
               :key="i.number"
               bottom
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <div
                   :style="{ 'background-image': `url('${i.img}')` }"
                   :class="i.ok ? 'itemOk' : 'itemGhost'"
                   @click="switchItem(i)"
-                  v-on="on"
+                  v-bind="props"
                 />
               </template>
               <span>{{ i.number }} - {{ i.title }}</span>
             </v-tooltip>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>

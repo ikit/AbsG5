@@ -133,10 +133,11 @@ export default {
 
             let result = this.tree;
             for (const p of this.paths) {
-              result = result.find(f => p.path.startsWith(f.path)).content;
-              
+              const found = result.find(f => p.path.startsWith(f.path));
+              if (!found) break;
+              result = found.content;
             }
-            this.files = Array.isArray(result) ? result : result.content;
+            this.files = Array.isArray(result) ? result : (result && result.content ? result.content : []);
         },
 
         logClickOnMedia(item) {
