@@ -120,29 +120,13 @@
           <v-data-table 
             :headers="serieEditor.headers" 
             :items="serieEditor.items"
-            item-key="number"
-            v-sortable-data-table
-            @sorted="saveOrder">
+            item-key="number">
             <template v-slot:body="{ items, headers }">
               <tbody>
                 <tr v-for="(item,idx,k) in items" :key="idx">
                   <td v-for="(header,key) in headers" :key="key">
-                    <v-edit-dialog
-                      :return-value.sync="item[header.value]"
-                      @save="save"
-                      @cancel="cancel"
-                      @open="open"
-                      @close="close"
-                      large
-                    > {{item[header.value]}}
-                      <template v-slot:input>
-                        <v-text-field
-                          v-model="item[header.value]"
-                          label="Edit"
-                          single-line
-                        ></v-text-field>
-                      </template>
-                    </v-edit-dialog>
+                    {{ item[header.value] }}
+                    <!-- TODO: v-edit-dialog n'existe plus dans Vuetify 3, à remplacer par un dialog custom -->
                   </td>
                 </tr>
               </tbody>
@@ -214,6 +198,8 @@ import { format } from 'date-fns';
 
 export default {
     data: () => ({
+        isLoading: false,
+        panel: [],
         collections: [],
         displayedCollections: [],
         types: [
