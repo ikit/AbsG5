@@ -69,11 +69,11 @@
               <h2>
                 Passa G
                 <v-btn
-                  text
+                  variant="text"
                   style="position: absolute; right: 15px; top: 15px;"
                   @click.stop="displayPassagHistoryDialog()"
                 >
-                  <v-icon left>
+                  <v-icon start>
                     far fa-clock
                   </v-icon>historique
                 </v-btn>
@@ -134,7 +134,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="passagHistoryDialogDisplayed=false"
           >
             Fermer
@@ -147,8 +147,6 @@
 
 
 <script>
-import Vue from 'vue';
-import Vuex from 'vuex';
 import store from '../store';
 import axios from 'axios';
 //import VueSilentbox from 'vue-silentbox';

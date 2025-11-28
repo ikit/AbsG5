@@ -9,7 +9,7 @@
     >
       <v-list
         nav
-        dense
+        density="compact"
         data-cy="menuDrawer"
       >
         <v-list-item
