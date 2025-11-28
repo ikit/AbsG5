@@ -222,7 +222,7 @@ import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import HC_sankey from 'highcharts/modules/sankey';
 import HC_depwheel from 'highcharts/modules/dependency-wheel';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 HC_sankey(Highcharts);
 HC_depwheel(Highcharts);
 

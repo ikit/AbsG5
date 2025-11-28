@@ -239,7 +239,7 @@
 
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from '../../../stores/helpers';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 

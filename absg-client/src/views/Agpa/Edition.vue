@@ -88,7 +88,7 @@
 
 <script>
 import store from '../../store';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { getModuleInfo, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";

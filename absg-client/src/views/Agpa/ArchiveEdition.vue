@@ -231,7 +231,7 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 

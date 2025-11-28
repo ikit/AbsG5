@@ -93,7 +93,7 @@ import Vue from 'vue';
 import store from "../../store";
 import axios from "axios";
 import { MODULES, parseAxiosResponse } from  "../../middleware/CommonHelper";
-import { mapState } from "vuex";
+import { mapState } from "../../stores/helpers";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 

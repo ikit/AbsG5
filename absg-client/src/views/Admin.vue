@@ -41,7 +41,7 @@
 
 <script>
 import store from "../store";
-import { mapState } from "vuex";
+import { mapState } from "../stores/helpers";
 
 export default  {
     store,

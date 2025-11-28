@@ -238,7 +238,7 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
-import { mapState } from "vuex";
+import { mapState } from "../../stores/helpers";
 import UploadFiles from "../../components/UploadFiles.vue";
 import draggable from 'vuedraggable';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
