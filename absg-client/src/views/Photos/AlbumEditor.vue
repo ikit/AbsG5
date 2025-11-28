@@ -47,7 +47,7 @@
           style="margin-right: 15px"
           @click.stop="displayUploadDialog = true"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-plus
           </v-icon>
           <span v-if="$vuetify.display.lgAndUp">Ajouter des photos</span>
@@ -56,7 +56,7 @@
         <v-btn
           :to="{ path: `/photos/albums/${album.id}` }"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-undo
           </v-icon>
           <span v-if="$vuetify.display.lgAndUp">Retour à l'album</span>
@@ -136,14 +136,14 @@
                 </div>
                 <div style="text-align: center;">
                   <v-tooltip bottom>
-                    <template #activator="{ on }">
+                    <template #activator="{ props }">
                       <v-btn
                         v-if="isAdmin"
                         icon
                         @click="photosGalleryDisplay(p.order)"
-                        v-on="on"
+                        v-bind="props"
                       >
-                        <v-icon small>
+                        <v-icon size="small">
                           fas fa-pen
                         </v-icon>
                       </v-btn>
@@ -151,13 +151,13 @@
                     <span>Editer les informations de la photo</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <template #activator="{ on }">
+                    <template #activator="{ props }">
                       <v-btn
                         icon
                         @click="setCover(p)"
-                        v-on="on"
+                        v-bind="props"
                       >
-                        <v-icon small>
+                        <v-icon size="small">
                           fas fa-desktop
                         </v-icon>
                       </v-btn>
@@ -165,14 +165,14 @@
                     <span>Mettre en couverture</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <template #activator="{ on }">
+                    <template #activator="{ props }">
                       <v-btn
                         v-if="isAdmin"
                         icon
                         @click="deletePhoto(p)"
-                        v-on="on"
+                        v-bind="props"
                       >
-                        <v-icon small>
+                        <v-icon size="small">
                           fas fa-trash
                         </v-icon>
                       </v-btn>

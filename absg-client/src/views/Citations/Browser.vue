@@ -15,7 +15,7 @@
             v-if="$vuetify.display.mdAndUp"
             @click.stop="resetDialog(true)"
           >
-            <v-icon left>
+            <v-icon start>
               fas fa-plus
             </v-icon>
             <span>Nouvelle citation</span>

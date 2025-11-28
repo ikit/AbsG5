@@ -18,7 +18,7 @@
       <div
         style="display: inline-block; margin-left: 15px"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-chevron-right
         </v-icon> Album auto (configuration)
       </div>
@@ -32,7 +32,7 @@
               disabled
               @click.stop="download()"
             >
-              <v-icon left>
+              <v-icon start>
                 fas fa-star
               </v-icon>Favoris
             </v-btn>
@@ -69,7 +69,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn>
-            <v-icon left>
+            <v-icon start>
               fas fa-eye
             </v-icon>
             Voir les photos

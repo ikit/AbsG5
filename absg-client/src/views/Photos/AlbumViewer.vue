@@ -19,7 +19,7 @@
         v-if="album"
         style="display: inline-block; margin-left: 15px"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-chevron-right
         </v-icon> {{ album.title }}
       </div>
@@ -31,7 +31,7 @@
           style="margin-right: 15px"
           @click.stop="download()"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-download
           </v-icon>Télécharger
         </v-btn>
@@ -39,7 +39,7 @@
         <v-btn
           :to="{ path: `/photos/albums/${album.id}/edit` }"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-pen
           </v-icon>Modifier
         </v-btn>

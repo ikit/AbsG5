@@ -19,7 +19,7 @@
         style="position: absolute; right: 15px; top: 10px"
         @click.stop="displayNewAlbum()"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-plus
         </v-icon>Nouvel album
       </v-btn>
