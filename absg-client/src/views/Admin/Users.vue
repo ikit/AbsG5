@@ -13,8 +13,8 @@
           <v-spacer />
           <v-btn @click="resetDialog(true)">
             <v-icon
-              small
-              left
+              size="small"
+              start
             >
               fa-plus
             </v-icon>
@@ -48,7 +48,7 @@
           <template #[`item.active`]="{ item }">
             <v-icon
               v-if="item.isActive"
-              small
+              size="small"
               class="mr-2"
               color="success"
               @click="switchUserActivity(item)"
@@ -57,7 +57,7 @@
             </v-icon>
             <v-icon
               v-if="!item.isActive"
-              small
+              size="small"
               class="mr-2"
               color="error"
               @click="switchUserActivity(item)"
@@ -69,7 +69,7 @@
 
           <template #[`item.actions`]="{ item }">
             <v-icon
-              small
+              size="small"
               class="mr-2"
               @click="editUser(item)"
             >
