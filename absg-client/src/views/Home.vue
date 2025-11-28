@@ -30,16 +30,14 @@
               hide-default-footer
               class="notifications"
             >
-              <template #item="{item}">
-                <tr @click="onEventClick(item)">
-                  <td>
-                    <div style="display: flex;">
-                      <v-icon style="flex">far fa-calendar-alt</v-icon>
-                      <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.name }}</span>
-                    </div>
-                  </td>
-                  <td style="text-align: right; padding-right: 25px">{{ item.dateLabel }}</td>
-                </tr>
+              <template #[`item.what`]="{ item }">
+                <div style="display: flex;">
+                  <v-icon style="flex">far fa-calendar-alt</v-icon>
+                  <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.name }}</span>
+                </div>
+              </template>
+              <template #[`item.when`]="{ item }">
+                <span style="text-align: right; padding-right: 25px">{{ item.dateLabel }}</span>
               </template>
             </v-data-table>
           </v-card>
