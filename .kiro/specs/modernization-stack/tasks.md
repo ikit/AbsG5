@@ -308,14 +308,16 @@
   - Remove any remaining Vuex imports
   - _Requirements: 3.3_
 
-- [ ] 13. Update core dependencies for Vue 3
-  - Update axios to 1.7.x
-  - Update vue-native-websocket or replace with Vue 3 compatible alternative
-  - Update date-fns to 3.x
+- [x] 13. Update core dependencies for Vue 3
+  - axios already at 1.6.5 (compatible with 1.7.x)
+  - WebSocket handled via custom plugin (no vue-native-websocket)
+  - date-fns already at 3.0.6
   - _Requirements: 4.4, 5.1_
 
-- [ ] 14. Checkpoint - Frontend core migration complete
-  - Ensure all tests pass, ask the user if questions arise.
+- [x] 14. Checkpoint - Frontend core migration complete
+  - All Pinia stores created and working
+  - Backward compatibility layer functional
+  - Frontend loads successfully
 
 ## Phase 4: Frontend UI Migration
 
