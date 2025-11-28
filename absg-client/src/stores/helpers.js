@@ -1,6 +1,7 @@
 // Pinia helpers that mimic Vuex mapState/mapActions
 import { useMainStore } from './main'
 import { useUserStore } from './user'
+import { useNotificationStore } from './notification'
 
 /**
  * Maps Pinia state to component computed properties (like Vuex mapState)
@@ -18,6 +19,17 @@ export function mapPiniaState(keys) {
         }
         return userStore[key]
       }
+      
+      // Check if it's a notification-related property
+      const notifProps = ['notifications', 'unreadNotifications', 'notif', 'warning', 'error', 'snack']
+      if (notifProps.includes(key)) {
+        const notifStore = useNotificationStore()
+        if (key === 'unreadNotifications') {
+          return notifStore.unreadCount
+        }
+        return notifStore[key]
+      }
+      
       // Otherwise use main store
       const store = useMainStore()
       return store[key]
@@ -54,6 +66,7 @@ export default {
     // Return a proxy that delegates to appropriate stores
     const mainStore = useMainStore()
     const userStore = useUserStore()
+    const notifStore = useNotificationStore()
     
     return new Proxy(mainStore, {
       get(target, prop) {
@@ -64,6 +77,16 @@ export default {
         if (prop === 'isLoggedIn' || prop === 'isAuthenticated') {
           return userStore.isLoggedIn
         }
+        
+        // Delegate notification-related properties to notificationStore
+        const notifProps = ['notifications', 'unreadNotifications', 'notif', 'warning', 'error', 'snack']
+        if (notifProps.includes(prop)) {
+          if (prop === 'unreadNotifications') {
+            return notifStore.unreadCount
+          }
+          return notifStore[prop]
+        }
+        
         // Otherwise use main store
         return target[prop]
       }
@@ -73,9 +96,22 @@ export default {
     // Check if it's a user action
     const userActions = ['setCurrentUser', 'updateUser', 'logUser', 'logoutUser']
     if (userActions.includes(action)) {
-      const userStore = useUserStore()
       const mainStore = useMainStore()
-      // Call both for backward compatibility
+      // Call main store for backward compatibility
+      if (typeof mainStore[action] === 'function') {
+        mainStore[action](payload)
+      }
+      return
+    }
+    
+    // Check if it's a notification action
+    const notifActions = [
+      'updateNotifications', 'readAllNotification', 'readNotification',
+      'onSnack', 'onNotif', 'onWarning', 'onError'
+    ]
+    if (notifActions.includes(action)) {
+      const mainStore = useMainStore()
+      // Call main store for backward compatibility
       if (typeof mainStore[action] === 'function') {
         mainStore[action](payload)
       }
@@ -96,6 +132,15 @@ export default {
       const userStore = useUserStore()
       if (typeof userStore[action] === 'function') {
         return userStore[action](payload)
+      }
+    }
+    
+    // Check if it's a notification action
+    const notifActions = ['fetchNotifications', 'readAllNotifications', 'readNotification']
+    if (notifActions.includes(action)) {
+      const notifStore = useNotificationStore()
+      if (typeof notifStore[action] === 'function') {
+        return notifStore[action](payload)
       }
     }
     

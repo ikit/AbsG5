@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../middleware/CommonHelper'
-import { format } from "date-fns"
-import { fr } from "date-fns/locale"
+import { parseAxiosResponse } from '../middleware/CommonHelper'
 import { useUserStore } from './user'
+import { useNotificationStore } from './notification'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -11,6 +10,7 @@ export const useMainStore = defineStore('main', {
     citation: null,
     // DEPRECATED: Use useUserStore() instead
     user: null,
+    // DEPRECATED: Use useNotificationStore() instead
     notifications: [],
     unreadNotifications: 0,
     settings: null,
@@ -24,27 +24,24 @@ export const useMainStore = defineStore('main', {
     // Editeur photo
     photoMetadataEditorDisplayed: false,
     agpaMeta: null,
-    // Notification
+    // DEPRECATED: Use useNotificationStore() instead
     notif: {
       displayed: false,
       title: "",
       msg: "",
       log: ""
     },
-    // Warning
     warning: {
       displayed: false,
       msg: "",
       log: ""
     },
-    // Erreur
     error: {
       displayed: false,
       query: "",
       msg: "",
       log: ""
     },
-    // Snackbar
     snack: {
       displayed: false,
       msg: "",
@@ -60,6 +57,15 @@ export const useMainStore = defineStore('main', {
     isLoggedIn() {
       const userStore = useUserStore()
       return userStore.isLoggedIn
+    },
+    // Backward compatibility getters - delegate to notificationStore
+    allNotifications() {
+      const notifStore = useNotificationStore()
+      return notifStore.allNotifications
+    },
+    unreadCount() {
+      const notifStore = useNotificationStore()
+      return notifStore.unreadCount
     }
   },
 
@@ -110,38 +116,31 @@ export const useMainStore = defineStore('main', {
       this.settings = settings
     },
 
+    // DEPRECATED: Use useNotificationStore().updateNotifications() instead
     updateNotifications(notifications) {
-      this.notifications = notifications.map(e => {
-        const m = getModuleInfo(e.module)
-        return {
-          id: e.id,
-          module: m,
-          message: e.message,
-          datetime: new Date(e.datetime),
-          dateLabel: format(new Date(e.datetime), "dd MMM HH'h'mm", {locale: fr}),
-          url: getPeopleAvatar(e).url,
-          read: e.read,
-          data: e.data
-        }
-      })
-      this.unreadNotifications = this.notifications.filter(e => !e.read).length
+      const notifStore = useNotificationStore()
+      notifStore.updateNotifications(notifications)
+      // Keep in sync for backward compatibility
+      this.notifications = notifStore.notifications
+      this.unreadNotifications = notifStore.unreadNotifications
     },
 
+    // DEPRECATED: Use useNotificationStore().readAllNotifications() instead
     readAllNotification() {
-      for (const n of this.notifications) {
-        n.read = true
-      }
-      this.unreadNotifications = 0
-      axios.get(`/api/markAsRead/all`)
+      const notifStore = useNotificationStore()
+      notifStore.readAllNotifications()
+      // Keep in sync
+      this.notifications = notifStore.notifications
+      this.unreadNotifications = notifStore.unreadNotifications
     },
 
+    // DEPRECATED: Use useNotificationStore().readNotification() instead
     readNotification(notification) {
-      const idx = this.notifications.findIndex(e => e.datetime === notification.datetime)
-      if (idx > -1) {
-        this.notifications[idx].read = true
-        this.unreadNotifications -= 1
-        axios.get(`/api/markAsRead/${notification.id}`)
-      }
+      const notifStore = useNotificationStore()
+      notifStore.readNotification(notification)
+      // Keep in sync
+      this.notifications = notifStore.notifications
+      this.unreadNotifications = notifStore.unreadNotifications
     },
 
     photosGalleryReset(gallery) {
@@ -187,39 +186,36 @@ export const useMainStore = defineStore('main', {
       this.photosGalleryIndex = index
     },
 
+    // DEPRECATED: Use useNotificationStore().showSnack() instead
     onSnack(msg) {
-      this.snack.msg = msg
-      this.snack.displayed = true
+      const notifStore = useNotificationStore()
+      notifStore.showSnack(msg)
+      // Keep in sync
+      this.snack = notifStore.snack
     },
 
+    // DEPRECATED: Use useNotificationStore().showNotif() instead
     onNotif(info) {
-      this.notif.title = info[0]
-      this.notif.msg = info[1]
-      this.notif.displayed = true
+      const notifStore = useNotificationStore()
+      notifStore.showNotif(info)
+      // Keep in sync
+      this.notif = notifStore.notif
     },
 
+    // DEPRECATED: Use useNotificationStore().showWarning() instead
     onWarning(message) {
-      this.warning.msg = message
-      this.warning.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss")
-      this.warning.displayed = true
+      const notifStore = useNotificationStore()
+      notifStore.showWarning(message)
+      // Keep in sync
+      this.warning = notifStore.warning
     },
 
+    // DEPRECATED: Use useNotificationStore().showError() instead
     onError(axiosError) {
-      console.log(axiosError)
-      this.error.query = axiosError && axiosError.config ? `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}` : ""
-      this.error.log = format(new Date(), "yyyy.MM.dd.HH.mm.ss")
-      this.error.displayed = true
-
-      if (axiosError.response) {
-        this.error.htmlError = `${axiosError.response.status} ${axiosError.response.statusText}`
-        this.error.msg = axiosError.response.data ? axiosError.response.data.message : axiosError
-      } else if (axiosError.request) {
-        this.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`
-        this.error.msg = axiosError
-      } else {
-        this.error.htmlError = "Probleme IHM (probablement)"
-        this.error.msg = axiosError
-      }
+      const notifStore = useNotificationStore()
+      notifStore.showError(axiosError)
+      // Keep in sync
+      this.error = notifStore.error
     },
 
     async initStore() {

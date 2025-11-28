@@ -28,16 +28,42 @@ Manages user authentication and profile data.
 - `changePassword(passwordData)`: Change password
 - `updateProfile(profileData)`: Update profile
 
+### Notification Store (`notification.js`)
+Manages user notifications and UI alerts.
+
+**State:**
+- `notifications`: List of user notifications (events history)
+- `unreadNotifications`: Count of unread notifications
+- `notif`: Info notification dialog state
+- `warning`: Warning dialog state
+- `error`: Error dialog state
+- `snack`: Snackbar notification state
+
+**Getters:**
+- `unreadCount`: Number of unread notifications
+- `hasUnread`: Boolean if there are unread notifications
+- `allNotifications`: All notifications
+- `unreadNotificationsList`: Only unread notifications
+
+**Actions:**
+- `updateNotifications(notifications)`: Update notifications from API
+- `readAllNotifications()`: Mark all as read
+- `readNotification(notification)`: Mark one as read
+- `showSnack(msg)`: Show snackbar
+- `showNotif(info)`: Show info dialog
+- `showWarning(message)`: Show warning dialog
+- `showError(axiosError)`: Show error dialog
+- `fetchNotifications()`: Fetch from API
+
 ### Main Store (`main.js`)
-Manages global application state (notifications, settings, photo gallery, etc.)
+Manages global application state (settings, photo gallery, etc.)
 
 **State:**
 - `citation`: Random citation
-- `notifications`: User notifications
 - `settings`: Application settings
 - `photosGallery`: Photo gallery state
 - `agpaMeta`: AGPA metadata
-- `notif`, `warning`, `error`, `snack`: UI notifications
+- `wsOnline`, `wsMessage`: WebSocket state
 
 ## Migration Guide
 
@@ -48,18 +74,25 @@ Use Pinia stores directly with the Composition API:
 ```vue
 <script setup>
 import { useUserStore } from '@/stores/user'
+import { useNotificationStore } from '@/stores/notification'
 import { useMainStore } from '@/stores/main'
 
 const userStore = useUserStore()
+const notifStore = useNotificationStore()
 const mainStore = useMainStore()
 
 // Access state
 const user = computed(() => userStore.currentUser)
 const isLoggedIn = computed(() => userStore.isLoggedIn)
+const unreadCount = computed(() => notifStore.unreadCount)
 
 // Call actions
 const handleLogin = async () => {
   await userStore.login({ username, password })
+}
+
+const handleError = (error) => {
+  notifStore.showError(error)
 }
 </script>
 ```
@@ -121,6 +154,10 @@ describe('User Store', () => {
 ## Migration Status
 
 - [x] User store created
+- [x] Notification store created
 - [x] Backward compatibility layer
+- [ ] Photo gallery store
+- [ ] AGPA store
+- [ ] WebSocket store
 - [ ] Migrate all components to use new stores
 - [ ] Remove Vuex dependency
