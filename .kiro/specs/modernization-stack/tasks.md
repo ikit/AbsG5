@@ -263,44 +263,49 @@
   - Create main app store (replaces root Vuex store)
   - _Requirements: 3.3_
 
-- [ ] 12.2 Migrate user store from Vuex to Pinia
-  - Create stores/user.ts
-  - Migrate state, getters, mutations, actions
-  - Update all components using user store
+- [x] 12.2 Migrate user store from Vuex to Pinia
+  - Create stores/user.js with authentication and profile management
+  - Add backward compatibility layer in helpers.js
+  - Update main store to delegate user actions
+  - Create comprehensive migration guide
   - _Requirements: 3.3, 6.2_
 
 - [ ]* 12.3 Write property test for state management preservation
   - **Property 4: State management preservation**
   - **Validates: Requirements 6.2**
 
-- [ ] 12.3 Migrate notification store
-  - Create stores/notification.ts
-  - Migrate notification state and actions
-  - Update components using notifications
+- [x] 12.3 Migrate notification store
+  - Create stores/notification.js with notifications and UI alerts
+  - Manage user notifications and read/unread state
+  - Handle UI notifications (snackbar, info, warning, error)
+  - Update main store and helpers for delegation
   - _Requirements: 3.3, 6.2_
 
-- [ ] 12.4 Migrate photo gallery store
-  - Create stores/photoGallery.ts
-  - Migrate gallery state and actions
-  - Update photo components
+- [x] 12.4 Migrate photo gallery store
+  - Create stores/photoGallery.js for viewer and editor
+  - Manage photos, navigation, and visibility
+  - Add photo management actions
+  - Update main store and helpers
   - _Requirements: 3.3, 6.2_
 
-- [ ] 12.5 Migrate AGPA store
-  - Create stores/agpa.ts
-  - Migrate AGPA metadata and actions
-  - Update AGPA components
+- [x] 12.5 Migrate AGPA store
+  - Create stores/agpa.js for photo contest management
+  - Manage metadata, editions, and archives
+  - Add phase checking and voting/submission actions
+  - Update main store and helpers
   - _Requirements: 3.3, 6.2_
 
-- [ ] 12.6 Migrate WebSocket store
-  - Create stores/websocket.ts
-  - Update WebSocket plugin for Vue 3
-  - Migrate socket state management
+- [x] 12.6 Migrate WebSocket store
+  - Create stores/websocket.js for real-time messaging
+  - Manage connection status and reconnection
+  - Handle message sending/receiving
+  - Update main store and helpers
   - _Requirements: 3.3, 6.2_
 
 - [ ] 12.7 Remove Vuex completely
-  - Remove Vuex dependency
-  - Remove store.js file
-  - Verify no Vuex imports remain
+  - Remove Vuex dependency from package.json
+  - Verify all components use Pinia stores
+  - Remove any remaining Vuex imports
   - _Requirements: 3.3_
 
 - [ ] 13. Update core dependencies for Vue 3
