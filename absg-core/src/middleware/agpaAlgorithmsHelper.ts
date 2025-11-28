@@ -13,31 +13,37 @@ import { getRepository } from "./database";
 function deliverAwardsPhotos(pIds: number[], catId: number, ctx: any) {
     // On vérifie si tout est correctement initialisé
     for (let idx = 0; idx < 4; idx++) {
-        if (!ctx.photos[pIds[idx]].awards) {
+        if (ctx.photos[pIds[idx]] && !ctx.photos[pIds[idx]].awards) {
             ctx.photos[pIds[idx]].awards = [];
         }
     }
 
     // On attribut simplement les agpa or, diamant et bronze aux 1ere, deuxième et troisième photos
     if (
+        ctx.photos[pIds[0]] && ctx.photos[pIds[1]] &&
         ctx.photos[pIds[0]].userId === ctx.photos[pIds[1]].userId &&
         ctx.photos[pIds[0]].score === ctx.photos[pIds[1]].score
     ) {
         // Test du double agpa d'or
-        ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
-        ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
-        ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
-        ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
+        if (ctx.photos[pIds[0]]) ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        if (ctx.photos[pIds[1]]) ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        if (ctx.photos[pIds[2]]) ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
+        if (ctx.photos[pIds[3]]) ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
     } else {
-        ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
-        ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
-        ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
-        ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.nominated, categoryId: catId });
+        if (ctx.photos[pIds[0]]) ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        if (ctx.photos[pIds[1]]) ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
+        if (ctx.photos[pIds[2]]) ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
+        if (ctx.photos[pIds[3]]) ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.nominated, categoryId: catId });
     }
     // On met à jour le palmarès (de l'édition) des auteurs
     for (let idx = 0; idx < 4; idx++) {
         const p = ctx.photos[pIds[idx]];
-        ctx.users[p.userId].palmares += palmaresPoints(p.awards.find(a => a.categoryId === catId).award);
+        if (p && ctx.users[p.userId]) {
+            const award = p.awards.find(a => a.categoryId === catId);
+            if (award) {
+                ctx.users[p.userId].palmares += palmaresPoints(award.award);
+            }
+        }
     }
 }
 
@@ -50,12 +56,14 @@ function deliverAwardsPhotos(pIds: number[], catId: number, ctx: any) {
  */
 function deliverAwardsPhotographes(pIds: number[], ctx: any) {
     // On attribut simplement les agpa or, diamant et bronze aux 1er, deuxième et troisième photographes
-    ctx.users[pIds[0]].award = AgpaAwardType.gold;
-    ctx.users[pIds[1]].award = AgpaAwardType.sylver;
-    ctx.users[pIds[2]].award = AgpaAwardType.bronze;
+    if (ctx.users[pIds[0]]) ctx.users[pIds[0]].award = AgpaAwardType.gold;
+    if (ctx.users[pIds[1]]) ctx.users[pIds[1]].award = AgpaAwardType.sylver;
+    if (ctx.users[pIds[2]]) ctx.users[pIds[2]].award = AgpaAwardType.bronze;
     // On met à jour le palmarès (de l'édition) des auteurs
     for (let idx = 0; idx < 3; idx++) {
-        ctx.users[pIds[idx]].palmares += palmaresPoints(ctx.users[pIds[idx]].award);
+        if (ctx.users[pIds[idx]]) {
+            ctx.users[pIds[idx]].palmares += palmaresPoints(ctx.users[pIds[idx]].award);
+        }
     }
 }
 
@@ -469,6 +477,9 @@ export async function p4AgpaAttribution(ctx: any) {
  */
 export async function p4DiamondAttribution(ctx: any) {
     // Pour chaque catégories:
+    if (!ctx.categories || !Array.isArray(ctx.categories)) {
+        return;
+    }
     for (const cat of ctx.categories) {
         // Il faut au moins 2 photos dans la catégorie
         if (cat.photos.length <= 2) continue;
@@ -535,6 +546,9 @@ export async function p4DiamondAttribution(ctx: any) {
  * @param ctx les données retournées lors de l'étape 4 (cf p4DiamondAttribution)
  */
 export async function p4HonorAttribution(ctx: any) {
+    if (!ctx.users) {
+        return ctx;
+    }
     for (const uid in ctx.users) {
         const u = ctx.users[uid];
         if (u.age < 12 && (!Array.isArray(u.awards) || u.awards.length === 0)) {
