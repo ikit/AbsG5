@@ -87,8 +87,8 @@
               v-if="item.bestYear.stats[7] > 0"
               right
             >
-              <template #activator="{ on }">
-                <span v-on="on">{{ item.bestYear.year }}
+              <template #activator="{ props }">
+                <span v-bind="props">{{ item.bestYear.year }}
                   <span style="opacity: 0.5">({{ item.bestYear.stats[6] }} awards - {{ item.bestYear.stats[7] }} pts)</span>
                 </span>
               </template>
@@ -128,8 +128,8 @@
               v-if="item.bestYear.stats[6] > 0"
               right
             >
-              <template #activator="{ on }">
-                <span v-on="on">{{ item.bestCat.title }}
+              <template #activator="{ props }">
+                <span v-bind="props">{{ item.bestCat.title }}
                   <span style="opacity: 0.5">({{ item.bestCat.stats[5] }} awards - {{ item.bestCat.stats[6] }} pts)</span>
                 </span>
               </template>
@@ -192,51 +192,49 @@
           grid-list-sm
           class="pa-4"
         >
-          <v-simple-table>
-            <template #default>
-              <thead>
-                <tr>
-                  <th class="text-left" />
-                  <th class="text-left">
-                    Nomination
-                  </th>
-                  <th class="text-left">
-                    Bronze
-                  </th>
-                  <th class="text-left">
-                    Argent
-                  </th>
-                  <th class="text-left">
-                    Or
-                  </th>
-                  <th class="text-left">
-                    Diamant
-                  </th>
-                  <th class="text-left">
-                    AGPA total
-                  </th>
-                  <th class="text-left">
-                    Points
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="i in palmaresDetails.statsByCategories"
-                  :key="i.id"
-                >
-                  <td>{{ i.title }}</td>
-                  <td>{{ i.stats[0] }}</td>
-                  <td>{{ i.stats[1] }}</td>
-                  <td>{{ i.stats[2] }}</td>
-                  <td>{{ i.stats[3] }}</td>
-                  <td>{{ i.stats[4] }}</td>
-                  <td>{{ i.stats[5] }}</td>
-                  <td>{{ i.stats[6] }}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
+          <v-table>
+            <thead>
+              <tr>
+                <th class="text-left" />
+                <th class="text-left">
+                  Nomination
+                </th>
+                <th class="text-left">
+                  Bronze
+                </th>
+                <th class="text-left">
+                  Argent
+                </th>
+                <th class="text-left">
+                  Or
+                </th>
+                <th class="text-left">
+                  Diamant
+                </th>
+                <th class="text-left">
+                  AGPA total
+                </th>
+                <th class="text-left">
+                  Points
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="i in palmaresDetails.statsByCategories"
+                :key="i.id"
+              >
+                <td>{{ i.title }}</td>
+                <td>{{ i.stats[0] }}</td>
+                <td>{{ i.stats[1] }}</td>
+                <td>{{ i.stats[2] }}</td>
+                <td>{{ i.stats[3] }}</td>
+                <td>{{ i.stats[4] }}</td>
+                <td>{{ i.stats[5] }}</td>
+                <td>{{ i.stats[6] }}</td>
+              </tr>
+            </tbody>
+          </v-table>
         </v-container>
         <v-card-actions>
           <v-spacer />

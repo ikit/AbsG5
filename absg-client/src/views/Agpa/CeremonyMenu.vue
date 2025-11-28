@@ -13,8 +13,9 @@
         ouverture dans
       </p>
       <Timer
-        v-if="timerEnable"
+        v-if="timerEnable && current.ceremonyDate"
         ref="timer"
+        :end="current.ceremonyDate"
         style="margin: auto"
         @completed="startCeremony()"
       />
@@ -120,10 +121,7 @@ import { padNumber } from '../../middleware/CommonHelper';
 import { addDays, addSeconds, format } from 'date-fns';
 import Timer from '../../components/Timer.vue';
 
-import Vue from 'vue';
-import Vlf from 'vlf';
 import localforage from 'localforage';
-Vue.use(Vlf, localforage);
 
 export default {
     name: 'CeremonyMenu',
@@ -141,7 +139,8 @@ export default {
         current: {
             ceremonyDate: null,
             displayed: false
-        }
+        },
+        vlf: null
 
     }),
     computed: {
@@ -164,8 +163,8 @@ export default {
         }
     },
     mounted() {
-        this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
-        this.$vlf.createInstance({
+        this.isAdmin = this.user?.roles?.find(e => e === "admin") !== undefined;
+        this.vlf = localforage.createInstance({
             storeName: 'absg5'
         });
 
@@ -202,7 +201,6 @@ export default {
                 this.timerEnable = false;
             } else {
                 this.timerEnable = true;
-                this.$refs.timer.init(this.current.ceremonyDate);
             }
 
             this.preloadIntro();
@@ -212,7 +210,9 @@ export default {
         startCeremony() {
             this.current.displayed = true;
             this.$refs.video.play();
-            this.$refs.timer.stop();
+            if (this.$refs.timer) {
+                this.$refs.timer.stop();
+            }
         },
 
         openCeremonySlideShow() {
@@ -275,7 +275,7 @@ export default {
 
         preloadCeremony() {
             const that = this;
-            that.$vlf.getItem("ceremonyData").then(
+            that.vlf.getItem("ceremonyData").then(
                 data => {
                     if (!data) {
                         // Si on ne trouve pas l'intro, on la prétélécharge
@@ -283,7 +283,7 @@ export default {
                             const d = parseAxiosResponse(response);
                             if (d) {
                                 // On sauvegarde localement la vidéo
-                                that.$vlf.setItem('ceremonyData', d).then(v => {
+                                that.vlf.setItem('ceremonyData', d).then(v => {
                                     that.preloadImages(d);
                                 });
                             }

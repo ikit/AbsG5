@@ -36,12 +36,12 @@
                   :key="author.id"
                   bottom
                 >
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <img
                       style="height: 40px; margin-top: 10px;"
                       :src="getAvatar(author)"
                       :alt="getName(author)"
-                      v-on="on"
+                      v-bind="props"
                     >
                   </template>
                   <span>{{ `${getPlace(index)}: ${getName(author)}` }}</span>
@@ -56,10 +56,10 @@
                 v-if="edition.palmares"
                 bottom
               >
-                <template #activator="{ on }">
+                <template #activator="{ props }">
                   <div
                     style="position: absolute; bottom: 10px; right: 15px; text-align: right; font-size: 0.9em;"
-                    v-on="on"
+                    v-bind="props"
                   >
                     <template v-if="edition.palmares.diamond">
                       <i

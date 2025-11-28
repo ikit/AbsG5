@@ -3,12 +3,12 @@
     <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               depressed
               small
               :to="{path: `/agpa/archives/${year}` }"
-              v-on="on"
+              v-bind="props"
             >
               <v-icon left>
                 fas fa-chevron-left
@@ -22,12 +22,12 @@
         <v-spacer />
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
               small
               :disabled="isLoading"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextYear(-1)"
             >
               <v-icon>fa-chevron-left</v-icon>
@@ -39,12 +39,12 @@
           {{ year }}
         </span>
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
               small
               :disabled="isLoading"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextYear(1)"
             >
               <v-icon>fa-chevron-right</v-icon>
@@ -56,12 +56,12 @@
         <v-spacer />
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
               small
               :disabled="isLoading"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(-1)"
             >
               <v-icon>fas fa-chevron-left</v-icon>
@@ -73,12 +73,12 @@
           {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
         </span>
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
               small
               :disabled="isLoading"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(1)"
             >
               <v-icon>fas fa-chevron-right</v-icon>
