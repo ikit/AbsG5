@@ -3,16 +3,16 @@
     <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-icon
-              left
+              start
               style="margin-top:-10px; font-size: 30px"
             >
               far fa-question-circle
             </v-icon>
             <div
               class="phase-left-header"
-              v-on="on"
+              v-bind="props"
               @click="help.displayed = true; help.page = 3"
             >
               <h2>Phase n°3 en cours : Votes</h2>
@@ -25,13 +25,13 @@
         <v-spacer />
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
-              small
+              size="small"
               :disabled="isLoading"
               style="margin-top: 3px;"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(-1)"
             >
               <v-icon>fas fa-chevron-left</v-icon>
@@ -47,7 +47,7 @@
           <template #activator="{ on, attrs }">
             <v-btn
               v-bind="attrs"
-              text
+              variant="text"
               class="grey--text"
               v-on="on"
             >
@@ -66,13 +66,13 @@
         </v-menu>
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
-              small
+              size="small"
               :disabled="isLoading"
               style="margin-top: 3px;"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(1)"
             >
               <v-icon>fas fa-chevron-right</v-icon>
@@ -84,12 +84,10 @@
         <v-spacer />
 
         <v-tooltip bottom>
-          <template
-            #activator="{ on }"
-            v-on="on"
-          >
+          <template #activator="{ props }">
             <div
               class="phase-right-header"
+              v-bind="props"
               @click="help.displayed = true; help.page = 4"
             >
               <h2>Vos votes</h2>
@@ -190,14 +188,14 @@
               </div>
               <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <v-btn
                       v-if="photo.enableVotes"
                       icon
-                      small
+                      size="small"
                       :disabled="isLoading"
                       style="opacity: 1; background: #fff"
-                      v-on="on"
+                      v-bind="props"
                       @click="vote(photo, 1)"
                     >
                       <v-icon :style="{ color: photo.userVote > 0 ? '#ecce00' : '' }">
@@ -209,14 +207,14 @@
                 </v-tooltip>
 
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <v-btn
                       v-if="photo.enableVotes"
                       icon
-                      small
+                      size="small"
                       :disabled="isLoading"
                       style="opacity: 1; background: #fff"
-                      v-on="on"
+                      v-bind="props"
                       @click="vote(photo, 2)"
                     >
                       <v-icon :style="{ color: photo.userVote > 1 ? '#ecce00' : '' }">
@@ -228,14 +226,14 @@
                 </v-tooltip>
 
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <v-btn
                       v-if="photo.enableVotes"
                       icon
-                      small
+                      size="small"
                       :disabled="isLoading"
                       style="opacity: 1; background: #fff"
-                      v-on="on"
+                      v-bind="props"
                       @click="vote(photo, -3)"
                     >
                       <v-icon :style="{ color: photo.titleVote > 0 ? '#ecce00' : '' }">
@@ -265,7 +263,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="help.displayed = false"
           >

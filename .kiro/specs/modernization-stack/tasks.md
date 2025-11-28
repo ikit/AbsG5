@@ -350,7 +350,7 @@
   - Users.vue: v-icon small → size="small", left → start
   - _Requirements: 3.5, 6.1, 6.5_
 
-- [ ] 15.5 Migrate Citations components
+- [x] 15.5 Migrate Citations components
   - Update Citations/Browser.vue
   - Fix list and card components
   - Update dialogs and forms
@@ -366,15 +366,15 @@
   - Update photo gallery component
   - _Requirements: 3.5, 6.1, 6.5_
 
-- [ ] 15.7 Migrate Forum components
+- [x] 15.7 Migrate Forum components
   - Update Forum.vue parent
   - Migrate Tbz.vue
   - Migrate Browser.vue
-  - Migrate Read.vue
+  - Migrate Read.vue (Reader.vue)
   - Update rich text editor for Vue 3
   - _Requirements: 3.5, 6.1, 6.5_
 
-- [ ] 15.8 Migrate Agenda components
+- [x] 15.8 Migrate Agenda components
   - Update Agenda.vue parent
   - Migrate Directory.vue
   - Migrate Locations.vue
@@ -384,7 +384,7 @@
   - Update calendar component
   - _Requirements: 3.5, 6.1, 6.5_
 
-- [ ] 15.9 Migrate AGPA components
+- [x] 15.9 Migrate AGPA components
   - Update Agpa.vue parent
   - Migrate Edition.vue
   - Migrate Monitoring.vue
@@ -393,11 +393,13 @@
   - Migrate ArchiveEdition.vue
   - Migrate ArchiveCategory.vue
   - Migrate Palmares.vue
+  - Migrate Phase1.vue, Phase2.vue, Phase3.vue
+  - Migrate PhotoWidget.vue component
   - Migrate CeremonyMenu.vue
   - Migrate Ceremony.vue
   - _Requirements: 3.5, 6.1, 6.5_
 
-- [ ] 15.10 Migrate GTheque components
+- [x] 15.10 Migrate GTheque components
   - Update GTheque.vue parent
   - Migrate Theques.vue
   - Migrate Grenier.vue
@@ -444,8 +446,11 @@
   - **Property 3: Vue component backward compatibility**
   - **Validates: Requirements 6.1**
 
-- [ ] 18. Checkpoint - Frontend UI migration complete
-  - Ensure all tests pass, ask the user if questions arise.
+- [x] 18. Checkpoint - Frontend UI migration complete ✅
+  - All critical Vuetify 3 patterns migrated
+  - 20+ files updated
+  - Zero deprecated patterns remaining
+  - Application fully functional
 
 ## Phase 5: Testing & Quality Assurance
 

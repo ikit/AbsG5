@@ -39,8 +39,8 @@
         @click="closeEdition()"
       >
         <v-icon
-          small
-          left
+          size="small"
+          start
         >
           fa-plus
         </v-icon>
@@ -219,40 +219,40 @@
                 :key="a.categoryId"
               >
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <i
                       v-if="a.award === 'diamond'"
                       class="fas fa-circle"
                       style="color: #c3f1ff"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'gold'"
                       class="fas fa-circle"
                       style="color: #c68b00"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'sylver'"
                       class="fas fa-circle"
                       style="color: #9b9b9b"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'bronze'"
                       class="fas fa-circle"
                       style="color: #964c31"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'nominated'"
                       class="far fa-circle"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'honor'"
                       class="far fa-smile"
-                      v-on="on"
+                      v-bind="props"
                     />
                   </template>
                   {{ data.categories[a.categoryId].title }}
@@ -423,7 +423,7 @@
         <div style="display: flex; margin: 0 24px">
           <v-table
             v-if="photoDetails.votes.length > 0"
-              dense
+              density="compact"
               style="text-align: left; font-size: 0.8em; margin: 10px"
             >
               <template #default>
@@ -459,7 +459,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoDetails.displayed = false"
           >
@@ -483,7 +483,7 @@
         </div>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoEdition.displayed = false"
           >
@@ -491,14 +491,14 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoEdition.displayed = false"
           >
             Annuler
           </v-btn>
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoEdition.displayed = false"
           >
@@ -524,7 +524,7 @@
         <div style="display: flex; margin: 0 24px">
           <div style="flex: 1 1 auto">
             <v-table
-              dense
+              density="compact"
               style="text-align: left; font-size: 0.8em; margin: 10px"
             >
               <template #default>
@@ -585,7 +585,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="voteDetails.displayed = false"
           >

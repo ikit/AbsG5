@@ -2,8 +2,8 @@
   <div>
     <v-timeline
       v-if="messages.length > 0"
-      align-top
-      dense
+      align="start"
+      density="compact"
       style="background: none; margin: auto; max-width: 700px; width: 100%;"
     >
       <v-timeline-item
@@ -129,7 +129,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="msgDeletion.open = false"
           >
@@ -163,7 +163,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="editMessageDisplayed = null"
           >

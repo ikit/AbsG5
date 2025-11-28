@@ -29,8 +29,8 @@
 
         <v-btn-toggle :disabled="isLoading">
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="downloadAsCsv()">
+            <template #activator="{ props }">
+              <v-btn @click.stop="downloadAsCsv()" v-bind="props">
                 <v-icon>fas fa-file-download</v-icon>
               </v-btn>
             </template>
@@ -38,8 +38,8 @@
           </v-tooltip>
           
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="displayStats()">
+            <template #activator="{ props }">
+              <v-btn @click.stop="displayStats()" v-bind="props">
                 <v-icon>fas fa-chart-pie</v-icon>
               </v-btn>
             </template>
@@ -47,8 +47,8 @@
           </v-tooltip>
 
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="resetDialog(true)">
+            <template #activator="{ props }">
+              <v-btn @click.stop="resetDialog(true)" v-bind="props">
                 <v-icon>fas fa-plus</v-icon>
               </v-btn>
             </template>
@@ -160,7 +160,7 @@
         </v-container>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="serieEditor.isLoading"
             @click="addItem()"
@@ -169,7 +169,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="serieEditor.isLoading"
             @click="resetDialog()"

@@ -8,8 +8,7 @@
         >
           <template #activator="{ props }">
             <v-btn
-              depressed
-              small
+              size="small"
               :to="{path: '/agpa/archives/' }"
               v-bind="props"
             >
@@ -27,8 +26,7 @@
         >
           <template #activator="{ props }">
             <v-btn
-              small
-              depressed
+              size="small"
               :to="{path: '/agpa/archives/' }"
               v-bind="props"
             >
@@ -191,7 +189,6 @@
             <template #activator="{ props }">
               <v-btn
                 style="margin-top: 20px"
-                depressed
                 :to="{path: `/agpa/archives/${year}/${catIdx}` }"
                 v-bind="props"
               >

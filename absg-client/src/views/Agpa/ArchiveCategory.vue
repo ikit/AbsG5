@@ -5,8 +5,7 @@
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
-              depressed
-              small
+              size="small"
               :to="{path: `/agpa/archives/${year}` }"
               v-bind="props"
             >

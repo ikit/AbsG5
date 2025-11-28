@@ -64,7 +64,6 @@
           <v-tooltip bottom>
             <template #activator="{ props }">
               <v-btn
-                depressed
                 v-bind="props"
                 @click="addNewPhoto()"
               >

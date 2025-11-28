@@ -194,10 +194,10 @@
             v-if="$vuetify.display.lgAndUp"
             bottom
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 style="margin: 5px 0 -5px 10px;"
-                v-on="on"
+                v-bind="props"
                 @click="switchSmilies()"
               >
                 Smilies
@@ -207,7 +207,7 @@
           </v-tooltip>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="resetDialog()"
           >

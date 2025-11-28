@@ -8,7 +8,7 @@
         >
           <template #activator="{ props }">
             <v-icon
-              left
+              start
               style="margin-top:-10px; font-size: 30px"
             >
               far fa-question-circle
@@ -28,13 +28,13 @@
         <v-spacer />
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
-              small
+              size="small"
               :disabled="isLoading"
               style="margin-top: 3px;"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(-1)"
             >
               <v-icon>fas fa-chevron-left</v-icon>
@@ -51,7 +51,7 @@
             <v-btn
               dark
               v-bind="attrs"
-              text
+              variant="text"
               class="grey--text"
               v-on="on"
             >
@@ -70,13 +70,13 @@
         </v-menu>
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
-              small
+              size="small"
               :disabled="isLoading"
               style="margin-top: 3px;"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(1)"
             >
               <v-icon>fas fa-chevron-right</v-icon>
@@ -128,13 +128,13 @@
               </div>
               <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <v-btn
                       icon
-                      small
+                      size="small"
                       :disabled="isLoading"
                       style="opacity: 1; background: #fff"
-                      v-on="on"
+                      v-bind="props"
                       @click="displayPhotoDiscussion(photo)"
                     >
                       <v-icon
@@ -173,7 +173,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="help.displayed = false"
           >
@@ -264,14 +264,14 @@
         <v-card-actions>
           <v-btn
             v-if="isAdmin"
-            text
+            variant="text"
             @click="photoDiscussion.deleteConfirmation = true"
           >
             Supprimer
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoDiscussion.displayed = false"
           >
@@ -296,13 +296,13 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="photoDiscussion.deleteConfirmation = false"
           >
             Annuler
           </v-btn>
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="deletePhoto()"
           >

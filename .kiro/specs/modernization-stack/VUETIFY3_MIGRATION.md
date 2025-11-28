@@ -12,6 +12,7 @@
 **Files updated:**
 - `ArchiveEdition.vue`
 - `Palmares.vue`
+- `Monitoring.vue` (2 instances)
 
 #### Tooltips
 - ✅ `{ on }` → `{ props }`
@@ -21,6 +22,10 @@
 - `ArchiveEdition.vue`
 - `ArchiveCategory.vue`
 - `App.vue`
+- `Phase2.vue` (3 instances)
+- `Phase3.vue` (7 instances)
+- `Monitoring.vue` (1 instance)
+- `Theques.vue` (3 instances)
 
 #### Expansion Panels
 - ✅ `v-expansion-panel-header` → `v-expansion-panel-title`
@@ -37,6 +42,14 @@
 
 **Files updated:**
 - `Home.vue`
+- `Phase2.vue` (8 instances)
+- `Phase3.vue` (1 instance)
+- `Monitoring.vue` (6 instances)
+- `Theques.vue` (2 instances)
+- `Reader.vue` (2 instances)
+- `ArchiveEdition.vue` (3 instances) ✨ NEW
+- `ArchiveCategory.vue` (1 instance) ✨ NEW
+- `PhotoWidget.vue` (1 instance) ✨ NEW
 
 #### Icons
 - ✅ `left` prop → `start`
@@ -47,12 +60,22 @@
 - `Home.vue`
 - `Profile.vue`
 - `Users.vue`
+- `Phase2.vue`
+- `Phase3.vue`
+- `Monitoring.vue`
 
 #### Lists
 - ✅ `dense` prop → `density="compact"`
 
 **Files updated:**
 - `App.vue`
+
+#### Timeline
+- ✅ `align-top` prop → `align="start"`
+- ✅ `dense` prop → `density="compact"`
+
+**Files updated:**
+- `Reader.vue` (Forum)
 
 ### Migration Patterns
 
@@ -118,22 +141,23 @@
 
 ### Components to Audit
 - [x] Admin section components (Profile, Dashboard, Users, NewPassword, Settings)
-- [ ] Citations components
-- [ ] Photos section components
-- [ ] Forum components
-- [ ] Agenda components
-- [ ] AGPA components (remaining)
-- [ ] GTheque components
+- [x] Citations components (no issues found)
+- [ ] Photos section components (minor icon issues)
+- [x] Forum components (Reader, Browser, Tbz)
+- [x] Agenda components (no issues found)
+- [x] AGPA components (Phase2, Phase3, Monitoring, ArchiveEdition, ArchiveCategory, Palmares, ArchivesSummary)
+- [x] GTheque components (Theques, Grenier)
 - [ ] Authentication components
 
 ### Known Issues to Check
-- [ ] v-data-table headers and items syntax
-- [ ] v-dialog transitions
-- [ ] v-menu positioning
-- [ ] v-select and v-autocomplete
-- [ ] v-text-field and v-textarea
-- [ ] v-chip variants
-- [ ] v-avatar sizes
+- [x] v-data-table headers and items syntax (checked, working)
+- [x] v-dialog transitions (checked, working)
+- [x] v-menu positioning (checked, working)
+- [x] v-select and v-autocomplete (checked, working)
+- [x] v-text-field and v-textarea (checked, working)
+- [x] v-chip variants (no issues found)
+- [x] v-avatar sizes (no issues found)
+- [x] v-timeline align-top → align="start" (migrated in Reader.vue)
 
 ## Testing Checklist
 
