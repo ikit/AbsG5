@@ -4,6 +4,7 @@ import { parseAxiosResponse } from '../middleware/CommonHelper'
 import { useUserStore } from './user'
 import { useNotificationStore } from './notification'
 import { usePhotoGalleryStore } from './photoGallery'
+import { useAgpaStore } from './agpa'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -23,6 +24,7 @@ export const useMainStore = defineStore('main', {
     photosGalleryIndex: 0,
     photosGalleryDisplayed: false,
     photoMetadataEditorDisplayed: false,
+    // DEPRECATED: Use useAgpaStore() instead
     agpaMeta: null,
     // DEPRECATED: Use useNotificationStore() instead
     notif: {
@@ -108,8 +110,12 @@ export const useMainStore = defineStore('main', {
       this.citation = citation
     },
 
+    // DEPRECATED: Use useAgpaStore().updateMeta() instead
     updateAgpaMeta(meta) {
-      this.agpaMeta = meta
+      const agpaStore = useAgpaStore()
+      agpaStore.updateMeta(meta)
+      // Keep in sync
+      this.agpaMeta = agpaStore.meta
     },
 
     updateSettings(settings) {
@@ -256,11 +262,14 @@ export const useMainStore = defineStore('main', {
       }
     },
 
+    // DEPRECATED: Use useAgpaStore().initialize() instead
     async initAGPA() {
-      if (!this.agpaMeta) {
+      const agpaStore = useAgpaStore()
+      if (!agpaStore.isInitialized) {
         try {
-          const response = await axios.get(`/api/agpa`)
-          this.updateAgpaMeta(parseAxiosResponse(response))
+          await agpaStore.initialize()
+          // Keep in sync
+          this.agpaMeta = agpaStore.meta
         } catch (error) {
           console.error('Failed to initialize AGPA:', error)
         }

@@ -81,13 +81,42 @@ Manages photo gallery viewer and metadata editor.
 - `addPhoto(photo)`, `removePhoto(index)`: Manage photos
 - `clearGallery()`: Clear all
 
+### AGPA Store (`agpa.js`)
+Manages AGPA (photo contest) data and operations.
+
+**State:**
+- `meta`: AGPA metadata (categories, years, phases)
+- `currentEdition`: Current edition data
+- `isLoading`: Loading state
+- `isInitialized`: Initialization state
+
+**Getters:**
+- `agpaMeta`: Get metadata
+- `currentYear`, `minYear`, `maxYear`: Year info
+- `categories`: All categories
+- `getCategoryById(id)`: Get specific category
+- `currentPhase`: Current phase number
+- `isActive`, `isVotingPhase`, `isSubmissionPhase`, etc.: Phase checks
+- `specialEdition`: Special edition info
+- `isLoaded`: Check if data is loaded
+
+**Actions:**
+- `updateMeta(meta)`: Update metadata
+- `initialize()`: Load AGPA data from API
+- `fetchCurrentEdition()`: Get current edition
+- `fetchArchiveEdition(year)`: Get archive
+- `fetchCategoryData(year, categoryId)`: Get category
+- `fetchPalmares()`: Get hall of fame
+- `submitPhoto(photoData)`: Submit photo
+- `submitVotes(votes)`: Submit votes
+- `reset()`: Reset store
+
 ### Main Store (`main.js`)
-Manages global application state (settings, AGPA, etc.)
+Manages global application state (settings, citation, etc.)
 
 **State:**
 - `citation`: Random citation
 - `settings`: Application settings
-- `agpaMeta`: AGPA metadata
 - `wsOnline`, `wsMessage`: WebSocket state
 
 ## Migration Guide
@@ -101,11 +130,13 @@ Use Pinia stores directly with the Composition API:
 import { useUserStore } from '@/stores/user'
 import { useNotificationStore } from '@/stores/notification'
 import { usePhotoGalleryStore } from '@/stores/photoGallery'
+import { useAgpaStore } from '@/stores/agpa'
 import { useMainStore } from '@/stores/main'
 
 const userStore = useUserStore()
 const notifStore = useNotificationStore()
 const galleryStore = usePhotoGalleryStore()
+const agpaStore = useAgpaStore()
 const mainStore = useMainStore()
 
 // Access state
@@ -113,6 +144,8 @@ const user = computed(() => userStore.currentUser)
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 const unreadCount = computed(() => notifStore.unreadCount)
 const currentPhoto = computed(() => galleryStore.currentPhoto)
+const agpaMeta = computed(() => agpaStore.agpaMeta)
+const isVotingPhase = computed(() => agpaStore.isVotingPhase)
 
 // Call actions
 const handleLogin = async () => {
@@ -126,6 +159,10 @@ const handleError = (error) => {
 const showPhotoGallery = (photos) => {
   galleryStore.resetGallery(photos)
   galleryStore.showGallery()
+}
+
+const initAgpa = async () => {
+  await agpaStore.initialize()
 }
 </script>
 ```
@@ -189,8 +226,8 @@ describe('User Store', () => {
 - [x] User store created
 - [x] Notification store created
 - [x] Photo gallery store created
+- [x] AGPA store created
 - [x] Backward compatibility layer
-- [ ] AGPA store
 - [ ] WebSocket store
 - [ ] Migrate all components to use new stores
 - [ ] Remove Vuex dependency

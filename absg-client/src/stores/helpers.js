@@ -3,6 +3,7 @@ import { useMainStore } from './main'
 import { useUserStore } from './user'
 import { useNotificationStore } from './notification'
 import { usePhotoGalleryStore } from './photoGallery'
+import { useAgpaStore } from './agpa'
 
 /**
  * Maps Pinia state to component computed properties (like Vuex mapState)
@@ -39,6 +40,12 @@ export function mapPiniaState(keys) {
         if (key === 'photosGalleryIndex') return galleryStore.currentIndex
         if (key === 'photosGalleryDisplayed') return galleryStore.isDisplayed
         if (key === 'photoMetadataEditorDisplayed') return galleryStore.isEditorDisplayed
+      }
+      
+      // Check if it's an AGPA property
+      if (key === 'agpaMeta') {
+        const agpaStore = useAgpaStore()
+        return agpaStore.meta
       }
       
       // Otherwise use main store
@@ -79,6 +86,7 @@ export default {
     const userStore = useUserStore()
     const notifStore = useNotificationStore()
     const galleryStore = usePhotoGalleryStore()
+    const agpaStore = useAgpaStore()
     
     return new Proxy(mainStore, {
       get(target, prop) {
@@ -104,6 +112,9 @@ export default {
         if (prop === 'photosGalleryIndex') return galleryStore.currentIndex
         if (prop === 'photosGalleryDisplayed') return galleryStore.isDisplayed
         if (prop === 'photoMetadataEditorDisplayed') return galleryStore.isEditorDisplayed
+        
+        // Delegate AGPA properties to agpaStore
+        if (prop === 'agpaMeta') return agpaStore.meta
         
         // Otherwise use main store
         return target[prop]
@@ -151,6 +162,17 @@ export default {
       return
     }
     
+    // Check if it's an AGPA action
+    const agpaActions = ['updateAgpaMeta', 'initAGPA']
+    if (agpaActions.includes(action)) {
+      const mainStore = useMainStore()
+      // Call main store for backward compatibility
+      if (typeof mainStore[action] === 'function') {
+        mainStore[action](payload)
+      }
+      return
+    }
+    
     const store = useMainStore()
     if (typeof store[action] === 'function') {
       store[action](payload)
@@ -174,6 +196,18 @@ export default {
       const notifStore = useNotificationStore()
       if (typeof notifStore[action] === 'function') {
         return notifStore[action](payload)
+      }
+    }
+    
+    // Check if it's an AGPA action
+    const agpaActions = [
+      'initialize', 'fetchCurrentEdition', 'fetchArchiveEdition',
+      'fetchCategoryData', 'fetchPalmares', 'submitPhoto', 'submitVotes'
+    ]
+    if (agpaActions.includes(action)) {
+      const agpaStore = useAgpaStore()
+      if (typeof agpaStore[action] === 'function') {
+        return agpaStore[action](payload)
       }
     }
     
