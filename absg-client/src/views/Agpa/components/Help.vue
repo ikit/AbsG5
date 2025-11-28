@@ -104,8 +104,11 @@
       Phase 5
     </v-tab>
 
+  </v-tabs>
+
+  <v-window :model-value="selectedTab" @update:model-value="$emit('update:selectedTab', $event)">
     <!-- P1 -->
-    <v-tab-item>
+    <v-window-item :value="0">
       <div class="help-content">
         <h3>Enregistrement des photos</h3>
         <p>
@@ -129,10 +132,10 @@
           De plus à l'avenir, les téléphones portables et ordinateurs utiliseront couramment cette résolution.
         </p>
       </div>
-    </v-tab-item>
+    </v-window-item>
 
     <!-- P2 -->
-    <v-tab-item>
+    <v-window-item :value="1">
       <div class="help-content">
         <h3>Vérification des photos</h3>
         <p>
@@ -147,10 +150,10 @@
           S’il ne le fait pas, la photo en cause sera exclues de la phase de vote et ne pourra pas obtenir de point pour le classement final.
         </p>
       </div>
-    </v-tab-item>
+    </v-window-item>
 
     <!-- P3 -->
-    <v-tab-item>
+    <v-window-item :value="2">
       <div class="help-content">
         <h3>Votes</h3>
         <p>
@@ -185,10 +188,10 @@
           a été attribués.
         </p>
       </div>
-    </v-tab-item>
+    </v-window-item>
 
     <!-- P4 -->
-    <v-tab-item>
+    <v-window-item :value="3">
       <div class="help-content">
         <h3>Dépouillement des votes</h3>
         <p>
@@ -219,10 +222,10 @@
           </ul>
         </p>
       </div>
-    </v-tab-item>
+    </v-window-item>
 
     <!-- P5 -->
-    <v-tab-item>
+    <v-window-item :value="4">
       <div class="help-content">
         <h3>Cérémonie de remise des AGPA</h3>
         <p>
@@ -230,8 +233,8 @@
           aucune récompense n’est assurée. Les photos gagnantes seront cependant durablement mises en ligne sur le site Absolument G.
         </p>
       </div>
-    </v-tab-item>
-  </v-tabs>
+    </v-window-item>
+  </v-window>
 </template>
 
 

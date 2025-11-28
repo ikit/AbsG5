@@ -202,7 +202,7 @@
             </v-icon>
             Aide sur le déroulement du concours
           </v-card-title>
-          <Help selected-tab="2" />
+          <Help :selected-tab="2" />
           <v-card-actions>
             <v-spacer />
             <v-btn

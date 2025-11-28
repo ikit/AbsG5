@@ -32,25 +32,27 @@
         </v-tab>
 
 
-        <v-btn
-          style="position: absolute; top: 5px; right: 5px"
-          @click="closeEdition()"
+      </v-tabs>
+
+      <v-btn
+        style="position: absolute; top: 5px; right: 5px"
+        @click="closeEdition()"
+      >
+        <v-icon
+          small
+          left
         >
-          <v-icon
-            small
-            left
-          >
-            fa-plus
-          </v-icon>
-          Close edition
-        </v-btn>
+          fa-plus
+        </v-icon>
+        Close edition
+      </v-btn>
 
-
+      <v-window>
         <!-- Vérification des photos -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Participation</h2>
 
-          <v-simple-table style="text-align: left; font-size: 0.8em; margin: 10px">
+          <v-table style="text-align: left; font-size: 0.8em; margin: 10px">
             <template #default>
               <thead>
                 <tr style="vertical-align: baseline;">
@@ -96,14 +98,14 @@
                 </tr>
               </tbody>
             </template>
-          </v-simple-table>
-        </v-tab-item>
+          </v-table>
+        </v-window-item>
 
         <!-- Vérification des votes -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Vérification des votes</h2>
 
-          <v-simple-table style="text-align: left; font-size: 0.8em; margin: 10px">
+          <v-table style="text-align: left; font-size: 0.8em; margin: 10px">
             <template #default>
               <thead>
                 <tr style="vertical-align: baseline;">
@@ -147,11 +149,11 @@
                 </tr>
               </tbody>
             </template>
-          </v-simple-table>
-        </v-tab-item>
+          </v-table>
+        </v-window-item>
 
         <!-- Notes des photos -->
-        <v-tab-item>
+        <v-window-item>
           <div
             class="row"
             style="margin: 0 10px 0 0;"
@@ -258,10 +260,10 @@
               </span>
             </template>
           </v-data-table>
-        </v-tab-item>
+        </v-window-item>
 
         <!-- Palmarès -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Etablissement du palmarès</h2>
           <v-data-table
             :headers="palmaresHeaders"
@@ -362,10 +364,10 @@
               </template>
             </template>
           </v-data-table>
-        </v-tab-item>
+        </v-window-item>
 
         <!-- Stats -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Participation</h2>
           <div style="display: flex;">
             <div style="flex: 1 0 0;">
@@ -405,8 +407,8 @@
               :options="votesGraph"
             />
           </div>
-        </v-tab-item>
-      </v-tabs>
+        </v-window-item>
+      </v-window>
     </v-card>
 
     <!-- Détails photo -->
@@ -419,7 +421,7 @@
           Informations sur la photo {{ photoDetails.photo.id }}
         </v-card-title>
         <div style="display: flex; margin: 0 24px">
-          <v-simple-table
+          <v-table
             v-if="photoDetails.votes.length > 0"
               dense
               style="text-align: left; font-size: 0.8em; margin: 10px"
@@ -452,7 +454,7 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+            </v-table>
         </div>
         <v-card-actions>
           <v-spacer />
@@ -521,7 +523,7 @@
         </p>
         <div style="display: flex; margin: 0 24px">
           <div style="flex: 1 1 auto">
-            <v-simple-table
+            <v-table
               dense
               style="text-align: left; font-size: 0.8em; margin: 10px"
             >
@@ -554,7 +556,7 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+            </v-table>
           </div>
 
           <div style="flex: 1 1 auto;">

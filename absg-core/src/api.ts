@@ -72,8 +72,11 @@ AppDataSource.initialize()
             fileUpload({
                 createParentPath: true,
                 limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
-                useTempFiles: false,
-                debug: process.env.NODE_ENV === "development"
+                useTempFiles: true,
+                tempFileDir: '/tmp/',
+                parseNested: true,
+                abortOnLimit: false,
+                debug: false
             })
         );
 
