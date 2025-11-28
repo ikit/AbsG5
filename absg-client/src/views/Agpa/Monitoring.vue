@@ -195,7 +195,7 @@
             </template>
 
             <template #[`item.photo`]="{ item }">
-              {{ item.title }} <bre />({{ item.id }})
+              {{ item.title }} <br />({{ item.id }})
             </template>
 
             <template #[`item.votes`]="{ item }">
