@@ -4,6 +4,7 @@ import { useUserStore } from './user'
 import { useNotificationStore } from './notification'
 import { usePhotoGalleryStore } from './photoGallery'
 import { useAgpaStore } from './agpa'
+import { useWebSocketStore } from './websocket'
 
 /**
  * Maps Pinia state to component computed properties (like Vuex mapState)
@@ -46,6 +47,14 @@ export function mapPiniaState(keys) {
       if (key === 'agpaMeta') {
         const agpaStore = useAgpaStore()
         return agpaStore.meta
+      }
+      
+      // Check if it's a WebSocket property
+      const wsProps = ['wsOnline', 'wsMessage']
+      if (wsProps.includes(key)) {
+        const wsStore = useWebSocketStore()
+        if (key === 'wsOnline') return wsStore.isOnline
+        if (key === 'wsMessage') return wsStore.lastMessage
       }
       
       // Otherwise use main store
@@ -116,6 +125,11 @@ export default {
         // Delegate AGPA properties to agpaStore
         if (prop === 'agpaMeta') return agpaStore.meta
         
+        // Delegate WebSocket properties to webSocketStore
+        const wsStore = useWebSocketStore()
+        if (prop === 'wsOnline') return wsStore.isOnline
+        if (prop === 'wsMessage') return wsStore.lastMessage
+        
         // Otherwise use main store
         return target[prop]
       }
@@ -173,6 +187,17 @@ export default {
       return
     }
     
+    // Check if it's a WebSocket action
+    const wsActions = ['sendWsMessage', 'setWsOnline', 'setWsMessage']
+    if (wsActions.includes(action)) {
+      const mainStore = useMainStore()
+      // Call main store for backward compatibility
+      if (typeof mainStore[action] === 'function') {
+        mainStore[action](payload)
+      }
+      return
+    }
+    
     const store = useMainStore()
     if (typeof store[action] === 'function') {
       store[action](payload)
@@ -208,6 +233,15 @@ export default {
       const agpaStore = useAgpaStore()
       if (typeof agpaStore[action] === 'function') {
         return agpaStore[action](payload)
+      }
+    }
+    
+    // Check if it's a WebSocket action
+    const wsActions = ['sendMessage', 'disconnect', 'connect']
+    if (wsActions.includes(action)) {
+      const wsStore = useWebSocketStore()
+      if (typeof wsStore[action] === 'function') {
+        return wsStore[action](payload)
       }
     }
     

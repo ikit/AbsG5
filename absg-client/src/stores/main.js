@@ -5,6 +5,7 @@ import { useUserStore } from './user'
 import { useNotificationStore } from './notification'
 import { usePhotoGalleryStore } from './photoGallery'
 import { useAgpaStore } from './agpa'
+import { useWebSocketStore } from './websocket'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -16,7 +17,7 @@ export const useMainStore = defineStore('main', {
     notifications: [],
     unreadNotifications: 0,
     settings: null,
-    // Websocket connection
+    // DEPRECATED: Use useWebSocketStore() instead
     wsOnline: false,
     wsMessage: null,
     // DEPRECATED: Use usePhotoGalleryStore() instead
@@ -276,12 +277,26 @@ export const useMainStore = defineStore('main', {
       }
     },
 
+    // DEPRECATED: Use useWebSocketStore().sendMessage() instead
     sendWsMessage(message) {
-      console.log("WS send", message)
-      // Access via app.config.globalProperties.$socket
-      if (window.$socket && window.$socket.readyState === WebSocket.OPEN) {
-        window.$socket.sendObj(message)
-      }
+      const wsStore = useWebSocketStore()
+      wsStore.sendMessage(message)
+    },
+
+    // DEPRECATED: Use useWebSocketStore().setOnlineStatus() instead
+    setWsOnline(status) {
+      const wsStore = useWebSocketStore()
+      wsStore.setOnlineStatus(status)
+      // Keep in sync
+      this.wsOnline = wsStore.isOnline
+    },
+
+    // DEPRECATED: Use useWebSocketStore().receiveMessage() instead
+    setWsMessage(message) {
+      const wsStore = useWebSocketStore()
+      wsStore.receiveMessage(message)
+      // Keep in sync
+      this.wsMessage = wsStore.lastMessage
     }
   }
 })

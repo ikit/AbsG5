@@ -111,13 +111,39 @@ Manages AGPA (photo contest) data and operations.
 - `submitVotes(votes)`: Submit votes
 - `reset()`: Reset store
 
+### WebSocket Store (`websocket.js`)
+Manages WebSocket connection and real-time messaging.
+
+**State:**
+- `isOnline`: Connection status
+- `isConnecting`: Connecting status
+- `lastMessage`: Last received message
+- `socket`: WebSocket instance
+- `reconnectAttempts`: Reconnection counter
+- `messageHistory`: Recent messages (debugging)
+
+**Getters:**
+- `isConnected`: Check if connected
+- `connectionStatus`: Get status ('online', 'offline', 'connecting')
+- `canReconnect`: Check if can attempt reconnection
+
+**Actions:**
+- `setOnlineStatus(status)`: Update connection status
+- `setConnecting(status)`: Update connecting status
+- `receiveMessage(message)`: Store received message
+- `sendMessage(message)`: Send message through WebSocket
+- `setSocket(socket)`: Set WebSocket instance
+- `onOpen()`, `onClose()`, `onError()`, `onMessage()`: Event handlers
+- `disconnect()`: Close connection
+- `reset()`: Reset store
+
 ### Main Store (`main.js`)
 Manages global application state (settings, citation, etc.)
 
 **State:**
 - `citation`: Random citation
 - `settings`: Application settings
-- `wsOnline`, `wsMessage`: WebSocket state
+- `isInitialized`: Initialization flag
 
 ## Migration Guide
 
@@ -227,7 +253,7 @@ describe('User Store', () => {
 - [x] Notification store created
 - [x] Photo gallery store created
 - [x] AGPA store created
-- [x] Backward compatibility layer
-- [ ] WebSocket store
+- [x] WebSocket store created
+- [x] Backward compatibility layer complete
 - [ ] Migrate all components to use new stores
 - [ ] Remove Vuex dependency
