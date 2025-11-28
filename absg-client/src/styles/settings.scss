@@ -1,0 +1,4 @@
+// Vuetify 3 settings
+@use 'vuetify' with (
+  $utilities: false
+);

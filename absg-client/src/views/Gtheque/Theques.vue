@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row
         style="margin: 0"
         align="center"
@@ -12,7 +12,7 @@
           :items="types"
           style="width: 150px; margin-right: 30px"
           label="Collection"
-          item-text="label"
+          item-title="label"
           item-value="key"
           @change="changeCollection($event)"
         />
@@ -29,8 +29,8 @@
 
         <v-btn-toggle :disabled="isLoading">
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="downloadAsCsv()">
+            <template #activator="{ props }">
+              <v-btn @click.stop="downloadAsCsv()" v-bind="props">
                 <v-icon>fas fa-file-download</v-icon>
               </v-btn>
             </template>
@@ -38,8 +38,8 @@
           </v-tooltip>
           
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="displayStats()">
+            <template #activator="{ props }">
+              <v-btn @click.stop="displayStats()" v-bind="props">
                 <v-icon>fas fa-chart-pie</v-icon>
               </v-btn>
             </template>
@@ -47,8 +47,8 @@
           </v-tooltip>
 
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="resetDialog(true)">
+            <template #activator="{ props }">
+              <v-btn @click.stop="resetDialog(true)" v-bind="props">
                 <v-icon>fas fa-plus</v-icon>
               </v-btn>
             </template>
@@ -68,29 +68,29 @@
           v-for="c of displayedCollections"
           :key="c.id"
         >
-          <v-expansion-panel-header>
+          <v-expansion-panel-title>
             {{ c.title }}
             <v-spacer />
             {{ c.count }}/{{ c.total }}
             <i class="fas fa-circle" style="flex: none" :class="c.cssStatus"/>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
             <v-tooltip
               v-for="i of c.items"
               :key="i.number"
               bottom
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <div
                   :style="{ 'background-image': `url('${i.img}')` }"
                   :class="i.ok ? 'itemOk' : 'itemGhost'"
                   @click="switchItem(i)"
-                  v-on="on"
+                  v-bind="props"
                 />
               </template>
               <span>{{ i.number }} - {{ i.title }}</span>
             </v-tooltip>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
@@ -112,7 +112,7 @@
             :items="serieEditor.availableSeries"
             label="Titre de la série"
             prepend-icon="fas fa-tag"
-            item-text="title"
+            item-title="title"
             :disabled="serieEditor.isLoading"
             @change="onSerieTitleChanged()"
           />
@@ -120,29 +120,13 @@
           <v-data-table 
             :headers="serieEditor.headers" 
             :items="serieEditor.items"
-            item-key="number"
-            v-sortable-data-table
-            @sorted="saveOrder">
+            item-key="number">
             <template v-slot:body="{ items, headers }">
               <tbody>
                 <tr v-for="(item,idx,k) in items" :key="idx">
                   <td v-for="(header,key) in headers" :key="key">
-                    <v-edit-dialog
-                      :return-value.sync="item[header.value]"
-                      @save="save"
-                      @cancel="cancel"
-                      @open="open"
-                      @close="close"
-                      large
-                    > {{item[header.value]}}
-                      <template v-slot:input>
-                        <v-text-field
-                          v-model="item[header.value]"
-                          label="Edit"
-                          single-line
-                        ></v-text-field>
-                      </template>
-                    </v-edit-dialog>
+                    {{ item[header.value] }}
+                    <!-- TODO: v-edit-dialog n'existe plus dans Vuetify 3, à remplacer par un dialog custom -->
                   </td>
                 </tr>
               </tbody>
@@ -176,7 +160,7 @@
         </v-container>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="serieEditor.isLoading"
             @click="addItem()"
@@ -185,7 +169,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="serieEditor.isLoading"
             @click="resetDialog()"
@@ -214,6 +198,8 @@ import { format } from 'date-fns';
 
 export default {
     data: () => ({
+        isLoading: false,
+        panel: [],
         collections: [],
         displayedCollections: [],
         types: [

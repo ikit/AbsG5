@@ -13,7 +13,7 @@
         hide-default-footer
       >
         <template #header>
-          <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+          <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
             <v-row
               style="margin: 0"
               align="center"
@@ -50,13 +50,13 @@
               <v-spacer />
 
               <v-btn
-                v-if="$vuetify.breakpoint.mdAndUp"
+                v-if="$vuetify.display.mdAndUp"
                 @click.stop="resetDialog(true)"
               >
-                <v-icon left>
+                <v-icon start>
                   fas fa-plus
                 </v-icon>
-                <span v-if="$vuetify.breakpoint.mdAndUp">Nouvelle image</span>
+                <span v-if="$vuetify.display.mdAndUp">Nouvelle image</span>
               </v-btn>
               <v-btn
                 v-else
@@ -75,11 +75,11 @@
             fluid
             grid-list-sm
           >
-            <v-layout
+            <v-row
               row
               wrap
             >
-              <v-flex
+              <v-col
                 v-for="p in props.items"
                 :key="p.id"
                 style="text-align: center; max-width: 250px;"
@@ -102,8 +102,8 @@
                     {{ p.user ? p.user.username : "" }} le {{ p.date }}
                   </div>
                 </v-card>
-              </v-flex>
-            </v-layout>
+              </v-col>
+            </v-row>
           </v-container>
         </template>
       </v-data-iterator>

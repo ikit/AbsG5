@@ -21,11 +21,11 @@
       <tr>
         <td style="text-align: center; padding-top: 20px">
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 fab
                 small
-                v-on="on"
+                v-bind="props"
                 @click="editPhoto()"
               >
                 <v-icon style="font-size: 20px">
@@ -37,11 +37,11 @@
           </v-tooltip>
                 &nbsp;
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 fab
                 small
-                v-on="on"
+                v-bind="props"
                 @click="deletePhoto()"
               >
                 <v-icon style="font-size: 20px">
@@ -62,13 +62,12 @@
       <tr>
         <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
-                depressed
-                v-on="on"
+                v-bind="props"
                 @click="addNewPhoto()"
               >
-                <v-icon left>
+                <v-icon start>
                   fas fa-plus
                 </v-icon>
                 <span>Photo</span>
@@ -85,7 +84,7 @@
 
 <script>
 import axios from 'axios';
-import { mapState } from 'vuex';
+import { mapState } from '../../../stores/helpers';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
@@ -95,7 +94,7 @@ export default {
     name: 'PhotoWidget',
     props: {
         photo: {
-            type: Photo,
+            type: Object,
             required: true
         }
     },

@@ -12,7 +12,8 @@ import {
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { logger } from "../middleware/logger";
-import { getRepository, Equal } from "typeorm";
+import { Equal } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { saveImage, shuffleArray } from "../middleware/commonHelper";
 import * as path from "path";
 import * as fs from "fs";
@@ -387,7 +388,7 @@ class AgpaService {
         photo.title = photoData.title ? photoData.title : photo.title;
         photo.categoryId = photoData.catId ? photoData.catId : photo.category.id;
         photo.error = photoData.error ? JSON.parse(photoData.error) : photo.error;
-        photo.category = await this.catRepo.findOne(photo.categoryId);
+        photo.category = await this.catRepo.findOne({ where: { id: photo.categoryId } });
 
         photo = await this.photoRepo.save(photo);
 

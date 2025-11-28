@@ -9,12 +9,10 @@
         <v-badge
           right
           color="accent"
-          :value="tbzNnewMessages"
+          :content="tbzNnewMessages"
+          :model-value="tbzNnewMessages > 0"
         >
-          <template #badge>
-            <span>{{ tbzNnewMessages }}</span>
-          </template>
-          <v-icon left>
+          <v-icon start>
             far fa-comment-dots
           </v-icon> T.B.Z.
         </v-badge>
@@ -27,18 +25,16 @@
         <v-badge
           right
           color="accent"
-          :value="t.newMessages ? t.newMessages : 0"
+          :content="t.newMessages || 0"
+          :model-value="t.newMessages > 0"
         >
-          <template #badge>
-            <span>{{ t.newMessages }}</span>
-          </template>
-          <v-icon left>
+          <v-icon start>
             far fa-comment-dots
           </v-icon> {{ t.name }}
         </v-badge>
       </v-tab>
       <v-tab :to="{path: `/forum/browse`}">
-        <v-icon left>
+        <v-icon start>
           fas fa-archive
         </v-icon> Forums
       </v-tab>
@@ -62,18 +58,23 @@ export default {
     }),
     mounted () {
         // On s'abonne aux notifications temps réels pour mettre à jours les notifications
-        this.$options.sockets.onmessage = (wsMsg) => {
-            const data = parseWsMessage(wsMsg);
-            if (data.message === "pinnedTopicsChanged") {
-                this.topics = data.payload;
-            }
-        };
+        if (this.$socket) {
+            this._wsHandler = (wsMsg) => {
+                const data = parseWsMessage(wsMsg);
+                if (data.message === "pinnedTopicsChanged") {
+                    this.topics = data.payload;
+                }
+            };
+            this.$socket.addEventListener('message', this._wsHandler);
+        }
 
         this.updatePinnedTopics();
     },
-    beforeDestroy() {
+    beforeUnmount() {
         // On se désabonne aux notifications temps réels quand on quitte la section forum
-        delete this.$options.sockets.onmessage;
+        if (this.$socket && this._wsHandler) {
+            this.$socket.removeEventListener('message', this._wsHandler);
+        }
     },
 
     methods: {

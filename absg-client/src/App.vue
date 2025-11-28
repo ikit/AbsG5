@@ -1,28 +1,25 @@
 <template>
   <v-app id="mainContent">
     <v-navigation-drawer
-      v-if="user && user.id > 0 && !$vuetify.breakpoint.lgAndUp"
+      v-if="user && user.id > 0 && !$vuetify.display.lgAndUp"
       v-model="drawerOpen"
       app
-      style="height: 100%; z-index: 1000"
+      temporary
+      style="height: 100%"
     >
       <v-list
         nav
-        dense
+        density="compact"
         data-cy="menuDrawer"
       >
         <v-list-item
           to="/"
           style="margin-top: 60px"
+          prepend-icon="fas fa-home"
         >
-          <v-list-item-action>
-            <v-icon>fas fa-home</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>
-              Accueil
-            </v-list-item-title>
-          </v-list-item-content>
+          <v-list-item-title>
+            Accueil
+          </v-list-item-title>
         </v-list-item>
         <template v-for="item in menuItems">
           <v-list-item
@@ -30,15 +27,11 @@
             :key="item.id"
             link
             :to="{ path: item.url }"
+            :prepend-icon="item.icon"
           >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ item.name }}
-              </v-list-item-title>
-            </v-list-item-content>
+            <v-list-item-title>
+              {{ item.name }}
+            </v-list-item-title>
           </v-list-item>
         </template>
       </v-list>
@@ -51,13 +44,13 @@
       style="z-index: 2000; background: #37474f"
     >
       <v-app-bar-nav-icon
-        v-if="!$vuetify.breakpoint.lgAndUp"
+        v-if="!$vuetify.display.lgAndUp"
         data-cy="menuButton"
         @click.stop="drawerOpen = !drawerOpen"
       />
 
       <v-toolbar-title
-        v-if="$vuetify.breakpoint.lgAndUp"
+        v-if="$vuetify.display.lgAndUp"
         data-cy="title"
       >
         <router-link
@@ -69,7 +62,7 @@
       </v-toolbar-title>
       <v-spacer>
         <div
-          v-if="citation && $vuetify.breakpoint.lgAndUp"
+          v-if="citation && $vuetify.display.lgAndUp"
           data-cy="citation"
           style="text-align:center; margin: 0 100px; color: #fff"
         >
@@ -80,18 +73,18 @@
         </div>
       </v-spacer>
       <v-tooltip bottom>
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-badge
             color="accent"
             style="margin-right: 15px"
             overlap
             data-cy="notifications"
-            :value="unreadNotifications"
+            :content="unreadNotifications"
+            :model-value="unreadNotifications > 0"
           >
-            <span slot="badge">{{ unreadNotifications }}</span>
             <v-btn
               icon
-              v-on="on"
+              v-bind="props"
               @click.stop="displayNotifications()"
             >
               <v-icon>far fa-bell</v-icon>
@@ -111,11 +104,12 @@
           :key="u.id"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <img
               :src="u.avatarUrl"
               :style="{ opacity: u.opacity }"
-              v-on="on"
+              v-bind="props"
+              @error="(e) => e.target.style.display = 'none'"
             >
           </template>
           <span>{{ u.username }} - {{ u.activity }}</span>
@@ -135,18 +129,18 @@
         bottom
         left
       >
-        <template #activator="{ on, attrs }">
+        <template #activator="{ props }">
           <v-btn
             icon
             color="primary"
-            v-bind="attrs"
+            v-bind="props"
             data-cy="user"
             style="margin-right: 0"
-            v-on="on"
           >
             <img
               :src="user.avatarUrl"
               style="height: 40px;"
+              @error="(e) => e.target.style.display = 'none'"
             >
           </v-btn>
         </template>
@@ -184,7 +178,7 @@
 
     <v-main>
       <div
-        v-if="user && user.id > 0 && $vuetify.breakpoint.lgAndUp"
+        v-if="user && user.id > 0 && $vuetify.display.lgAndUp"
         id="menu"
         data-cy="menu"
       >
@@ -220,7 +214,7 @@
       <router-view
         :socket="ws"
         style="min-height: 100%"
-        :style="{ 'margin-left': $vuetify.breakpoint.lgAndUp ? '85px' : '0' }"
+        :style="{ 'margin-left': $vuetify.display.lgAndUp ? '85px' : '0' }"
       />
       <div
         v-if="user && user.id > 0 && photosGalleryDisplayed"
@@ -342,9 +336,11 @@
               </td>
               <td>{{ item.dateLabel }}</td>
               <td>
-                <v-simple-checkbox
+                <v-checkbox
                   v-model="item.read"
                   disabled
+                  hide-details
+                  density="compact"
                 />
               </td>
             </tr>
@@ -476,7 +472,7 @@
 
       <template #action="{ attrs }">
         <v-btn
-          color="pink"
+          color="secondary"
           text
           v-bind="attrs"
           @click="snack.displayed = false"
@@ -491,7 +487,7 @@
 <script>
 import store from "./store";
 import axios from "axios";
-import { mapState } from "vuex";
+import { mapState } from "./stores/helpers";
 import { MODULES, parseAxiosResponse } from  "./middleware/CommonHelper";
 import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
 import PhotoMetadataEditor from "./components/PhotoMetadataEditor.vue";
@@ -536,6 +532,10 @@ export default {
             "notif",
             "snack"
         ]),
+        // WebSocket
+        ws() {
+            return this.$socket || null;
+        },
         // Galerie photos
         photosGalleryDisplayed() {
             return this.$store.state.photosGalleryDisplayed;
@@ -571,32 +571,32 @@ export default {
             if (newValue.message === "onlineUsers") {
                 // on met à jours la liste des utilisateurs en ligne
                 const now = new Date().getTime();
-                this.usersOnline = newValue.payload.filter(e => e.id != this.user.id).map(e => ({
+                this.usersOnline = newValue.payload.filter(e => e && e.id && e.id > 0 && this.user && e.id != this.user.id).map(e => ({
                     ...e,
                     avatarUrl: `/files/avatars/${e.id.toString().padStart(3, '0')}.png`,
                     opacity: now - new Date(e.lastTime).getTime() <= 300000 ? 0.9 : 0.5 // 300000 = 5 minutes
                 })).sort((a,b) => new Date(a.lastTime).getTime() < new Date(b.lastTime).getTime());
                 // console.log(this.usersOnline.reduce((p, e) => (`${p}> ${e.id}:${e.username} `), ""))
                 // On met à jour l'indicateur de notifications pour l'utilisateur
-                const activity = newValue.payload.find(e => e.id === this.user.id);
-                if (activity && activity.unreadNotifications.length > this.unreadNotifications) {
-                    this.refreshNotifications();
+                if (this.user) {
+                    const activity = newValue.payload.find(e => e.id === this.user.id);
+                    if (activity && activity.unreadNotifications.length > this.unreadNotifications) {
+                        this.refreshNotifications();
+                    }
                 }
             }
         }
     },
     mounted() {
-        // On récupère le numéro de version
-        this.version = require("../package.json").version;
+        // On récupère le numéro de version depuis import.meta.env ou package.json
+        // Note: En Vite, on ne peut pas utiliser require()
+        this.version = import.meta.env.VITE_APP_VERSION || "5.2.0";
 
         // On charge les informations sur le thème à utiliser depuis le localstorage du browser
         const theme = localStorage.getItem("dark_theme");
         if (theme) {
-            if (theme == "true") {
-                this.$vuetify.theme.dark = true;
-            } else {
-                this.$vuetify.theme.dark = false;
-            }
+            // En Vuetify 3, l'API du thème a changé
+            this.$vuetify.theme.global.name = theme === "true" ? "dark" : "light";
         }
 
         if (this.user) {
@@ -713,8 +713,11 @@ export default {
         },
 
         toggleDarkMode() {
-            this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
-            localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
+            // Vuetify 3 theme API
+            const currentTheme = this.$vuetify.theme.global.name;
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            this.$vuetify.theme.global.name = newTheme;
+            localStorage.setItem("dark_theme", (newTheme === 'dark').toString());
         }
 
     }

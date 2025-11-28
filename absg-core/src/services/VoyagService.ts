@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { Person, User } from "../entities";
 
 class VoyagService {

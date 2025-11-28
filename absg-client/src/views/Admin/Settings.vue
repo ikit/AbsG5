@@ -5,13 +5,13 @@
   >
     <v-expansion-panels style="padding: 10px; max-width: 500px; margin: auto">
       <v-expansion-panel>
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           <span><i
             class="fas fa-bullhorn"
             style="display: inline-block; width: 40px"
           /> Mettre une annonce</span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <p>
             <span class="details">
               Met en avant sur le site une annonce visible par tous.
@@ -27,17 +27,17 @@
               hint="HTML autorisé"
             />
           </p>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
 
       <v-expansion-panel>
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           <span><i
             class="fas fa-star"
             style="display: inline-block; width: 40px"
           /> Edition spéciale des AGPA {{ settings.agpaSpecialEdition ? settings.agpaSpecialEdition.year : '' }}</span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <p>
             <span class="details">
               Configurer la catégorie spéciale de l'année en cours.
@@ -51,17 +51,17 @@
               label="Description"
             />
           </p>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
 
       <v-expansion-panel>
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           <span><i
             class="far fa-calendar-alt"
             style="display: inline-block; width: 40px"
           /> Durées des phases des AGPA</span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <p>
             <span class="details">
               Configurer les durées en jours des différentes phases. La phase n°1 commence obligatoirement le 1er octobre.
@@ -91,17 +91,17 @@
               @change="updateAgpaPhasesBoundaries()"
             />
           </p>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
 
       <v-expansion-panel>
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           <span><i
             class="fas fa-desktop"
             style="display: inline-block; width: 40px"
           /> Début de la cérémonie</span>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <p>
             <span class="details">
               La cérémonie sera accessible et démarrera automatiquement à partir de l'heure indiqué, en nombre de seconde, à partir de minuit une fois la phase 4 terminée.
@@ -112,7 +112,7 @@
               @change="updateAgpaPhasesBoundaries()"
             />
           </p>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
 

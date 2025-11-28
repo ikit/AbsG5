@@ -16,7 +16,7 @@
       hide-default-footer
     >
       <template #header>
-        <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+        <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
           <v-row
             style="margin: 0"
             align="center"
@@ -31,8 +31,8 @@
             <v-spacer />
             <v-btn-toggle :disabled="isLoading">
               <v-tooltip bottom>
-                <template #activator="{ on }">
-                  <v-btn @click.stop="switchViewDoublon()" v-on="on">
+                <template #activator="{ props }">
+                  <v-btn @click.stop="switchViewDoublon()" v-bind="props">
                     <v-icon>{{ filter.viewDoublon ? "fa-solid fa-eye" : "fa-solid fa-eye-slash" }}</v-icon>
                   </v-btn>
                 </template>
@@ -80,11 +80,11 @@
           fluid
           grid-list-sm
         >
-          <v-layout
+          <v-row
             row
             wrap
           >
-            <v-flex
+            <v-col
               v-for="p in props.items"
               :key="p.id"
               style="text-align: center;"
@@ -99,8 +99,8 @@
                   >
                 </div>
               </div>
-            </v-flex>
-          </v-layout>
+            </v-col>
+          </v-row>
         </v-container>
       </template>
     </v-data-iterator>

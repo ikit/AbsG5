@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <router-link
@@ -10,7 +10,7 @@
       >
         <v-icon>fas fa-home</v-icon>
         <span
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           style="margin-left: 15px"
         >Liste des albums</span>
       </router-link>
@@ -19,18 +19,18 @@
         style="position: absolute; right: 15px; top: 10px"
         @click.stop="displayNewAlbum()"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-plus
         </v-icon>Nouvel album
       </v-btn>
     </div>
     
     <v-container fluid>
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex>
+        <v-col>
           <router-link
             :to="{path: `/photos/albums/auto`}"
             style="text-decoration: none; max-width: 200px"
@@ -54,10 +54,10 @@
               </v-card-subtitle>
             </v-card>
           </router-link>
-        </v-flex>
+        </v-col>
 
         <!-- Les albums créés par les utilisateurs -->
-        <v-flex
+        <v-col
           v-for="album in albums"
           :key="album.id"
         >
@@ -86,8 +86,8 @@
               </v-card-subtitle>
             </v-card>
           </router-link>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
     
 

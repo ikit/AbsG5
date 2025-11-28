@@ -1,5 +1,5 @@
-import { getRepository } from "typeorm";
 import { AgpaPhoto, AgpaAwardType } from "../entities";
+import { getRepository } from "./database";
 import { checkValidYear, getMaxArchiveEdition } from "./agpaCommonHelpers";
 import { AgpaPalmares } from "./model/AgpaPalmares";
 

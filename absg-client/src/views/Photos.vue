@@ -5,17 +5,17 @@
       class="fixed-tabs-bar"
     >
       <v-tab :to="{path:'/photos/immt'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-image
         </v-icon> Immt
       </v-tab>
       <v-tab :to="{path:'/photos/albums'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-images
         </v-icon> Albums
       </v-tab>
       <v-tab :to="{path:'/photos/browser'}">
-        <v-icon left>
+        <v-icon start>
           fab fa-stack-overflow
         </v-icon> Trier
       </v-tab>

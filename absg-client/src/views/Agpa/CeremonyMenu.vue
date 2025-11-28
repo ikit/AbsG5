@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card style="margin: 20px auto; margin-top: 100px; width: 600px; display: relative; padding: 40px 10px 40px 10px;">
+    <v-card style="margin: 20px auto; margin-top: 100px; width: 600px; display: relative; padding: 40px 10px 40px 10px; overflow: visible;">
       <img
         src="/img/agpa/cupesMaxi/c1.png"
         width="200px"
@@ -13,8 +13,9 @@
         ouverture dans
       </p>
       <Timer
-        v-if="timerEnable"
+        v-if="timerEnable && current.ceremonyDate"
         ref="timer"
+        :end="current.ceremonyDate"
         style="margin: auto"
         @completed="startCeremony()"
       />
@@ -62,11 +63,11 @@
       fluid
       :style="{ 'display': current.displayed ? 'none' : 'block' }"
     >
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex
+        <v-col
           v-for="edition in formerEditions"
           :key="edition.year"
           style="min-width: 250px; width: 250px; margin: 15px"
@@ -84,8 +85,8 @@
               <p style=" margin: 0; text-align: center; font-size: 3em; font-weight: bold; font-family: 'Tangerine', serif; opacity: 0.5; line-height: 1em;">{{ edition.year }}</p>
             </v-card>
           </a>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
 
     <div :class="{ ceremony: current.displayed, hiddenCeremony: !current.displayed }">
@@ -98,10 +99,11 @@
         preload="auto"
         @ended="openCeremonySlideShow()"
       >
-        <source
+        <!-- TODO: Restaurer après migration - fichier manquant -->
+        <!-- <source
           src="/files/agpa/intro.mp4"
           type="video/mp4"
-        >
+        > -->
         Your browser does not support the video tag.
       </video>
     </div>
@@ -112,17 +114,14 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
 import { addDays, addSeconds, format } from 'date-fns';
-import Timer from '../../components/Timer';
+import Timer from '../../components/Timer.vue';
 
-import Vue from 'vue';
-import Vlf from 'vlf';
 import localforage from 'localforage';
-Vue.use(Vlf, localforage);
 
 export default {
     name: 'CeremonyMenu',
@@ -140,7 +139,8 @@ export default {
         current: {
             ceremonyDate: null,
             displayed: false
-        }
+        },
+        vlf: null
 
     }),
     computed: {
@@ -163,8 +163,8 @@ export default {
         }
     },
     mounted() {
-        this.isAdmin = this.user.roles.find(e => e === "admin") !== null;
-        this.$vlf.createInstance({
+        this.isAdmin = this.user?.roles?.find(e => e === "admin") !== undefined;
+        this.vlf = localforage.createInstance({
             storeName: 'absg5'
         });
 
@@ -201,7 +201,6 @@ export default {
                 this.timerEnable = false;
             } else {
                 this.timerEnable = true;
-                this.$refs.timer.init(this.current.ceremonyDate);
             }
 
             this.preloadIntro();
@@ -211,7 +210,9 @@ export default {
         startCeremony() {
             this.current.displayed = true;
             this.$refs.video.play();
-            this.$refs.timer.stop();
+            if (this.$refs.timer) {
+                this.$refs.timer.stop();
+            }
         },
 
         openCeremonySlideShow() {
@@ -223,7 +224,10 @@ export default {
         },
 
         preloadIntro() {
-            const that = this;
+            // TODO: Restaurer après migration - fichier intro.mp4 manquant
+            // Temporairement désactivé pendant la migration
+            this.introReady();
+            /* const that = this;
             that.$vlf.getItem("ceremonyIntro").then(
                 data => {
                     if (!data) {
@@ -266,12 +270,12 @@ export default {
                     }
                     that.introReady();
                 }
-            )
+            ) */
         },
 
         preloadCeremony() {
             const that = this;
-            that.$vlf.getItem("ceremonyData").then(
+            that.vlf.getItem("ceremonyData").then(
                 data => {
                     if (!data) {
                         // Si on ne trouve pas l'intro, on la prétélécharge
@@ -279,7 +283,7 @@ export default {
                             const d = parseAxiosResponse(response);
                             if (d) {
                                 // On sauvegarde localement la vidéo
-                                that.$vlf.setItem('ceremonyData', d).then(v => {
+                                that.vlf.setItem('ceremonyData', d).then(v => {
                                     that.preloadImages(d);
                                 });
                             }

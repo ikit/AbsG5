@@ -1,4 +1,5 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { User, LogModule, Photo } from "../entities";
 import * as path from "path";
 import * as fs from "fs";

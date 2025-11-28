@@ -1,7 +1,8 @@
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { Action } from "routing-controllers";
-import { getRepository, Equal } from "typeorm";
+import { Equal } from "typeorm";
+import { getRepository } from "./database";
 import { User, LogPassag, LogSystem } from "../entities";
 import { differenceInSeconds } from "date-fns";
 import { Mutex } from "async-mutex";
@@ -79,8 +80,8 @@ export function createToken(user: User, newPwdSession = false): string {
  *
  * @param token
  */
-export function checkToken(token: string) {
-    return jwt.verify(token, process.env.AUTH_SESSION_SALT);
+export function checkToken(token: string): any {
+    return jwt.verify(token, process.env.AUTH_SESSION_SALT) as any;
 }
 
 /**

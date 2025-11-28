@@ -28,23 +28,38 @@ networks:
 services:
   absg5_db:
     container_name: absg5_db
-    image: docker.io/postgres:11.5
+    image: docker.io/postgres:16-alpine
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgresSecretPassword
       - POSTGRES_DB=absg
       - POSTGRES_USER=absg
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C
     networks:
       - absg5_net
     volumes:
       # - absg5-db-data:/var/lib/postgresql/data
       - /var/absg5/absg5_db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U absg -d absg"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 5s
+      start_period: 10s
+    command: >
+      postgres
+      -c max_connections=100
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=2621kB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
 
 
   absg5_pgadmin:

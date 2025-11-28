@@ -52,12 +52,16 @@ export async function saveImage(file, thumbPath, webPath, originalPath) {
     const img = await Jimp.read(file);
     // create WEB version
     if (webPath) {
+        // On crée le répertoire si besoin
+        fs.mkdirSync(path.dirname(webPath), { recursive: true });
         img.scaleToFit(2000, 2000); // 4K
         img.quality(85);
         img.write(webPath);
     }
     // create THUMB
     if (thumbPath) {
+        // On crée le répertoire si besoin
+        fs.mkdirSync(path.dirname(thumbPath), { recursive: true });
         img.scaleToFit(200, 200);
         img.quality(85);
         img.write(thumbPath);

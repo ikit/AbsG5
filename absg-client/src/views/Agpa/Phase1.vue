@@ -1,12 +1,12 @@
 <template>
   <section id="content">
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip
-          v-if="$vuetify.breakpoint.mdAndUp"
+          v-if="$vuetify.display.mdAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-icon
               left
               style="margin-top:-10px; font-size: 30px"
@@ -15,7 +15,7 @@
             </v-icon>
             <div
               class="phase-left-header"
-              v-on="on"
+              v-bind="props"
               @click="help.displayed = true; help.page = 3"
             >
               <h4>Phase n°1 en cours : Enregistrement des photos</h4>
@@ -40,7 +40,7 @@
         :key="catIdx"
         style="margin: 15px; margin-top: 50px;"
       >
-        <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+        <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0; overflow: visible;">
           <img
             :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
             width="100px"
@@ -53,10 +53,10 @@
             <v-spacer />
             <v-tooltip bottom>
               <v-spacer />
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <span
                   style="line-height: 48px; margin-right: 10px;"
-                  v-on="on"
+                  v-bind="props"
                 ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
               </template>
               <span>Nombre total de participants</span>
@@ -64,10 +64,10 @@
                     &nbsp; &nbsp;
             <v-tooltip bottom>
               <v-spacer />
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <span
                   style="line-height: 48px"
-                  v-on="on"
+                  v-bind="props"
                 ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
               </template>
               <span>Nombre total de photos</span>
@@ -197,12 +197,12 @@
       >
         <v-card>
           <v-card-title class="grey lighten-4">
-            <v-icon left>
+            <v-icon start>
               far fa-question-circle
             </v-icon>
             Aide sur le déroulement du concours
           </v-card-title>
-          <Help selected-tab="2" />
+          <Help :selected-tab="2" />
           <v-card-actions>
             <v-spacer />
             <v-btn
@@ -222,14 +222,14 @@
 
 <script>
 import axios from 'axios';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
-import PhotoWidget from './components/PhotoWidget';
+import PhotoWidget from './components/PhotoWidget.vue';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
-import Help from './components/Help';
+import Help from './components/Help.vue';
 
 export default {
     name: 'Phase1',
@@ -240,6 +240,7 @@ export default {
     },
     store,
     data: () => ({
+        isLoading: false,
         photos: {},
         photoEditor: {
             open: false,

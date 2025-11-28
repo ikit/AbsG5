@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getRepository } from "../middleware/database";
 import { getDayOfYear } from "date-fns";
 import { Immt, User, LogModule } from "../entities";
 import * as path from "path";
@@ -17,7 +17,10 @@ class ImmtService {
      * Renvoie la dernière image du moment en date
      */
     public async last() {
-        return await this.immtsRepo.findOne({ order: { year: "DESC", day: "DESC" } });
+        return await this.immtsRepo.findOne({ 
+            where: {},
+            order: { year: "DESC", day: "DESC" } 
+        });
     }
 
     /**

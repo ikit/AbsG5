@@ -4,11 +4,11 @@
     fluid
     style="text-align: center;"
   >
-    <v-layout
+    <v-row
       row
       wrap
     >
-      <v-flex
+      <v-col
         v-for="edition in summary"
         :key="edition.year"
         style="width: 400px; max-width: 400px; margin: 15px"
@@ -36,12 +36,12 @@
                   :key="author.id"
                   bottom
                 >
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <img
                       style="height: 40px; margin-top: 10px;"
                       :src="getAvatar(author)"
                       :alt="getName(author)"
-                      v-on="on"
+                      v-bind="props"
                     >
                   </template>
                   <span>{{ `${getPlace(index)}: ${getName(author)}` }}</span>
@@ -56,10 +56,10 @@
                 v-if="edition.palmares"
                 bottom
               >
-                <template #activator="{ on }">
+                <template #activator="{ props }">
                   <div
                     style="position: absolute; bottom: 10px; right: 15px; text-align: right; font-size: 0.9em;"
-                    v-on="on"
+                    v-bind="props"
                   >
                     <template v-if="edition.palmares.diamond">
                       <i
@@ -98,8 +98,8 @@
             </v-card-actions>
           </v-card>
         </router-link>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

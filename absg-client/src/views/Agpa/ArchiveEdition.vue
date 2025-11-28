@@ -1,19 +1,18 @@
 <template>
   <section id="content">
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip
-          v-if="$vuetify.breakpoint.mdAndUp"
+          v-if="$vuetify.display.mdAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
-              depressed
-              small
+              size="small"
               :to="{path: '/agpa/archives/' }"
-              v-on="on"
+              v-bind="props"
             >
-              <v-icon left>
+              <v-icon start>
                 fas fa-chevron-left
               </v-icon>
               <span>Retour</span>
@@ -25,12 +24,11 @@
           v-else
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
-              small
-              depressed
+              size="small"
               :to="{path: '/agpa/archives/' }"
-              v-on="on"
+              v-bind="props"
             >
               <v-icon>fas fa-chevron-left</v-icon>
             </v-btn>
@@ -41,12 +39,12 @@
         <v-spacer />
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
               small
               :disabled="isLoading"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextYear(-1)"
             >
               <v-icon>fa-chevron-left</v-icon>
@@ -58,12 +56,12 @@
           {{ year }}
         </span>
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
               small
               :disabled="isLoading"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextYear(1)"
             >
               <v-icon>fa-chevron-right</v-icon>
@@ -102,7 +100,7 @@
         :key="catIdx"
         style="margin: 15px; margin-top: 50px; flex-wrap: nowrap;"
       >
-        <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0;">
+        <v-card style="margin: 15px; width: 400px; min-width: 400px; display: relative; padding: 40px 0 10px 0; overflow: visible;">
           <img
             :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
             width="100px"
@@ -114,22 +112,20 @@
             </span>
             <v-spacer />
             <v-tooltip bottom>
-              <v-spacer />
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <span
                   style="line-height: 48px"
-                  v-on="on"
+                  v-bind="props"
                 ><i class="far fa-user" /> {{ current.categories[catIdx].totalUsers }}</span>
               </template>
               <span>Nombre total de participants</span>
             </v-tooltip>
                         &nbsp; &nbsp;
             <v-tooltip bottom>
-              <v-spacer />
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <span
                   style="line-height: 48px"
-                  v-on="on"
+                  v-bind="props"
                 ><i class="far fa-image" /> {{ current.categories[catIdx].totalPhotos }}</span>
               </template>
               <span>Nombre total de photos</span>
@@ -137,72 +133,69 @@
           </v-row>
 
           <v-list>
-            <v-simple-table dense>
-              <template #default>
-                <tbody>
-                  <tr
-                    v-for="p of current.categories[catIdx].photos"
-                    :key="p.id"
-                  >
-                    <td style="text-align: left">
-                      <span
-                        v-for="a of p.awards"
-                        :key="a"
-                      >
-                        <i
-                          v-if="a == 'diamond'"
-                          class="fas fa-circle"
-                          style="color: #c3f1ff"
-                        />
-                        <i
-                          v-if="a == 'gold'"
-                          class="fas fa-circle"
-                          style="color: #c68b00"
-                        />
-                        <i
-                          v-if="a == 'sylver'"
-                          class="fas fa-circle"
-                          style="color: #9b9b9b"
-                        />
-                        <i
-                          v-if="a == 'bronze'"
-                          class="fas fa-circle"
-                          style="color: #964c31"
-                        />
-                        <i
-                          v-if="a == 'nominated'"
-                          class="far fa-circle"
-                        />
-                        <i
-                          v-if="a == 'honor'"
-                          class="far fa-smile"
-                        />
-                      </span>
-                    </td>
-                    <td style="text-align: left">
-                      {{ p.user.username }}
-                    </td>
-                    <td style="text-align: left">
-                      {{ p.title }}
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
+            <v-table density="compact">
+              <tbody>
+                <tr
+                  v-for="p of current.categories[catIdx].photos"
+                  :key="p.id"
+                >
+                  <td style="text-align: left">
+                    <span
+                      v-for="a of p.awards"
+                      :key="a"
+                    >
+                      <i
+                        v-if="a == 'diamond'"
+                        class="fas fa-circle"
+                        style="color: #c3f1ff"
+                      />
+                      <i
+                        v-if="a == 'gold'"
+                        class="fas fa-circle"
+                        style="color: #c68b00"
+                      />
+                      <i
+                        v-if="a == 'sylver'"
+                        class="fas fa-circle"
+                        style="color: #9b9b9b"
+                      />
+                      <i
+                        v-if="a == 'bronze'"
+                        class="fas fa-circle"
+                        style="color: #964c31"
+                      />
+                      <i
+                        v-if="a == 'nominated'"
+                        class="far fa-circle"
+                      />
+                      <i
+                        v-if="a == 'honor'"
+                        class="far fa-smile"
+                      />
+                    </span>
+                  </td>
+                  <td style="text-align: left">
+                    {{ p.user.username }}
+                  </td>
+                  <td style="text-align: left">
+                    {{ p.title }}
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
           </v-list>
 
           <v-tooltip bottom>
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 style="margin-top: 20px"
-                depressed
                 :to="{path: `/agpa/archives/${year}/${catIdx}` }"
-                v-on="on"
+                v-bind="props"
               >
-                <v-icon left>
+                <v-icon start>
                   far fa-images
                 </v-icon>
-                <span v-if="$vuetify.breakpoint.mdAndUp">Galerie</span>
+                <span v-if="$vuetify.display.mdAndUp">Galerie</span>
               </v-btn>
             </template>
             <span>Voir les photos de la catégorie {{ current.categories[catIdx].title }} </span>
@@ -216,11 +209,11 @@
           >
             <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
               <v-tooltip bottom>
-                <template #activator="{ on }">
+                <template #activator="{ props }">
                   <img
                     class="thumb"
                     :src="photo.thumb"
-                    v-on="on"
+                    v-bind="props"
                     @click="photosGalleryDisplay(photo.idx)"
                   >
                 </template>
@@ -238,7 +231,7 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 

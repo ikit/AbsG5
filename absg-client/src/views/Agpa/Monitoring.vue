@@ -6,51 +6,53 @@
     <v-card style="margin: 24px">
       <v-tabs>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             far fa-image
           </v-icon> Photos
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-vote-yea
           </v-icon> Votes
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-calculator
           </v-icon> Notes
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-trophy
           </v-icon> Palmarès
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-chart-pie
           </v-icon> Stats
         </v-tab>
 
 
-        <v-btn
-          style="position: absolute; top: 5px; right: 5px"
-          @click="closeEdition()"
+      </v-tabs>
+
+      <v-btn
+        style="position: absolute; top: 5px; right: 5px"
+        @click="closeEdition()"
+      >
+        <v-icon
+          size="small"
+          start
         >
-          <v-icon
-            small
-            left
-          >
-            fa-plus
-          </v-icon>
-          Close edition
-        </v-btn>
+          fa-plus
+        </v-icon>
+        Close edition
+      </v-btn>
 
-
+      <v-window>
         <!-- Vérification des photos -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Participation</h2>
 
-          <v-simple-table style="text-align: left; font-size: 0.8em; margin: 10px">
+          <v-table style="text-align: left; font-size: 0.8em; margin: 10px">
             <template #default>
               <thead>
                 <tr style="vertical-align: baseline;">
@@ -96,14 +98,14 @@
                 </tr>
               </tbody>
             </template>
-          </v-simple-table>
-        </v-tab-item>
+          </v-table>
+        </v-window-item>
 
         <!-- Vérification des votes -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Vérification des votes</h2>
 
-          <v-simple-table style="text-align: left; font-size: 0.8em; margin: 10px">
+          <v-table style="text-align: left; font-size: 0.8em; margin: 10px">
             <template #default>
               <thead>
                 <tr style="vertical-align: baseline;">
@@ -147,11 +149,11 @@
                 </tr>
               </tbody>
             </template>
-          </v-simple-table>
-        </v-tab-item>
+          </v-table>
+        </v-window-item>
 
         <!-- Notes des photos -->
-        <v-tab-item>
+        <v-window-item>
           <div
             class="row"
             style="margin: 0 10px 0 0;"
@@ -170,7 +172,7 @@
             <v-select
               :items="notesCategories"
               label="Catégorie"
-              item-text="label"
+              item-title="label"
               item-value="id"
               style="width: 200px"
               @change="updateNotesList($event)"
@@ -193,7 +195,7 @@
             </template>
 
             <template #[`item.photo`]="{ item }">
-              {{ item.title }} <bre />({{ item.id }})
+              {{ item.title }} <br />({{ item.id }})
             </template>
 
             <template #[`item.votes`]="{ item }">
@@ -217,40 +219,40 @@
                 :key="a.categoryId"
               >
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <i
                       v-if="a.award === 'diamond'"
                       class="fas fa-circle"
                       style="color: #c3f1ff"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'gold'"
                       class="fas fa-circle"
                       style="color: #c68b00"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'sylver'"
                       class="fas fa-circle"
                       style="color: #9b9b9b"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'bronze'"
                       class="fas fa-circle"
                       style="color: #964c31"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'nominated'"
                       class="far fa-circle"
-                      v-on="on"
+                      v-bind="props"
                     />
                     <i
                       v-if="a.award === 'honor'"
                       class="far fa-smile"
-                      v-on="on"
+                      v-bind="props"
                     />
                   </template>
                   {{ data.categories[a.categoryId].title }}
@@ -258,10 +260,10 @@
               </span>
             </template>
           </v-data-table>
-        </v-tab-item>
+        </v-window-item>
 
         <!-- Palmarès -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Etablissement du palmarès</h2>
           <v-data-table
             :headers="palmaresHeaders"
@@ -362,10 +364,10 @@
               </template>
             </template>
           </v-data-table>
-        </v-tab-item>
+        </v-window-item>
 
         <!-- Stats -->
-        <v-tab-item>
+        <v-window-item>
           <h2>Participation</h2>
           <div style="display: flex;">
             <div style="flex: 1 0 0;">
@@ -378,7 +380,7 @@
                   <td>Adultes | Enfants</td>
                 </tr>
                 <tr
-                  v-for="row in data.photosStats"
+                  v-for="row in (data && data.photosStats) || []"
                   :key="row.catId"
                 >
                   <td style="text-align: right; font-weight: bold">
@@ -405,8 +407,8 @@
               :options="votesGraph"
             />
           </div>
-        </v-tab-item>
-      </v-tabs>
+        </v-window-item>
+      </v-window>
     </v-card>
 
     <!-- Détails photo -->
@@ -419,9 +421,9 @@
           Informations sur la photo {{ photoDetails.photo.id }}
         </v-card-title>
         <div style="display: flex; margin: 0 24px">
-          <v-simple-table
+          <v-table
             v-if="photoDetails.votes.length > 0"
-              dense
+              density="compact"
               style="text-align: left; font-size: 0.8em; margin: 10px"
             >
               <template #default>
@@ -452,12 +454,12 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+            </v-table>
         </div>
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoDetails.displayed = false"
           >
@@ -481,7 +483,7 @@
         </div>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoEdition.displayed = false"
           >
@@ -489,14 +491,14 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoEdition.displayed = false"
           >
             Annuler
           </v-btn>
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoEdition.displayed = false"
           >
@@ -521,8 +523,8 @@
         </p>
         <div style="display: flex; margin: 0 24px">
           <div style="flex: 1 1 auto">
-            <v-simple-table
-              dense
+            <v-table
+              density="compact"
               style="text-align: left; font-size: 0.8em; margin: 10px"
             >
               <template #default>
@@ -554,7 +556,7 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
+            </v-table>
           </div>
 
           <div style="flex: 1 1 auto;">
@@ -583,7 +585,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="voteDetails.displayed = false"
           >
@@ -604,12 +606,12 @@
 
 <script>
 import axios from 'axios';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget';
+import PhotoWidget from './components/PhotoWidget.vue';
 import store from '../../store';
 import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
@@ -680,7 +682,13 @@ export default {
         },
         palmares: [],
 
-        data: null,
+        data: {
+            categories: {},
+            photosStats: [],
+            usersOrder: [],
+            votesStats: [],
+            categoriesOrders: []
+        },
         participationGraph: null,
         votesGraph: null,
     }),
@@ -719,6 +727,14 @@ export default {
 
             axios.get(`/api/agpa/monitoring/${this.agpaMeta.year}`).then(response => {
                 this.data = parseAxiosResponse(response);
+                
+                // Vérifier que les données sont valides
+                if (!this.data || !this.data.categories) {
+                    console.error('Invalid monitoring data received:', this.data);
+                    this.isLoading = false;
+                    return;
+                }
+                
                 const categories = Object.values(this.data.categories);
 
                 // On reformate les photos pour les présenter sous forme de tableau "users x categories"

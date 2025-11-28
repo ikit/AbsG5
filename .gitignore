@@ -96,3 +96,8 @@ absg-core/src/data/*.sql
 absg-core/log
 install/docker-compose-prod.yml
 install/docker-compose-dev.yml
+
+# Migration backups (contain sensitive data)
+backups/
+*.backup
+*.sql.gz

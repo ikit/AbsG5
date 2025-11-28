@@ -29,14 +29,8 @@
 import 'cropperjs/dist/cropper.css';
 import './ImageEditor';
 
-// TODO: check avec Alex pour pour import ImageEditor[/index.js] ne fonctionne pas
-import Vue from 'vue';
 import Editor from './ImageEditor/editor.vue';
 import Loader from './ImageEditor/loader.vue';
-Vue.component(Editor.name, Editor);
-Vue.component(Loader.name, Loader);
-
-
 
 export default {
     name: 'ImageEditor',

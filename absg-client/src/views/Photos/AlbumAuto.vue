@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <router-link
@@ -10,7 +10,7 @@
       >
         <v-icon>fas fa-home</v-icon>
         <span
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           style="margin-left: 15px"
         >Liste des albums</span>
       </router-link>
@@ -18,7 +18,7 @@
       <div
         style="display: inline-block; margin-left: 15px"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-chevron-right
         </v-icon> Album auto (configuration)
       </div>
@@ -32,7 +32,7 @@
               disabled
               @click.stop="download()"
             >
-              <v-icon left>
+              <v-icon start>
                 fas fa-star
               </v-icon>Favoris
             </v-btn>
@@ -69,7 +69,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn>
-            <v-icon left>
+            <v-icon start>
               fas fa-eye
             </v-icon>
             Voir les photos

@@ -1,18 +1,29 @@
 {
     "compilerOptions": {
-        "lib": ["es5", "es6"],
-        "target": "es5",
+        "lib": ["ES2022"],
+        "target": "ES2022",
         "module": "commonjs",
         "moduleResolution": "node",
         "outDir": "./build",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "resolveJsonModule": true,
         "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": false,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "declaration": true,
+        "declarationMap": true
     },
     "exclude": [
-      "node_modules",
-      "typings"
+        "node_modules",
+        "build",
+        "dist"
+    ],
+    "include": [
+        "src/**/*"
     ]
 }

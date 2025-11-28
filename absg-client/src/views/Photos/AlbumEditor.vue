@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <router-link
@@ -10,7 +10,7 @@
       >
         <v-icon>fas fa-home</v-icon>
         <span
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           style="margin-left: 15px"
         >Liste des albums</span>
       </router-link>
@@ -47,19 +47,19 @@
           style="margin-right: 15px"
           @click.stop="displayUploadDialog = true"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-plus
           </v-icon>
-          <span v-if="$vuetify.breakpoint.lgAndUp">Ajouter des photos</span>
+          <span v-if="$vuetify.display.lgAndUp">Ajouter des photos</span>
         </v-btn>
         
         <v-btn
           :to="{ path: `/photos/albums/${album.id}` }"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-undo
           </v-icon>
-          <span v-if="$vuetify.breakpoint.lgAndUp">Retour à l'album</span>
+          <span v-if="$vuetify.display.lgAndUp">Retour à l'album</span>
         </v-btn>
       </div>
     </div>
@@ -104,7 +104,7 @@
 
     <div v-if="album">
       <v-container fluid>
-        <v-layout
+        <v-row
           row
           wrap
         >
@@ -116,7 +116,7 @@
             @start="drag=true"
             @end="drag=false; save();"
           >
-            <v-flex
+            <v-col
               v-for="p in album.photos"
               :key="p.id"
               style="min-width: 100px; margin: 15px"
@@ -136,14 +136,14 @@
                 </div>
                 <div style="text-align: center;">
                   <v-tooltip bottom>
-                    <template #activator="{ on }">
+                    <template #activator="{ props }">
                       <v-btn
                         v-if="isAdmin"
                         icon
                         @click="photosGalleryDisplay(p.order)"
-                        v-on="on"
+                        v-bind="props"
                       >
-                        <v-icon small>
+                        <v-icon size="small">
                           fas fa-pen
                         </v-icon>
                       </v-btn>
@@ -151,13 +151,13 @@
                     <span>Editer les informations de la photo</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <template #activator="{ on }">
+                    <template #activator="{ props }">
                       <v-btn
                         icon
                         @click="setCover(p)"
-                        v-on="on"
+                        v-bind="props"
                       >
-                        <v-icon small>
+                        <v-icon size="small">
                           fas fa-desktop
                         </v-icon>
                       </v-btn>
@@ -165,14 +165,14 @@
                     <span>Mettre en couverture</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <template #activator="{ on }">
+                    <template #activator="{ props }">
                       <v-btn
                         v-if="isAdmin"
                         icon
                         @click="deletePhoto(p)"
-                        v-on="on"
+                        v-bind="props"
                       >
-                        <v-icon small>
+                        <v-icon size="small">
                           fas fa-trash
                         </v-icon>
                       </v-btn>
@@ -181,9 +181,9 @@
                   </v-tooltip>
                 </div>
               </div>
-            </v-flex>
+            </v-col>
           </draggable>
-        </v-layout>
+        </v-row>
       </v-container>
     </div>
 
@@ -238,8 +238,8 @@
 <script>
 import axios from 'axios';
 import store from '../../store';
-import { mapState } from "vuex";
-import UploadFiles from "../../components/UploadFiles";
+import { mapState } from "../../stores/helpers";
+import UploadFiles from "../../components/UploadFiles.vue";
 import draggable from 'vuedraggable';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 

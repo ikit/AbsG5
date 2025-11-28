@@ -5,7 +5,7 @@
       class="fixed-tabs-bar"
     >
       <v-tab :to="{path:'/citations/browser'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-bars
         </v-icon> Liste
       </v-tab>
@@ -13,7 +13,7 @@
         :to="{path:'/citations/play'}"
         disabled
       >
-        <v-icon left>
+        <v-icon start>
           far fa-grin-tongue
         </v-icon> Devinettes
       </v-tab>

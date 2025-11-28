@@ -16,12 +16,12 @@
         </v-row>
         <v-tabs>
           <v-tab>
-            <v-icon left>
+            <v-icon start>
               fas fa-address-book
             </v-icon> Répertoire
           </v-tab>
           <v-tab>
-            <v-icon left>
+            <v-icon start>
               fas fa-map-marked-alt
             </v-icon> Habitation
           </v-tab>

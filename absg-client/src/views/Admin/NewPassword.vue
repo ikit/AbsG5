@@ -38,8 +38,8 @@
 
     <v-expansion-panels style="margin: 15px">
       <v-expansion-panel>
-        <v-expansion-panel-header>Comment choisir mon mot de passe ?</v-expansion-panel-header>
-        <v-expansion-panel-content>
+        <v-expansion-panel-title>Comment choisir mon mot de passe ?</v-expansion-panel-title>
+        <v-expansion-panel-text>
           <p>
             Si on met de côté le vol de donnée, les personnes mal intentionnées ont 2 façons de deviner un mot de passe.
             <ul>
@@ -102,11 +102,11 @@
               <li>Après libre à vous d'inventer des combines pour altérer le mot de passe et le rendre vraiment unique et introuvable.</li>
             </ul>
           </p>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
       <v-expansion-panel>
-        <v-expansion-panel-header>Olivier connaît-il tous les mots de passe ?</v-expansion-panel-header>
-        <v-expansion-panel-content>
+        <v-expansion-panel-title>Olivier connaît-il tous les mots de passe ?</v-expansion-panel-title>
+        <v-expansion-panel-text>
           <p>
             Il le pourrait si il avait volontairement programmé le site pour stocker en clair cette information sensible.
             Mais ça n'est pas le cas. Pour ceux qui veulent s'en convaincre, tout le code source du site est accessible sur
@@ -130,7 +130,7 @@
             base de donnée la version chiffrée de votre mot de passe, et ainsi à chaque fois que vous essaierez de vous authentifier, on comparera
             la version chiffrée du mot de passe que vous venez de saisir avec celle gardée en base de donnée.
           </p>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
   </v-container>
@@ -139,7 +139,6 @@
 <script>
 import axios from 'axios';
 import store from "../../store";
-import { format } from 'date-fns';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {

@@ -1,4 +1,4 @@
-import * as morgan from "morgan";
+import morgan from "morgan";
 import { format, createLogger, transports, config, addColors } from "winston";
 import { format as formatDate } from "date-fns";
 import { PgLogger } from "./pgLogger";
@@ -24,11 +24,11 @@ export const logger = createLogger({
                 colorize({ all: true }),
                 timestamp(),
                 metadata({ fillExcept: ["message", "level", "timestamp"] }),
-                printf(info => {
-                    let out = `${formatDate(new Date(info.timestamp), "HH:mm:ss:SSSS")} ${info.level.toUpperCase()}: ${
+                printf((info: any) => {
+                    let out = `${formatDate(new Date(info.timestamp as string), "HH:mm:ss:SSSS")} ${info.level.toUpperCase()}: ${
                         info.message
                     }`;
-                    if (Object.keys(info.metadata).length !== 0) {
+                    if (info.metadata && Object.keys(info.metadata).length !== 0) {
                         if (info.metadata.stack) {
                             out += `\u001b[31m\n${info.metadata.stack}\u001b[39m`;
                         } else {
@@ -45,11 +45,11 @@ export const logger = createLogger({
             format: combine(
                 timestamp(),
                 metadata({ fillExcept: ["message", "level", "timestamp"] }),
-                printf(info => {
-                    let out = `${formatDate(new Date(info.timestamp), "yyyy.MM.dd HH.mm.ss:SSSS")} ${info.level.toUpperCase()}: ${
+                printf((info: any) => {
+                    let out = `${formatDate(new Date(info.timestamp as string), "yyyy.MM.dd HH.mm.ss:SSSS")} ${info.level.toUpperCase()}: ${
                         info.message
                     }`;
-                    if (Object.keys(info.metadata).length !== 0) {
+                    if (info.metadata && Object.keys(info.metadata).length !== 0) {
                         if (info.metadata.stack) {
                             out += `\n${info.metadata.stack}`;
                         } else {

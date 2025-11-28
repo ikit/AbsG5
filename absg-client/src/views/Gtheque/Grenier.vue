@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <router-link
@@ -10,7 +10,7 @@
       >
         <v-icon>fas fa-home</v-icon>
         <span
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           style="margin-left: 15px"
         >Grenier</span>
       </router-link>
@@ -28,11 +28,11 @@
     </div>
     
     <v-container fluid>
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex
+        <v-col
           v-for="item in files"
           :key="item.name"
           style="width: 300px; max-width: 300px; margin: 15px;"
@@ -83,8 +83,8 @@
               </v-card-subtitle>
             </v-card>
           </a>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -93,7 +93,7 @@
 <script>
 import Vue from 'vue';
 import axios from 'axios';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 
@@ -133,10 +133,11 @@ export default {
 
             let result = this.tree;
             for (const p of this.paths) {
-              result = result.find(f => p.path.startsWith(f.path)).content;
-              
+              const found = result.find(f => p.path.startsWith(f.path));
+              if (!found) break;
+              result = found.content;
             }
-            this.files = Array.isArray(result) ? result : result.content;
+            this.files = Array.isArray(result) ? result : (result && result.content ? result.content : []);
         },
 
         logClickOnMedia(item) {

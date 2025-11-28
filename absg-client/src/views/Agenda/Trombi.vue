@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row
         style="margin: 0"
         align="center"
@@ -18,8 +18,8 @@
 
         <v-btn-toggle :disabled="isLoading">
           <v-tooltip bottom v-if="isAdmin">
-            <template #activator="{ on }">
-              <v-btn @click.stop="rebuildTrombis()" v-on="on">
+            <template #activator="{ props }">
+              <v-btn @click.stop="rebuildTrombis()" v-bind="props">
                 <v-icon>fas fa-redo</v-icon>
               </v-btn>
             </template>
@@ -27,8 +27,8 @@
           </v-tooltip>
 
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="switchHidden()" v-on="on">
+            <template #activator="{ props }">
+              <v-btn @click.stop="switchHidden()" v-bind="props">
                 <v-icon v-if="filter.hideEmpty">fas fa-portrait</v-icon>
                 <v-icon v-else>fas fa-user-friends</v-icon>
               </v-btn>
@@ -37,8 +37,8 @@
           </v-tooltip>
           
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="displayStats()" v-on="on">
+            <template #activator="{ props }">
+              <v-btn @click.stop="displayStats()" v-bind="props">
                 <v-icon>fas fa-chart-pie</v-icon>
               </v-btn>
             </template>
@@ -46,8 +46,8 @@
           </v-tooltip>
 
           <v-tooltip bottom>
-            <template #activator="{ on }">
-              <v-btn @click.stop="resetDialog(true)" v-on="on">
+            <template #activator="{ props }">
+              <v-btn @click.stop="resetDialog(true)" v-bind="props">
                 <v-icon>fas fa-plus</v-icon>
               </v-btn>
             </template>
@@ -68,29 +68,29 @@
           :key="p.id"
           :disabled="p.displayedTrombis.length === 0"
         >
-          <v-expansion-panel-header>
+          <v-expansion-panel-title>
             {{ p.fullname }}
             <v-spacer />
             {{ p.trombis.length }}/{{ p.trombiMax }}
             <i class="fas fa-portrait" :class="p.cssStatus" style="margin-left: 10px; margin-right: 10px; flex: none"/>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
             <v-tooltip
               v-for="t of p.displayedTrombis"
               :key="t.url"
               bottom
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <img
                   class="thumb"
                   :src="t.thumb"
-                  v-on="on"
+                  v-bind="props"
                   @click="photosGalleryDisplay(t.index)"
                 />
               </template>
               <span>{{ t.title }}</span>
             </v-tooltip>
-          </v-expansion-panel-content>
+          </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
     </v-container>
@@ -113,7 +113,7 @@
             :rules="editorRules.person"
             label="Qui"
             prepend-icon="fas fa-user"
-            item-text="fullname"
+            item-title="fullname"
           />
           
           <v-text-field
@@ -222,7 +222,7 @@ import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import HC_sankey from 'highcharts/modules/sankey';
 import HC_depwheel from 'highcharts/modules/dependency-wheel';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 HC_sankey(Highcharts);
 HC_depwheel(Highcharts);
 
@@ -235,6 +235,7 @@ export default {
     data: () => ({
         isLoading: false,
         isAdmin: false,
+        panel: [],
         persons: [],
         displayedPersons: [],
         layoutMode: "GRID",

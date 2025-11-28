@@ -13,10 +13,10 @@
           />
           <v-spacer />
           <v-btn
-            v-if="$vuetify.breakpoint.lgAndUp"
+            v-if="$vuetify.display.lgAndUp"
             @click="resetDialog(true)"
           >
-            <v-icon left>
+            <v-icon start>
               fa-plus
             </v-icon>
             Nouvelle entrée
@@ -42,7 +42,7 @@
         >
           <template #[`item.photo`]="{ item }">
             <div
-              v-if="item.thumb && $vuetify.breakpoint.lgAndUp"
+              v-if="item.thumb && $vuetify.display.lgAndUp"
               class="thumb"
             >
               <img
@@ -51,10 +51,10 @@
               >
             </div>
             <div
-              v-if="!item.thumb && $vuetify.breakpoint.lgAndUp"
+              v-if="!item.thumb && $vuetify.display.lgAndUp"
               class="noThumb"
             >
-              <v-icon small>
+              <v-icon size="small">
                 fas fa-user-circle
               </v-icon>
             </div>
@@ -171,7 +171,7 @@
                   :items="sexes"
                   prepend-icon="fas fa-venus-mars"
                   label="Sexe"
-                  item-text="label"
+                  item-title="label"
                   item-value="id"
                 />
 
@@ -180,7 +180,7 @@
                   :items="rootFamilies"
                   prepend-icon="fas fa-crown"
                   label="Maison mère"
-                  item-text="label"
+                  item-title="label"
                   item-value="id"
                 />
               </v-col>

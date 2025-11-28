@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <v-btn
@@ -21,7 +21,7 @@
           :to="{ path: path.url }"
           tag="button"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-chevron-right
           </v-icon> {{ path.label }}
         </router-link>
@@ -32,13 +32,13 @@
         v-if="topicId && topicId > 0"
         bottom
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-btn
             icon
             small
             :color="pinned ? 'accent' : 'default'"
             style="margin-left: 20px"
-            v-on="on"
+            v-bind="props"
             @click.stop="switchPin()"
           >
             <v-icon>fas fa-thumbtack</v-icon>
@@ -51,7 +51,7 @@
       <!-- <v-btn
             style="position: absolute; right: 15px; top: 10px"
             @click.stop="newTopic()">
-            <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
+            <v-icon start>fas fa-plus</v-icon>Nouvelle discussion
         </v-btn> -->
     </div>
 
@@ -64,7 +64,7 @@ import axios from 'axios';
 import store from '../../store';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
-import Reader from "./Reader";
+import Reader from "./Reader.vue";
 
 export default {
     components: {
@@ -74,6 +74,7 @@ export default {
         isLoading: false,
         breadcrumb: [],
         pinned: false,
+        topicId: null,
     }),
     watch: {
         $route(change) {

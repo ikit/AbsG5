@@ -5,7 +5,7 @@
         v-if="isAdmin"
         :to="{path:'/admin/dashboard'}"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-tachometer-alt
         </v-icon> Tableau de bord
       </v-tab>
@@ -13,7 +13,7 @@
         v-if="isAdmin"
         :to="{path:'/admin/settings'}"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-tools
         </v-icon> Paramètres généraux
       </v-tab>
@@ -21,13 +21,13 @@
         v-if="isAdmin"
         :to="{path:'/admin/users'}"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-users-cog
         </v-icon> Utilisateurs
       </v-tab>
-      <!-- <v-tab :to="{path:'/admin/profile'}"> <v-icon left>fas fa-info-circle</v-icon> Mes informations</v-tab> -->
+      <!-- <v-tab :to="{path:'/admin/profile'}"> <v-icon start>fas fa-info-circle</v-icon> Mes informations</v-tab> -->
       <v-tab :to="{path:'/admin/resetpwd'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-lock
         </v-icon> Changer mot de passe
       </v-tab>
@@ -41,7 +41,7 @@
 
 <script>
 import store from "../store";
-import { mapState } from "vuex";
+import { mapState } from "../stores/helpers";
 
 export default  {
     store,

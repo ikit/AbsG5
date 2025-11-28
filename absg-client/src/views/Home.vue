@@ -7,11 +7,8 @@
       fluid
       grid-list-xl
     >
-      <v-layout
-        row
-        wrap
-      >
-        <v-flex>
+      <v-row>
+        <v-col>
           <v-card style="width:500px; margin: auto">
             <v-card-title>
               <h2>
@@ -33,22 +30,20 @@
               hide-default-footer
               class="notifications"
             >
-              <template #item="{item}">
-                <tr @click="onEventClick(item)">
-                  <td>
-                    <div style="display: flex;">
-                      <v-icon style="flex">far fa-calendar-alt</v-icon>
-                      <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.name }}</span>
-                    </div>
-                  </td>
-                  <td style="text-align: right; padding-right: 25px">{{ item.dateLabel }}</td>
-                </tr>
+              <template #[`item.what`]="{ item }">
+                <div style="display: flex;">
+                  <v-icon style="flex">far fa-calendar-alt</v-icon>
+                  <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.name }}</span>
+                </div>
+              </template>
+              <template #[`item.when`]="{ item }">
+                <span style="text-align: right; padding-right: 25px">{{ item.dateLabel }}</span>
               </template>
             </v-data-table>
           </v-card>
-        </v-flex>
+        </v-col>
 
-        <v-flex>
+        <v-col>
           <div
             v-if="immt"
             class="immt"
@@ -63,23 +58,20 @@
             </div>
             <p>{{ immt.title }}</p>
           </div>
-        </v-flex>
-      </v-layout>
-      <v-layout
-        row
-        wrap
-      >
-        <v-flex>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
           <v-card>
             <v-card-title>
               <h2>
                 Passa G
                 <v-btn
-                  text
+                  variant="text"
                   style="position: absolute; right: 15px; top: 15px;"
                   @click.stop="displayPassagHistoryDialog()"
                 >
-                  <v-icon left>
+                  <v-icon start>
                     far fa-clock
                   </v-icon>historique
                 </v-btn>
@@ -87,27 +79,24 @@
             </v-card-title>
 
             <v-list class="passage overflow-auto">
-              <template v-for="item in passage">
+              <template v-for="item in passage" :key="item.title">
                 <v-list-item
-                  :key="item.title"
                   ripple
                 >
                   <div class="date">
                     {{ item.time }}
                   </div>
-                  <template v-for="(user, i2) in item.passage">
+                  <template v-for="(user, i2) in item.passage" :key="i2">
                     <v-tooltip
-                      :key="i2"
                       bottom
                     >
-                      <template #activator="{ on }">
+                      <template #activator="{ props }">
                         <img
-                          :key="i2"
                           :src="user.avatar"
                           :alt="user.username"
                           height="40px"
-                          onError="this.src='/files/avatars/000.png';"
-                          v-on="on"
+                          @error="(e) => e.target.src='/files/avatars/000.png'"
+                          v-bind="props"
                         >
                       </template>
                       <span>{{ user.username }}</span>
@@ -117,18 +106,15 @@
               </template>
             </v-list>
           </v-card>
-        </v-flex>
-      </v-layout>
-      <v-layout
-        row
-        wrap
-      >
+        </v-col>
+      </v-row>
+      <v-row>
         <div
           id="coke"
           data-src="/img/cube.jpg"
           data-depth-src="/img/cube-depth.jpg"
         />
-      </v-layout>
+      </v-row>
     </v-container>
 
 
@@ -146,7 +132,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="passagHistoryDialogDisplayed=false"
           >
             Fermer
@@ -159,8 +145,6 @@
 
 
 <script>
-import Vue from 'vue';
-import Vuex from 'vuex';
 import store from '../store';
 import axios from 'axios';
 //import VueSilentbox from 'vue-silentbox';
@@ -226,42 +210,7 @@ export default {
             }
         }
     }),
-    computed: {
-        // Méthode pour la calendrier
-        title () {
-            const { start, end } = this
-            if (!start || !end) {
-            return ''
-            }
 
-            const startMonth = this.monthFormatter(start)
-            const endMonth = this.monthFormatter(end)
-            const suffixMonth = startMonth === endMonth ? '' : endMonth
-
-            const startYear = start.year
-            const endYear = end.year
-            const suffixYear = startYear === endYear ? '' : endYear
-
-            const startDay = start.day + this.nth(start.day)
-            const endDay = end.day + this.nth(end.day)
-
-            switch (this.type) {
-            case 'month':
-                return `${startMonth} ${startYear}`
-            case 'week':
-            case '4day':
-                return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
-            case 'day':
-                return `${startMonth} ${startDay} ${startYear}`
-            }
-            return ''
-        },
-        monthFormatter () {
-            return this.$refs.calendar.getFormatter({
-            timeZone: 'UTC', month: 'long',
-            })
-        },
-    },
     watch: {
         menu (val) {
             val && this.$nextTick(() => (this.$refs.picker.activePicker = 'YEAR'));

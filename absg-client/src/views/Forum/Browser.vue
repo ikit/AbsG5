@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }"
+      :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
       style="padding: 15px"
     >
       <router-link
@@ -10,7 +10,7 @@
       >
         <v-icon>fas fa-home</v-icon>
         <span
-          v-if="$vuetify.breakpoint.lgAndUp"
+          v-if="$vuetify.display.lgAndUp"
           style="margin-left: 15px"
         >Liste des forums</span>
       </router-link>
@@ -24,7 +24,7 @@
           :to="{ path: path.url }"
           tag="button"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-chevron-right
           </v-icon> {{ path.label }}
         </router-link>
@@ -34,7 +34,7 @@
             v-if="breadcrumb.length === 1"
             style="position: absolute; right: 15px; top: 10px"
             @click.stop="newTopic()">
-            <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
+            <v-icon start>fas fa-plus</v-icon>Nouvelle discussion
         </v-btn> -->
     </div>
 
@@ -52,11 +52,11 @@
           />
           <v-spacer />
           <v-btn
-            v-if="$vuetify.breakpoint.mdAndUp"
+            v-if="$vuetify.display.mdAndUp"
             :disabled="topicEditor.disabled"
             @click.stop="newTopic()"
           >
-            <v-icon left>
+            <v-icon start>
               fas fa-plus
             </v-icon>
             <span>Nouvelle discussion</span>
@@ -94,12 +94,12 @@
               <td style="font-size: 1.1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
                 <v-icon>fas fa-archive</v-icon>  {{ item.name }}
               </td>
-              <td v-if="$vuetify.breakpoint.lgAndUp">
+              <td v-if="$vuetify.display.lgAndUp">
                 {{ item.description }}
               </td>
               <td>
                 <img
-                  v-if="$vuetify.breakpoint.lgAndUp"
+                  v-if="$vuetify.display.lgAndUp"
                   :src="item.last.avatar"
                   :alt="item.last.username"
                   style="display: block; margin-right: 15px; float: left; height: 40px"
@@ -119,12 +119,12 @@
               <td style="font-size: 1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
                 <v-icon>far fa-comment-dots</v-icon> {{ item.name }}
               </td>
-              <td v-if="$vuetify.breakpoint.lgAndUp">
+              <td v-if="$vuetify.display.lgAndUp">
                 {{ item.first.username }}<br><span style="opacity: 0.5">{{ item.first.dateLabel }}</span>
               </td>
               <td>
                 <img
-                  v-if="$vuetify.breakpoint.lgAndUp"
+                  v-if="$vuetify.display.lgAndUp"
                   :src="item.last.avatar"
                   :alt="item.last.username"
                   style="display: block; margin-right: 15px; float: left; height: 40px"
@@ -151,34 +151,34 @@
           grid-list-sm
           class="pa-4"
         >
-          <v-layout
+          <v-row
             row
             wrap
           >
-            <v-flex xs12>
+            <v-col cols="12">
               <v-autocomplete
                 v-model="topicEditor.forum"
                 prepend-icon="fas fa-archive"
                 label="Forum"
                 :items="topicEditor.forumsList"
-                item-text="name"
+                item-title="name"
                 item-value="id"
               />
-            </v-flex>
-            <v-flex xs12>
+            </v-col>
+            <v-col cols="12">
               <v-text-field
                 v-model="topicEditor.title"
                 prepend-icon="fas fa-quote-left"
                 label="Titre de la discussion"
               />
-            </v-flex>
-            <v-flex xs12>
+            </v-col>
+            <v-col cols="12">
               <TextEditor
                 ref="msgEditor"
                 v-model="topicEditor.msg"
                 style="max-height: 80vh"
               />
-            </v-flex>
+            </v-col>
 
             <VEmojiPicker
               v-if="topicEditor.displayEmojis"
@@ -187,17 +187,17 @@
               style="width: 100%; margin-top: 10px;"
               @select="selectEmoji"
             />
-          </v-layout>
+          </v-row>
         </v-container>
         <v-card-actions>
           <v-tooltip
-            v-if="$vuetify.breakpoint.lgAndUp"
+            v-if="$vuetify.display.lgAndUp"
             bottom
           >
-            <template #activator="{ on }">
+            <template #activator="{ props }">
               <v-btn
                 style="margin: 5px 0 -5px 10px;"
-                v-on="on"
+                v-bind="props"
                 @click="switchSmilies()"
               >
                 Smilies
@@ -207,7 +207,7 @@
           </v-tooltip>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="resetDialog()"
           >
@@ -232,7 +232,8 @@ import { fr } from "date-fns/locale";
 import { differenceInMonths, format } from 'date-fns';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import TextEditor from '../../components/TextEditor.vue';
-import { VEmojiPicker, emojisDefault, categoriesDefault } from "v-emoji-picker";
+import VEmojiPicker from 'vue3-emoji-picker';
+import 'vue3-emoji-picker/css';
 
 export default {
     components: {

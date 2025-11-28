@@ -1,13 +1,15 @@
-import { getRepository } from "typeorm";
 import { JsonController, Get, NotFoundError, Param } from "routing-controllers";
 import { subMinutes } from "date-fns";
 import { User } from "../entities";
 import { setLastActivity } from "../middleware";
 import { sleep } from "../middleware/commonHelper";
+import { AppDataSource } from "../data-source";
 
 @JsonController("/test")
 export class UserController {
-    private repo = getRepository(User);
+    private get repo() {
+        return AppDataSource.getRepository(User);
+    }
 
     /**
      * Route de test utilisé pour les tests automatiques cypress

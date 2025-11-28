@@ -1,21 +1,21 @@
 <template>
   <section id="content">
-    <div :class="{ stickyHeader: $vuetify.breakpoint.lgAndUp, stickyHeaderSmall: !$vuetify.breakpoint.lgAndUp }">
+    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <v-row style="padding: 15px">
         <v-tooltip
-          v-if="$vuetify.breakpoint.mdAndUp"
+          v-if="$vuetify.display.mdAndUp"
           bottom
         >
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-icon
-              left
+              start
               style="margin-top:-10px; font-size: 30px"
             >
               far fa-question-circle
             </v-icon>
             <div
               class="phase-left-header"
-              v-on="on"
+              v-bind="props"
               @click="help.displayed = true; help.page = 3"
             >
               <h2>Phase n°2 en cours : Vérification</h2>
@@ -28,13 +28,13 @@
         <v-spacer />
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
-              small
+              size="small"
               :disabled="isLoading"
               style="margin-top: 3px;"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(-1)"
             >
               <v-icon>fas fa-chevron-left</v-icon>
@@ -51,7 +51,7 @@
             <v-btn
               dark
               v-bind="attrs"
-              text
+              variant="text"
               class="grey--text"
               v-on="on"
             >
@@ -70,13 +70,13 @@
         </v-menu>
 
         <v-tooltip bottom>
-          <template #activator="{ on }">
+          <template #activator="{ props }">
             <v-btn
               icon
-              small
+              size="small"
               :disabled="isLoading"
               style="margin-top: 3px;"
-              v-on="on"
+              v-bind="props"
               @click="gotoNextCat(1)"
             >
               <v-icon>fas fa-chevron-right</v-icon>
@@ -96,11 +96,11 @@
     </div>
 
     <v-container fluid>
-      <v-layout
+      <v-row
         row
         wrap
       >
-        <v-flex
+        <v-col
           v-for="(photo, index) in photosGalery"
           :key="photo.id"
           style="min-width: 250px; width: 15%; margin: 15px"
@@ -128,13 +128,13 @@
               </div>
               <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
                 <v-tooltip bottom>
-                  <template #activator="{ on }">
+                  <template #activator="{ props }">
                     <v-btn
                       icon
-                      small
+                      size="small"
                       :disabled="isLoading"
                       style="opacity: 1; background: #fff"
-                      v-on="on"
+                      v-bind="props"
                       @click="displayPhotoDiscussion(photo)"
                     >
                       <v-icon
@@ -153,8 +153,8 @@
               </div>
             </v-card>
           </div>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
     </v-container>
 
     <!-- Aide -->
@@ -164,7 +164,7 @@
     >
       <v-card>
         <v-card-title class="grey lighten-4">
-          <v-icon left>
+          <v-icon start>
             far fa-question-circle
           </v-icon>
           Aide sur le déroulement du concours
@@ -173,7 +173,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="help.displayed = false"
           >
@@ -222,7 +222,7 @@
             <v-select
               :items="status"
               :value="photoDiscussion.status"
-              item-text="text"
+              item-title="text"
               item-value="value"
               solo
               style="height: 50px; margin-left: 10px; width: 150px;"
@@ -264,14 +264,14 @@
         <v-card-actions>
           <v-btn
             v-if="isAdmin"
-            text
+            variant="text"
             @click="photoDiscussion.deleteConfirmation = true"
           >
             Supprimer
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="photoDiscussion.displayed = false"
           >
@@ -296,13 +296,13 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="photoDiscussion.deleteConfirmation = false"
           >
             Annuler
           </v-btn>
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="deletePhoto()"
           >
@@ -317,15 +317,15 @@
 
 <script>
 import axios from 'axios';
-import { mapState } from 'vuex';
+import { mapState } from '../../stores/helpers';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget';
+import PhotoWidget from './components/PhotoWidget.vue';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../store';
-import Help from './components/Help';
+import Help from './components/Help.vue';
 
 export default {
     components: {
