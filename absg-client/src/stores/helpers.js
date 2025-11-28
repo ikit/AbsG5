@@ -2,6 +2,7 @@
 import { useMainStore } from './main'
 import { useUserStore } from './user'
 import { useNotificationStore } from './notification'
+import { usePhotoGalleryStore } from './photoGallery'
 
 /**
  * Maps Pinia state to component computed properties (like Vuex mapState)
@@ -28,6 +29,16 @@ export function mapPiniaState(keys) {
           return notifStore.unreadCount
         }
         return notifStore[key]
+      }
+      
+      // Check if it's a photo gallery property
+      const galleryProps = ['photosGallery', 'photosGalleryIndex', 'photosGalleryDisplayed', 'photoMetadataEditorDisplayed']
+      if (galleryProps.includes(key)) {
+        const galleryStore = usePhotoGalleryStore()
+        if (key === 'photosGallery') return galleryStore.photos
+        if (key === 'photosGalleryIndex') return galleryStore.currentIndex
+        if (key === 'photosGalleryDisplayed') return galleryStore.isDisplayed
+        if (key === 'photoMetadataEditorDisplayed') return galleryStore.isEditorDisplayed
       }
       
       // Otherwise use main store
@@ -67,6 +78,7 @@ export default {
     const mainStore = useMainStore()
     const userStore = useUserStore()
     const notifStore = useNotificationStore()
+    const galleryStore = usePhotoGalleryStore()
     
     return new Proxy(mainStore, {
       get(target, prop) {
@@ -86,6 +98,12 @@ export default {
           }
           return notifStore[prop]
         }
+        
+        // Delegate photo gallery properties to photoGalleryStore
+        if (prop === 'photosGallery') return galleryStore.photos
+        if (prop === 'photosGalleryIndex') return galleryStore.currentIndex
+        if (prop === 'photosGalleryDisplayed') return galleryStore.isDisplayed
+        if (prop === 'photoMetadataEditorDisplayed') return galleryStore.isEditorDisplayed
         
         // Otherwise use main store
         return target[prop]
@@ -110,6 +128,21 @@ export default {
       'onSnack', 'onNotif', 'onWarning', 'onError'
     ]
     if (notifActions.includes(action)) {
+      const mainStore = useMainStore()
+      // Call main store for backward compatibility
+      if (typeof mainStore[action] === 'function') {
+        mainStore[action](payload)
+      }
+      return
+    }
+    
+    // Check if it's a photo gallery action
+    const galleryActions = [
+      'photosGalleryReset', 'photosGalleryDisplay', 'photosGalleryHide',
+      'photosGalleryNext', 'photosGalleryPrev', 'photosGallerySetIndex',
+      'photoMetadataEditorDisplay', 'photoMetadataEditorHide'
+    ]
+    if (galleryActions.includes(action)) {
       const mainStore = useMainStore()
       // Call main store for backward compatibility
       if (typeof mainStore[action] === 'function') {

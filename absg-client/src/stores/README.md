@@ -55,13 +55,38 @@ Manages user notifications and UI alerts.
 - `showError(axiosError)`: Show error dialog
 - `fetchNotifications()`: Fetch from API
 
+### Photo Gallery Store (`photoGallery.js`)
+Manages photo gallery viewer and metadata editor.
+
+**State:**
+- `photos`: Array of photos in gallery
+- `currentIndex`: Current photo index
+- `isDisplayed`: Gallery visibility
+- `isEditorDisplayed`: Metadata editor visibility
+
+**Getters:**
+- `currentPhoto`: Currently displayed photo
+- `hasPhotos`: Boolean if gallery has photos
+- `photoCount`: Number of photos
+- `hasPrevious`, `hasNext`: Navigation availability
+- `isGalleryOpen`, `isEditorOpen`: Visibility states
+
+**Actions:**
+- `resetGallery(photos)`: Load new photos
+- `setIndex(index)`: Set current photo
+- `nextPhoto()`, `previousPhoto()`: Navigate
+- `showGallery()`, `hideGallery()`: Toggle gallery
+- `showEditor()`, `hideEditor()`: Toggle editor
+- `updateCurrentPhotoMetadata(metadata)`: Update photo
+- `addPhoto(photo)`, `removePhoto(index)`: Manage photos
+- `clearGallery()`: Clear all
+
 ### Main Store (`main.js`)
-Manages global application state (settings, photo gallery, etc.)
+Manages global application state (settings, AGPA, etc.)
 
 **State:**
 - `citation`: Random citation
 - `settings`: Application settings
-- `photosGallery`: Photo gallery state
 - `agpaMeta`: AGPA metadata
 - `wsOnline`, `wsMessage`: WebSocket state
 
@@ -75,16 +100,19 @@ Use Pinia stores directly with the Composition API:
 <script setup>
 import { useUserStore } from '@/stores/user'
 import { useNotificationStore } from '@/stores/notification'
+import { usePhotoGalleryStore } from '@/stores/photoGallery'
 import { useMainStore } from '@/stores/main'
 
 const userStore = useUserStore()
 const notifStore = useNotificationStore()
+const galleryStore = usePhotoGalleryStore()
 const mainStore = useMainStore()
 
 // Access state
 const user = computed(() => userStore.currentUser)
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 const unreadCount = computed(() => notifStore.unreadCount)
+const currentPhoto = computed(() => galleryStore.currentPhoto)
 
 // Call actions
 const handleLogin = async () => {
@@ -93,6 +121,11 @@ const handleLogin = async () => {
 
 const handleError = (error) => {
   notifStore.showError(error)
+}
+
+const showPhotoGallery = (photos) => {
+  galleryStore.resetGallery(photos)
+  galleryStore.showGallery()
 }
 </script>
 ```
@@ -155,8 +188,8 @@ describe('User Store', () => {
 
 - [x] User store created
 - [x] Notification store created
+- [x] Photo gallery store created
 - [x] Backward compatibility layer
-- [ ] Photo gallery store
 - [ ] AGPA store
 - [ ] WebSocket store
 - [ ] Migrate all components to use new stores

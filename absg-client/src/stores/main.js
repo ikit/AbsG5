@@ -3,6 +3,7 @@ import axios from 'axios'
 import { parseAxiosResponse } from '../middleware/CommonHelper'
 import { useUserStore } from './user'
 import { useNotificationStore } from './notification'
+import { usePhotoGalleryStore } from './photoGallery'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -17,11 +18,10 @@ export const useMainStore = defineStore('main', {
     // Websocket connection
     wsOnline: false,
     wsMessage: null,
-    // Galerie photos
+    // DEPRECATED: Use usePhotoGalleryStore() instead
     photosGallery: [],
     photosGalleryIndex: 0,
     photosGalleryDisplayed: false,
-    // Editeur photo
     photoMetadataEditorDisplayed: false,
     agpaMeta: null,
     // DEPRECATED: Use useNotificationStore() instead
@@ -143,47 +143,70 @@ export const useMainStore = defineStore('main', {
       this.unreadNotifications = notifStore.unreadNotifications
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().resetGallery() instead
     photosGalleryReset(gallery) {
-      this.photosGallery = gallery
-      this.photosGalleryIndex = 0
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.resetGallery(gallery)
+      // Keep in sync
+      this.photosGallery = galleryStore.photos
+      this.photosGalleryIndex = galleryStore.currentIndex
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().showEditor() instead
     photoMetadataEditorDisplay() {
-      this.photoMetadataEditorDisplayed = true
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.showEditor()
+      // Keep in sync
+      this.photoMetadataEditorDisplayed = galleryStore.isEditorDisplayed
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().hideEditor() instead
     photoMetadataEditorHide() {
-      this.photoMetadataEditorDisplayed = false
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.hideEditor()
+      // Keep in sync
+      this.photoMetadataEditorDisplayed = galleryStore.isEditorDisplayed
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().showGallery() instead
     photosGalleryDisplay() {
-      this.photosGalleryDisplayed = true
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.showGallery()
+      // Keep in sync
+      this.photosGalleryDisplayed = galleryStore.isDisplayed
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().hideGallery() instead
     photosGalleryHide() {
-      this.photosGalleryDisplayed = false
-      this.photoMetadataEditorDisplayed = false
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.hideGallery()
+      // Keep in sync
+      this.photosGalleryDisplayed = galleryStore.isDisplayed
+      this.photoMetadataEditorDisplayed = galleryStore.isEditorDisplayed
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().nextPhoto() instead
     photosGalleryNext() {
-      if (this.photosGallery.length > 1) {
-        this.photosGalleryIndex++
-        this.photosGalleryIndex %= this.photosGallery.length
-      }
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.nextPhoto()
+      // Keep in sync
+      this.photosGalleryIndex = galleryStore.currentIndex
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().previousPhoto() instead
     photosGalleryPrev() {
-      if (this.photosGallery.length > 1) {
-        this.photosGalleryIndex--
-        this.photosGalleryIndex %= this.photosGallery.length
-        if (this.photosGalleryIndex < 0) {
-          this.photosGalleryIndex = this.photosGallery.length - 1
-        }
-      }
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.previousPhoto()
+      // Keep in sync
+      this.photosGalleryIndex = galleryStore.currentIndex
     },
 
+    // DEPRECATED: Use usePhotoGalleryStore().setIndex() instead
     photosGallerySetIndex(index) {
-      this.photosGalleryIndex = index
+      const galleryStore = usePhotoGalleryStore()
+      galleryStore.setIndex(index)
+      // Keep in sync
+      this.photosGalleryIndex = galleryStore.currentIndex
     },
 
     // DEPRECATED: Use useNotificationStore().showSnack() instead
