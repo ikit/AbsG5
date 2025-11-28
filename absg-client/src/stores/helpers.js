@@ -1,5 +1,6 @@
 // Pinia helpers that mimic Vuex mapState/mapActions
 import { useMainStore } from './main'
+import { useUserStore } from './user'
 
 /**
  * Maps Pinia state to component computed properties (like Vuex mapState)
@@ -9,6 +10,15 @@ export function mapPiniaState(keys) {
   const map = {}
   keys.forEach(key => {
     map[key] = function() {
+      // Check if it's a user-related property
+      if (key === 'user' || key === 'currentUser' || key === 'isLoggedIn') {
+        const userStore = useUserStore()
+        if (key === 'user' || key === 'currentUser') {
+          return userStore.currentUser
+        }
+        return userStore[key]
+      }
+      // Otherwise use main store
       const store = useMainStore()
       return store[key]
     }
@@ -41,11 +51,37 @@ export const mapActions = mapPiniaActions
  */
 export default {
   get state() {
-    // Return the store itself so that state properties are accessible
-    // e.g., store.state.user works because it accesses store.user
-    return useMainStore()
+    // Return a proxy that delegates to appropriate stores
+    const mainStore = useMainStore()
+    const userStore = useUserStore()
+    
+    return new Proxy(mainStore, {
+      get(target, prop) {
+        // Delegate user-related properties to userStore
+        if (prop === 'user' || prop === 'currentUser') {
+          return userStore.currentUser
+        }
+        if (prop === 'isLoggedIn' || prop === 'isAuthenticated') {
+          return userStore.isLoggedIn
+        }
+        // Otherwise use main store
+        return target[prop]
+      }
+    })
   },
   commit(action, payload) {
+    // Check if it's a user action
+    const userActions = ['setCurrentUser', 'updateUser', 'logUser', 'logoutUser']
+    if (userActions.includes(action)) {
+      const userStore = useUserStore()
+      const mainStore = useMainStore()
+      // Call both for backward compatibility
+      if (typeof mainStore[action] === 'function') {
+        mainStore[action](payload)
+      }
+      return
+    }
+    
     const store = useMainStore()
     if (typeof store[action] === 'function') {
       store[action](payload)
@@ -54,6 +90,15 @@ export default {
     }
   },
   dispatch(action, payload) {
+    // Check if it's a user action
+    const userActions = ['login', 'logout', 'checkSession', 'changePassword', 'updateProfile']
+    if (userActions.includes(action)) {
+      const userStore = useUserStore()
+      if (typeof userStore[action] === 'function') {
+        return userStore[action](payload)
+      }
+    }
+    
     const store = useMainStore()
     if (typeof store[action] === 'function') {
       return store[action](payload)

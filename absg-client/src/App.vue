@@ -487,7 +487,7 @@
 <script>
 import store from "./store";
 import axios from "axios";
-import { mapState } from "vuex";
+import { mapState } from "./stores/helpers";
 import { MODULES, parseAxiosResponse } from  "./middleware/CommonHelper";
 import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
 import PhotoMetadataEditor from "./components/PhotoMetadataEditor.vue";

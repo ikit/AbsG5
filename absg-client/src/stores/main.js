@@ -3,11 +3,13 @@ import axios from 'axios'
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../middleware/CommonHelper'
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
+import { useUserStore } from './user'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
     isInitialized: false,
     citation: null,
+    // DEPRECATED: Use useUserStore() instead
     user: null,
     notifications: [],
     unreadNotifications: 0,
@@ -49,19 +51,48 @@ export const useMainStore = defineStore('main', {
     }
   }),
 
+  getters: {
+    // Backward compatibility getters - delegate to userStore
+    currentUser() {
+      const userStore = useUserStore()
+      return userStore.currentUser
+    },
+    isLoggedIn() {
+      const userStore = useUserStore()
+      return userStore.isLoggedIn
+    }
+  },
+
   actions: {
+    // DEPRECATED: Use useUserStore().setCurrentUser() instead
     setCurrentUser(user) {
-      if (user) {
-        const idAsStr = `${user.id}`
-        user.avatarUrl = `/files/avatars/${idAsStr.padStart(3, '0')}.png`
-      } else {
-        this.user = null
-      }
+      const userStore = useUserStore()
+      userStore.setCurrentUser(user)
+      // Keep in sync for backward compatibility
       this.user = user
     },
 
+    // DEPRECATED: Use useUserStore().updateUser() instead
     updateUser(user) {
+      const userStore = useUserStore()
+      userStore.updateUser(user)
+      // Keep in sync for backward compatibility
       this.user = user
+    },
+
+    // DEPRECATED: Use useUserStore().login() instead
+    async logUser(credentials) {
+      const userStore = useUserStore()
+      const user = await userStore.login(credentials)
+      this.user = user
+      return user
+    },
+
+    // DEPRECATED: Use useUserStore().logout() instead
+    async logoutUser() {
+      const userStore = useUserStore()
+      await userStore.logout()
+      this.user = null
     },
 
     updateCitation(citation) {
