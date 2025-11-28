@@ -342,13 +342,12 @@
   - Unused imports removed
   - _Requirements: 3.5, 6.5_
 
-- [ ] 15.4 Migrate Admin section components
-  - Update Admin.vue and child components
-  - Migrate Profile.vue
-  - Migrate NewPassword.vue
-  - Migrate Dashboard.vue
-  - Migrate Settings.vue
-  - Migrate Users.vue
+- [x] 15.4 Migrate Admin section components
+  - Profile.vue: v-icon left → start
+  - NewPassword.vue: expansion panels migrated
+  - Dashboard.vue: already compliant
+  - Settings.vue: expansion panels migrated
+  - Users.vue: v-icon small → size="small", left → start
   - _Requirements: 3.5, 6.1, 6.5_
 
 - [ ] 15.5 Migrate Citations components

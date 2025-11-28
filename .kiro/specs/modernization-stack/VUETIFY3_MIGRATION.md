@@ -41,9 +41,12 @@
 #### Icons
 - ✅ `left` prop → `start`
 - ✅ `right` prop → `end`
+- ✅ `small` prop → `size="small"`
 
 **Files updated:**
 - `Home.vue`
+- `Profile.vue`
+- `Users.vue`
 
 #### Lists
 - ✅ `dense` prop → `density="compact"`
@@ -114,7 +117,7 @@
 ## Remaining Work
 
 ### Components to Audit
-- [ ] Admin section components (Profile, Dashboard, Users)
+- [x] Admin section components (Profile, Dashboard, Users, NewPassword, Settings)
 - [ ] Citations components
 - [ ] Photos section components
 - [ ] Forum components
