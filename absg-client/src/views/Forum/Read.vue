@@ -21,7 +21,7 @@
           :to="{ path: path.url }"
           tag="button"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-chevron-right
           </v-icon> {{ path.label }}
         </router-link>
@@ -51,7 +51,7 @@
       <!-- <v-btn
             style="position: absolute; right: 15px; top: 10px"
             @click.stop="newTopic()">
-            <v-icon left>fas fa-plus</v-icon>Nouvelle discussion
+            <v-icon start>fas fa-plus</v-icon>Nouvelle discussion
         </v-btn> -->
     </div>
 

@@ -5,12 +5,12 @@
       class="fixed-tabs-bar"
     >
       <v-tab :to="{path:'/gtheque/grenier'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-star
         </v-icon> Grenier
       </v-tab>
       <v-tab v-if="isAdmin" :to="{path:'/gtheque/collections'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-book
         </v-icon> Collections
       </v-tab>

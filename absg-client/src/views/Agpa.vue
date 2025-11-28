@@ -5,7 +5,7 @@
       class="fixed-tabs-bar"
     >
       <v-tab :to="{path:'/agpa/'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-star
         </v-icon> Edition {{ agpaMeta ? agpaMeta.year : "" }}
       </v-tab>
@@ -13,27 +13,27 @@
         v-if="isAdmin"
         :to="{path:'/agpa/admin'}"
       >
-        <v-icon left>
+        <v-icon start>
           fas fa-tachometer-alt
         </v-icon> Supervision
       </v-tab>
       <v-tab :to="{path:'/agpa/rules'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-scroll
         </v-icon> Réglement
       </v-tab>
       <v-tab :to="{path:'/agpa/archives'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-archive
         </v-icon> Archives
       </v-tab>
       <v-tab :to="{path:'/agpa/palmares'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-trophy
         </v-icon> Palmarès
       </v-tab>
       <v-tab :to="{path:'/agpa/ceremony'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-tv
         </v-icon> Cérémonies
       </v-tab>

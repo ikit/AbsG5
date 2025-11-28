@@ -12,7 +12,7 @@
           :content="tbzNnewMessages"
           :model-value="tbzNnewMessages > 0"
         >
-          <v-icon left>
+          <v-icon start>
             far fa-comment-dots
           </v-icon> T.B.Z.
         </v-badge>
@@ -28,13 +28,13 @@
           :content="t.newMessages || 0"
           :model-value="t.newMessages > 0"
         >
-          <v-icon left>
+          <v-icon start>
             far fa-comment-dots
           </v-icon> {{ t.name }}
         </v-badge>
       </v-tab>
       <v-tab :to="{path: `/forum/browse`}">
-        <v-icon left>
+        <v-icon start>
           fas fa-archive
         </v-icon> Forums
       </v-tab>

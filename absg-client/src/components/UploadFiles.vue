@@ -25,7 +25,7 @@
           :disabled="uploadProgress.progress"
           @click="uploadFiles"
         >
-          <v-icon left>
+          <v-icon start>
             fas fa-cloud-upload-alt
           </v-icon>
           Envoyer

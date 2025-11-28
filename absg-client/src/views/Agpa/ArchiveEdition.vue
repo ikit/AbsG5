@@ -13,7 +13,7 @@
               :to="{path: '/agpa/archives/' }"
               v-bind="props"
             >
-              <v-icon left>
+              <v-icon start>
                 fas fa-chevron-left
               </v-icon>
               <span>Retour</span>
@@ -195,7 +195,7 @@
                 :to="{path: `/agpa/archives/${year}/${catIdx}` }"
                 v-bind="props"
               >
-                <v-icon left>
+                <v-icon start>
                   far fa-images
                 </v-icon>
                 <span v-if="$vuetify.display.mdAndUp">Galerie</span>

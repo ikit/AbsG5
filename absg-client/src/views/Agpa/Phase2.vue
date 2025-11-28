@@ -164,7 +164,7 @@
     >
       <v-card>
         <v-card-title class="grey lighten-4">
-          <v-icon left>
+          <v-icon start>
             far fa-question-circle
           </v-icon>
           Aide sur le déroulement du concours

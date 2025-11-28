@@ -10,7 +10,7 @@
               :to="{path: `/agpa/archives/${year}` }"
               v-bind="props"
             >
-              <v-icon left>
+              <v-icon start>
                 fas fa-chevron-left
               </v-icon>
               <span v-if="$vuetify.display.mdAndUp">Retour</span>

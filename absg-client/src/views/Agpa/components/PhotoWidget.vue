@@ -68,7 +68,7 @@
                 v-bind="props"
                 @click="addNewPhoto()"
               >
-                <v-icon left>
+                <v-icon start>
                   fas fa-plus
                 </v-icon>
                 <span>Photo</span>

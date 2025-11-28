@@ -16,7 +16,7 @@
             v-if="$vuetify.display.lgAndUp"
             @click="resetDialog(true)"
           >
-            <v-icon left>
+            <v-icon start>
               fa-plus
             </v-icon>
             Nouvelle entrée
@@ -54,7 +54,7 @@
               v-if="!item.thumb && $vuetify.display.lgAndUp"
               class="noThumb"
             >
-              <v-icon small>
+              <v-icon size="small">
                 fas fa-user-circle
               </v-icon>
             </div>

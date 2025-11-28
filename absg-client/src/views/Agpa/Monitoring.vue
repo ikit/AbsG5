@@ -6,27 +6,27 @@
     <v-card style="margin: 24px">
       <v-tabs>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             far fa-image
           </v-icon> Photos
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-vote-yea
           </v-icon> Votes
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-calculator
           </v-icon> Notes
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-trophy
           </v-icon> Palmarès
         </v-tab>
         <v-tab>
-          <v-icon left>
+          <v-icon start>
             fas fa-chart-pie
           </v-icon> Stats
         </v-tab>

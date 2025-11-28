@@ -5,18 +5,18 @@
       class="fixed-tabs-bar"
     >
       <v-tab :to="{path:'/agenda/directory'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-address-book
         </v-icon> Répertoire
       </v-tab>
       <v-tab :to="{path:'/agenda/locations'}">
-        <v-icon left>
+        <v-icon start>
           fas fa-map-marked-alt
         </v-icon> Lieux
       </v-tab>
-      <v-tab :to="{path:'/agenda/trombi'}"><v-icon left>fas fa-user-circle</v-icon> Trombinoscope</v-tab>
-      <!--<v-tab :to="{path:'/agenda/genealogy'}"> <v-icon left>fas fa-sitemap</v-icon> Généalogie</v-tab>
-      <v-tab :to="{path:'/agenda/web3g'}"> <v-icon left>fas fa-globe</v-icon> Web 3G</v-tab-->
+      <v-tab :to="{path:'/agenda/trombi'}"><v-icon start>fas fa-user-circle</v-icon> Trombinoscope</v-tab>
+      <!--<v-tab :to="{path:'/agenda/genealogy'}"> <v-icon start>fas fa-sitemap</v-icon> Généalogie</v-tab>
+      <v-tab :to="{path:'/agenda/web3g'}"> <v-icon start>fas fa-globe</v-icon> Web 3G</v-tab-->
     </v-tabs>
 
     <router-view />
