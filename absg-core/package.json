@@ -22,11 +22,13 @@
         "@types/jsonwebtoken": "^9.0.5",
         "@types/morgan": "^1.9.9",
         "@types/multer": "^1.4.11",
-        "@types/node": "^20.10.0",
+        "@types/node": "^20.19.25",
         "@types/ws": "^8.5.10",
+        "@vitest/ui": "^4.0.14",
         "husky": "^9.0.0",
         "ts-node-dev": "^2.0.0",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "vitest": "^4.0.14"
     },
     "dependencies": {
         "async-mutex": "^0.5.0",
@@ -63,6 +65,10 @@
         "prebuild": "rimraf build",
         "build": "tsc",
         "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\"",
+        "test": "vitest",
+        "test:ui": "vitest --ui",
+        "test:run": "vitest run",
+        "test:coverage": "vitest run --coverage",
         "typeorm": "typeorm-ts-node-commonjs",
         "migration:generate": "npm run typeorm -- migration:generate",
         "migration:run": "npm run typeorm -- migration:run",
