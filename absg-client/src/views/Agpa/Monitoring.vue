@@ -1064,6 +1064,12 @@ export default {
         },
 
         displayPhotoDetails(photo)  {
+          // Safety check: ensure data is loaded
+          if (!this.data || !this.data.categories) {
+            console.warn('Cannot display photo details: data not loaded yet');
+            return;
+          }
+
           this.photoDetails.photo = photo;
           // On récupère les votes de la photo
           this.photoDetails.votes.splice(0);
