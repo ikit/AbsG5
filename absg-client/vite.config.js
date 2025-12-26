@@ -49,6 +49,10 @@ export default defineConfig({
         target: 'ws://localhost:5011',
         ws: true,
       },
+      '/files': {
+        target: 'http://localhost:5010',
+        changeOrigin: true,
+      },
     },
     // Serve static files directly from local directory
     middlewareMode: false,
@@ -70,11 +74,16 @@ export default defineConfig({
       '.json': 'application/json',
     }
 
+    // Add middleware directly
     server.middlewares.use((req, res, next) => {
       if (req.url?.startsWith('/files/')) {
         // Remove query parameters
         const cleanUrl = req.url.split('?')[0]
-        const filePath = path.join(filesPath, cleanUrl.replace('/files/', ''))
+        const relPath = cleanUrl.replace('/files/', '')
+        const filePath = path.join(filesPath, relPath)
+
+        console.log(`🔍 Request: ${cleanUrl}`)
+        console.log(`📂 Looking for: ${filePath}`)
 
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
           // Detect MIME type
@@ -86,10 +95,17 @@ export default defineConfig({
           res.setHeader('Access-Control-Allow-Origin', '*')
           res.setHeader('Cache-Control', 'public, max-age=31536000')
 
-          fs.createReadStream(filePath).pipe(res)
+          const stream = fs.createReadStream(filePath)
+          stream.pipe(res)
+          stream.on('error', (err) => {
+            console.error(`✗ Error reading file: ${err.message}`)
+            res.statusCode = 500
+            res.end('Internal Server Error')
+          })
         } else {
           console.log(`✗ File not found: ${filePath}`)
-          next()
+          res.statusCode = 404
+          res.end('File not found')
         }
       } else {
         next()

@@ -8,7 +8,17 @@
       "Bash(git restore:*)",
       "Bash(git commit:*)",
       "Bash(echo:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(for f in c*.png)",
+      "Bash(do identify \"$f\")",
+      "Bash(done)",
+      "Bash(test:*)",
+      "Bash(curl:*)",
+      "Bash(for file in \"absg-client/src/views/Photos/Browser.vue\" \"absg-client/src/views/Photos/AlbumViewer.vue\" \"absg-client/src/views/Photos/Albums.vue\" \"absg-client/src/views/Photos/AlbumEditor.vue\" \"absg-client/src/views/Photos/AlbumAuto.vue\")",
+      "Bash(do grep -n \"from ''../../store''\" \"$file\")",
+      "Bash(while read file)",
+      "Bash(do sed -i \"s|from ''../../store''|from ''../../stores/helpers''|g\" \"$file\")",
+      "Bash(do sed -i \"s|from ''../store''|from ''../stores/helpers''|g\" \"$file\")"
     ]
   }
 }
