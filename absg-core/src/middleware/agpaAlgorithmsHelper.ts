@@ -478,7 +478,7 @@ export async function p4AgpaAttribution(ctx: any) {
 export async function p4DiamondAttribution(ctx: any) {
     // Pour chaque catégories:
     if (!ctx.categories || !Array.isArray(ctx.categories)) {
-        return;
+        return ctx;
     }
     for (const cat of ctx.categories) {
         // Il faut au moins 2 photos dans la catégorie
