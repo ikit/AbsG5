@@ -379,7 +379,7 @@ export default {
                         this.agpaMeta.categories[s.categoryId].totalUsers = s.totalUsers;
                         this.agpaMeta.categories[s.categoryId].totalPhotos = s.totalPhotos;
                     }
-                    this.photosGallery.reset(this.photos.filter(p => p.id > -1));
+                    this.photosGallery.resetGallery(this.photos.filter(p => p.id > -1));
                 })
                 .catch(err => {
                     this.mainStore.onError(err);
@@ -476,11 +476,11 @@ export default {
             const index = this.photos.filter(p => p.id > -1).findIndex(p => p.id === photo.id);
             if (index > -1) {
                 this.photosGallery.setIndex(index);
-                this.photosGallery.display();
+                this.photosGallery.showGallery();
             }
         },
         photosGalleryHide() {
-            this.photosGallery.hide();
+            this.photosGallery.hideGallery();
         },
 
     }
