@@ -5,6 +5,7 @@
   >
     <v-card style="margin: 24px">
       <v-tabs
+        v-model="currentTab"
         :show-arrows="$vuetify.display.mobile"
         :touch="false"
       >
@@ -50,7 +51,7 @@
         Close edition
       </v-btn>
 
-      <v-window>
+      <v-window v-model="currentTab" :touch="false">
         <!-- Vérification des photos -->
         <v-window-item>
           <h2>Participation</h2>
@@ -717,6 +718,7 @@ export default {
     },
     store,
     data: () => ({
+        currentTab: 0,
         isLoading: false,
         waitingScreen: false,
         isAdmin: false,
