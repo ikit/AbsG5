@@ -415,11 +415,54 @@
           </div>
           <div :style="{ marginTop: '20px' }">
             <h2>Votes</h2>
-            <div :style="{ overflowX: 'auto' }">
-              <highcharts
-                v-if="votesGraph"
-                :options="votesGraph"
-              />
+            <div :style="{ display: 'flex', flexDirection: $vuetify.display.mobile ? 'column' : 'row', gap: '20px' }">
+              <!-- Formulaire de filtre -->
+              <div :style="{ flex: '0 0 250px', minWidth: $vuetify.display.mobile ? '100%' : '250px' }">
+                <v-card>
+                  <v-card-title class="text-subtitle-1">Filtrer par photographe</v-card-title>
+                  <v-card-text>
+                    <v-select
+                      v-model="votesFilter.selectedUser"
+                      :items="photographersList"
+                      item-title="label"
+                      item-value="username"
+                      label="Photographe"
+                      clearable
+                      density="compact"
+                    />
+
+                    <!-- Stats du photographe sélectionné -->
+                    <div v-if="votesFilter.selectedUser && votesUserStats" style="margin-top: 16px;">
+                      <v-divider style="margin-bottom: 12px;" />
+                      <div style="font-size: 0.85em;">
+                        <div style="font-weight: bold; margin-bottom: 8px;">Points donnés:</div>
+                        <div style="padding-left: 12px; margin-bottom: 4px;">
+                          • Total: {{ votesUserStats.given.total }} pts
+                        </div>
+                        <div v-for="(value, family) in votesUserStats.given.byFamily" :key="'given-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
+                          {{ family }}: {{ value }} pts
+                        </div>
+
+                        <div style="font-weight: bold; margin: 12px 0 8px 0;">Points reçus:</div>
+                        <div style="padding-left: 12px; margin-bottom: 4px;">
+                          • Total: {{ votesUserStats.received.total }} pts
+                        </div>
+                        <div v-for="(value, family) in votesUserStats.received.byFamily" :key="'received-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
+                          {{ family }}: {{ value }} pts
+                        </div>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </div>
+
+              <!-- Diagramme -->
+              <div :style="{ flex: '1 1 auto', overflowX: 'auto' }">
+                <highcharts
+                  v-if="votesGraph"
+                  :options="votesGraph"
+                />
+              </div>
             </div>
           </div>
         </v-window-item>
@@ -792,10 +835,14 @@ export default {
             photosStats: [],
             usersOrder: [],
             votesStats: [],
+            votesStatsAll: [], // Copie complète des stats de votes
             categoriesOrders: []
         },
         participationGraph: null,
         votesGraph: null,
+        votesFilter: {
+            selectedUser: null
+        },
     }),
     computed: {
         ...mapState([
@@ -807,6 +854,54 @@ export default {
             return this.data.categoriesOrders
                 .map(id => this.data.categories[id])
                 .filter(cat => cat && cat.id > 0);
+        },
+        photographersList() {
+            if (!this.data || !this.data.users) return [];
+            return Object.values(this.data.users)
+                .map(u => ({
+                    username: u.username,
+                    label: u.username,
+                    rootFamily: u.rootFamily
+                }))
+                .sort((a, b) => a.username.localeCompare(b.username));
+        },
+        votesUserStats() {
+            if (!this.votesFilter.selectedUser || !this.data.votesStatsAll) return null;
+
+            const username = this.votesFilter.selectedUser;
+            const stats = {
+                given: { total: 0, byFamily: {} },
+                received: { total: 0, byFamily: {} }
+            };
+
+            // Calculer les points donnés et reçus
+            this.data.votesStatsAll.forEach(vote => {
+                const [from, to, weight] = vote;
+
+                // Points donnés par le photographe
+                if (from === username) {
+                    stats.given.total += weight;
+                    // Trouver la famille du destinataire
+                    const toUser = Object.values(this.data.users).find(u => u.username === to);
+                    if (toUser) {
+                        const family = toUser.rootFamily || 'Autre';
+                        stats.given.byFamily[family] = (stats.given.byFamily[family] || 0) + weight;
+                    }
+                }
+
+                // Points reçus par le photographe
+                if (to === username) {
+                    stats.received.total += weight;
+                    // Trouver la famille de l'expéditeur
+                    const fromUser = Object.values(this.data.users).find(u => u.username === from);
+                    if (fromUser) {
+                        const family = fromUser.rootFamily || 'Autre';
+                        stats.received.byFamily[family] = (stats.received.byFamily[family] || 0) + weight;
+                    }
+                }
+            });
+
+            return stats;
         }
     },
     watch: {
@@ -817,6 +912,9 @@ export default {
             if (!this.isLoading && !this.end) {
                 this.refresh();
             }
+        },
+        'votesFilter.selectedUser': function(newUser) {
+            this.updateVotesGraph();
         }
     },
     mounted () {
@@ -989,39 +1087,11 @@ export default {
                     },
                 };
 
-                this.votesGraph = {
-                    title: null,
-                    exporting: {
-                        buttons: {
-                            contextButton: {
-                                menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF']
-                            }
-                        }
-                    },
+                // Sauvegarder une copie complète des stats de votes
+                this.data.votesStatsAll = [...this.data.votesStats];
 
-                    accessibility: {
-                        point: {
-                            valueDescriptionFormat: '{index}. From {point.from} to {point.to}: {point.weight}.'
-                        }
-                    },
-
-                    series: [{
-                        keys: ['from', 'to', 'weight'],
-                        data: this.data.votesStats,
-                        type: 'dependencywheel',
-                        dataLabels: {
-                            color: '#333',
-                            textPath: {
-                                enabled: true,
-                                attributes: {
-                                    dy: 5
-                                }
-                            },
-                            distance: 15
-                        },
-                        size: '95%'
-                    }]
-                };
+                // Créer le graphique de votes
+                this.updateVotesGraph();
 
                 console.log(this.data)
                 this.isLoading = false;
@@ -1187,6 +1257,55 @@ export default {
                 return [];
             }
             return items.filter(e => e != null && e.quicksearch.indexOf(search.toLowerCase()) > -1);
+        },
+
+        updateVotesGraph() {
+            if (!this.data.votesStatsAll) return;
+
+            // Filtrer les données si un utilisateur est sélectionné
+            let votesData = this.data.votesStatsAll;
+            if (this.votesFilter.selectedUser) {
+                const username = this.votesFilter.selectedUser;
+                votesData = this.data.votesStatsAll.filter(vote => {
+                    const [from, to] = vote;
+                    return from === username || to === username;
+                });
+            }
+
+            // Créer ou mettre à jour le graphique
+            this.votesGraph = {
+                title: null,
+                exporting: {
+                    buttons: {
+                        contextButton: {
+                            menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF']
+                        }
+                    }
+                },
+
+                accessibility: {
+                    point: {
+                        valueDescriptionFormat: '{index}. From {point.from} to {point.to}: {point.weight}.'
+                    }
+                },
+
+                series: [{
+                    keys: ['from', 'to', 'weight'],
+                    data: votesData,
+                    type: 'dependencywheel',
+                    dataLabels: {
+                        color: '#333',
+                        textPath: {
+                            enabled: true,
+                            attributes: {
+                                dy: 5
+                            }
+                        },
+                        distance: 15
+                    },
+                    size: '95%'
+                }]
+            };
         },
 
         closeEdition() {
