@@ -83,7 +83,7 @@ export const useUserStore = defineStore('user', {
      */
     async checkSession() {
       try {
-        const response = await axios.get('/api/session')
+        const response = await axios.get('/api/auth/check')
         const user = parseAxiosResponse(response)
         if (user) {
           this.setCurrentUser(user)
