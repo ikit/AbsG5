@@ -496,9 +496,8 @@ export default {
             this.$vuetify.theme.global.name = theme === "true" ? "dark" : "light";
         }
 
-        if (this.user) {
-            this.init();
-        }
+        // Initialiser le store (citations, settings) même si l'utilisateur n'est pas connecté
+        this.init();
     },
     methods: {
         init() {
