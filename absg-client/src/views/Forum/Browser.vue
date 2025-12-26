@@ -227,7 +227,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
+import store from '../../stores/helpers';
 import { fr } from "date-fns/locale";
 import { differenceInMonths, format } from 'date-fns';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';

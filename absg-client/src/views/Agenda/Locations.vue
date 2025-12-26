@@ -161,7 +161,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
+import store from '../../stores/helpers';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
 import ImageEditor from '../../components/ImageEditor.vue';

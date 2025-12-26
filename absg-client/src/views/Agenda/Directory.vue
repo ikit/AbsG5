@@ -258,7 +258,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
+import store from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { differenceInMonths, format } from 'date-fns';
 

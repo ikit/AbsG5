@@ -181,7 +181,7 @@ import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
 import { addDays, format } from 'date-fns';
 import ImageEditor from '../../components/ImageEditor.vue';
-import store from '../../store';
+import store from '../../stores/helpers';
 
 export default {
     components: {

@@ -217,7 +217,7 @@
 import axios from 'axios';
 import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
 import ImageEditor from '../../components/ImageEditor.vue';
-import store from '../../store';
+import store from '../../stores/helpers';
 import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import HC_sankey from 'highcharts/modules/sankey';

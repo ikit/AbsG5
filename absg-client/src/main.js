@@ -15,7 +15,7 @@ app.use(router)
 app.use(vuetify)
 
 // Add $store to global properties for Vuex compatibility
-import store from './store'
+import store from './stores/helpers'
 app.config.globalProperties.$store = store
 
 // Initialize $socket to null (will be set by WebSocket plugin)

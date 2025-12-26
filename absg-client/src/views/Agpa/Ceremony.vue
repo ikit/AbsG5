@@ -196,9 +196,9 @@ import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
 import {Chart} from 'highcharts-vue';
-import * as md5 from "md5";
+import md5 from "md5";
 import Reveal from 'reveal.js';
-import store from '../../store';
+import store from '../../stores/helpers';
 
 export default {
     name: "Ceremony",

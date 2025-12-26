@@ -129,7 +129,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
+import store from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { addDays, addSeconds, format } from 'date-fns';
 import { fr } from "date-fns/locale";

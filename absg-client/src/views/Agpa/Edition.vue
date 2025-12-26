@@ -87,7 +87,7 @@
 
 
 <script>
-import store from '../../store';
+import store from '../../stores/helpers';
 import { mapState } from '../../stores/helpers';
 import { getModuleInfo, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';

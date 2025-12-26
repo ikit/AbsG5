@@ -140,7 +140,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
+import store from '../../stores/helpers';
 import { save as saveFile } from "save-file";
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 

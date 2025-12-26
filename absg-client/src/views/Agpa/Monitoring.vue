@@ -700,7 +700,7 @@ import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import PhotoWidget from './components/PhotoWidget.vue';
-import store from '../../store';
+import store from '../../stores/helpers';
 import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import HC_sankey from 'highcharts/modules/sankey';

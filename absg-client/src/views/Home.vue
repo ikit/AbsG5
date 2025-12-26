@@ -117,7 +117,7 @@
 
 
 <script>
-import store from '../store';
+import store from '../stores/helpers';
 import axios from 'axios';
 //import VueSilentbox from 'vue-silentbox';
 import { parseAxiosResponse } from '../middleware/CommonHelper';

@@ -2,35 +2,33 @@
   <v-container
     v-if="summary"
     fluid
-    style="text-align: center;"
   >
-    <v-row
-      row
-      wrap
-    >
+    <v-row justify="center">
       <v-col
         v-for="edition in summary"
         :key="edition.year"
-        style="width: 400px; max-width: 400px; margin: 15px"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+        xl="3"
       >
         <router-link
           :to="{path: '/agpa/archives/' + edition.year}"
           style="text-decoration: none"
         >
-          <v-card>
+          <v-card class="edition-card">
             <v-img
               :src="getEditionPhoto(edition)"
-              aspect-ratio="2.75"
+              height="200"
+              cover
             />
 
-            <v-card-title
-              primary-title
-              style="position: relative"
-            >
+            <v-card-title class="edition-title">
               <h3 class="headline mb-0">
                 Edition {{ edition.year }}
               </h3>
-              <div style="position: absolute; top: 0; right: 15px; text-align: right;">
+              <div class="authors-avatars">
                 <v-tooltip
                   v-for="(author, index) in edition.authors"
                   :key="author.id"
@@ -38,7 +36,7 @@
                 >
                   <template #activator="{ props }">
                     <img
-                      style="height: 40px; margin-top: 10px;"
+                      class="author-avatar"
                       :src="getAvatar(author)"
                       :alt="getName(author)"
                       v-bind="props"
@@ -49,8 +47,8 @@
               </div>
             </v-card-title>
 
-            <v-card-actions style="position: relative; padding-left: 18px;">
-              {{ edition.totalPhotos }} photos
+            <v-card-actions class="edition-actions">
+              <span class="photo-count">{{ edition.totalPhotos }} photos</span>
 
               <v-tooltip
                 v-if="edition.palmares"
@@ -58,7 +56,7 @@
               >
                 <template #activator="{ props }">
                   <div
-                    style="position: absolute; bottom: 10px; right: 15px; text-align: right; font-size: 0.9em;"
+                    class="palmares-badges"
                     v-bind="props"
                   >
                     <template v-if="edition.palmares.diamond">
@@ -150,8 +148,69 @@ export default {
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
 
-h3 {
-    font-family: 'Tangerine', serif;
-    color: orange;
+.edition-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    }
+}
+
+.edition-title {
+    position: relative;
+    padding-bottom: 10px;
+    flex-grow: 1;
+
+    h3 {
+        font-family: 'Tangerine', serif;
+        color: #c0b44f;
+        font-size: 2em;
+        font-weight: bold;
+        margin: 0;
+    }
+}
+
+.authors-avatars {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    display: flex;
+    gap: 5px;
+    flex-direction: row-reverse;
+}
+
+.author-avatar {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    object-fit: cover;
+}
+
+.edition-actions {
+    position: relative;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(0,0,0,0.12);
+}
+
+.photo-count {
+    font-weight: 500;
+    color: rgba(0,0,0,0.6);
+}
+
+.palmares-badges {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 </style>

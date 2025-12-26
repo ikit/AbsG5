@@ -77,7 +77,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../store';
+import store from '../stores/helpers';
 import { format } from "date-fns";
 import { parseAxiosResponse } from '../middleware/CommonHelper';
 import { el } from 'date-fns/locale';

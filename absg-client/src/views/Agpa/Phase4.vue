@@ -34,7 +34,7 @@ import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import PhotoWidget from './components/PhotoWidget.vue';
-import store from '../../store';
+import store from '../../stores/helpers';
 
 export default {
     store,

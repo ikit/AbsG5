@@ -76,29 +76,27 @@
     </v-card>
 
 
-    <p
-      v-if="prealoadInfoDisplay"
-      class="preloadInfo"
-    >
-      Vous avez encore le temps... en attendant vous pouvez revoir les anciennes cérémonies:
-    </p>
-
     <div
-      v-else
+      v-if="!current.displayed"
       class="preloadInfo"
     >
-      <p v-if="preloadProgress === 100">
+      <p v-if="prealoadInfoDisplay">
+        Vous avez encore le temps... en attendant vous pouvez revoir les anciennes cérémonies:
+      </p>
+      <p v-else-if="preloadProgress === 100">
         Vous êtes pret pour la cérémonie
       </p>
-      <p v-else>
+      <p v-else-if="preloadProgress < 100">
         Préchargement des données pour la cérémonie: {{ preloadProgress }}%
+      </p>
+      <p v-else>
+        Vous pouvez revoir les anciennes cérémonies:
       </p>
     </div>
 
     <v-container
-      v-if="prealoadInfoDisplay"
+      v-if="!current.displayed"
       fluid
-      :style="{ 'display': current.displayed ? 'none' : 'block' }"
     >
       <v-row
         row
@@ -123,13 +121,13 @@
             <v-card
               :style="{
                 width: $vuetify.display.xs ? '100%' : '250px',
-                height: $vuetify.display.xs ? '120px' : '150px',
                 margin: 'auto'
               }"
             >
               <v-img
                 :src="`/files/agpa/${edition.year}/mini/${edition.photos[0].filename}`"
-                aspect-ratio="2.75"
+                :height="$vuetify.display.xs ? '120px' : '150px'"
+                cover
               />
               <p
                 :style="{
@@ -174,7 +172,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
+import store from '../../stores/helpers';
 import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
