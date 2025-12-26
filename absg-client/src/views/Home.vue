@@ -8,42 +8,7 @@
       grid-list-xl
     >
       <v-row>
-        <v-col>
-          <v-card style="width:500px; margin: auto">
-            <v-card-title>
-              <h2>
-                Prochains événements
-                <router-link to="/agenda/events" tag="button" 
-                  style="position: absolute; right: 20px; top: 25px;">
-                  <v-icon>
-                    fas fa-pen
-                  </v-icon>
-                </router-link>
-              </h2>
-            </v-card-title>
-
-            <v-data-table
-              :headers="eventsHeaders"
-              :items="events"
-              items-per-page="10"
-              loading-text="Récupération des notifications..."
-              hide-default-footer
-              class="notifications"
-            >
-              <template #[`item.what`]="{ item }">
-                <div style="display: flex;">
-                  <v-icon style="flex">far fa-calendar-alt</v-icon>
-                  <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.name }}</span>
-                </div>
-              </template>
-              <template #[`item.when`]="{ item }">
-                <span style="text-align: right; padding-right: 25px">{{ item.dateLabel }}</span>
-              </template>
-            </v-data-table>
-          </v-card>
-        </v-col>
-
-        <v-col>
+        <v-col :cols="12">
           <div
             v-if="immt"
             class="immt"
@@ -68,12 +33,19 @@
                 Passa G
                 <v-btn
                   variant="text"
-                  style="position: absolute; right: 15px; top: 15px;"
+                  :style="{
+                    position: 'absolute',
+                    right: '15px',
+                    top: '15px',
+                    fontSize: $vuetify.display.xs ? '0.8em' : '1em'
+                  }"
+                  :size="$vuetify.display.xs ? 'small' : 'default'"
                   @click.stop="displayPassagHistoryDialog()"
                 >
                   <v-icon start>
                     far fa-clock
-                  </v-icon>historique
+                  </v-icon>
+                  <span v-if="!$vuetify.display.xs">historique</span>
                 </v-btn>
               </h2>
             </v-card-title>
@@ -94,7 +66,7 @@
                         <img
                           :src="user.avatar"
                           :alt="user.username"
-                          height="40px"
+                          :height="$vuetify.display.xs ? '30px' : '40px'"
                           @error="handleAvatarError"
                           v-bind="props"
                         >
@@ -164,11 +136,6 @@ export default {
     data: () => ({
         menu: false,
         immt: null,
-        eventsHeaders: [
-          { text: "Quoi", value: "what" },
-          { text: "Quand", value: "when", align: "right" },
-        ],
-        events: [],
         passagHistoryDialogDisplayed: false,
         historyData: {
             title: "",
@@ -226,14 +193,6 @@ export default {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.isLoading = false;
-
-                    // Les événements à venir
-                    this.events = data.events.map(e => ({
-                      ...e,
-                      dateLabel: e.endDate 
-                        ? `du ${format(new Date(e.startDate), "dd MMM", {locale: fr})} au ${format(new Date(e.endDate), "dd MMM", {locale: fr})}`
-                        : format(new Date(e.startDate), "dd MMM", {locale: fr})
-                    }));
 
                     // La photo du moment
                     if (data.immt) {
@@ -308,21 +267,26 @@ export default {
 .immt {
     div {
         max-width: 700px;
-        min-width: 460px;
-        height: 450px;
+        min-width: 100%;
+        height: auto;
+        min-height: 250px;
         margin: auto;
         display: table;
 
         div {
             max-width: 700px;
-            height: 450px;
+            width: 100%;
+            height: auto;
+            min-height: 250px;
             display: table-cell;
             text-align: center;
             vertical-align: middle;
 
             img {
-                max-width: min(90vw, 700px);
+                max-width: min(95vw, 700px);
                 max-height: 450px;
+                width: auto;
+                height: auto;
                 background: white;
                 padding: 1px;
                 box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
@@ -334,6 +298,8 @@ export default {
         text-align: center;
         margin-top: 15px;
         opacity: 0.5;
+        font-size: 0.9em;
+        padding: 0 10px;
     }
 }
 

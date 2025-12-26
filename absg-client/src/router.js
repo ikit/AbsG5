@@ -141,32 +141,10 @@ export const router = createRouter({
                 }
             ]
         },
-        // Agenda
+        // Trombinoscope
         {
-            path: "/agenda",
-            component: () => import("./views/Agenda.vue"),
-            children: [
-                {
-                    path: "",
-                    redirect: "/agenda/directory"
-                },
-                {
-                    path: "directory",
-                    component: () => import("./views/Agenda/Directory.vue"),
-                },
-                {
-                    path: "locations",
-                    component: () => import("./views/Agenda/Locations.vue"),
-                },
-                {
-                    path: "trombi",
-                    component: () => import("./views/Agenda/Trombi.vue"),
-                },
-                {
-                    path: "genealogy",
-                    component: () => import("./views/Agenda/Genealogy.vue"),
-                }
-            ]
+            path: "/trombi",
+            component: () => import("./views/Agenda/Trombi.vue"),
         },
         // AGPA
         {

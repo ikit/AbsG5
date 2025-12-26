@@ -327,7 +327,7 @@
               </td>
               <td>
                 <div style="display: flex;">
-                  <v-icon style="flex">
+                  <v-icon v-if="item.module" style="flex">
                     {{ item.module.icon }}
                   </v-icon>
                   <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.message }}</span>
