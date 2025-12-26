@@ -161,28 +161,24 @@
         <v-btn
           small
           color="primary"
-          dark
         >
           Début
         </v-btn>
         <v-btn
           small
           color="primary"
-          dark
         >
           Précédante
         </v-btn>
         <v-btn
           small
           color="primary"
-          dark
         >
           Suivante
         </v-btn>
         <v-btn
           small
           color="primary"
-          dark
           @click="close()"
         >
           Quitter

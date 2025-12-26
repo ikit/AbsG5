@@ -233,7 +233,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="personEditor.isLoading"
             @click="resetDialog()"

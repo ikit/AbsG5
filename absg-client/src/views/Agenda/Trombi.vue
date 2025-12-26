@@ -138,7 +138,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="trombiEditor.isLoading"
             @click="resetDialog()"
@@ -200,7 +200,7 @@
         <v-card-actions class="grey lighten-4 py-4 title">
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="trombiEditor.isLoading"
             @click="stats.open = false"

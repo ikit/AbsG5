@@ -50,7 +50,7 @@
             >
               <v-icon>fa-chevron-left</v-icon>
             </v-btn>
-            <span class="grey--text">
+            <span class="text-grey">
               <v-text-field
                 v-model="filter.pageIndex"
                 style="max-width: 30px; display: inline-block;"
@@ -67,7 +67,7 @@
             </v-btn>
           </v-row>
           <div
-            class="grey--text"
+            class="text-grey"
             style="font-size: 0.9em; display: block; position: absolute; right: 15px; bottom: 0;"
           >
             {{ photos.length }} photos

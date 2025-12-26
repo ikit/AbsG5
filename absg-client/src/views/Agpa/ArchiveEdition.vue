@@ -52,7 +52,7 @@
           </template>
           <span>Edition précédente</span>
         </v-tooltip>
-        <span class="grey--text">
+        <span class="text-grey">
           {{ year }}
         </span>
         <v-tooltip bottom>

@@ -25,7 +25,7 @@
                 placeholder="Rechercher"
                 style="max-width: 300px;"
               />
-              <!-- <span class="grey--text">{{immts.length}} images</span> -->
+              <!-- <span class="text-grey">{{immts.length}} images</span> -->
               <v-spacer />
               <v-btn
                 icon
@@ -35,7 +35,7 @@
               >
                 <v-icon>fa-chevron-left</v-icon>
               </v-btn>
-              <span class="grey--text">
+              <span class="text-grey">
                 Page {{ filter.pageIndex }} / {{ numberOfPages }}
               </span>
               <v-btn
@@ -154,7 +154,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             :disabled="immtEditor.isLoading"
             @click="resetDialog()"

@@ -125,7 +125,6 @@
       </div> -->
 
       <v-menu
-        offset-y
         bottom
         left
       >
@@ -381,7 +380,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="notif.displayed=false"
           >
             OK
@@ -413,7 +412,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="warning.displayed=false"
           >
             OK
@@ -447,7 +446,7 @@
         </v-container>
         <v-card-actions>
           <v-btn
-            text
+            variant="text"
             @click="copyError()"
           >
             <v-icon left>
@@ -456,7 +455,7 @@
           </v-btn>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             @click="error.displayed=false"
           >
             OK
@@ -473,7 +472,7 @@
       <template #actions>
         <v-btn
           color="secondary"
-          text
+          variant="text"
           @click="snack.displayed = false"
         >
           Close

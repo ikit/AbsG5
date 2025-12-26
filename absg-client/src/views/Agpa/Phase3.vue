@@ -42,13 +42,12 @@
 
         <v-menu
           v-if="category"
-          offset-y
         >
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
               variant="text"
-              class="grey--text"
+              class="text-grey"
             >
               {{ category.title }}
             </v-btn>

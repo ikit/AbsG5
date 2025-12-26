@@ -12,7 +12,7 @@
         >
           <template #activator="{ props }">
             <v-btn
-              text
+              variant="text"
               :disabled="isLoading || (currentYear == 2004 && currentMonth == 0)"
               v-bind="props"
               @click="go(2004, 0)"
@@ -56,7 +56,7 @@
           <v-tooltip bottom>
             <template #activator="{ props }">
               <v-btn
-                text
+                variant="text"
                 width="200px"
                 :disabled="isLoading"
                 v-bind="props"
@@ -102,7 +102,7 @@
         >
           <template #activator="{ props }">
             <v-btn
-              text
+              variant="text"
               :disabled="isLoading || (currentYear === todayYear && currentMonth === todayMonth)"
               v-bind="props"
               @click="go(todayYear, todayMonth, true)"

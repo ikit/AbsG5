@@ -126,14 +126,14 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
-            text
+            variant="text"
             color="primary"
             @click="newAlbumValidation()"
           >
             Créer l'album et ajouter des photos
           </v-btn>
           <v-btn
-            text
+            variant="text"
             @click="newAlbum.displayed = false;"
           >
             Annuler

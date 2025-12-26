@@ -45,14 +45,12 @@
 
         <v-menu
           v-if="agpaMeta && category"
-          offset-y
         >
           <template #activator="{ props }">
             <v-btn
-              dark
               v-bind="props"
               variant="text"
-              class="grey--text"
+              class="text-grey"
             >
               {{ agpaMeta.categories[category.categoryId].title }}
             </v-btn>

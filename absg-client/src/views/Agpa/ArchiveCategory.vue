@@ -34,7 +34,7 @@
           </template>
           <span>Edition précédente</span>
         </v-tooltip>
-        <span class="grey--text">
+        <span class="text-grey">
           {{ year }}
         </span>
         <v-tooltip bottom>
@@ -68,7 +68,7 @@
           </template>
           <span>Catégorie précédente</span>
         </v-tooltip>
-        <span class="grey--text">
+        <span class="text-grey">
           {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
         </span>
         <v-tooltip bottom>

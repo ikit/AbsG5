@@ -132,7 +132,7 @@
           <v-card-actions>
             <v-spacer />
             <v-btn
-              text
+              variant="text"
               color="primary"
               :disabled="photoEditor.isLoading"
               @click="resetEditor()"
@@ -173,7 +173,7 @@
           <v-card-actions>
             <v-spacer />
             <v-btn
-              text
+              variant="text"
               color="primary"
               @click="photoDeletion.open = false"
             >
@@ -206,7 +206,7 @@
           <v-card-actions>
             <v-spacer />
             <v-btn
-              text
+              variant="text"
               color="primary"
               @click="help.displayed = false"
             >

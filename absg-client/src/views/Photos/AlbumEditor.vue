@@ -222,7 +222,7 @@
           <v-spacer />
           <v-btn
             :disabled="uploadInProgress"
-            text
+            variant="text"
             color="primary"
             @click="displayUploadDialog = false;"
           >
