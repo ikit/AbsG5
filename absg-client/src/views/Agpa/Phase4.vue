@@ -116,9 +116,11 @@ h2, .h2 {
 }
 .p4 {
     p {
-        width: 500px;
+        max-width: 500px;
+        width: 100%;
         margin: auto;
         margin-top: 30px;
+        padding: 0 15px;
         text-align: justify;
     }
     a, .endDate {
