@@ -12,6 +12,7 @@
             autocomplete="username"
             data-cy="username"
             :rules="[v => !!v || 'Ce champs est obligatoire']"
+            @keyup.enter="isFormValid && login()"
           />
         </div>
         <div>
@@ -25,6 +26,7 @@
             autocomplete="current-password"
             data-cy="password"
             :rules="[v => !!v || 'Ce champs est obligatoire']"
+            @keyup.enter="isFormValid && login()"
           />
         </div>
         <div style="text-align: center">
