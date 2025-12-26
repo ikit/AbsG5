@@ -289,6 +289,9 @@
 <script>
 import axios from 'axios';
 import { mapState } from '../../stores/helpers';
+import { useMainStore } from '../../stores/main';
+import { usePhotoGalleryStore } from '../../stores/photoGallery';
+import { useAgpaStore } from '../../stores/agpa';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
@@ -326,11 +329,17 @@ export default {
     }),
     computed: {
         ...mapState([
-            'agpaMeta',
-            'photosGallery',
-            'main',
-            'agpa'
+            'agpaMeta'
         ]),
+        mainStore() {
+            return useMainStore();
+        },
+        photosGallery() {
+            return usePhotoGalleryStore();
+        },
+        agpaStore() {
+            return useAgpaStore();
+        }
     },
     watch: {
         'agpaMeta': function () {
@@ -341,7 +350,7 @@ export default {
         if (this.agpaMeta) {
             this.refreshGallery();
         } else {
-            this.agpa.initialize();
+            this.agpaStore.initialize();
         }
     },
     methods: {
@@ -373,7 +382,7 @@ export default {
                     this.photosGallery.reset(this.photos.filter(p => p.id > -1));
                 })
                 .catch(err => {
-                    this.main.onError(err);
+                    this.mainStore.onError(err);
                 });
         },
 
@@ -403,7 +412,7 @@ export default {
                         this.savePhotoApiCall(this.photoEditor.categoryId, photoId, this.photoEditor.title, response.data);
                     }
                 ).catch( err => {
-                    this.main.onError(err);
+                    this.mainStore.onError(err);
                     this.photoEditor.isLoading = false;
                 });
             } else {
@@ -437,7 +446,7 @@ export default {
                 this.resetEditor();
             })
             .catch(err => {
-                this.main.onError(err);
+                this.mainStore.onError(err);
             });
         },
 
@@ -449,7 +458,7 @@ export default {
                     this.refreshGallery();
                 })
                 .catch(err => {
-                    this.main.onError(err);
+                    this.mainStore.onError(err);
                 });
         },
         onNewPhoto(catId, photoId = null) {
