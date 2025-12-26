@@ -57,8 +57,9 @@ NODE_ENV=development
 JWT_SECRET=your_jwt_secret_here
 BCRYPT_ROUNDS=10
 
-# CORS
-CORS_ORIGIN=http://localhost:5173
+# CORS (IMPORTANT: Required when using credentials: true)
+# Must match the exact origin of the frontend (scheme + host + port)
+CORS_ORIGIN=http://localhost:8080
 
 # Files
 PATH_FILES=./data/files
