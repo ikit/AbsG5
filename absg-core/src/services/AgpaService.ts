@@ -385,7 +385,9 @@ class AgpaService {
         }
         photoData.id = photoId ? photoId : null; // pour éviter les problèmes lors du save en DB
         photo.user = !photo.user ? user : photo.user;
-        photo.title = photoData.title ? photoData.title : photo.title;
+        // Set title, use "(sans titre)" if empty or null
+        const titleValue = photoData.title?.trim();
+        photo.title = titleValue || photo.title || "(sans titre)";
         photo.categoryId = photoData.catId ? photoData.catId : photo.category.id;
         photo.error = photoData.error ? JSON.parse(photoData.error) : photo.error;
         photo.category = await this.catRepo.findOne({ where: { id: photo.categoryId } });
