@@ -1,15 +1,52 @@
 <template>
   <v-container>
-    <v-card style="margin: 20px auto; margin-top: 100px; width: 600px; display: relative; padding: 40px 10px 40px 10px; overflow: visible;">
+    <v-card
+      :style="{
+        margin: $vuetify.display.smAndDown ? '10px auto' : '20px auto',
+        marginTop: $vuetify.display.smAndDown ? '60px' : '100px',
+        width: $vuetify.display.smAndDown ? '100%' : '600px',
+        maxWidth: $vuetify.display.smAndDown ? '100%' : '600px',
+        display: 'relative',
+        padding: $vuetify.display.smAndDown ? '30px 10px 20px 10px' : '40px 10px 40px 10px',
+        overflow: 'visible'
+      }"
+    >
       <img
         src="/img/agpa/cupesMaxi/c1.png"
-        width="200px"
-        style="position: absolute; top: -100px; left: calc(100%/2 - 100px);"
+        :width="$vuetify.display.smAndDown ? '120px' : '200px'"
+        :style="{
+          position: 'absolute',
+          top: $vuetify.display.smAndDown ? '-60px' : '-100px',
+          left: $vuetify.display.smAndDown ? 'calc(50% - 60px)' : 'calc(50% - 100px)'
+        }"
       >
-      <h2 style="text-align: center; font-size: 3em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
-        <span style="font-size: 2em; font-weight: normal; padding-right: 3px;">{{ agpaMeta ? (agpaMeta.year - 2005) : "?" }} </span><sup>ème</sup> cérémonie des A.G.P.A.
+      <h2
+        :style="{
+          textAlign: 'center',
+          fontSize: $vuetify.display.smAndDown ? '1.8em' : '3em',
+          fontWeight: 'bold',
+          fontFamily: 'Tangerine, serif',
+          color: '#c0b44f',
+          lineHeight: '1em'
+        }"
+      >
+        <span
+          :style="{
+            fontSize: '2em',
+            fontWeight: 'normal',
+            paddingRight: '3px'
+          }"
+        >{{ agpaMeta ? (agpaMeta.year - 2005) : "?" }} </span><sup>ème</sup> cérémonie des A.G.P.A.
       </h2>
-      <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; opacity: 0.3">
+      <p
+        :style="{
+          textAlign: 'center',
+          fontSize: $vuetify.display.smAndDown ? '1.2em' : '2em',
+          fontWeight: 'bold',
+          fontFamily: 'Tangerine, serif',
+          opacity: 0.3
+        }"
+      >
         ouverture dans
       </p>
       <Timer
@@ -70,19 +107,43 @@
         <v-col
           v-for="edition in formerEditions"
           :key="edition.year"
-          style="min-width: 250px; width: 250px; margin: 15px"
+          :cols="6"
+          :sm="4"
+          :md="3"
+          :style="{
+            minWidth: $vuetify.display.xs ? '150px' : '250px',
+            margin: $vuetify.display.smAndDown ? '10px auto' : '15px'
+          }"
         >
           <a
             :href="`/agpa/ceremony/${edition.year}`"
             target="_blank"
             style="text-decoration: none"
           >
-            <v-card style="width: 250px; height: 150px; margin: auto;">
+            <v-card
+              :style="{
+                width: $vuetify.display.xs ? '100%' : '250px',
+                height: $vuetify.display.xs ? '120px' : '150px',
+                margin: 'auto'
+              }"
+            >
               <v-img
                 :src="`/files/agpa/${edition.year}/mini/${edition.photos[0].filename}`"
                 aspect-ratio="2.75"
               />
-              <p style=" margin: 0; text-align: center; font-size: 3em; font-weight: bold; font-family: 'Tangerine', serif; opacity: 0.5; line-height: 1em;">{{ edition.year }}</p>
+              <p
+                :style="{
+                  margin: 0,
+                  textAlign: 'center',
+                  fontSize: $vuetify.display.xs ? '2em' : '3em',
+                  fontWeight: 'bold',
+                  fontFamily: 'Tangerine, serif',
+                  opacity: 0.5,
+                  lineHeight: '1em'
+                }"
+              >
+                {{ edition.year }}
+              </p>
             </v-card>
           </a>
         </v-col>
