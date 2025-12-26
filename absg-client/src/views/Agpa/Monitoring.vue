@@ -4,7 +4,10 @@
     id="content"
   >
     <v-card style="margin: 24px">
-      <v-tabs>
+      <v-tabs
+        :show-arrows="$vuetify.display.mobile"
+        :touch="false"
+      >
         <v-tab>
           <v-icon start>
             far fa-image

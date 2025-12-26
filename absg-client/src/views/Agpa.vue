@@ -3,6 +3,8 @@
     <v-tabs
       centered
       class="fixed-tabs-bar"
+      :show-arrows="$vuetify.display.mobile"
+      :touch="false"
     >
       <v-tab :to="{path:'/agpa/'}">
         <v-icon start>
