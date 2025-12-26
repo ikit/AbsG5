@@ -478,30 +478,114 @@
         <v-card-title class="bg-grey-lighten-4">
           Modification de la photo {{ photoEdition.photo.id }}
         </v-card-title>
-        <div style="display: flex; margin: 0 24px">
-          todo
-        </div>
+        <v-container class="pa-4">
+          <v-row>
+            <v-col cols="12" md="6">
+              <!-- Prévisualisation de l'image -->
+              <div style="text-align: center; margin-bottom: 20px;">
+                <img
+                  :src="photoEdition.photo.thumb"
+                  :style="{
+                    transform: `rotate(${photoEdition.rotation}deg)`,
+                    transition: 'transform 0.3s ease',
+                    maxWidth: '100%',
+                    maxHeight: '300px'
+                  }"
+                  class="thumb"
+                >
+              </div>
+
+              <!-- Boutons de rotation -->
+              <div style="text-align: center;">
+                <v-btn-group>
+                  <v-btn
+                    @click="rotatePhoto(-90)"
+                    :disabled="photoEdition.isLoading"
+                  >
+                    <v-icon start>fas fa-undo</v-icon>
+                    Rotation -90°
+                  </v-btn>
+                  <v-btn
+                    @click="rotatePhoto(90)"
+                    :disabled="photoEdition.isLoading"
+                  >
+                    <v-icon start>fas fa-redo</v-icon>
+                    Rotation +90°
+                  </v-btn>
+                </v-btn-group>
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <!-- Titre -->
+              <v-text-field
+                v-model="photoEdition.title"
+                label="Titre"
+                prepend-icon="fas fa-feather-alt"
+                :disabled="photoEdition.isLoading"
+              />
+
+              <!-- Catégorie -->
+              <v-select
+                v-model="photoEdition.categoryId"
+                :items="categoriesOptions"
+                item-title="title"
+                item-value="id"
+                label="Catégorie"
+                prepend-icon="fas fa-tag"
+                :disabled="photoEdition.isLoading"
+              />
+
+              <!-- Auteur (lecture seule) -->
+              <v-text-field
+                :model-value="photoEdition.photo.username"
+                label="Auteur"
+                prepend-icon="fas fa-user"
+                readonly
+                disabled
+              />
+
+              <!-- Progress indicator -->
+              <v-progress-linear
+                v-if="photoEdition.isLoading"
+                :model-value="photoEdition.progress"
+                color="accent"
+                height="25"
+                striped
+              >
+                <template v-slot:default="{ value }">
+                  <strong>{{ Math.ceil(value) }}%</strong>
+                </template>
+              </v-progress-linear>
+            </v-col>
+          </v-row>
+        </v-container>
         <v-card-actions>
           <v-btn
             variant="text"
-            color="primary"
-            @click="photoEdition.displayed = false"
+            color="error"
+            @click="deletePhotoFromEdition()"
+            :disabled="photoEdition.isLoading"
           >
+            <v-icon start>fas fa-trash</v-icon>
             Supprimer
           </v-btn>
           <v-spacer />
           <v-btn
             variant="text"
             color="primary"
-            @click="photoEdition.displayed = false"
+            @click="cancelPhotoEdition()"
+            :disabled="photoEdition.isLoading"
           >
             Annuler
           </v-btn>
           <v-btn
-            variant="text"
-            color="primary"
-            @click="photoEdition.displayed = false"
+            color="accent"
+            @click="savePhotoEdition()"
+            :disabled="photoEdition.isLoading"
+            :loading="photoEdition.isLoading"
           >
+            <v-icon start>fas fa-save</v-icon>
             Enregistrer
           </v-btn>
         </v-card-actions>
@@ -639,7 +723,12 @@ export default {
         },
         photoEdition: {
           displayed: false,
-          photo: null
+          photo: null,
+          title: '',
+          categoryId: null,
+          rotation: 0,
+          isLoading: false,
+          progress: 0
         },
 
         votes: [],
@@ -692,10 +781,18 @@ export default {
         participationGraph: null,
         votesGraph: null,
     }),
-    computed: { ...mapState([
-        'agpaMeta',
-        'user'
-    ])},
+    computed: {
+        ...mapState([
+            'agpaMeta',
+            'user'
+        ]),
+        categoriesOptions() {
+            if (!this.data || !this.data.categories) return [];
+            return this.data.categoriesOrders
+                .map(id => this.data.categories[id])
+                .filter(cat => cat && cat.id > 0);
+        }
+    },
     watch: {
         $route(to, from) {
                 this.refresh();
@@ -975,7 +1072,66 @@ export default {
 
         displayPhotoEdition(photo) {
           this.photoEdition.photo = photo;
+          this.photoEdition.title = photo.title || '';
+          this.photoEdition.categoryId = photo.categoryId;
+          this.photoEdition.rotation = 0;
+          this.photoEdition.isLoading = false;
+          this.photoEdition.progress = 0;
           this.photoEdition.displayed = true;
+        },
+
+        rotatePhoto(degrees) {
+          this.photoEdition.rotation = (this.photoEdition.rotation + degrees) % 360;
+        },
+
+        cancelPhotoEdition() {
+          this.photoEdition.displayed = false;
+          this.photoEdition.photo = null;
+        },
+
+        async deletePhotoFromEdition() {
+          if (!confirm('Êtes-vous sûr de vouloir supprimer cette photo ?')) {
+            return;
+          }
+
+          try {
+            await axios.delete(`/api/agpa/photo/${this.photoEdition.photo.id}`);
+            this.photoEdition.displayed = false;
+            this.photoEdition.photo = null;
+            this.refresh();
+          } catch (err) {
+            store.commit("onError", err);
+          }
+        },
+
+        async savePhotoEdition() {
+          this.photoEdition.isLoading = true;
+          this.photoEdition.progress = 0;
+
+          try {
+            const formData = new FormData();
+            formData.append('id', this.photoEdition.photo.id);
+            formData.append('catId', this.photoEdition.categoryId);
+            formData.append('title', this.photoEdition.title);
+            formData.append('rotation', this.photoEdition.rotation);
+
+            await axios.post('/api/agpa/photo', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              },
+              onUploadProgress: progressEvent => {
+                this.photoEdition.progress = (progressEvent.loaded / progressEvent.total * 100) || 0;
+              }
+            });
+
+            this.photoEdition.displayed = false;
+            this.photoEdition.photo = null;
+            this.refresh();
+          } catch (err) {
+            store.commit("onError", err);
+          } finally {
+            this.photoEdition.isLoading = false;
+          }
         },
 
         displayVotesDetails(data) {

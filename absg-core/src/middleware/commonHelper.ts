@@ -47,9 +47,15 @@ export function decodeBase64Image(dataString) {
  * @param thumbPath Si renseigné: va y enregistrer la vignette 200x200px
  * @param webPath Si renseigné: va y enregistrer l'image optimisé pour affichage plein écran (1080p) 2000x2000px
  * @param originalPath Si renseigné: va y enregistrer l'image original sans modification
+ * @param rotation Rotation à appliquer en degrés (0, 90, 180, 270, etc.)
  */
-export async function saveImage(file, thumbPath, webPath, originalPath) {
+export async function saveImage(file, thumbPath, webPath, originalPath, rotation = 0) {
     const img = await Jimp.read(file);
+
+    // Apply rotation if specified
+    if (rotation !== 0) {
+        img.rotate(rotation);
+    }
 
     // create WEB version (must be done before THUMB to preserve quality)
     if (webPath) {
@@ -71,16 +77,12 @@ export async function saveImage(file, thumbPath, webPath, originalPath) {
         await thumbImg.writeAsync(thumbPath);
     }
 
-    // On déplace dans le répertoire ORIGINAL
+    // On déplace dans le répertoire ORIGINAL (apply rotation to original too)
     if (originalPath) {
         // On crée le répertoire si besoin
         fs.mkdirSync(path.dirname(originalPath), { recursive: true });
-        // If file is a path (string), copy it; if it's a Buffer, write it directly
-        if (typeof file === 'string') {
-            fs.copyFileSync(file, originalPath);
-        } else {
-            fs.writeFileSync(originalPath, file);
-        }
+        // Always save the rotated version
+        await img.writeAsync(originalPath);
     }
 }
 

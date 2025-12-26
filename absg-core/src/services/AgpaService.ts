@@ -394,13 +394,26 @@ class AgpaService {
 
         photo = await this.photoRepo.save(photo);
 
+        // Handle rotation - if rotation is provided without new image, rotate existing files
+        const rotation = Number.parseInt(photoData.rotation) || 0;
+
         if (image) {
             const thumb = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/vignette_${photo.filename}`);
             const web = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/${photo.filename}`);
             const raw = path.join(process.env.PATH_FILES, `agpa/${photo.year}/${photo.filename}`);
             // express-fileupload with useTempFiles uses 'tempFilePath', otherwise 'data' or 'buffer'
             const imageSource = image.tempFilePath || image.data || image.buffer;
-            await saveImage(imageSource, thumb, web, raw);
+            await saveImage(imageSource, thumb, web, raw, rotation);
+        } else if (rotation !== 0 && photoId) {
+            // Rotation without new image: rotate existing files
+            const raw = path.join(process.env.PATH_FILES, `agpa/${photo.year}/${photo.filename}`);
+            const thumb = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/vignette_${photo.filename}`);
+            const web = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/${photo.filename}`);
+
+            // Read existing original and re-save with rotation
+            if (fs.existsSync(raw)) {
+                await saveImage(raw, thumb, web, raw, rotation);
+            }
         }
 
         // Ce log n'est visible que par les admins
