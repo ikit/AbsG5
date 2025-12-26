@@ -396,9 +396,9 @@ class AgpaService {
             const thumb = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/vignette_${photo.filename}`);
             const web = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/${photo.filename}`);
             const raw = path.join(process.env.PATH_FILES, `agpa/${photo.year}/${photo.filename}`);
-            // express-fileupload uses 'data' property instead of 'buffer'
-            const imageBuffer = image.data || image.buffer;
-            await saveImage(imageBuffer, thumb, web, raw);
+            // express-fileupload with useTempFiles uses 'tempFilePath', otherwise 'data' or 'buffer'
+            const imageSource = image.tempFilePath || image.data || image.buffer;
+            await saveImage(imageSource, thumb, web, raw);
         }
 
         // Ce log n'est visible que par les admins

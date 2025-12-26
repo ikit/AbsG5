@@ -43,7 +43,7 @@ export function decodeBase64Image(dataString) {
 
 /**
  * Enregistre une image sur le serveur
- * @param file les données de l'image récupérées depuis une requête POST
+ * @param file les données de l'image (Buffer, chemin de fichier temporaire, ou chemin de fichier)
  * @param thumbPath Si renseigné: va y enregistrer la vignette 200x200px
  * @param webPath Si renseigné: va y enregistrer l'image optimisé pour affichage plein écran (1080p) 2000x2000px
  * @param originalPath Si renseigné: va y enregistrer l'image original sans modification
@@ -70,7 +70,12 @@ export async function saveImage(file, thumbPath, webPath, originalPath) {
     if (originalPath) {
         // On crée le répertoire si besoin
         fs.mkdirSync(path.dirname(originalPath), { recursive: true });
-        fs.writeFileSync(originalPath, file);
+        // If file is a path (string), copy it; if it's a Buffer, write it directly
+        if (typeof file === 'string') {
+            fs.copyFileSync(file, originalPath);
+        } else {
+            fs.writeFileSync(originalPath, file);
+        }
     }
 }
 
