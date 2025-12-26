@@ -38,50 +38,111 @@
       <div
         v-for="catIdx of agpaMeta.categoriesOrders"
         :key="catIdx"
-        style="margin: 15px; margin-top: 50px;"
+        :style="{
+          margin: $vuetify.display.smAndDown ? '10px' : '15px',
+          marginTop: $vuetify.display.smAndDown ? '40px' : '50px'
+        }"
       >
-        <v-card style="margin: 15px auto; width: 650px; min-width: 400px; display: relative; padding: 40px 0 10px 0; overflow: visible;">
+        <v-card
+          :style="{
+            margin: $vuetify.display.smAndDown ? '0 auto' : '15px auto',
+            width: $vuetify.display.smAndDown ? '100%' : '650px',
+            maxWidth: $vuetify.display.smAndDown ? '100%' : '650px',
+            minWidth: $vuetify.display.smAndDown ? 'auto' : '400px',
+            display: 'relative',
+            padding: $vuetify.display.smAndDown ? '35px 0 10px 0' : '40px 0 10px 0',
+            overflow: 'visible'
+          }"
+        >
           <img
             :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
-            width="100px"
-            style="position: absolute; top: -50px; left: 275px"
+            :width="$vuetify.display.smAndDown ? '80px' : '100px'"
+            :style="{
+              position: 'absolute',
+              top: $vuetify.display.smAndDown ? '-40px' : '-50px',
+              left: '50%',
+              transform: 'translateX(-50%)'
+            }"
           >
-          <v-row style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0">
-            <span style="font-family: 'Tangerine', serif; font-size: 2em">
+          <v-row
+            :style="{
+              padding: $vuetify.display.smAndDown ? '5px 10px' : '5px 15px',
+              margin: 0,
+              background: '#efefef',
+              border: '1px solid #ddd',
+              borderWidth: '1px 0',
+              flexWrap: $vuetify.display.smAndDown ? 'wrap' : 'nowrap'
+            }"
+          >
+            <span
+              :style="{
+                fontFamily: 'Tangerine, serif',
+                fontSize: $vuetify.display.smAndDown ? '1.5em' : '2em',
+                width: $vuetify.display.smAndDown ? '100%' : 'auto',
+                textAlign: $vuetify.display.smAndDown ? 'center' : 'left'
+              }"
+            >
               {{ agpaMeta.categories[catIdx].title }}
             </span>
-            <v-spacer />
-            <v-tooltip bottom>
-              <v-spacer />
-              <template #activator="{ props }">
-                <span
-                  style="line-height: 48px; margin-right: 10px;"
-                  v-bind="props"
-                ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
-              </template>
-              <span>Nombre total de participants</span>
-            </v-tooltip>
-                    &nbsp; &nbsp;
-            <v-tooltip bottom>
-              <v-spacer />
-              <template #activator="{ props }">
-                <span
-                  style="line-height: 48px"
-                  v-bind="props"
-                ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
-              </template>
-              <span>Nombre total de photos</span>
-            </v-tooltip>
+            <v-spacer v-if="!$vuetify.display.smAndDown" />
+            <div
+              :style="{
+                display: 'flex',
+                gap: '10px',
+                width: $vuetify.display.smAndDown ? '100%' : 'auto',
+                justifyContent: $vuetify.display.smAndDown ? 'center' : 'flex-end',
+                marginTop: $vuetify.display.smAndDown ? '5px' : '0'
+              }"
+            >
+              <v-tooltip bottom>
+                <template #activator="{ props }">
+                  <span
+                    style="line-height: 48px;"
+                    v-bind="props"
+                  ><i class="far fa-user" /> {{ agpaMeta.categories[catIdx].totalUsers }}</span>
+                </template>
+                <span>Nombre total de participants</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template #activator="{ props }">
+                  <span
+                    style="line-height: 48px"
+                    v-bind="props"
+                  ><i class="far fa-image" /> {{ agpaMeta.categories[catIdx].totalPhotos }}</span>
+                </template>
+                <span>Nombre total de photos</span>
+              </v-tooltip>
+            </div>
           </v-row>
-          <p style="font-size:0.9em; margin: 10px; text-align: center">
+          <p
+            :style="{
+              fontSize: '0.9em',
+              margin: '10px',
+              textAlign: 'center',
+              padding: $vuetify.display.smAndDown ? '0 10px' : '0'
+            }"
+          >
             {{ agpaMeta.categories[catIdx].description }}
           </p>
-          <div style="display: flex; width: 100%;">
+          <div
+            :style="{
+              display: 'flex',
+              width: '100%',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: $vuetify.display.smAndDown ? '10px' : '0'
+            }"
+          >
             <template v-for="(photo, idx) in photos">
               <PhotoWidget
                 v-if="photo.categoryId == catIdx"
                 :key="idx"
-                style="display: inline-block; width: 250px; margin: 0 auto;"
+                :style="{
+                  display: 'inline-block',
+                  width: $vuetify.display.smAndDown ? 'calc(50% - 5px)' : '250px',
+                  minWidth: $vuetify.display.smAndDown ? '150px' : '250px',
+                  margin: $vuetify.display.smAndDown ? '0' : '0 auto'
+                }"
                 :photo="photo"
                 @new-photo="onNewPhoto(catIdx)"
                 @edit-photo="onEditPhoto(photo)"
@@ -96,7 +157,8 @@
       <!-- Enregistrement/Edition photo -->
       <v-dialog
         v-model="photoEditor.open"
-        width="800px"
+        :width="$vuetify.display.smAndDown ? '100%' : '800px'"
+        :fullscreen="$vuetify.display.xs"
       >
         <v-card>
           <v-card-title class="bg-grey-lighten-4 py-4 title">
@@ -104,7 +166,7 @@
           </v-card-title>
           <v-container
             grid-list-sm
-            class="pa-4"
+            :class="$vuetify.display.smAndDown ? 'pa-2' : 'pa-4'"
           >
             <v-text-field
               v-model="photoEditor.title"
@@ -154,7 +216,8 @@
       <!-- Suppression photo -->
       <v-dialog
         v-model="photoDeletion.open"
-        width="800px"
+        :width="$vuetify.display.smAndDown ? '95%' : '800px'"
+        :max-width="$vuetify.display.smAndDown ? '400px' : '800px'"
       >
         <v-card v-if="photoDeletion.photo">
           <v-card-title class="bg-grey-lighten-4">
@@ -193,7 +256,8 @@
       <!-- Aide -->
       <v-dialog
         v-model="help.displayed"
-        width="800px"
+        :width="$vuetify.display.smAndDown ? '100%' : '800px'"
+        :fullscreen="$vuetify.display.xs"
       >
         <v-card>
           <v-card-title class="bg-grey-lighten-4">
@@ -228,7 +292,6 @@ import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import PhotoWidget from './components/PhotoWidget.vue';
 import ImageEditor from '../../components/ImageEditor.vue';
-import store from '../../store';
 import Help from './components/Help.vue';
 
 export default {
@@ -238,7 +301,6 @@ export default {
         ImageEditor,
         Help
     },
-    store,
     data: () => ({
         isLoading: false,
         photos: {},
@@ -263,6 +325,9 @@ export default {
     computed: {
         ...mapState([
             'agpaMeta',
+            'photosGallery',
+            'main',
+            'agpa'
         ]),
     },
     watch: {
@@ -274,7 +339,7 @@ export default {
         if (this.agpaMeta) {
             this.refreshGallery();
         } else {
-            store.dispatch('initAGPA');
+            this.agpa.initialize();
         }
     },
     methods: {
@@ -303,10 +368,10 @@ export default {
                         this.agpaMeta.categories[s.categoryId].totalUsers = s.totalUsers;
                         this.agpaMeta.categories[s.categoryId].totalPhotos = s.totalPhotos;
                     }
-                    store.commit('photosGalleryReset', this.photos.filter(p => p.id > -1));
+                    this.photosGallery.reset(this.photos.filter(p => p.id > -1));
                 })
                 .catch(err => {
-                    store.commit("onError", err);
+                    this.main.onError(err);
                 });
         },
 
@@ -336,7 +401,7 @@ export default {
                         this.savePhotoApiCall(this.photoEditor.categoryId, photoId, this.photoEditor.title, response.data);
                     }
                 ).catch( err => {
-                    store.commit("onError", err);
+                    this.main.onError(err);
                     this.photoEditor.isLoading = false;
                 });
             } else {
@@ -370,7 +435,7 @@ export default {
                 this.resetEditor();
             })
             .catch(err => {
-                store.commit("onError", err);
+                this.main.onError(err);
             });
         },
 
@@ -382,7 +447,7 @@ export default {
                     this.refreshGallery();
                 })
                 .catch(err => {
-                    store.commit("onError", err);
+                    this.main.onError(err);
                 });
         },
         onNewPhoto(catId, photoId = null) {
@@ -399,12 +464,12 @@ export default {
         photosGalleryDisplay(photo) {
             const index = this.photos.filter(p => p.id > -1).findIndex(p => p.id === photo.id);
             if (index > -1) {
-                store.commit('photosGallerySetIndex', index);
-                store.commit('photosGalleryDisplay');
+                this.photosGallery.setIndex(index);
+                this.photosGallery.display();
             }
         },
         photosGalleryHide() {
-            store.commit('photosGalleryHide');
+            this.photosGallery.hide();
         },
 
     }

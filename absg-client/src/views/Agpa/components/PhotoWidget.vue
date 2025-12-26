@@ -6,10 +6,22 @@
     >
       <tbody>
         <tr>
-          <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
+          <td
+            :style="{
+              width: '100%',
+              height: $vuetify.display.smAndDown ? '150px' : '250px',
+              textAlign: 'center',
+              verticalAlign: 'middle'
+            }"
+          >
             <img
               class="thumb"
               :src="photo.thumb"
+              :style="{
+                maxWidth: '100%',
+                maxHeight: $vuetify.display.smAndDown ? '140px' : '240px',
+                height: 'auto'
+              }"
               @click="clickOnPhoto()"
             >
           </td>
@@ -63,17 +75,25 @@
     >
       <tbody>
         <tr>
-          <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
+          <td
+            :style="{
+              width: '100%',
+              height: $vuetify.display.smAndDown ? '150px' : '250px',
+              textAlign: 'center',
+              verticalAlign: 'middle'
+            }"
+          >
             <v-tooltip bottom>
               <template #activator="{ props }">
                 <v-btn
                   v-bind="props"
+                  :size="$vuetify.display.smAndDown ? 'small' : 'default'"
                   @click="addNewPhoto()"
                 >
                   <v-icon start>
                     fas fa-plus
                   </v-icon>
-                  <span>Photo</span>
+                  <span v-if="!$vuetify.display.xs">Photo</span>
                 </v-btn>
               </template>
               <span>Enregistrer une nouvelle photo</span>
