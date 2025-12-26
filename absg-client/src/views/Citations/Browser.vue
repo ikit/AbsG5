@@ -94,7 +94,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
         </v-card-title>
         <v-container
@@ -167,7 +167,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Supprimer la citation
         </v-card-title>
         <p style="margin: 0 24px;">

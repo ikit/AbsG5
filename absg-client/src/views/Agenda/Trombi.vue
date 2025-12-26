@@ -100,7 +100,7 @@
       width="400px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
+        <v-card-title class="bg-grey-lighten-4 py-4 title">
           Nouvelle trombinette
         </v-card-title>
         <v-container
@@ -160,7 +160,7 @@
       v-model="stats.open"
     >
       <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
+        <v-card-title class="bg-grey-lighten-4 py-4 title">
           Statistiques
         </v-card-title>
         <div style="display: flex;">
@@ -197,7 +197,7 @@
           </div>
         </div>
           
-        <v-card-actions class="grey lighten-4 py-4 title">
+        <v-card-actions class="bg-grey-lighten-4 py-4 title">
           <v-spacer />
           <v-btn
             variant="text"

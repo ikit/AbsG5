@@ -94,7 +94,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           {{ placeEditor.id ? `Modifier les informations du lieux ${placeEditor.name}` : "Nouveau lieu" }}
         </v-card-title>
 

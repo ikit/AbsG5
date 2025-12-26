@@ -25,7 +25,7 @@
     </div>
 
     <v-card style="margin: 20px">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Configuration de l'album
           <div style="position: absolute; right: 15px; top: 10px">
             <v-btn
@@ -39,7 +39,7 @@
           </div>
         </v-card-title>
         <div style="display: flex">
-          <div class="grey lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
+          <div class="bg-grey-lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
             <b>Personnes</b><br/>
             <span style="opacity: 0.5; font-size: 0._em">Sélectionner les photos en fonction des personnes qui sont dessus.</span>
           </div>
@@ -48,7 +48,7 @@
           </div>
         </div>
         <div style="display: flex">
-          <div class="grey lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
+          <div class="bg-grey-lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
             <b>Lieux</b><br/>
             <span style="opacity: 0.5; font-size: 0._em">Sélectionner les photos en fonction des lieux.</span>
           </div>
@@ -57,7 +57,7 @@
           </div>
         </div>
         <div style="display: flex">
-          <div class="grey lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
+          <div class="bg-grey-lighten-4" style="width: 200px; padding: 10px; border-bottom: 1px solid #ddd">
             <b>Date</b><br/>
             <span style="opacity: 0.5; font-size: 0._em">Sélectionner les photos en fonction de la date de prise de vue</span>
           </div>

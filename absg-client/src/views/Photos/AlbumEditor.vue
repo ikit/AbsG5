@@ -192,7 +192,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Ajouter des photos
         </v-card-title>
         <v-card style="margin: 15px">

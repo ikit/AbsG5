@@ -131,7 +131,7 @@
       width="900px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           {{ personEditor.id ? `Modifier les informations de ${personEditor.lastname} ${personEditor.firstname}` : "Nouvelle fiche" }}
         </v-card-title>
 

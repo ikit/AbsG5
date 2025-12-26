@@ -185,7 +185,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
+        <v-card-title class="bg-grey-lighten-4 py-4 title">
           Palmarès de {{ palmaresDetails.username }}
         </v-card-title>
         <v-container

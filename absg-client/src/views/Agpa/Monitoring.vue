@@ -417,7 +417,7 @@
       width="800px"
     >
       <v-card v-if="photoDetails.photo">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Informations sur la photo {{ photoDetails.photo.id }}
         </v-card-title>
         <div style="display: flex; margin: 0 24px">
@@ -475,7 +475,7 @@
       width="800px"
     >
       <v-card v-if="photoEdition.photo">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Modification de la photo {{ photoEdition.photo.id }}
         </v-card-title>
         <div style="display: flex; margin: 0 24px">
@@ -514,7 +514,7 @@
       width="800px"
     >
       <v-card v-if="voteDetails.vote">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Votes {{ voteDetails.vote.username }}, catégorie {{ voteDetails.vote.categoryTitle }}
         </v-card-title>
         <p style="opacity: 0.5; padding: 0 24px">

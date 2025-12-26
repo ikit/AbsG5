@@ -120,7 +120,7 @@
 
     <v-dialog v-model="passagHistoryDialogDisplayed">
       <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
+        <v-card-title class="bg-grey-lighten-4 py-4 title">
           Statistiques de passa G sur l'année
         </v-card-title>
         <v-container

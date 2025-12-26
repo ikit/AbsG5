@@ -100,7 +100,7 @@
       width="600px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">
+        <v-card-title class="bg-grey-lighten-4 py-4 title">
           Ajouter une nouvelle série à votre collection
         </v-card-title>
         <v-container

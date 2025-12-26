@@ -160,7 +160,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           <v-icon start>
             far fa-question-circle
           </v-icon>
@@ -186,7 +186,7 @@
       width="800px"
     >
       <v-card v-if="photoDiscussion.photo">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Commentaires sur la photo
           <v-spacer />
           <template v-if="!isAdmin">
@@ -284,7 +284,7 @@
       width="500px"
     >
       <v-card v-if="photoDiscussion.photo">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Supprimer la photo ?
         </v-card-title>
         <p style="padding: 0 24px">

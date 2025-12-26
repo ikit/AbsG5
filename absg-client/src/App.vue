@@ -302,7 +302,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Historiques des événements
         </v-card-title>
         <v-data-table

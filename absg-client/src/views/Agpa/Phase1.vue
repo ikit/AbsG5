@@ -99,7 +99,7 @@
         width="800px"
       >
         <v-card>
-          <v-card-title class="grey lighten-4 py-4 title">
+          <v-card-title class="bg-grey-lighten-4 py-4 title">
             Nouvelle photo {{ agpaMeta.categories[photoEditor.categoryId].title }}
           </v-card-title>
           <v-container
@@ -157,7 +157,7 @@
         width="800px"
       >
         <v-card v-if="photoDeletion.photo">
-          <v-card-title class="grey lighten-4">
+          <v-card-title class="bg-grey-lighten-4">
             Êtes vous sûr de vouloir supprimer cette photo ?
           </v-card-title>
           <div style="text-align: center; margin-top: 10px">
@@ -196,7 +196,7 @@
         width="800px"
       >
         <v-card>
-          <v-card-title class="grey lighten-4">
+          <v-card-title class="bg-grey-lighten-4">
             <v-icon start>
               far fa-question-circle
             </v-icon>
