@@ -106,12 +106,11 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
+import { mapState } from '../../stores/helpers';
 import { getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {
-    name: 'Phase5',
-    store,
+    name: 'ArchivesSummary',
     data: () => ({
         summary: []
     }),
@@ -120,8 +119,11 @@ export default {
             this.summary = parseAxiosResponse(response);
             this.isLoading = false;
         }).catch( err => {
-            store.commit("onError", err);
+            this.main.onError(err);
         });
+    },
+    computed: {
+        ...mapState(['main'])
     },
     methods: {
         getPlace(index) {

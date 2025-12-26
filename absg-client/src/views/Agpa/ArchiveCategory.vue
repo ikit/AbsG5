@@ -147,14 +147,12 @@
 
 <script>
 import axios from 'axios';
-import store from '../../store';
 import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 
 
 export default {
-    store,
     data: () => ({
         isLoading: true,
         current: null,
@@ -163,7 +161,8 @@ export default {
         photosGalery: []
     }),
     computed: { ...mapState([
-        'agpaMeta'
+        'agpaMeta',
+        'photosGallery'
     ])},
     watch: {
         $route(to, from) {
@@ -187,17 +186,17 @@ export default {
                     for (let photo of this.current.photos) {
                         this.photosGalery.push(agpaPhotoToGalleryPhoto(photo));
                     }
-                    store.commit('photosGalleryReset', this.photosGalery);
+                    this.photosGallery.reset(this.photosGalery);
                 }
                 this.isLoading = false;
             });
         },
         photosGalleryDisplay(index) {
-            store.commit('photosGallerySetIndex', index);
-            store.commit('photosGalleryDisplay');
+            this.photosGallery.setIndex(index);
+            this.photosGallery.display();
         },
         photosGalleryHide() {
-            store.commit('photosGalleryHide');
+            this.photosGallery.hide();
         },
         gotoNextYear(step) {
             let nextYear = this.year + step;
