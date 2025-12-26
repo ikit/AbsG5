@@ -2,6 +2,8 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
+import fs from 'node:fs'
+import path from 'node:path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -43,23 +45,35 @@ export default defineConfig({
         target: 'http://localhost:5010',
         changeOrigin: true,
       },
-      '/files': {
-        target: 'http://localhost:5010',
-        changeOrigin: true,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
-            console.log('Proxy error on /files:', err);
-          });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('Proxying /files request:', req.url);
-          });
-        }
-      },
       '/ws': {
         target: 'ws://localhost:5011',
         ws: true,
       },
-    }
+    },
+    // Serve static files directly from local directory
+    middlewareMode: false,
+  },
+  // Configure Vite server to handle /files route
+  configureServer(server) {
+    const filesPath = 'C:\\Users\\ogueu\\Documents\\git\\ABSG_FILES'
+    console.log(`📁 Serving /files from ${filesPath}`)
+
+    server.middlewares.use((req, res, next) => {
+      if (req.url?.startsWith('/files/')) {
+        const filePath = path.join(filesPath, req.url.replace('/files/', ''))
+
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+          console.log(`✓ Serving file: ${req.url}`)
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          fs.createReadStream(filePath).pipe(res)
+        } else {
+          console.log(`✗ File not found: ${filePath}`)
+          next()
+        }
+      } else {
+        next()
+      }
+    })
   },
   optimizeDeps: {
     include: [
