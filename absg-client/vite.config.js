@@ -46,6 +46,14 @@ export default defineConfig({
       '/files': {
         target: 'http://localhost:5010',
         changeOrigin: true,
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('Proxy error on /files:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('Proxying /files request:', req.url);
+          });
+        }
       },
       '/ws': {
         target: 'ws://localhost:5011',
