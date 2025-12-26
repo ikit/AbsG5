@@ -86,7 +86,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           {{ userEditor.id != -1 ? `Editer le compte utilisateur n°${userEditor.id}` : "Nouvel utilisateur" }}
         </v-card-title>
 
@@ -188,7 +188,7 @@
       width="800px"
     >
       <v-card v-if="userActivity.user && userActivity.user.isActive">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Désactiver le compte {{ userActivity.user.username }}
         </v-card-title>
         <p style="margin: 0 24px;">
@@ -213,7 +213,7 @@
         </v-card-actions>
       </v-card>
       <v-card v-if="userActivity.user && !userActivity.user.isActive">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Réactiver le compte {{ userActivity.user.username }}
         </v-card-title>
         <p style="margin: 0 24px;">

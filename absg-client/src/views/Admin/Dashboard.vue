@@ -4,7 +4,7 @@
       class="column"
       style="margin: 15px"
     >
-      <v-card-title class="grey lighten-4">
+      <v-card-title class="bg-grey-lighten-4">
         Evénements
       </v-card-title>
       <v-data-table
@@ -35,7 +35,7 @@
       style="margin: 15px"
     >
       <v-card>
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Outils
         </v-card-title>
         <a
@@ -77,7 +77,7 @@
       </v-card>
 
       <v-card style="margin-top: 15px">
-        <v-card-title class="grey lighten-4">
+        <v-card-title class="bg-grey-lighten-4">
           Monitoring
         </v-card-title>
 

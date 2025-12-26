@@ -55,7 +55,7 @@ export default  {
     },
     mounted() {
         console.log(this.user)
-        this.isAdmin = this.user ? this.user.roles.indexOf("admin") > -1 : false;
+        this.isAdmin = this.user?.roles?.indexOf("admin") > -1 || false;
     }
 };
 </script>
