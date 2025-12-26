@@ -76,92 +76,32 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
+    // SIMPLIFIED: Reduce chunk count for better dev performance
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        // OPTIMIZED: Feature-based code splitting for better caching and lazy loading
         manualChunks(id) {
-          // Core Vue framework - loaded on every page
-          if (id.includes('vue') && !id.includes('node_modules/vuetify')) {
-            return 'vue-vendor'
-          }
-          if (id.includes('pinia') || id.includes('vue-router')) {
-            return 'vue-vendor'
+          // Core framework - Vue, Router, Pinia
+          if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
+            return 'framework'
           }
 
-          // UI Framework - loaded on every page
+          // UI Framework - Vuetify
           if (id.includes('vuetify') || id.includes('@mdi/font')) {
-            return 'vuetify'
+            return 'ui'
           }
 
-          // Feature: AGPA (photo contest) - only loaded when visiting /agpa
-          if (id.includes('/views/Agpa/') || id.includes('/stores/agpa')) {
-            return 'feature-agpa'
-          }
-
-          // Feature: Forum - only loaded when visiting /forum
-          if (id.includes('/views/Forum/')) {
-            return 'feature-forum'
-          }
-
-          // Feature: Photos - only loaded when visiting /photos
-          if (id.includes('/views/Photos/')) {
-            return 'feature-photos'
-          }
-
-          // Feature: Admin - only loaded when visiting /admin
-          if (id.includes('/views/Admin/')) {
-            return 'feature-admin'
-          }
-
-          // Feature: Agenda - only loaded when visiting /agenda
-          if (id.includes('/views/Agenda/')) {
-            return 'feature-agenda'
-          }
-
-          // Feature: GTheque - only loaded when visiting /gtheque
-          if (id.includes('/views/Gtheque/') || id.includes('/views/GTheque')) {
-            return 'feature-gtheque'
-          }
-
-          // Feature: Citations - only loaded when visiting /citations
-          if (id.includes('/views/Citations/')) {
-            return 'feature-citations'
-          }
-
-          // Rich Text Editor (TipTap) - only loaded in Forum
-          if (id.includes('@tiptap/')) {
-            return 'lib-editor'
-          }
-
-          // Charts (Highcharts) - only loaded in GTheque and stats pages
+          // Heavy libraries - split only the biggest ones
           if (id.includes('highcharts')) {
-            return 'lib-charts'
+            return 'charts'
+          }
+          if (id.includes('@tiptap/')) {
+            return 'editor'
           }
 
-          // Image manipulation - only loaded in photo editor
-          if (id.includes('cropperjs') || id.includes('jimp')) {
-            return 'lib-image'
-          }
-
-          // Common utilities - loaded when needed
-          if (id.includes('axios')) {
-            return 'lib-http'
-          }
-          if (id.includes('date-fns')) {
-            return 'lib-date'
-          }
-          if (id.includes('localforage') || id.includes('webdav')) {
-            return 'lib-storage'
-          }
-
-          // All other node_modules - group by size threshold
+          // Everything else from node_modules goes into vendor
           if (id.includes('node_modules')) {
-            // Large libraries get their own chunk
-            if (id.includes('reveal.js')) {
-              return 'lib-reveal'
-            }
-            // Medium-sized libraries
-            return 'vendor-utils'
+            return 'vendor'
           }
         }
       }
