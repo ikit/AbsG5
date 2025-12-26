@@ -32,6 +32,12 @@ export default defineConfig({
     watch: {
       usePolling: false,
     },
+    // Improve dev server performance with many chunks
+    hmr: {
+      overlay: true
+    },
+    // Increase chunk loading timeout
+    preTransformRequests: true,
     proxy: {
       '/api': {
         target: 'http://localhost:5010',
@@ -48,7 +54,23 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['vuetify', 'vue', 'vue-router', 'pinia', 'axios']
+    include: [
+      'vuetify',
+      'vue',
+      'vue-router',
+      'pinia',
+      'axios',
+      'date-fns',
+      'localforage',
+      'md5',
+      '@tiptap/vue-3',
+      '@tiptap/starter-kit',
+      'highcharts',
+      'highcharts-vue'
+    ],
+    exclude: [],
+    // Force dependency optimization on server start
+    force: false
   },
   build: {
     outDir: 'dist',
