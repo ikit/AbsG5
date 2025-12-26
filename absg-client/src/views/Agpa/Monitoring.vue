@@ -1067,8 +1067,15 @@ export default {
           this.photoDetails.photo = photo;
           // On récupère les votes de la photo
           this.photoDetails.votes.splice(0);
-          for (const u of this.data.categories[photo.categoryId].votes) {
-            this.photoDetails.votes.push(...u.votes.filter(v => v.photoId === photo.id))
+
+          // Check if category and votes exist
+          const category = this.data.categories?.[photo.categoryId];
+          if (category && Array.isArray(category.votes)) {
+            for (const u of category.votes) {
+              if (u.votes && Array.isArray(u.votes)) {
+                this.photoDetails.votes.push(...u.votes.filter(v => v.photoId === photo.id))
+              }
+            }
           }
 
           this.photoDetails.displayed = true;
