@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { format } from 'date-fns'
 import { parseAxiosResponse } from '../middleware/CommonHelper'
 import { useUserStore } from './user'
-import { useNotificationStore } from './notification'
 import { usePhotoGalleryStore } from './photoGallery'
 import { useAgpaStore } from './agpa'
 import { useWebSocketStore } from './websocket'
@@ -13,9 +13,6 @@ export const useMainStore = defineStore('main', {
     citation: null,
     // DEPRECATED: Use useUserStore() instead
     user: null,
-    // DEPRECATED: Use useNotificationStore() instead
-    notifications: [],
-    unreadNotifications: 0,
     settings: null,
     // DEPRECATED: Use useWebSocketStore() instead
     wsOnline: false,
@@ -27,7 +24,7 @@ export const useMainStore = defineStore('main', {
     photoMetadataEditorDisplayed: false,
     // DEPRECATED: Use useAgpaStore() instead
     agpaMeta: null,
-    // DEPRECATED: Use useNotificationStore() instead
+    // UI notifications (kept in main store)
     notif: {
       displayed: false,
       title: "",
@@ -43,7 +40,8 @@ export const useMainStore = defineStore('main', {
       displayed: false,
       query: "",
       msg: "",
-      log: ""
+      log: "",
+      htmlError: ""
     },
     snack: {
       displayed: false,
@@ -60,15 +58,6 @@ export const useMainStore = defineStore('main', {
     isLoggedIn() {
       const userStore = useUserStore()
       return userStore.isLoggedIn
-    },
-    // Backward compatibility getters - delegate to notificationStore
-    allNotifications() {
-      const notifStore = useNotificationStore()
-      return notifStore.allNotifications
-    },
-    unreadCount() {
-      const notifStore = useNotificationStore()
-      return notifStore.unreadCount
     }
   },
 
@@ -121,33 +110,6 @@ export const useMainStore = defineStore('main', {
 
     updateSettings(settings) {
       this.settings = settings
-    },
-
-    // DEPRECATED: Use useNotificationStore().updateNotifications() instead
-    updateNotifications(notifications) {
-      const notifStore = useNotificationStore()
-      notifStore.updateNotifications(notifications)
-      // Keep in sync for backward compatibility
-      this.notifications = notifStore.notifications
-      this.unreadNotifications = notifStore.unreadNotifications
-    },
-
-    // DEPRECATED: Use useNotificationStore().readAllNotifications() instead
-    readAllNotification() {
-      const notifStore = useNotificationStore()
-      notifStore.readAllNotifications()
-      // Keep in sync
-      this.notifications = notifStore.notifications
-      this.unreadNotifications = notifStore.unreadNotifications
-    },
-
-    // DEPRECATED: Use useNotificationStore().readNotification() instead
-    readNotification(notification) {
-      const notifStore = useNotificationStore()
-      notifStore.readNotification(notification)
-      // Keep in sync
-      this.notifications = notifStore.notifications
-      this.unreadNotifications = notifStore.unreadNotifications
     },
 
     // DEPRECATED: Use usePhotoGalleryStore().resetGallery() instead
@@ -216,36 +178,43 @@ export const useMainStore = defineStore('main', {
       this.photosGalleryIndex = galleryStore.currentIndex
     },
 
-    // DEPRECATED: Use useNotificationStore().showSnack() instead
+    // UI notification actions
     onSnack(msg) {
-      const notifStore = useNotificationStore()
-      notifStore.showSnack(msg)
-      // Keep in sync
-      this.snack = notifStore.snack
+      this.snack.msg = msg
+      this.snack.displayed = true
     },
 
-    // DEPRECATED: Use useNotificationStore().showNotif() instead
     onNotif(info) {
-      const notifStore = useNotificationStore()
-      notifStore.showNotif(info)
-      // Keep in sync
-      this.notif = notifStore.notif
+      this.notif.title = info[0]
+      this.notif.msg = info[1]
+      this.notif.displayed = true
     },
 
-    // DEPRECATED: Use useNotificationStore().showWarning() instead
     onWarning(message) {
-      const notifStore = useNotificationStore()
-      notifStore.showWarning(message)
-      // Keep in sync
-      this.warning = notifStore.warning
+      this.warning.msg = message
+      this.warning.log = format(new Date(), 'yyyy.MM.dd.HH.mm.ss')
+      this.warning.displayed = true
     },
 
-    // DEPRECATED: Use useNotificationStore().showError() instead
     onError(axiosError) {
-      const notifStore = useNotificationStore()
-      notifStore.showError(axiosError)
-      // Keep in sync
-      this.error = notifStore.error
+      console.error(axiosError)
+
+      this.error.query = axiosError?.config
+        ? `${axiosError.config.method.toUpperCase()} ${axiosError.config.url}`
+        : ''
+      this.error.log = format(new Date(), 'yyyy.MM.dd.HH.mm.ss')
+      this.error.displayed = true
+
+      if (axiosError.response) {
+        this.error.htmlError = `${axiosError.response.status} ${axiosError.response.statusText}`
+        this.error.msg = axiosError.response.data?.message || axiosError.message || axiosError
+      } else if (axiosError.request) {
+        this.error.htmlError = `${axiosError.request.status} ${axiosError.request.statusText}`
+        this.error.msg = axiosError.message || axiosError
+      } else {
+        this.error.htmlError = 'Probleme IHM (probablement)'
+        this.error.msg = axiosError.message || axiosError
+      }
     },
 
     async initStore() {
@@ -255,7 +224,6 @@ export const useMainStore = defineStore('main', {
           const data = parseAxiosResponse(response)
           this.updateSettings(data.settings)
           this.updateCitation(data.citation)
-          this.updateNotifications(data.notifications)
           this.isInitialized = true
         } catch (error) {
           console.error('Failed to initialize store:', error)

@@ -72,27 +72,6 @@
           />
         </div>
       </v-spacer>
-      <v-tooltip bottom>
-        <template #activator="{ props }">
-          <v-badge
-            color="accent"
-            style="margin-right: 15px"
-            overlap
-            data-cy="notifications"
-            :content="unreadNotifications"
-            :model-value="unreadNotifications > 0"
-          >
-            <v-btn
-              icon
-              v-bind="props"
-              @click.stop="displayNotifications()"
-            >
-              <v-icon>far fa-bell</v-icon>
-            </v-btn>
-          </v-badge>
-        </template>
-        <span>Voir l'historique des événements</span>
-      </v-tooltip>
 
       <div
         v-if="usersOnline.length > 0"
@@ -296,67 +275,6 @@
       </div>
     </v-main>
 
-
-    <v-dialog
-      v-model="notifDialog"
-      width="800px"
-    >
-      <v-card>
-        <v-card-title class="bg-grey-lighten-4">
-          Historiques des événements
-        </v-card-title>
-        <v-data-table
-          :headers="notificationsHeaders"
-          :items="notifications"
-          items-per-page="500"
-          loading-text="Récupération des notifications..."
-          hide-default-footer
-          height="60vh"
-          class="notifications"
-        >
-          <template #item="{item}">
-            <tr
-              :class="{ 'unreadNotification': !item.read }"
-              @click="onNotificationClicked(item)"
-            >
-              <td>
-                <img
-                  :src="item.url"
-                  height="40px"
-                >
-              </td>
-              <td>
-                <div style="display: flex;">
-                  <v-icon v-if="item.module" style="flex">
-                    {{ item.module.icon }}
-                  </v-icon>
-                  <span style="display: inline-block; margin-left: 15px; line-height: 25px">{{ item.message }}</span>
-                </div>
-              </td>
-              <td>{{ item.dateLabel }}</td>
-              <td>
-                <v-checkbox
-                  v-model="item.read"
-                  disabled
-                  hide-details
-                  density="compact"
-                />
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-        <v-card-actions style="padding-top: 20px">
-          <v-spacer />
-          <v-btn @click="closeNotifications(true)">
-            Marquer tout comme vu
-          </v-btn>
-          <v-btn @click="closeNotifications()">
-            Fermer
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
     <v-dialog
       v-model="notif.displayed"
       class="msgDiallog"
@@ -499,19 +417,10 @@ export default {
     },
     data: () => ({
         drawerOpen: false, // flag pour savoir si le menu-tiroir (écran mobile)
-        notifDialog: false,
-        errDialog: false,
         drawer: null,
         usersOnline: [],
         menuItems: MODULES,
         version: "",
-        notificationRefreshing: false,
-        notificationsHeaders: [
-            { text: "Qui", value: "who" },
-            { text: "Quoi", value: "what" },
-            { text: "Quand", value: "when" },
-            { text: "", value: "read" },
-        ],
 
         // Galerie photo editor
         photoDisplayedDateMenu: false,
@@ -523,8 +432,6 @@ export default {
             "user",
             "wsOnline",
             "wsMessage",
-            "notifications",
-            "unreadNotifications",
             "error",
             "warning",
             "notif",
@@ -574,14 +481,6 @@ export default {
                     avatarUrl: `/files/avatars/${e.id.toString().padStart(3, '0')}.png`,
                     opacity: now - new Date(e.lastTime).getTime() <= 300000 ? 0.9 : 0.5 // 300000 = 5 minutes
                 })).sort((a,b) => new Date(a.lastTime).getTime() < new Date(b.lastTime).getTime());
-                // console.log(this.usersOnline.reduce((p, e) => (`${p}> ${e.id}:${e.username} `), ""))
-                // On met à jour l'indicateur de notifications pour l'utilisateur
-                if (this.user) {
-                    const activity = newValue.payload.find(e => e.id === this.user.id);
-                    if (activity && activity.unreadNotifications.length > this.unreadNotifications) {
-                        this.refreshNotifications();
-                    }
-                }
             }
         }
     },
@@ -668,46 +567,6 @@ export default {
         },
         photosGalleryAuto() {
             console.debug("TODO: photosGalleryAuto");
-        },
-        refreshNotifications() {
-            if (!this.notificationRefreshing) {
-                this.notificationRefreshing = true;
-                axios.get("/api/notifications")
-                    .then( response => {
-                        const notifications = parseAxiosResponse(response);
-                        store.commit("updateNotifications", notifications);
-                        this.notificationRefreshing = false;
-                    })
-                    .catch(err => {
-                        store.commit("onError", err);
-                        this.notificationRefreshing = false;
-                    });
-            }
-        },
-        displayNotifications() {
-            this.notifDialog = true;
-            this.refreshNotifications();
-        },
-        onNotificationClicked(notification) {
-            if (notification && !notification.read) {
-                store.commit("readNotification", notification);
-                this.notifDialog = false;
-                if (notification.module.id == "forum") {
-                    const topic = notification.data.topicId ? `read/${notification.data.topicId}` : "tbz";
-                    const msgId = notification.data.msgId;
-                    const url = `${notification.module.url}/${topic}`;
-                    this.$router.push({ path: url }); // , hash: `#post_${msgId}`
-                } else {
-                    this.$router.push(notification.module.url);
-                }
-
-            }
-        },
-        closeNotifications(readAll = false) {
-            this.notifDialog = false;
-            if (readAll) {
-                store.commit("readAllNotification");
-            }
         },
 
         toggleDarkMode() {

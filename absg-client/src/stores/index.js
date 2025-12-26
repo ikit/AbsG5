@@ -7,7 +7,6 @@ export default pinia
 // Export all stores
 export { useMainStore } from './main'
 export { useUserStore } from './user'
-export { useNotificationStore } from './notification'
 export { usePhotoGalleryStore } from './photoGallery'
 export { useAgpaStore } from './agpa'
 export { useWebSocketStore } from './websocket'

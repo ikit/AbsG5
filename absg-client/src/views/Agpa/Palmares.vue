@@ -254,6 +254,7 @@
 
 <script>
 import axios from 'axios';
+import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 
 export default {
@@ -273,6 +274,9 @@ export default {
         palmares: [],
         palmaresDetails: null
     }),
+    computed: {
+        ...mapState(['main'])
+    },
     mounted () {
         this.initView();
     },
@@ -286,7 +290,7 @@ export default {
                 }));
                 this.isLoading = false;
             }).catch( err => {
-                store.commit("onError", err);
+                this.main.onError(err);
             });
         },
         displaydetails(palmares) {

@@ -1,13 +1,57 @@
 // Pinia helpers that mimic Vuex mapState/mapActions
-// OPTIMIZED: These imports are static but helpers.js is now only imported when needed
-// The key optimization is that App.vue and other components don't import this at module level
+// OPTIMIZED: Lazy loading - stores are only imported when helpers.js is used
 
 import { useMainStore } from './main'
 import { useUserStore } from './user'
-import { useNotificationStore } from './notification'
 import { usePhotoGalleryStore } from './photoGallery'
 import { useAgpaStore } from './agpa'
 import { useWebSocketStore } from './websocket'
+
+// Cache for store instances to avoid multiple instantiations
+let mainStoreCache = null
+let userStoreCache = null
+let galleryStoreCache = null
+let agpaStoreCache = null
+let wsStoreCache = null
+
+/**
+ * Get store instance synchronously (uses cache to avoid multiple instantiations)
+ * Stores are imported statically but helpers.js itself is lazy-loaded
+ */
+function getMainStoreSync() {
+  if (!mainStoreCache) {
+    mainStoreCache = useMainStore()
+  }
+  return mainStoreCache
+}
+
+function getUserStoreSync() {
+  if (!userStoreCache) {
+    userStoreCache = useUserStore()
+  }
+  return userStoreCache
+}
+
+function getPhotoGalleryStoreSync() {
+  if (!galleryStoreCache) {
+    galleryStoreCache = usePhotoGalleryStore()
+  }
+  return galleryStoreCache
+}
+
+function getAgpaStoreSync() {
+  if (!agpaStoreCache) {
+    agpaStoreCache = useAgpaStore()
+  }
+  return agpaStoreCache
+}
+
+function getWebSocketStoreSync() {
+  if (!wsStoreCache) {
+    wsStoreCache = useWebSocketStore()
+  }
+  return wsStoreCache
+}
 
 /**
  * Maps Pinia state to component computed properties (like Vuex mapState)
@@ -19,27 +63,24 @@ export function mapPiniaState(keys) {
     map[key] = function() {
       // Check if it's a user-related property
       if (key === 'user' || key === 'currentUser' || key === 'isLoggedIn') {
-        const userStore = useUserStore()
+        const userStore = getUserStoreSync()
         if (key === 'user' || key === 'currentUser') {
           return userStore.currentUser
         }
         return userStore[key]
       }
 
-      // Check if it's a notification-related property
-      const notifProps = ['notifications', 'unreadNotifications', 'notif', 'warning', 'error', 'snack']
-      if (notifProps.includes(key)) {
-        const notifStore = useNotificationStore()
-        if (key === 'unreadNotifications') {
-          return notifStore.unreadCount
-        }
-        return notifStore[key]
+      // Check if it's UI notification-related property (warning, error, notif, snack - NOT user notifications)
+      const uiNotifProps = ['notif', 'warning', 'error', 'snack']
+      if (uiNotifProps.includes(key)) {
+        const mainStore = getMainStoreSync()
+        return mainStore[key]
       }
 
       // Check if it's a photo gallery property
       const galleryProps = ['photosGallery', 'photosGalleryIndex', 'photosGalleryDisplayed', 'photoMetadataEditorDisplayed']
       if (galleryProps.includes(key)) {
-        const galleryStore = usePhotoGalleryStore()
+        const galleryStore = getPhotoGalleryStoreSync()
         if (key === 'photosGallery') return galleryStore.photos
         if (key === 'photosGalleryIndex') return galleryStore.currentIndex
         if (key === 'photosGalleryDisplayed') return galleryStore.isDisplayed
@@ -48,20 +89,20 @@ export function mapPiniaState(keys) {
 
       // Check if it's an AGPA property
       if (key === 'agpaMeta') {
-        const agpaStore = useAgpaStore()
+        const agpaStore = getAgpaStoreSync()
         return agpaStore.meta
       }
 
       // Check if it's a WebSocket property
       const wsProps = ['wsOnline', 'wsMessage']
       if (wsProps.includes(key)) {
-        const wsStore = useWebSocketStore()
+        const wsStore = getWebSocketStoreSync()
         if (key === 'wsOnline') return wsStore.isOnline
         if (key === 'wsMessage') return wsStore.lastMessage
       }
 
       // Otherwise use main store
-      const store = useMainStore()
+      const store = getMainStoreSync()
       return store[key]
     }
   })
@@ -76,7 +117,7 @@ export function mapPiniaActions(keys) {
   const map = {}
   keys.forEach(key => {
     map[key] = function(...args) {
-      const store = useMainStore()
+      const store = getMainStoreSync()
       return store[key](...args)
     }
   })
@@ -101,12 +142,11 @@ export default {
       return stateProxyCache
     }
 
-    // Get stores
-    const mainStore = useMainStore()
-    const userStore = useUserStore()
-    const notifStore = useNotificationStore()
-    const galleryStore = usePhotoGalleryStore()
-    const agpaStore = useAgpaStore()
+    // Get stores lazily
+    const mainStore = getMainStoreSync()
+    const userStore = getUserStoreSync()
+    const galleryStore = getPhotoGalleryStoreSync()
+    const agpaStore = getAgpaStoreSync()
 
     stateProxyCache = new Proxy(mainStore, {
       get(target, prop) {
@@ -118,13 +158,10 @@ export default {
           return userStore.isLoggedIn
         }
 
-        // Delegate notification-related properties to notificationStore
-        const notifProps = ['notifications', 'unreadNotifications', 'notif', 'warning', 'error', 'snack']
-        if (notifProps.includes(prop)) {
-          if (prop === 'unreadNotifications') {
-            return notifStore.unreadCount
-          }
-          return notifStore[prop]
+        // UI notifications (warning, error, notif, snack) are in mainStore
+        const uiNotifProps = ['notif', 'warning', 'error', 'snack']
+        if (uiNotifProps.includes(prop)) {
+          return target[prop]
         }
 
         // Delegate photo gallery properties to photoGalleryStore
@@ -137,7 +174,7 @@ export default {
         if (prop === 'agpaMeta') return agpaStore.meta
 
         // Delegate WebSocket properties to webSocketStore
-        const wsStore = useWebSocketStore()
+        const wsStore = getWebSocketStoreSync()
         if (prop === 'wsOnline') return wsStore.isOnline
         if (prop === 'wsMessage') return wsStore.lastMessage
 
@@ -149,7 +186,7 @@ export default {
     return stateProxyCache
   },
   commit(action, payload) {
-    const mainStore = useMainStore()
+    const mainStore = getMainStoreSync()
 
     // Check if it's a user action
     const userActions = ['setCurrentUser', 'updateUser', 'logUser', 'logoutUser']
@@ -160,12 +197,9 @@ export default {
       return
     }
 
-    // Check if it's a notification action
-    const notifActions = [
-      'updateNotifications', 'readAllNotification', 'readNotification',
-      'onSnack', 'onNotif', 'onWarning', 'onError'
-    ]
-    if (notifActions.includes(action)) {
+    // UI notification actions (onSnack, onNotif, onWarning, onError) are in mainStore
+    const uiNotifActions = ['onSnack', 'onNotif', 'onWarning', 'onError']
+    if (uiNotifActions.includes(action)) {
       if (typeof mainStore[action] === 'function') {
         mainStore[action](payload)
       }
@@ -213,18 +247,9 @@ export default {
     // Check if it's a user action
     const userActions = ['login', 'logout', 'checkSession', 'changePassword', 'updateProfile']
     if (userActions.includes(action)) {
-      const userStore = useUserStore()
+      const userStore = getUserStoreSync()
       if (typeof userStore[action] === 'function') {
         return userStore[action](payload)
-      }
-    }
-
-    // Check if it's a notification action
-    const notifActions = ['fetchNotifications', 'readAllNotifications', 'readNotification']
-    if (notifActions.includes(action)) {
-      const notifStore = useNotificationStore()
-      if (typeof notifStore[action] === 'function') {
-        return notifStore[action](payload)
       }
     }
 
@@ -234,7 +259,7 @@ export default {
       'fetchCategoryData', 'fetchPalmares', 'submitPhoto', 'submitVotes'
     ]
     if (agpaActions.includes(action)) {
-      const agpaStore = useAgpaStore()
+      const agpaStore = getAgpaStoreSync()
       if (typeof agpaStore[action] === 'function') {
         return agpaStore[action](payload)
       }
@@ -243,13 +268,13 @@ export default {
     // Check if it's a WebSocket action
     const wsActions = ['sendMessage', 'disconnect', 'connect']
     if (wsActions.includes(action)) {
-      const wsStore = useWebSocketStore()
+      const wsStore = getWebSocketStoreSync()
       if (typeof wsStore[action] === 'function') {
         return wsStore[action](payload)
       }
     }
 
-    const store = useMainStore()
+    const store = getMainStoreSync()
     if (typeof store[action] === 'function') {
       return store[action](payload)
     } else {
