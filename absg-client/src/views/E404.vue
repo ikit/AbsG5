@@ -12,7 +12,6 @@
 
 
 <script>
-import Vue from 'vue';
 import { format } from 'date-fns';
 
 export default {
@@ -24,7 +23,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../themes/global.scss';
+@use '../themes/global.scss' as *;
 h1 {
     font-size: 200px;
     line-height: 400px;

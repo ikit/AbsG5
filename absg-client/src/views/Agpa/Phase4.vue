@@ -63,8 +63,8 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
-@import '../../themes/agpa.scss';
+@use '../../themes/global.scss' as *;
+@use '../../themes/agpa.scss' as *;
 
 #content {
     text-align: center;

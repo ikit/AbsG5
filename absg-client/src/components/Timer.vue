@@ -3,7 +3,7 @@
     <ul class="vuejs-countdown">
       <li v-if="days > 0">
         <p class="digit">
-          {{ days | twoDigits }}
+          {{ twoDigits(days) }}
         </p>
         <p class="text">
           {{ days > 1 ? 'jours' : 'jour' }}
@@ -11,7 +11,7 @@
       </li>
       <li v-if="hours > 0">
         <p class="digit">
-          {{ hours | twoDigits }}
+          {{ twoDigits(hours) }}
         </p>
         <p class="text">
           {{ hours > 1 ? 'heures' : 'heur' }}
@@ -19,7 +19,7 @@
       </li>
       <li>
         <p class="digit">
-          {{ minutes | twoDigits }}
+          {{ twoDigits(minutes) }}
         </p>
         <p class="text">
           min
@@ -27,7 +27,7 @@
       </li>
       <li>
         <p class="digit">
-          {{ seconds | twoDigits }}
+          {{ twoDigits(seconds) }}
         </p>
         <p class="text">
           sec
@@ -40,14 +40,6 @@
 <script>
 let interval = null;
 export default {
-    filters: {
-        twoDigits(value) {
-            if ( value.toString().length <= 1 ) {
-                return '0'+value.toString()
-            }
-            return value.toString()
-        }
-    },
     props: {
         end: {
             type: Date,
@@ -86,10 +78,16 @@ export default {
     created() {
         this.init();
     },
-    destroyed() {
+    unmounted() {
         clearInterval(interval);
     },
     methods: {
+        twoDigits(value) {
+            if ( value.toString().length <= 1 ) {
+                return '0'+value.toString()
+            }
+            return value.toString()
+        },
         init(endDate=null) {
             if (endDate) {
                 this.end = endDate;

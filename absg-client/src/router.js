@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router"
-import Home from "./views/Home.vue"
-import E404 from "./views/E404.vue"
-import Changelog from "./views/Changelog.vue"
-import Login from "./views/User/Login.vue"
+// OPTIMIZED: Lazy load all components to reduce initial bundle size
+// These components are now loaded on-demand when their route is accessed
+const Home = () => import("./views/Home.vue")
+const E404 = () => import("./views/E404.vue")
+const Changelog = () => import("./views/Changelog.vue")
+const Login = () => import("./views/User/Login.vue")
 import axios from "axios"
 import store from "./store"
 import { checkAutentication, logoutUser, logUser } from "./middleware/AuthHelper"

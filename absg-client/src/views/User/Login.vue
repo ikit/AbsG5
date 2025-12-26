@@ -55,7 +55,6 @@
 
 
 <script>
-import Vue from "vue";
 import axios from "axios";
 import store from "../../store";
 import { parseAxiosResponse, getPeopleAvatar } from "../../middleware/CommonHelper";
@@ -114,7 +113,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 
 .errorMsg {
     position: absolute;

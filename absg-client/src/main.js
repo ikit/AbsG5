@@ -1,4 +1,4 @@
-import { createApp, configureCompat } from 'vue'
+import { createApp } from 'vue'
 import vuetify from '@/plugins/vuetify'
 import websocketPlugin from '@/plugins/websocket'
 import App from './App.vue'
@@ -6,54 +6,6 @@ import { router } from './router'
 import pinia from './stores'
 import './registerServiceWorker'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
-
-// Configure Vue 3 compatibility mode
-configureCompat({
-  MODE: 2, // Vue 2 mode with warnings
-  INSTANCE_ATTRS_CLASS_STYLE: 'suppress-warning', // Suppress Vuetify 3 warnings
-  GLOBAL_MOUNT: false,
-  GLOBAL_EXTEND: false,
-  GLOBAL_PROTOTYPE: false,
-  GLOBAL_SET: false,
-  GLOBAL_DELETE: false,
-  GLOBAL_OBSERVABLE: false,
-  CONFIG_OPTION_MERGE_STRATS: false,
-  CONFIG_DEVTOOLS: false,
-  INSTANCE_SET: false,
-  INSTANCE_DELETE: false,
-  INSTANCE_DESTROY: false,
-  INSTANCE_EVENT_EMITTER: false,
-  INSTANCE_EVENT_HOOKS: false,
-  INSTANCE_CHILDREN: false,
-  INSTANCE_LISTENERS: false,
-  INSTANCE_SCOPED_SLOTS: 'suppress-warning',
-  COMPONENT_V_MODEL: false,
-  COMPONENT_FUNCTIONAL: false,
-  COMPONENT_ASYNC: false,
-  RENDER_FUNCTION: false,
-  FILTERS: false,
-  COMPILER_IS_ON_ELEMENT: false,
-  COMPILER_V_BIND_SYNC: false,
-  COMPILER_V_BIND_PROP: false,
-  COMPILER_V_BIND_OBJECT_ORDER: false,
-  COMPILER_V_ON_NATIVE: false,
-  COMPILER_V_IF_V_FOR_PRECEDENCE: false,
-  COMPILER_NATIVE_TEMPLATE: false,
-  COMPILER_INLINE_TEMPLATE: false,
-  COMPILER_FILTERS: false,
-  ATTR_FALSE_VALUE: false,
-  ATTR_ENUMERATED_COERCION: false,
-  TRANSITION_GROUP_ROOT: false,
-  TRANSITION_CLASSES: false,
-  WATCH_ARRAY: false,
-  OPTIONS_DATA_FN: false,
-  OPTIONS_DATA_MERGE: false,
-  OPTIONS_BEFORE_DESTROY: 'suppress-warning',
-  OPTIONS_DESTROYED: 'suppress-warning',
-  PRIVATE_APIS: false,
-  V_ON_KEYCODE_MODIFIER: false,
-  CUSTOM_DIR: false,
-})
 
 const app = createApp(App)
 

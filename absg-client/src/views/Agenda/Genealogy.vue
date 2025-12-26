@@ -4,8 +4,6 @@
 
 
 <script>
-import Vue from 'vue';
-
 export default {
     data: () => ({
         genealogData: {
@@ -38,5 +36,5 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 </style>

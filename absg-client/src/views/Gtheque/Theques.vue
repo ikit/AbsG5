@@ -191,7 +191,6 @@
 
 
 <script>
-import Vue from 'vue';
 import axios from 'axios';
 import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
@@ -316,7 +315,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 
 .colStatus {
   flex: none;

@@ -231,7 +231,7 @@ console.log(this.mode)
 </script>
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 
 .editor {
     height: 100%;

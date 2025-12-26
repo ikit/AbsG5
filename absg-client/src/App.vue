@@ -726,7 +726,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "./themes/global.scss";
+@use './themes/global.scss' as *;
 #title {
     font-size: 1.5em;
     line-height: 1.5em;

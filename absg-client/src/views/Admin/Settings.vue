@@ -128,7 +128,6 @@
 
 
 <script>
-import Vue from 'vue';
 import axios from 'axios';
 import store from '../../store';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
@@ -195,7 +194,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 
 h2 {
     line-height: initial;

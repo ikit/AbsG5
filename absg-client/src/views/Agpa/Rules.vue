@@ -526,7 +526,7 @@ export default  {
 </script>
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 
 h1 {
     display: block;

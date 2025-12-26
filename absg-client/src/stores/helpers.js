@@ -1,4 +1,7 @@
 // Pinia helpers that mimic Vuex mapState/mapActions
+// OPTIMIZED: These imports are static but helpers.js is now only imported when needed
+// The key optimization is that App.vue and other components don't import this at module level
+
 import { useMainStore } from './main'
 import { useUserStore } from './user'
 import { useNotificationStore } from './notification'
@@ -22,7 +25,7 @@ export function mapPiniaState(keys) {
         }
         return userStore[key]
       }
-      
+
       // Check if it's a notification-related property
       const notifProps = ['notifications', 'unreadNotifications', 'notif', 'warning', 'error', 'snack']
       if (notifProps.includes(key)) {
@@ -32,7 +35,7 @@ export function mapPiniaState(keys) {
         }
         return notifStore[key]
       }
-      
+
       // Check if it's a photo gallery property
       const galleryProps = ['photosGallery', 'photosGalleryIndex', 'photosGalleryDisplayed', 'photoMetadataEditorDisplayed']
       if (galleryProps.includes(key)) {
@@ -42,13 +45,13 @@ export function mapPiniaState(keys) {
         if (key === 'photosGalleryDisplayed') return galleryStore.isDisplayed
         if (key === 'photoMetadataEditorDisplayed') return galleryStore.isEditorDisplayed
       }
-      
+
       // Check if it's an AGPA property
       if (key === 'agpaMeta') {
         const agpaStore = useAgpaStore()
         return agpaStore.meta
       }
-      
+
       // Check if it's a WebSocket property
       const wsProps = ['wsOnline', 'wsMessage']
       if (wsProps.includes(key)) {
@@ -56,7 +59,7 @@ export function mapPiniaState(keys) {
         if (key === 'wsOnline') return wsStore.isOnline
         if (key === 'wsMessage') return wsStore.lastMessage
       }
-      
+
       // Otherwise use main store
       const store = useMainStore()
       return store[key]
@@ -84,20 +87,28 @@ export function mapPiniaActions(keys) {
 export const mapState = mapPiniaState
 export const mapActions = mapPiniaActions
 
+// Cache the proxy to avoid creating it repeatedly (OPTIMIZATION)
+let stateProxyCache = null
+
 /**
  * Vuex-like store object for backward compatibility
  * Allows using store.commit() and store.dispatch() with Pinia
  */
 export default {
   get state() {
-    // Return a proxy that delegates to appropriate stores
+    // Return cached proxy or create new one
+    if (stateProxyCache) {
+      return stateProxyCache
+    }
+
+    // Get stores
     const mainStore = useMainStore()
     const userStore = useUserStore()
     const notifStore = useNotificationStore()
     const galleryStore = usePhotoGalleryStore()
     const agpaStore = useAgpaStore()
-    
-    return new Proxy(mainStore, {
+
+    stateProxyCache = new Proxy(mainStore, {
       get(target, prop) {
         // Delegate user-related properties to userStore
         if (prop === 'user' || prop === 'currentUser') {
@@ -106,7 +117,7 @@ export default {
         if (prop === 'isLoggedIn' || prop === 'isAuthenticated') {
           return userStore.isLoggedIn
         }
-        
+
         // Delegate notification-related properties to notificationStore
         const notifProps = ['notifications', 'unreadNotifications', 'notif', 'warning', 'error', 'snack']
         if (notifProps.includes(prop)) {
@@ -115,52 +126,52 @@ export default {
           }
           return notifStore[prop]
         }
-        
+
         // Delegate photo gallery properties to photoGalleryStore
         if (prop === 'photosGallery') return galleryStore.photos
         if (prop === 'photosGalleryIndex') return galleryStore.currentIndex
         if (prop === 'photosGalleryDisplayed') return galleryStore.isDisplayed
         if (prop === 'photoMetadataEditorDisplayed') return galleryStore.isEditorDisplayed
-        
+
         // Delegate AGPA properties to agpaStore
         if (prop === 'agpaMeta') return agpaStore.meta
-        
+
         // Delegate WebSocket properties to webSocketStore
         const wsStore = useWebSocketStore()
         if (prop === 'wsOnline') return wsStore.isOnline
         if (prop === 'wsMessage') return wsStore.lastMessage
-        
+
         // Otherwise use main store
         return target[prop]
       }
     })
+
+    return stateProxyCache
   },
   commit(action, payload) {
+    const mainStore = useMainStore()
+
     // Check if it's a user action
     const userActions = ['setCurrentUser', 'updateUser', 'logUser', 'logoutUser']
     if (userActions.includes(action)) {
-      const mainStore = useMainStore()
-      // Call main store for backward compatibility
       if (typeof mainStore[action] === 'function') {
         mainStore[action](payload)
       }
       return
     }
-    
+
     // Check if it's a notification action
     const notifActions = [
       'updateNotifications', 'readAllNotification', 'readNotification',
       'onSnack', 'onNotif', 'onWarning', 'onError'
     ]
     if (notifActions.includes(action)) {
-      const mainStore = useMainStore()
-      // Call main store for backward compatibility
       if (typeof mainStore[action] === 'function') {
         mainStore[action](payload)
       }
       return
     }
-    
+
     // Check if it's a photo gallery action
     const galleryActions = [
       'photosGalleryReset', 'photosGalleryDisplay', 'photosGalleryHide',
@@ -168,39 +179,32 @@ export default {
       'photoMetadataEditorDisplay', 'photoMetadataEditorHide'
     ]
     if (galleryActions.includes(action)) {
-      const mainStore = useMainStore()
-      // Call main store for backward compatibility
       if (typeof mainStore[action] === 'function') {
         mainStore[action](payload)
       }
       return
     }
-    
+
     // Check if it's an AGPA action
     const agpaActions = ['updateAgpaMeta', 'initAGPA']
     if (agpaActions.includes(action)) {
-      const mainStore = useMainStore()
-      // Call main store for backward compatibility
       if (typeof mainStore[action] === 'function') {
         mainStore[action](payload)
       }
       return
     }
-    
+
     // Check if it's a WebSocket action
     const wsActions = ['sendWsMessage', 'setWsOnline', 'setWsMessage']
     if (wsActions.includes(action)) {
-      const mainStore = useMainStore()
-      // Call main store for backward compatibility
       if (typeof mainStore[action] === 'function') {
         mainStore[action](payload)
       }
       return
     }
-    
-    const store = useMainStore()
-    if (typeof store[action] === 'function') {
-      store[action](payload)
+
+    if (typeof mainStore[action] === 'function') {
+      mainStore[action](payload)
     } else {
       console.warn(`Action ${action} not found in Pinia store`)
     }
@@ -214,7 +218,7 @@ export default {
         return userStore[action](payload)
       }
     }
-    
+
     // Check if it's a notification action
     const notifActions = ['fetchNotifications', 'readAllNotifications', 'readNotification']
     if (notifActions.includes(action)) {
@@ -223,7 +227,7 @@ export default {
         return notifStore[action](payload)
       }
     }
-    
+
     // Check if it's an AGPA action
     const agpaActions = [
       'initialize', 'fetchCurrentEdition', 'fetchArchiveEdition',
@@ -235,7 +239,7 @@ export default {
         return agpaStore[action](payload)
       }
     }
-    
+
     // Check if it's a WebSocket action
     const wsActions = ['sendMessage', 'disconnect', 'connect']
     if (wsActions.includes(action)) {
@@ -244,7 +248,7 @@ export default {
         return wsStore[action](payload)
       }
     }
-    
+
     const store = useMainStore()
     if (typeof store[action] === 'function') {
       return store[action](payload)

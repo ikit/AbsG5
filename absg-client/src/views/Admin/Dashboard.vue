@@ -89,7 +89,6 @@
 
 
 <script>
-import Vue from 'vue';
 import store from "../../store";
 import axios from "axios";
 import { MODULES, parseAxiosResponse } from  "../../middleware/CommonHelper";
@@ -125,7 +124,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 
 .tool {
     display: inline-block;

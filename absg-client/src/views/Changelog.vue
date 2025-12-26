@@ -246,8 +246,6 @@
 
 
 <script>
-import Vue from 'vue';
-
 export default {
     data: () => ({
         version: ""
@@ -261,7 +259,7 @@ export default {
 
 
 <style lang="scss" scoped>
-@import '../themes/global.scss';
+@use '../themes/global.scss' as *;
 
 h2 {
     color: #fff;

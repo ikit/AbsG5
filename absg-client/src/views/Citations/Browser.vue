@@ -326,11 +326,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../themes/global.scss';
+@use '../../themes/global.scss' as *;
 
 
 
-.citation ::v-deep .note  {
+.citation :deep(.note)  {
     color: #999!important;
     flex: 1 0 1;
 }
