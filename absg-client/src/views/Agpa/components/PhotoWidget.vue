@@ -4,79 +4,83 @@
       v-if="photo.id !== -1"
       width="100%"
     >
-      <tr>
-        <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
-          <img
-            class="thumb"
-            :src="photo.thumb"
-            @click="clickOnPhoto()"
-          >
-        </td>
-      </tr>
-      <tr>
-        <td style="text-align: center">
-          {{ photo.title }}
-        </td>
-      </tr>
-      <tr>
-        <td style="text-align: center; padding-top: 20px">
-          <v-tooltip bottom>
-            <template #activator="{ props }">
-              <v-btn
-                fab
-                small
-                v-bind="props"
-                @click="editPhoto()"
-              >
-                <v-icon style="font-size: 20px">
-                  fas fa-pen
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Modifier la photo</span>
-          </v-tooltip>
-                &nbsp;
-          <v-tooltip bottom>
-            <template #activator="{ props }">
-              <v-btn
-                fab
-                small
-                v-bind="props"
-                @click="deletePhoto()"
-              >
-                <v-icon style="font-size: 20px">
-                  fas fa-times
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>Supprimer la photo</span>
-          </v-tooltip>
-        </td>
-      </tr>
+      <tbody>
+        <tr>
+          <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
+            <img
+              class="thumb"
+              :src="photo.thumb"
+              @click="clickOnPhoto()"
+            >
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center">
+            {{ photo.title }}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; padding-top: 20px">
+            <v-tooltip bottom>
+              <template #activator="{ props }">
+                <v-btn
+                  fab
+                  small
+                  v-bind="props"
+                  @click="editPhoto()"
+                >
+                  <v-icon style="font-size: 20px">
+                    fas fa-pen
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>Modifier la photo</span>
+            </v-tooltip>
+                  &nbsp;
+            <v-tooltip bottom>
+              <template #activator="{ props }">
+                <v-btn
+                  fab
+                  small
+                  v-bind="props"
+                  @click="deletePhoto()"
+                >
+                  <v-icon style="font-size: 20px">
+                    fas fa-times
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>Supprimer la photo</span>
+            </v-tooltip>
+          </td>
+        </tr>
+      </tbody>
     </table>
 
     <table
       v-else
       width="100%"
     >
-      <tr>
-        <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
-          <v-tooltip bottom>
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                @click="addNewPhoto()"
-              >
-                <v-icon start>
-                  fas fa-plus
-                </v-icon>
-                <span>Photo</span>
-              </v-btn>
-            </template>
-            <span>Enregistrer une nouvelle photo</span>
-          </v-tooltip>
-        </td>
-      </tr>
+      <tbody>
+        <tr>
+          <td style="width: 250px; height: 250px; text-align: center; vertical-align: middle;">
+            <v-tooltip bottom>
+              <template #activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  @click="addNewPhoto()"
+                >
+                  <v-icon start>
+                    fas fa-plus
+                  </v-icon>
+                  <span>Photo</span>
+                </v-btn>
+              </template>
+              <span>Enregistrer une nouvelle photo</span>
+            </v-tooltip>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>
