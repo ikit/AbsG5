@@ -8,31 +8,37 @@
         v-model="currentTab"
         :show-arrows="$vuetify.display.mobile"
         :touch="false"
+        :stacked="$vuetify.display.mobile"
       >
         <v-tab>
-          <v-icon start>
+          <v-icon :start="!$vuetify.display.mobile">
             far fa-image
-          </v-icon> Photos
+          </v-icon>
+          <span v-if="!$vuetify.display.mobile">Photos</span>
         </v-tab>
         <v-tab>
-          <v-icon start>
+          <v-icon :start="!$vuetify.display.mobile">
             fas fa-vote-yea
-          </v-icon> Votes
+          </v-icon>
+          <span v-if="!$vuetify.display.mobile">Votes</span>
         </v-tab>
         <v-tab>
-          <v-icon start>
+          <v-icon :start="!$vuetify.display.mobile">
             fas fa-calculator
-          </v-icon> Notes
+          </v-icon>
+          <span v-if="!$vuetify.display.mobile">Notes</span>
         </v-tab>
         <v-tab>
-          <v-icon start>
+          <v-icon :start="!$vuetify.display.mobile">
             fas fa-trophy
-          </v-icon> Palmarès
+          </v-icon>
+          <span v-if="!$vuetify.display.mobile">Palmarès</span>
         </v-tab>
         <v-tab>
-          <v-icon start>
+          <v-icon :start="!$vuetify.display.mobile">
             fas fa-chart-pie
-          </v-icon> Stats
+          </v-icon>
+          <span v-if="!$vuetify.display.mobile">Stats</span>
         </v-tab>
 
 
