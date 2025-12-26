@@ -396,7 +396,9 @@ class AgpaService {
             const thumb = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/vignette_${photo.filename}`);
             const web = path.join(process.env.PATH_FILES, `agpa/${photo.year}/mini/${photo.filename}`);
             const raw = path.join(process.env.PATH_FILES, `agpa/${photo.year}/${photo.filename}`);
-            await saveImage(image.buffer, thumb, web, raw);
+            // express-fileupload uses 'data' property instead of 'buffer'
+            const imageBuffer = image.data || image.buffer;
+            await saveImage(imageBuffer, thumb, web, raw);
         }
 
         // Ce log n'est visible que par les admins

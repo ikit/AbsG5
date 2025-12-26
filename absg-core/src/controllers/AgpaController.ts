@@ -5,9 +5,9 @@ import {
     Delete,
     Authorized,
     CurrentUser,
-    UploadedFile,
     Post,
-    Body
+    Body,
+    Req
 } from "routing-controllers";
 import { AgpaPhoto, User } from "../entities";
 import { agpaService } from "../services/AgpaService";
@@ -141,12 +141,14 @@ export class AgpaController {
 
     /**
      * Enregistre ou modifie une photo
-     * @param image la photo si défini
-     * @param body les informations sur la photo au format json
+     * @param req la requête express contenant les fichiers
      * @param user l'utilisateur qui effectue la demande
      */
     @Post("/photo")
-    savePhoto(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() user: any) {
+    savePhoto(@Req() req: any, @CurrentUser() user: any) {
+        // Extract data from express-fileupload format
+        const body = req.body;
+        const image = req.files?.image;
         return agpaService.savePhoto(body, image, user);
     }
 
