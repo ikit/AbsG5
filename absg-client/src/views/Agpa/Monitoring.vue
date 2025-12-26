@@ -372,25 +372,29 @@
           <div style="display: flex;">
             <div style="flex: 1 0 0;">
               <table style="width: 100%">
-                <tr>
-                  <td>&nbsp;</td>
-                  <td>Gueudelot</td>
-                  <td>Guibert</td>
-                  <td>Guyomard</td>
-                  <td>Adultes | Enfants</td>
-                </tr>
-                <tr
-                  v-for="row in (data && data.photosStats) || []"
-                  :key="row.catId"
-                >
-                  <td style="text-align: right; font-weight: bold">
-                    {{ row.name }}
-                  </td>
-                  <td>{{ row.totalByFamilies.gueudelot }}</td>
-                  <td>{{ row.totalByFamilies.guibert }}</td>
-                  <td>{{ row.totalByFamilies.guyomard }}</td>
-                  <td>{{ row.totalByAge.adults }} | {{ row.totalByAge.childdren }}</td>
-                </tr>
+                <thead>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <th>Gueudelot</th>
+                    <th>Guibert</th>
+                    <th>Guyomard</th>
+                    <th>Adultes | Enfants</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="row in (data && data.photosStats) || []"
+                    :key="row.catId"
+                  >
+                    <td style="text-align: right; font-weight: bold">
+                      {{ row.name }}
+                    </td>
+                    <td>{{ row.totalByFamilies.gueudelot }}</td>
+                    <td>{{ row.totalByFamilies.guibert }}</td>
+                    <td>{{ row.totalByFamilies.guyomard }}</td>
+                    <td>{{ row.totalByAge.adults }} | {{ row.totalByAge.childdren }}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <div style="flex: 0 1 0;">
