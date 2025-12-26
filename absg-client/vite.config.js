@@ -58,13 +58,34 @@ export default defineConfig({
     const filesPath = 'C:\\Users\\ogueu\\Documents\\git\\ABSG_FILES'
     console.log(`📁 Serving /files from ${filesPath}`)
 
+    // MIME types mapping
+    const mimeTypes = {
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.mp4': 'video/mp4',
+      '.pdf': 'application/pdf',
+      '.json': 'application/json',
+    }
+
     server.middlewares.use((req, res, next) => {
       if (req.url?.startsWith('/files/')) {
-        const filePath = path.join(filesPath, req.url.replace('/files/', ''))
+        // Remove query parameters
+        const cleanUrl = req.url.split('?')[0]
+        const filePath = path.join(filesPath, cleanUrl.replace('/files/', ''))
 
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-          console.log(`✓ Serving file: ${req.url}`)
+          // Detect MIME type
+          const ext = path.extname(filePath).toLowerCase()
+          const mimeType = mimeTypes[ext] || 'application/octet-stream'
+
+          console.log(`✓ Serving file: ${cleanUrl} (${mimeType})`)
+          res.setHeader('Content-Type', mimeType)
           res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Cache-Control', 'public, max-age=31536000')
+
           fs.createReadStream(filePath).pipe(res)
         } else {
           console.log(`✗ File not found: ${filePath}`)
