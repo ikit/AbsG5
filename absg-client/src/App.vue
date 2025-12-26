@@ -500,9 +500,11 @@ export default {
         this.init();
     },
     methods: {
-        init() {
-            // On initialise le store
-            store.dispatch("initStore");
+        async init() {
+            // On vérifie si l'utilisateur a une session active
+            await store.dispatch("checkSession");
+            // On initialise le store (citations, settings)
+            await store.dispatch("initStore");
         },
         logout() {
             logoutUser(store);
