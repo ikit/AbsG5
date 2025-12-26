@@ -378,9 +378,9 @@
         <!-- Stats -->
         <v-window-item>
           <h2>Participation</h2>
-          <div style="display: flex;">
-            <div style="flex: 1 0 0;">
-              <table style="width: 100%">
+          <div :style="{ display: 'flex', flexDirection: $vuetify.display.mobile ? 'column' : 'row' }">
+            <div :style="{ flex: $vuetify.display.mobile ? '1 1 auto' : '1 0 0', overflowX: 'auto' }">
+              <table style="width: 100%; font-size: 0.8em;">
                 <thead>
                   <tr>
                     <th>&nbsp;</th>
@@ -406,19 +406,21 @@
                 </tbody>
               </table>
             </div>
-            <div style="flex: 0 1 0;">
+            <div :style="{ flex: $vuetify.display.mobile ? '1 1 auto' : '0 1 0', marginTop: $vuetify.display.mobile ? '20px' : '0' }">
               <highcharts
                 v-if="participationGraph"
                 :options="participationGraph"
               />
             </div>
           </div>
-          <div>
+          <div :style="{ marginTop: '20px' }">
             <h2>Votes</h2>
-            <highcharts
-              v-if="votesGraph"
-              :options="votesGraph"
-            />
+            <div :style="{ overflowX: 'auto' }">
+              <highcharts
+                v-if="votesGraph"
+                :options="votesGraph"
+              />
+            </div>
           </div>
         </v-window-item>
       </v-window>
