@@ -222,8 +222,14 @@ export const useMainStore = defineStore('main', {
         try {
           const response = await axios.get(`/api/welcom`)
           const data = parseAxiosResponse(response)
-          this.updateSettings(data.settings)
-          this.updateCitation(data.citation)
+          if (data) {
+            if (data.settings) {
+              this.updateSettings(data.settings)
+            }
+            if (data.citation) {
+              this.updateCitation(data.citation)
+            }
+          }
           this.isInitialized = true
         } catch (error) {
           console.error('Failed to initialize store:', error)
