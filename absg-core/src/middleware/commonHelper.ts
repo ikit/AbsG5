@@ -50,22 +50,27 @@ export function decodeBase64Image(dataString) {
  */
 export async function saveImage(file, thumbPath, webPath, originalPath) {
     const img = await Jimp.read(file);
-    // create WEB version
+
+    // create WEB version (must be done before THUMB to preserve quality)
     if (webPath) {
         // On crée le répertoire si besoin
         fs.mkdirSync(path.dirname(webPath), { recursive: true });
-        img.scaleToFit(2000, 2000); // 4K
-        img.quality(85);
-        img.write(webPath);
+        const webImg = img.clone();
+        webImg.scaleToFit(2000, 2000); // 4K
+        webImg.quality(85);
+        await webImg.writeAsync(webPath);
     }
-    // create THUMB
+
+    // create THUMB (use original image, not the scaled web version)
     if (thumbPath) {
         // On crée le répertoire si besoin
         fs.mkdirSync(path.dirname(thumbPath), { recursive: true });
-        img.scaleToFit(200, 200);
-        img.quality(85);
-        img.write(thumbPath);
+        const thumbImg = img.clone();
+        thumbImg.scaleToFit(200, 200);
+        thumbImg.quality(85);
+        await thumbImg.writeAsync(thumbPath);
     }
+
     // On déplace dans le répertoire ORIGINAL
     if (originalPath) {
         // On crée le répertoire si besoin
