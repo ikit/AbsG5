@@ -372,3 +372,22 @@ Si le slash final est manquant, les URLs seront incorrectement formées:
 - ❌ `/filesagpa/2025/...` (sans slash)
 - ✅ `/files/agpa/2025/...` (avec slash)
 
+### AGPA_FORCE_EDITION (Debug)
+**Usage**: Forcer l'édition courante des AGPA pour le développement et les tests.
+
+Par défaut, l'édition courante est calculée automatiquement en fonction de la date :
+- Du 1er février au 30 septembre : édition de l'année en cours
+- Du 1er octobre au 31 janvier : édition de l'année en cours (qui se termine en janvier suivant)
+
+Pour tester des fonctionnalités d'une édition spécifique (par exemple, les archives ou la cérémonie d'une année passée), vous pouvez forcer l'édition :
+
+```bash
+# Forcer l'édition 2024 (utile pour tester les archives, le palmares, etc.)
+AGPA_FORCE_EDITION=2024
+
+# Laisser vide pour le comportement normal (calculé automatiquement)
+AGPA_FORCE_EDITION=
+```
+
+**Attention**: Cette variable ne doit être utilisée qu'en développement. En production, laissez-la vide pour que l'édition soit calculée automatiquement.
+

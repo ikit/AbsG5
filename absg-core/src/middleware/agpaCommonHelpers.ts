@@ -11,6 +11,14 @@ export const agpaCtx = new AgpaContext();
  * @return l'année de l'édition en cours
  */
 export function getCurrentEdition(): number {
+    // DEBUG: Si la variable d'environnement AGPA_FORCE_EDITION est définie, on force l'édition
+    if (process.env.AGPA_FORCE_EDITION) {
+        const forcedEdition = parseInt(process.env.AGPA_FORCE_EDITION, 10);
+        if (!isNaN(forcedEdition) && forcedEdition >= 2006) {
+            return forcedEdition;
+        }
+    }
+
     // Une édition commence toujours au 1er octobre pour se terminer fin décembre
     // Mais en fonction du calendrier, peut déborder sur janvier de l'année suivante
     // Donc si on est avant 1er février, il s'agit de l'édition précédente, sinon il s'agit de l'année courante
