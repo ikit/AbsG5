@@ -470,11 +470,10 @@
     >
       {{ snack.msg }}
 
-      <template #action="{ attrs }">
+      <template #actions>
         <v-btn
           color="secondary"
           text
-          v-bind="attrs"
           @click="snack.displayed = false"
         >
           Close

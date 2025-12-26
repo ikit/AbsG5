@@ -44,12 +44,11 @@
           v-if="category"
           offset-y
         >
-          <template #activator="{ on, attrs }">
+          <template #activator="{ props }">
             <v-btn
-              v-bind="attrs"
+              v-bind="props"
               variant="text"
               class="grey--text"
-              v-on="on"
             >
               {{ category.title }}
             </v-btn>
