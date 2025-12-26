@@ -38,7 +38,7 @@
 
       </v-tabs>
 
-      <v-btn
+      <!-- <v-btn
         style="position: absolute; top: 5px; right: 5px"
         @click="closeEdition()"
       >
@@ -49,7 +49,7 @@
           fa-plus
         </v-icon>
         Close edition
-      </v-btn>
+      </v-btn> -->
 
       <v-window v-model="currentTab" :touch="false">
         <!-- Vérification des photos -->
