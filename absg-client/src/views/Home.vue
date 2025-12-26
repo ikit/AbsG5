@@ -95,7 +95,7 @@
                           :src="user.avatar"
                           :alt="user.username"
                           height="40px"
-                          @error="(e) => e.target.src='/files/avatars/000.png'"
+                          @error="handleAvatarError"
                           v-bind="props"
                         >
                       </template>
@@ -284,6 +284,17 @@ export default {
         },
         zoomOnImmt(event) {
             store.commit('photosGalleryDisplay');
+        },
+        handleAvatarError(event) {
+            // Prevent infinite loop by checking if we already tried the fallback
+            if (event.target.src.includes('000.png')) {
+                // Already on fallback, use a transparent pixel to stop the loop
+                event.target.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                event.target.style.display = 'none'; // Hide broken image
+            } else {
+                // First error, try fallback avatar
+                event.target.src = '/files/avatars/000.png';
+            }
         }
     }
 };
