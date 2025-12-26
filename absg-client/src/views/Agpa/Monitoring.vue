@@ -274,7 +274,6 @@
             :items="palmares"
             :search="palmaresFilter.quickFilter"
             :loading="isLoading"
-            :custom-filter="palmaresSearchMethod"
             loading-text="Récupération des données..."
             no-data-text="Aucun palmarès disponible."
             no-results-text="Aucune personne trouvée."
