@@ -56,12 +56,14 @@
         >
           <img
             :src="`/img/agpa/cupesMaxi/c${catIdx}.png`"
-            :width="$vuetify.display.smAndDown ? '80px' : '100px'"
             :style="{
               position: 'absolute',
               top: $vuetify.display.smAndDown ? '-40px' : '-50px',
               left: '50%',
-              transform: 'translateX(-50%)'
+              transform: 'translateX(-50%)',
+              width: $vuetify.display.smAndDown ? '80px' : '100px',
+              height: $vuetify.display.smAndDown ? '80px' : '100px',
+              objectFit: 'contain'
             }"
           >
           <v-row
