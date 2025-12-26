@@ -351,3 +351,23 @@ Privé - Tous droits réservés
 ## Auteur
 
 Olivier Gueudelot - [ikit](https://github.com/ikit)
+
+## Configuration de l'environnement
+
+### URL_FILES
+**Important**: La variable `URL_FILES` doit avoir un slash final `/` pour que les URLs des images soient correctement formées.
+
+Exemple pour le développement:
+```
+URL_FILES=/files/
+```
+
+Exemple pour la production:
+```
+URL_FILES=https://absolumentg.fr/files/
+```
+
+Si le slash final est manquant, les URLs seront incorrectement formées:
+- ❌ `/filesagpa/2025/...` (sans slash)
+- ✅ `/files/agpa/2025/...` (avec slash)
+
