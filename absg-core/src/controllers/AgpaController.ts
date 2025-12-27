@@ -91,6 +91,15 @@ export class AgpaController {
     }
 
     /**
+     * Récupère les profils de votes pour une édition donnée
+     * @param year l'année de l'édition à analyser
+     */
+    @Get("/vote-profiles/:year([0-9]{4})")
+    getVoteProfiles(@Param("year") year: number) {
+        return agpaService.getVoteProfiles(year);
+    }
+
+    /**
      * Récupère les informations de l'utilisateur pour la phase 1
      * @param user l'utilisateur qui effectue la demande
      */

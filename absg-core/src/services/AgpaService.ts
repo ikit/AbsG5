@@ -11,6 +11,7 @@ import {
 } from "../middleware/agpaAlgorithmsHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
+import { analyzeVoteProfiles, UserData } from "../middleware/agpaVoteProfilesHelper";
 import { logger } from "../middleware/logger";
 import { Equal } from "typeorm";
 import { getRepository } from "../middleware/database";
@@ -545,6 +546,62 @@ class AgpaService {
             votes: result,
             totalTitleVotes: result.filter(v => v.categoryId === -3).length
         };
+    }
+
+    /**
+     * Analyse les profils de votes pour une année donnée
+     * Attribution de badges amusants basés sur les comportements de vote
+     * @param year l'année de l'édition à analyser
+     */
+    async getVoteProfiles(year: number) {
+        // Récupération des votes de l'année
+        const votesQuery = `
+            SELECT
+                v."userId" as "from",
+                p."userId" as "to",
+                v.score as weight
+            FROM agpa_vote v
+            INNER JOIN agpa_photo p ON v."photoId" = p.id
+            WHERE v.year = ${year} AND v."categoryId" > 0
+        `;
+        const votesData = await this.catRepo.query(votesQuery);
+
+        // Transformation des votes au format attendu par l'helper
+        const votes: Array<[string, string, number]> = votesData.map(v => [
+            v.from.toString(),
+            v.to.toString(),
+            v.weight
+        ]);
+
+        // Récupération des données utilisateurs
+        const usersQuery = `
+            SELECT
+                u.id,
+                u.username,
+                u."rootFamily"
+            FROM public."user" u
+            WHERE u.id IN (
+                SELECT DISTINCT "userId" FROM agpa_photo WHERE year = ${year}
+                UNION
+                SELECT DISTINCT "userId" FROM agpa_vote WHERE year = ${year}
+            )
+        `;
+        const usersData = await this.catRepo.query(usersQuery);
+
+        // Transformation des utilisateurs au format attendu par l'helper
+        const users: Record<string, UserData> = {};
+        usersData.forEach(u => {
+            users[u.id.toString()] = {
+                username: u.username,
+                rootFamily: u.rootFamily || 'autre'
+                // TODO: Ajouter spouse et children quand ces données seront disponibles en base
+            };
+        });
+
+        // Analyse des profils via l'helper
+        const profiles = analyzeVoteProfiles(votes, users);
+
+        return profiles;
     }
 }
 
