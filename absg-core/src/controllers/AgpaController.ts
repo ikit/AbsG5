@@ -91,6 +91,14 @@ export class AgpaController {
     }
 
     /**
+     * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
+     */
+    @Get("/palmares/sliding")
+    getSlidingPalmares() {
+        return agpaService.getSlidingPalmaresData();
+    }
+
+    /**
      * Récupère les profils de votes pour une édition donnée
      * @param year l'année de l'édition à analyser
      */

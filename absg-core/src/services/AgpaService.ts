@@ -73,6 +73,15 @@ class AgpaService {
     }
 
     /**
+     * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
+     */
+    getSlidingPalmaresData() {
+        const maxYear = getMaxArchiveEdition();
+        const fromYear = Math.max(2006, maxYear - 2); // 3 dernières années
+        return palmaresData(fromYear, maxYear);
+    }
+
+    /**
      * Récupère les données pour une cérémonie donnée
      * @param year l'année de la cérémonie
      */

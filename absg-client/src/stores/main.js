@@ -220,7 +220,7 @@ export const useMainStore = defineStore('main', {
     async initStore() {
       if (!this.isInitialized) {
         try {
-          const response = await axios.get(`/api/welcom`)
+          const response = await axios.get(`/api/welcome`)
           const data = parseAxiosResponse(response)
           if (data) {
             if (data.settings) {

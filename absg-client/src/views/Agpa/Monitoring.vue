@@ -301,28 +301,43 @@
 
         <!-- Notes des photos -->
         <v-window-item>
-          <div
-            class="row"
-            style="margin: 0 10px 0 0;"
-          >
-            <h2>Calcul des notes</h2>
-            <v-spacer />
+          <div :style="{
+            display: 'flex',
+            flexDirection: $vuetify.display.mobile ? 'column' : 'row',
+            alignItems: $vuetify.display.mobile ? 'stretch' : 'center',
+            gap: '15px',
+            margin: '10px',
+            marginBottom: '20px'
+          }">
+            <h2 :style="{
+              flex: $vuetify.display.mobile ? '0 0 auto' : '1 1 auto',
+              marginBottom: $vuetify.display.mobile ? '10px' : '0'
+            }">Calcul des notes</h2>
             <v-text-field
               v-model="notesFilter.quickFilter"
               prepend-icon="fas fa-search"
               label="Rechercher"
               single-line
               hide-details
-              style="width: 200px"
+              density="compact"
+              :style="{
+                flex: $vuetify.display.mobile ? '1 1 auto' : '0 0 250px',
+                minWidth: $vuetify.display.mobile ? '100%' : '200px'
+              }"
             />
-                        &nbsp;
             <v-select
+              v-model="notesFilter.categoryId"
               :items="notesCategories"
               label="Catégorie"
               item-title="label"
               item-value="id"
-              style="width: 200px"
-              @change="updateNotesList($event)"
+              density="compact"
+              hide-details
+              :style="{
+                flex: $vuetify.display.mobile ? '1 1 auto' : '0 0 200px',
+                minWidth: $vuetify.display.mobile ? '100%' : '200px'
+              }"
+              @update:model-value="updateNotesList"
             />
           </div>
 
@@ -330,6 +345,7 @@
             :headers="notesHeaders"
             :items="notes"
             :search="notesFilter.quickFilter"
+            :custom-filter="notesSearchFilter"
             :loading="isLoading"
             loading-text="Récupération des données..."
           >
@@ -1339,7 +1355,7 @@ export default {
             });
 
             // Parcourir les votes pour compter votants et votes par famille et catégorie
-            this.votes.forEach(voter => {
+            Object.values(this.votes).forEach(voter => {
                 const user = this.data.users[voter.id];
                 if (user && user.rootFamily) {
                     const family = user.rootFamily.toLowerCase();
@@ -1482,9 +1498,10 @@ export default {
                 this.notesCategories = this.notesCategories.concat(categories.filter(c => c.id === -3 || c.id > 0).map(e => ({ label: e.title, id: e.id })));
                 this.notesAll = this.data.photosOrder.map(id => {
                     const res = this.data.photos[id];
+                    const categoryTitle = this.data.categories[res.categoryId]?.title || '';
                     return {
                         ... res,
-                        quicksearch: `${res.username} ${res.title}`.toLowerCase()
+                        quicksearch: `${categoryTitle} ${res.username} ${res.title}`.toLowerCase()
                     }
                 });
                 this.updateNotesList();
@@ -1732,24 +1749,32 @@ export default {
         },
 
         updateNotesList(catId) {
-            if (catId > -1) {
-                this.notes = this.notesAll.filter(e => e.categoryId === catId);
+            if (catId === null || catId === undefined) {
+                // "Toutes" - afficher toutes les notes
+                this.notes = this.notesAll;
             } else if (catId === -3) {
+                // Catégorie spéciale "Meilleur titre"
                 this.notes = this.notesAll.filter(e => e.votesTitle > 0);
+            } else if (catId > 0) {
+                // Catégorie normale
+                this.notes = this.notesAll.filter(e => e.categoryId === catId);
             } else {
+                // Fallback - afficher toutes les notes
                 this.notes = this.notesAll;
             }
         },
 
-        notesSearchMethod(items, search) {
-            console.log("search", items, search)
-            if (!search) {
-                return items;
+        notesSearchFilter(value, search, item) {
+            // Si pas de recherche, afficher l'item
+            if (!search || search.trim() === '') {
+                return true;
             }
-            if (!items) {
-                return [];
+            // Si pas d'item ou pas de quicksearch, ne pas afficher
+            if (!item || !item.quicksearch) {
+                return false;
             }
-            return items.filter(e => e != null && e.quicksearch.indexOf(search.toLowerCase()) > -1);
+            // Rechercher dans le champ quicksearch (qui contient catégorie, auteur, titre en minuscules)
+            return item.quicksearch.includes(search.toLowerCase());
         },
 
         getFamilyColors() {

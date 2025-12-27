@@ -18,8 +18,8 @@ export class UserController {
      *  - Les paramètres de configuration du site (notament si il y a une annonce à afficher)
      */
     @Authorized()
-    @Get("/welcom")
-    async welcom(@CurrentUser() user: User) {
+    @Get("/welcome")
+    async welcome(@CurrentUser() user: User) {
         const result = {
             citation: await citationService.random(),
             notifications: await userService.getLastNotifications(user),

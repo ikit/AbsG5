@@ -1,7 +1,8 @@
 <template>
   <section id="content">
     <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
-      <v-row style="padding: 15px">
+      <!-- Desktop Layout -->
+      <v-row v-if="!$vuetify.display.mobile" style="padding: 15px">
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-icon
@@ -105,6 +106,83 @@
           <span>Besoin d'aide sur le déroulement du concours ?</span>
         </v-tooltip>
       </v-row>
+
+      <!-- Mobile Layout -->
+      <div v-else style="padding: 10px;">
+        <!-- Header avec aide et votes -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+          <div
+            class="phase-left-header-mobile"
+            @click="help.displayed = true; help.page = 3"
+          >
+            <v-icon size="small" style="margin-right: 5px;">far fa-question-circle</v-icon>
+            <div>
+              <h2>Phase 3 : Votes</h2>
+              <p>Phase 4 - dès le {{ end }}</p>
+            </div>
+          </div>
+
+          <div
+            class="phase-right-header-mobile"
+            @click="help.displayed = true; help.page = 4"
+          >
+            <h2>Vos votes</h2>
+            <p v-if="category && category.categoryId > 0">
+              <span :style="{ color: totalVotes >= category.maxVotes / 2.0 && totalVotes <= category.maxVotes ? 'green' : 'red'}">
+                {{ totalVotes }}/{{ category.maxVotes }} <i class="fas fa-star" style="font-size: 0.8em;" />
+              </span>
+              &nbsp;
+              <span :style="{ color: totalTitleVotes >= 5 && totalTitleVotes <= 10 ? 'green' : 'red' }">
+                {{ totalTitleVotes }}/10 <i class="fas fa-feather-alt" style="font-size: 0.8em;" />
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Navigation catégories -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <v-btn
+            icon
+            size="small"
+            :disabled="isLoading"
+            @click="gotoNextCat(-1)"
+          >
+            <v-icon size="small">fas fa-chevron-left</v-icon>
+          </v-btn>
+
+          <v-menu v-if="category">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                variant="outlined"
+                size="small"
+                style="flex: 1; text-transform: none;"
+              >
+                {{ category.title }}
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item
+                v-for="cat in categories"
+                :key="cat.categoryId"
+                @click="gotoCat(cat.categoryId)"
+              >
+                <v-list-item-title>{{ cat.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+
+          <v-btn
+            icon
+            size="small"
+            :disabled="isLoading"
+            @click="gotoNextCat(1)"
+          >
+            <v-icon size="small">fas fa-chevron-right</v-icon>
+          </v-btn>
+        </div>
+      </div>
+
       <v-progress-linear
         v-if="isLoading"
         color="accent"
@@ -155,18 +233,20 @@
     </div>
 
     <v-container fluid>
-      <v-row
-        row
-        wrap
-      >
+      <v-row>
         <v-col
           v-for="(photo, index) in photosGalery"
           :key="photo.id"
-          style="min-width: 250px; width: 15%; margin: 15px"
+          :cols="12"
+          :sm="6"
+          :md="4"
+          :lg="3"
+          :xl="2"
+          class="photo-col"
         >
-          <div>
-            <div style="width: 250px; height: 250px; margin: auto;">
-              <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+          <div class="photo-wrapper">
+            <div class="photo-container">
+              <div class="photo-inner">
                 <img
                   class="thumb"
                   :src="photo.thumb"
@@ -174,17 +254,11 @@
                 >
               </div>
             </div>
-            <v-card
-              class="card"
-              style="margin-bottom: 50px"
-            >
-              <div
-                class="thumb-title"
-                style="text-align: center"
-              >
+            <v-card class="card">
+              <div class="thumb-title">
                 {{ photo.title }}
               </div>
-              <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
+              <div class="vote-buttons">
                 <v-tooltip bottom>
                   <template #activator="{ props }">
                     <v-btn
@@ -192,7 +266,7 @@
                       icon
                       size="small"
                       :disabled="isLoading"
-                      style="opacity: 1; background: #fff"
+                      class="vote-btn"
                       v-bind="props"
                       @click="vote(photo, 1)"
                     >
@@ -211,7 +285,7 @@
                       icon
                       size="small"
                       :disabled="isLoading"
-                      style="opacity: 1; background: #fff"
+                      class="vote-btn"
                       v-bind="props"
                       @click="vote(photo, 2)"
                     >
@@ -230,7 +304,7 @@
                       icon
                       size="small"
                       :disabled="isLoading"
-                      style="opacity: 1; background: #fff"
+                      class="vote-btn"
                       v-bind="props"
                       @click="vote(photo, -3)"
                     >
@@ -596,6 +670,29 @@ h2.section {
         margin: 0;
     }
 }
+
+.phase-left-header-mobile {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    flex: 1;
+
+    h2 {
+        font-size: 14px;
+        line-height: 16px;
+        text-align: left;
+        margin: 0;
+        font-weight: 600;
+    }
+    p {
+        text-align: left;
+        font-size: 11px;
+        line-height: 14px;
+        opacity: 0.6;
+        margin: 0;
+    }
+}
+
 .phase-right-header {
     margin: -5px 0 -10px 0;
     opacity: 0.5;
@@ -614,10 +711,92 @@ h2.section {
     }
 }
 
+.phase-right-header-mobile {
+    opacity: 0.7;
+    cursor: pointer;
+    flex: 0 0 auto;
+    margin-left: 10px;
+
+    h2 {
+        font-size: 14px;
+        line-height: 16px;
+        text-align: right;
+        margin: 0;
+        font-weight: 600;
+    }
+    p {
+        text-align: right;
+        font-size: 11px;
+        line-height: 14px;
+        margin: 0;
+        white-space: nowrap;
+    }
+}
+
+.photo-col {
+    display: flex;
+    justify-content: center;
+}
+
+.photo-wrapper {
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+.photo-container {
+    width: 100%;
+    padding-bottom: 100%; // Aspect ratio 1:1
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.photo-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .thumb {
+    max-width: 100%;
+    max-height: 100%;
     background: white;
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
     cursor: pointer;
+}
+
+.card {
+    position: relative;
+    padding-bottom: 30px;
+    margin-bottom: 20px;
+}
+
+.thumb-title {
+    text-align: center;
+    padding: 8px 8px 4px 8px;
+    min-height: 40px;
+}
+
+.vote-buttons {
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+.vote-btn {
+    opacity: 1 !important;
+    background: #fff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 </style>
