@@ -190,6 +190,68 @@
         <v-window-item>
           <h2>Vérification des votes</h2>
 
+          <!-- Résumé des votes -->
+          <v-card
+            v-if="votesSummary"
+            style="margin: 10px 10px 20px 10px; padding: 15px;"
+            elevation="2"
+          >
+            <h3 style="margin-bottom: 15px; color: #666;">Résumé des votes</h3>
+
+            <v-row dense>
+              <!-- Votants par famille -->
+              <v-col cols="12" md="6">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #555;">Votants par famille</div>
+                <v-table density="compact" style="font-size: 0.85em;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left;">Famille</th>
+                      <th style="text-align: center;">Votants</th>
+                      <th style="text-align: center;">Votes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="family in votesSummary.byFamily" :key="family.name">
+                      <td style="text-align: left;">{{ family.name }}</td>
+                      <td style="text-align: center; font-weight: 500;">{{ family.voters }}</td>
+                      <td style="text-align: center;">{{ family.votes }}</td>
+                    </tr>
+                    <tr style="border-top: 2px solid #ccc; font-weight: bold;">
+                      <td style="text-align: left;">Total</td>
+                      <td style="text-align: center;">{{ votesSummary.totalVoters }}</td>
+                      <td style="text-align: center;">{{ votesSummary.totalVotes }}</td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </v-col>
+
+              <!-- Votes par catégorie -->
+              <v-col cols="12" md="6">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #555;">Votes par catégorie</div>
+                <v-table density="compact" style="font-size: 0.85em;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left;">Catégorie</th>
+                      <th style="text-align: center;" title="Famille Gueudelot">Gd</th>
+                      <th style="text-align: center;" title="Famille Guibert">Gb</th>
+                      <th style="text-align: center;" title="Famille Guyomard">Gy</th>
+                      <th style="text-align: center;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="cat in votesSummary.byCategory" :key="cat.id">
+                      <td style="text-align: left;">{{ cat.name }}</td>
+                      <td style="text-align: center;">{{ cat.gueudelot || '-' }}</td>
+                      <td style="text-align: center;">{{ cat.guibert || '-' }}</td>
+                      <td style="text-align: center;">{{ cat.guyomard || '-' }}</td>
+                      <td style="text-align: center; font-weight: 500;">{{ cat.total }}</td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </v-col>
+            </v-row>
+          </v-card>
+
           <v-table style="text-align: left; font-size: 0.8em; margin: 10px">
             <template #default>
               <thead>
@@ -1252,6 +1314,87 @@ export default {
                     photo.title.toLowerCase().includes(search)
                 );
             });
+        },
+        votesSummary() {
+            if (!this.votes || !this.data.users || !this.data.categories) return null;
+
+            // Calculer les votants par famille
+            const familyStats = {
+                gueudelot: { voters: new Set(), votes: 0 },
+                guibert: { voters: new Set(), votes: 0 },
+                guyomard: { voters: new Set(), votes: 0 }
+            };
+
+            // Initialiser les catégories
+            const categoryStats = {};
+            this.votesCategories.forEach(catId => {
+                categoryStats[catId] = {
+                    id: catId,
+                    name: this.data.categories[catId]?.title || 'N/A',
+                    gueudelot: 0,
+                    guibert: 0,
+                    guyomard: 0,
+                    total: 0
+                };
+            });
+
+            // Parcourir les votes pour compter votants et votes par famille et catégorie
+            this.votes.forEach(voter => {
+                const user = this.data.users[voter.id];
+                if (user && user.rootFamily) {
+                    const family = user.rootFamily.toLowerCase();
+                    if (familyStats[family]) {
+                        familyStats[family].voters.add(voter.id);
+
+                        // Compter les votes par catégorie
+                        voter.votes.forEach((voteData, idx) => {
+                            if (voteData && voteData.votes && voteData.votes.length > 0) {
+                                const catId = this.votesCategories[idx];
+                                const voteCount = voteData.votes.length;
+
+                                familyStats[family].votes += voteCount;
+
+                                if (categoryStats[catId]) {
+                                    categoryStats[catId][family] += voteCount;
+                                    categoryStats[catId].total += voteCount;
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            // Convertir en tableaux pour l'affichage
+            const byFamily = [
+                {
+                    name: 'Gueudelot',
+                    voters: familyStats.gueudelot.voters.size,
+                    votes: familyStats.gueudelot.votes
+                },
+                {
+                    name: 'Guibert',
+                    voters: familyStats.guibert.voters.size,
+                    votes: familyStats.guibert.votes
+                },
+                {
+                    name: 'Guyomard',
+                    voters: familyStats.guyomard.voters.size,
+                    votes: familyStats.guyomard.votes
+                }
+            ];
+
+            const byCategory = Object.values(categoryStats);
+
+            // Calcul des totaux
+            const totalVoters = byFamily.reduce((sum, f) => sum + f.voters, 0);
+            const totalVotes = byFamily.reduce((sum, f) => sum + f.votes, 0);
+
+            return {
+                byFamily,
+                byCategory,
+                totalVoters,
+                totalVotes
+            };
         }
     },
     watch: {
