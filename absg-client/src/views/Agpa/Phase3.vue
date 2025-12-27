@@ -5,19 +5,22 @@
       <v-row v-if="!$vuetify.display.mobile" style="padding: 15px">
         <v-tooltip bottom>
           <template #activator="{ props }">
-            <v-icon
-              start
-              style="margin-top:-10px; font-size: 30px"
-            >
-              far fa-question-circle
-            </v-icon>
             <div
               class="phase-left-header"
               v-bind="props"
               @click="help.displayed = true; help.page = 3"
+              style="display: flex; align-items: flex-start;"
             >
-              <h2>Phase n°3 en cours : Votes</h2>
-              <p>Phase n°4 Délibération - à partir du {{ end }}</p>
+              <v-icon
+                start
+                style="margin-top:-10px; font-size: 30px; margin-right: 10px;"
+              >
+                far fa-question-circle
+              </v-icon>
+              <div>
+                <h2>Phase n°3 en cours : Votes</h2>
+                <p>Phase n°4 Délibération - à partir du {{ end }}</p>
+              </div>
             </div>
           </template>
           <span>Besoin d'aide sur la phase actuelle du concours ?</span>
