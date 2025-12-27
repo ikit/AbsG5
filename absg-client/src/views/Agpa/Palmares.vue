@@ -257,7 +257,7 @@
 
           <template #[`item.bestYear`]="{ item }">
             <v-tooltip
-              v-if="item.bestYear.stats[7] > 0"
+              v-if="item.bestYear && item.bestYear.stats && item.bestYear.stats[7] > 0"
               right
             >
               <template #activator="{ props }">
@@ -298,7 +298,7 @@
 
           <template #[`item.bestCat`]="{ item }">
             <v-tooltip
-              v-if="item.bestYear.stats[6] > 0"
+              v-if="item.bestCat && item.bestCat.stats && item.bestCat.stats[6] > 0"
               right
             >
               <template #activator="{ props }">
@@ -463,7 +463,7 @@
 
           <template #[`item.bestYear`]="{ item }">
             <v-tooltip
-              v-if="item.bestYear.stats[7] > 0"
+              v-if="item.bestYear && item.bestYear.stats && item.bestYear.stats[7] > 0"
               right
             >
               <template #activator="{ props }">
@@ -504,7 +504,7 @@
 
           <template #[`item.bestCat`]="{ item }">
             <v-tooltip
-              v-if="item.bestYear.stats[6] > 0"
+              v-if="item.bestCat && item.bestCat.stats && item.bestCat.stats[6] > 0"
               right
             >
               <template #activator="{ props }">
