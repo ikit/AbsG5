@@ -437,18 +437,18 @@
                       <div style="font-size: 0.85em;">
                         <div style="font-weight: bold; margin-bottom: 8px;">Points donnés:</div>
                         <div style="padding-left: 12px; margin-bottom: 4px;">
-                          • Total: {{ votesUserStats.given.total }} pts
+                          • Total: {{ votesUserStats.given.total }} pts ({{ votesUserStats.given.totalVotes }} votes)
                         </div>
-                        <div v-for="(value, family) in votesUserStats.given.byFamily" :key="'given-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
-                          {{ family }}: {{ value }} pts
+                        <div v-for="(data, family) in votesUserStats.given.byFamily" :key="'given-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
+                          {{ family }}: {{ data.points }} pts ({{ data.votes }} votes, {{ Math.round(data.votes / votesUserStats.given.totalVotes * 100) }}%)
                         </div>
 
                         <div style="font-weight: bold; margin: 12px 0 8px 0;">Points reçus:</div>
                         <div style="padding-left: 12px; margin-bottom: 4px;">
-                          • Total: {{ votesUserStats.received.total }} pts
+                          • Total: {{ votesUserStats.received.total }} pts ({{ votesUserStats.received.totalVotes }} votes)
                         </div>
-                        <div v-for="(value, family) in votesUserStats.received.byFamily" :key="'received-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
-                          {{ family }}: {{ value }} pts
+                        <div v-for="(data, family) in votesUserStats.received.byFamily" :key="'received-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
+                          {{ family }}: {{ data.points }} pts ({{ data.votes }} votes, {{ Math.round(data.votes / votesUserStats.received.totalVotes * 100) }}%)
                         </div>
                       </div>
                     </div>
@@ -870,8 +870,8 @@ export default {
 
             const username = this.votesFilter.selectedUser;
             const stats = {
-                given: { total: 0, byFamily: {} },
-                received: { total: 0, byFamily: {} }
+                given: { total: 0, totalVotes: 0, byFamily: {} },
+                received: { total: 0, totalVotes: 0, byFamily: {} }
             };
 
             // Calculer les points donnés et reçus
@@ -881,22 +881,32 @@ export default {
                 // Points donnés par le photographe
                 if (from === username) {
                     stats.given.total += weight;
+                    stats.given.totalVotes += 1;
                     // Trouver la famille du destinataire
                     const toUser = Object.values(this.data.users).find(u => u.username === to);
                     if (toUser) {
                         const family = toUser.rootFamily || 'Autre';
-                        stats.given.byFamily[family] = (stats.given.byFamily[family] || 0) + weight;
+                        if (!stats.given.byFamily[family]) {
+                            stats.given.byFamily[family] = { points: 0, votes: 0 };
+                        }
+                        stats.given.byFamily[family].points += weight;
+                        stats.given.byFamily[family].votes += 1;
                     }
                 }
 
                 // Points reçus par le photographe
                 if (to === username) {
                     stats.received.total += weight;
+                    stats.received.totalVotes += 1;
                     // Trouver la famille de l'expéditeur
                     const fromUser = Object.values(this.data.users).find(u => u.username === from);
                     if (fromUser) {
                         const family = fromUser.rootFamily || 'Autre';
-                        stats.received.byFamily[family] = (stats.received.byFamily[family] || 0) + weight;
+                        if (!stats.received.byFamily[family]) {
+                            stats.received.byFamily[family] = { points: 0, votes: 0 };
+                        }
+                        stats.received.byFamily[family].points += weight;
+                        stats.received.byFamily[family].votes += 1;
                     }
                 }
             });
