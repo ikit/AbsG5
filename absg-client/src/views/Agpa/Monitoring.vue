@@ -62,48 +62,123 @@
         <v-window-item>
           <h2>Participation</h2>
 
+          <!-- Résumé de participation -->
+          <v-card
+            v-if="participationSummary"
+            style="margin: 10px 10px 20px 10px; padding: 15px;"
+            elevation="2"
+          >
+            <h3 style="margin-bottom: 15px; color: #666;">Résumé de la participation</h3>
+
+            <v-row dense>
+              <!-- Participants par famille -->
+              <v-col cols="12" md="6">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #555;">Participants par famille</div>
+                <v-table density="compact" style="font-size: 0.85em;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left;">Famille</th>
+                      <th style="text-align: center;">Participants</th>
+                      <th style="text-align: center;">Photos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="family in participationSummary.byFamily" :key="family.name">
+                      <td style="text-align: left;">{{ family.name }}</td>
+                      <td style="text-align: center; font-weight: 500;">{{ family.participants }}</td>
+                      <td style="text-align: center;">{{ family.photos }}</td>
+                    </tr>
+                    <tr style="border-top: 2px solid #ccc; font-weight: bold;">
+                      <td style="text-align: left;">Total</td>
+                      <td style="text-align: center;">{{ participationSummary.totalParticipants }}</td>
+                      <td style="text-align: center;">{{ participationSummary.totalPhotos }}</td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </v-col>
+
+              <!-- Photos par catégorie -->
+              <v-col cols="12" md="6">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #555;">Photos par catégorie</div>
+                <v-table density="compact" style="font-size: 0.85em;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left;">Catégorie</th>
+                      <th style="text-align: center;" title="Famille Gueudelot">Gd</th>
+                      <th style="text-align: center;" title="Famille Guibert">Gb</th>
+                      <th style="text-align: center;" title="Famille Guyomard">Gy</th>
+                      <th style="text-align: center;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="cat in participationSummary.byCategory" :key="cat.id">
+                      <td style="text-align: left;">{{ cat.name }}</td>
+                      <td style="text-align: center;">{{ cat.gueudelot || '-' }}</td>
+                      <td style="text-align: center;">{{ cat.guibert || '-' }}</td>
+                      <td style="text-align: center;">{{ cat.guyomard || '-' }}</td>
+                      <td style="text-align: center; font-weight: 500;">{{ cat.total }}</td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </v-col>
+            </v-row>
+          </v-card>
+
+          <!-- Filtre rapide -->
+          <v-card style="margin: 10px; padding: 15px;" elevation="1">
+            <v-text-field
+              v-model="photoFilter"
+              prepend-icon="fas fa-search"
+              label="Filtrer par photographe, titre de photo ou catégorie"
+              single-line
+              hide-details
+              clearable
+              density="compact"
+            />
+          </v-card>
+
           <v-table style="text-align: left; font-size: 0.8em; margin: 10px">
             <template #default>
               <thead>
                 <tr style="vertical-align: baseline;">
-                  <th>Photo</th>
-                  <th>Infos</th>
-                  <th>&nbsp;</th>
+                  <th style="width: 200px;">Auteur</th>
+                  <th style="width: 150px;">Catégorie</th>
+                  <th>Photos</th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="photo of photos"
-                  :key="photo.id"
+                  v-for="group of filteredPhotosByAuthorAndCategory"
+                  :key="`${group.userId}-${group.categoryId}`"
                 >
-                  <td>
-                    <img
-                      class="thumb"
-                      :src="photo.thumb"
-                      @click="photosGalleryDisplay(photo)"
-                    >
+                  <td style="vertical-align: top; padding-top: 10px;">
+                    {{ group.username }}
+                  </td>
+                  <td style="vertical-align: top; padding-top: 10px;">
+                    {{ group.categoryTitle }}
                   </td>
                   <td>
-                    {{ photo.title }}
-                    <br/>
-                    <span style="opacity: 0.5">{{ photo.username }}</span><br/>
-                    <span style="opacity: 0.5">{{ data.categories[photo.categoryId].title }}</span>
-                  </td>
-                  <td style="text-align: right">
-                    <v-btn
-                      icon
-                      color="primary"
-                      @click="displayPhotoEdition(photo)"
-                    >
-                      <v-icon>fas fa-pen</v-icon>
-                    </v-btn>
-                    <v-btn
-                      icon
-                      color="primary"
-                      @click="displayPhotoDetails(photo)"
-                    >
-                      <v-icon>fas fa-info-circle</v-icon>
-                    </v-btn>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                      <div
+                        v-for="photo in group.photos"
+                        :key="photo.id"
+                        style="display: inline-block; text-align: center;"
+                      >
+                        <img
+                          class="thumb"
+                          :src="photo.thumb"
+                          @click="photosGalleryDisplay(photo)"
+                          style="display: block; margin-bottom: 5px;"
+                        >
+                        <div
+                          @click="displayPhotoEdition(photo)"
+                          style="cursor: pointer; font-size: 0.9em; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1976d2;"
+                          :title="photo.title"
+                        >
+                          {{ photo.title }}
+                        </div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -415,55 +490,145 @@
           </div>
           <div :style="{ marginTop: '20px' }">
             <h2>Votes</h2>
-            <div :style="{ display: 'flex', flexDirection: $vuetify.display.mobile ? 'column' : 'row', gap: '20px' }">
-              <!-- Formulaire de filtre -->
-              <div :style="{ flex: '0 0 250px', minWidth: $vuetify.display.mobile ? '100%' : '250px' }">
-                <v-card>
-                  <v-card-title class="text-subtitle-1">Filtrer par photographe</v-card-title>
-                  <v-card-text>
+
+            <!-- Partie 1: Sélection du photographe + Indicateurs globaux -->
+            <v-card style="margin-bottom: 20px;">
+              <v-card-text>
+                <div :style="{ display: 'flex', flexDirection: $vuetify.display.mobile ? 'column' : 'row', gap: '20px', alignItems: $vuetify.display.mobile ? 'stretch' : 'center' }">
+                  <div :style="{ flex: '0 0 250px', minWidth: $vuetify.display.mobile ? '100%' : '250px' }">
                     <v-select
                       v-model="votesFilter.selectedUser"
                       :items="photographersList"
                       item-title="label"
                       item-value="username"
-                      label="Photographe"
+                      label="Sélectionner un photographe"
                       clearable
                       density="compact"
-                    />
+                    >
+                      <template v-slot:item="{ props, item }">
+                        <v-list-subheader v-if="item.raw.header" :key="item.raw.header">
+                          {{ item.raw.header }}
+                        </v-list-subheader>
+                        <v-list-item v-else v-bind="props" :key="item.raw.username" />
+                      </template>
+                    </v-select>
+                  </div>
 
-                    <!-- Stats du photographe sélectionné -->
-                    <div v-if="votesFilter.selectedUser && votesUserStats" style="margin-top: 16px;">
-                      <v-divider style="margin-bottom: 12px;" />
-                      <div style="font-size: 0.85em;">
-                        <div style="font-weight: bold; margin-bottom: 8px;">Points donnés:</div>
-                        <div style="padding-left: 12px; margin-bottom: 4px;">
-                          • Total: {{ votesUserStats.given.total }} pts ({{ votesUserStats.given.totalVotes }} votes)
-                        </div>
-                        <div v-for="(data, family) in votesUserStats.given.byFamily" :key="'given-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
-                          {{ family }}: {{ data.points }} pts ({{ data.votes }} votes, {{ Math.round(data.votes / votesUserStats.given.totalVotes * 100) }}%)
-                        </div>
-
-                        <div style="font-weight: bold; margin: 12px 0 8px 0;">Points reçus:</div>
-                        <div style="padding-left: 12px; margin-bottom: 4px;">
-                          • Total: {{ votesUserStats.received.total }} pts ({{ votesUserStats.received.totalVotes }} votes)
-                        </div>
-                        <div v-for="(data, family) in votesUserStats.received.byFamily" :key="'received-'+family" style="padding-left: 24px; font-size: 0.9em; color: #666;">
-                          {{ family }}: {{ data.points }} pts ({{ data.votes }} votes, {{ Math.round(data.votes / votesUserStats.received.totalVotes * 100) }}%)
-                        </div>
-                      </div>
+                  <!-- Indicateurs globaux -->
+                  <div v-if="votesFilter.selectedUser && votesUserStats" :style="{ flex: '1 1 auto', display: 'flex', gap: '30px', flexWrap: 'wrap' }">
+                    <div>
+                      <div style="font-size: 0.75em; color: #666; text-transform: uppercase;">Points donnés</div>
+                      <div style="font-size: 1.5em; font-weight: bold; color: #1976d2;">{{ votesUserStats.given.total }}</div>
                     </div>
+                    <div>
+                      <div style="font-size: 0.75em; color: #666; text-transform: uppercase;">Points reçus</div>
+                      <div style="font-size: 1.5em; font-weight: bold; color: #388e3c;">{{ votesUserStats.received.total }}</div>
+                    </div>
+                    <div>
+                      <div style="font-size: 0.75em; color: #666; text-transform: uppercase;">Ratio</div>
+                      <div style="font-size: 1.5em; font-weight: bold; color: #f57c00;">{{ votesUserStats.received.total > 0 ? (votesUserStats.given.total / votesUserStats.received.total).toFixed(2) : '-' }}</div>
+                    </div>
+                  </div>
+                </div>
+              </v-card-text>
+            </v-card>
+
+            <div v-if="votesFilter.selectedUser && votesUserStats" :style="{ display: 'flex', flexDirection: $vuetify.display.mobile ? 'column' : 'row', gap: '20px' }">
+
+              <!-- Partie 2: Tableaux votes donnés/reçus -->
+              <v-card :style="{ flex: $vuetify.display.mobile ? '1 1 auto' : '1 1 50%', minWidth: $vuetify.display.mobile ? '100%' : '400px', maxWidth: $vuetify.display.mobile ? '100%' : '600px' }">
+                <v-card-text>
+                  <!-- Layout en 2 colonnes -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8em;">
+
+                        <!-- Colonne Points Donnés -->
+                        <div>
+                          <div style="font-weight: bold; margin-bottom: 8px; text-align: center; background: #f5f5f5; padding: 4px;">
+                            Points donnés
+                          </div>
+
+                          <!-- Stats par famille -->
+                          <div style="margin-bottom: 8px; padding: 4px; background: #fafafa;">
+                            <div style="font-size: 0.9em; margin-bottom: 4px;">
+                              Total: {{ votesUserStats.given.total }} pts
+                            </div>
+                            <div v-for="item in votesUserStats.given.byFamily" :key="'given-fam-'+item.family" style="font-size: 0.85em; color: #666; padding-left: 8px;">
+                              {{ item.family }}: {{ item.points }} pts ({{ Math.round(item.points / votesUserStats.given.total * 100) }}%)
+                            </div>
+                          </div>
+
+                          <!-- Tableau détaillé par personne -->
+                          <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                              <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="text-align: left; padding: 2px; font-size: 0.85em;">Personne</th>
+                                <th style="text-align: right; padding: 2px; font-size: 0.85em;">Points (%)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for="person in votesUserStats.given.byPerson" :key="'given-'+person.username" style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 2px; font-size: 0.85em; text-align: left;">
+                                  <span :style="{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: getUserColor(person.username), marginRight: '6px' }"></span>
+                                  {{ person.username }}
+                                </td>
+                                <td style="text-align: right; padding: 2px; font-size: 0.85em;">{{ person.points }} ({{ Math.round(person.points / votesUserStats.given.total * 100) }}%)</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <!-- Colonne Points Reçus -->
+                        <div>
+                          <div style="font-weight: bold; margin-bottom: 8px; text-align: center; background: #f5f5f5; padding: 4px;">
+                            Points reçus
+                          </div>
+
+                          <!-- Stats par famille -->
+                          <div style="margin-bottom: 8px; padding: 4px; background: #fafafa;">
+                            <div style="font-size: 0.9em; margin-bottom: 4px;">
+                              Total: {{ votesUserStats.received.total }} pts
+                            </div>
+                            <div v-for="item in votesUserStats.received.byFamily" :key="'received-fam-'+item.family" style="font-size: 0.85em; color: #666; padding-left: 8px;">
+                              {{ item.family }}: {{ item.points }} pts ({{ Math.round(item.points / votesUserStats.received.total * 100) }}%)
+                            </div>
+                          </div>
+
+                          <!-- Tableau détaillé par personne -->
+                          <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                              <tr style="border-bottom: 1px solid #ddd;">
+                                <th style="text-align: left; padding: 2px; font-size: 0.85em;">Personne</th>
+                                <th style="text-align: right; padding: 2px; font-size: 0.85em;">Points (%)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for="person in votesUserStats.received.byPerson" :key="'received-'+person.username" style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 2px; font-size: 0.85em; text-align: left;">
+                                  <span :style="{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: getUserColor(person.username), marginRight: '6px' }"></span>
+                                  {{ person.username }}
+                                </td>
+                                <td style="text-align: right; padding: 2px; font-size: 0.85em;">{{ person.points }} ({{ Math.round(person.points / votesUserStats.received.total * 100) }}%)</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                      </div>
                   </v-card-text>
                 </v-card>
+
+                <!-- Partie 3: Diagramme -->
+                <v-card :style="{ flex: $vuetify.display.mobile ? '1 1 auto' : '1 1 50%', minWidth: $vuetify.display.mobile ? '100%' : '400px' }">
+                  <v-card-text>
+                    <highcharts
+                      v-if="votesGraph"
+                      :options="votesGraph"
+                    />
+                  </v-card-text>
+                </v-card>
+
               </div>
 
-              <!-- Diagramme -->
-              <div :style="{ flex: '1 1 auto', overflowX: 'auto' }">
-                <highcharts
-                  v-if="votesGraph"
-                  :options="votesGraph"
-                />
-              </div>
-            </div>
           </div>
         </v-window-item>
       </v-window>
@@ -774,6 +939,7 @@ export default {
         isAdmin: false,
         end: "",
 
+        photoFilter: "",
         photos: [],
         photoDetails: {
           displayed: false,
@@ -857,21 +1023,50 @@ export default {
         },
         photographersList() {
             if (!this.data || !this.data.users) return [];
-            return Object.values(this.data.users)
-                .map(u => ({
+
+            // Grouper les utilisateurs par famille
+            const usersByFamily = {};
+            Object.values(this.data.users).forEach(u => {
+                const family = (u.rootFamily || 'autre').toLowerCase();
+                if (!usersByFamily[family]) {
+                    usersByFamily[family] = [];
+                }
+                usersByFamily[family].push({
                     username: u.username,
                     label: u.username,
-                    rootFamily: u.rootFamily
-                }))
-                .sort((a, b) => a.username.localeCompare(b.username));
+                    rootFamily: family
+                });
+            });
+
+            // Trier les utilisateurs dans chaque famille
+            Object.keys(usersByFamily).forEach(family => {
+                usersByFamily[family].sort((a, b) => a.username.localeCompare(b.username));
+            });
+
+            // Créer la liste avec headers de groupe
+            const result = [];
+            const familyOrder = ['gueudelot', 'guibert', 'guyomard', 'autre'];
+
+            familyOrder.forEach(family => {
+                if (usersByFamily[family]) {
+                    // Ajouter le header de groupe
+                    result.push({
+                        header: family.charAt(0).toUpperCase() + family.slice(1)
+                    });
+                    // Ajouter les utilisateurs de cette famille
+                    result.push(...usersByFamily[family]);
+                }
+            });
+
+            return result;
         },
         votesUserStats() {
             if (!this.votesFilter.selectedUser || !this.data.votesStatsAll) return null;
 
             const username = this.votesFilter.selectedUser;
             const stats = {
-                given: { total: 0, totalVotes: 0, byFamily: {} },
-                received: { total: 0, totalVotes: 0, byFamily: {} }
+                given: { total: 0, totalVotes: 0, byFamily: {}, byPerson: {} },
+                received: { total: 0, totalVotes: 0, byFamily: {}, byPerson: {} }
             };
 
             // Calculer les points donnés et reçus
@@ -891,6 +1086,13 @@ export default {
                         }
                         stats.given.byFamily[family].points += weight;
                         stats.given.byFamily[family].votes += 1;
+
+                        // Ajouter au compteur par personne
+                        if (!stats.given.byPerson[to]) {
+                            stats.given.byPerson[to] = { username: to, voteCount: 0, points: 0 };
+                        }
+                        stats.given.byPerson[to].voteCount += 1;
+                        stats.given.byPerson[to].points += weight;
                     }
                 }
 
@@ -907,11 +1109,149 @@ export default {
                         }
                         stats.received.byFamily[family].points += weight;
                         stats.received.byFamily[family].votes += 1;
+
+                        // Ajouter au compteur par personne
+                        if (!stats.received.byPerson[from]) {
+                            stats.received.byPerson[from] = { username: from, voteCount: 0, points: 0 };
+                        }
+                        stats.received.byPerson[from].voteCount += 1;
+                        stats.received.byPerson[from].points += weight;
                     }
                 }
             });
 
+            // Convertir les objets byPerson en tableaux triés par nombre de points décroissant
+            stats.given.byPerson = Object.values(stats.given.byPerson)
+                .sort((a, b) => b.points - a.points);
+            stats.received.byPerson = Object.values(stats.received.byPerson)
+                .sort((a, b) => b.points - a.points);
+
+            // Convertir les objets byFamily en tableaux triés par nombre de points décroissant
+            stats.given.byFamily = Object.entries(stats.given.byFamily)
+                .map(([family, data]) => ({ family, ...data }))
+                .sort((a, b) => b.points - a.points);
+            stats.received.byFamily = Object.entries(stats.received.byFamily)
+                .map(([family, data]) => ({ family, ...data }))
+                .sort((a, b) => b.points - a.points);
+
+            // Recalculer les totaux à partir des données par personne pour éviter les incohérences
+            stats.given.total = stats.given.byPerson.reduce((sum, p) => sum + p.points, 0);
+            stats.received.total = stats.received.byPerson.reduce((sum, p) => sum + p.points, 0);
+
             return stats;
+        },
+        participationSummary() {
+            if (!this.data || !this.data.photosStats || !this.data.users) return null;
+
+            // Calculer les participants par famille
+            const familyStats = {
+                gueudelot: { participants: new Set(), photos: 0 },
+                guibert: { participants: new Set(), photos: 0 },
+                guyomard: { participants: new Set(), photos: 0 }
+            };
+
+            // Parcourir les photos pour compter participants et photos par famille
+            this.photos.forEach(photo => {
+                const user = this.data.users[photo.userId];
+                if (user && user.rootFamily) {
+                    const family = user.rootFamily.toLowerCase();
+                    if (familyStats[family]) {
+                        familyStats[family].participants.add(photo.userId);
+                        familyStats[family].photos += 1;
+                    }
+                }
+            });
+
+            // Convertir en tableau pour l'affichage
+            const byFamily = [
+                {
+                    name: 'Gueudelot',
+                    participants: familyStats.gueudelot.participants.size,
+                    photos: familyStats.gueudelot.photos
+                },
+                {
+                    name: 'Guibert',
+                    participants: familyStats.guibert.participants.size,
+                    photos: familyStats.guibert.photos
+                },
+                {
+                    name: 'Guyomard',
+                    participants: familyStats.guyomard.participants.size,
+                    photos: familyStats.guyomard.photos
+                }
+            ];
+
+            // Calculer les photos par catégorie (en excluant la ligne "Total" qui a catId = 0)
+            const byCategory = this.data.photosStats
+                .filter(stat => stat.catId !== 0)
+                .map(stat => ({
+                    id: stat.catId,
+                    name: stat.name,
+                    gueudelot: stat.totalByFamilies?.gueudelot || 0,
+                    guibert: stat.totalByFamilies?.guibert || 0,
+                    guyomard: stat.totalByFamilies?.guyomard || 0,
+                    total: stat.total
+                }));
+
+            // Calcul des totaux
+            const totalParticipants = byFamily.reduce((sum, f) => sum + f.participants, 0);
+            const totalPhotos = byFamily.reduce((sum, f) => sum + f.photos, 0);
+
+            return {
+                byFamily,
+                byCategory,
+                totalParticipants,
+                totalPhotos
+            };
+        },
+        photosByAuthorAndCategory() {
+            if (!this.photos || !this.data.categories) return [];
+
+            // Grouper les photos par userId + categoryId
+            const groups = {};
+
+            this.photos.forEach(photo => {
+                const key = `${photo.userId}-${photo.categoryId}`;
+
+                if (!groups[key]) {
+                    groups[key] = {
+                        userId: photo.userId,
+                        username: photo.username,
+                        categoryId: photo.categoryId,
+                        categoryTitle: this.data.categories[photo.categoryId]?.title || 'N/A',
+                        photos: []
+                    };
+                }
+
+                groups[key].photos.push(photo);
+            });
+
+            // Convertir en tableau et trier par username puis par categoryId
+            return Object.values(groups).sort((a, b) => {
+                const usernameCompare = a.username.localeCompare(b.username);
+                if (usernameCompare !== 0) return usernameCompare;
+                return a.categoryId - b.categoryId;
+            });
+        },
+        filteredPhotosByAuthorAndCategory() {
+            if (!this.photoFilter || this.photoFilter.trim() === '') {
+                return this.photosByAuthorAndCategory;
+            }
+
+            const search = this.photoFilter.toLowerCase();
+
+            return this.photosByAuthorAndCategory.filter(group => {
+                // Check username
+                if (group.username.toLowerCase().includes(search)) return true;
+
+                // Check category title
+                if (group.categoryTitle.toLowerCase().includes(search)) return true;
+
+                // Check photo titles
+                return group.photos.some(photo =>
+                    photo.title.toLowerCase().includes(search)
+                );
+            });
         }
     },
     watch: {
@@ -1269,6 +1609,24 @@ export default {
             return items.filter(e => e != null && e.quicksearch.indexOf(search.toLowerCase()) > -1);
         },
 
+        getFamilyColors() {
+            return {
+                'gueudelot': '#7cb5ec',  // Bleu
+                'guibert': '#434348',    // Gris foncé
+                'guyomard': '#90ed7d',   // Vert
+                'autre': '#f7a35c'       // Orange
+            };
+        },
+
+        getUserColor(username) {
+            const user = Object.values(this.data.users).find(u => u.username === username);
+            if (!user) return '#f7a35c'; // Orange par défaut
+
+            const family = user.rootFamily || 'autre';
+            const familyColors = this.getFamilyColors();
+            return familyColors[family] || familyColors['autre'];
+        },
+
         updateVotesGraph() {
             if (!this.data.votesStatsAll) return;
 
@@ -1279,6 +1637,38 @@ export default {
                 votesData = this.data.votesStatsAll.filter(vote => {
                     const [from, to] = vote;
                     return from === username || to === username;
+                });
+            }
+
+            // Définir les couleurs par famille (correspondant au graphique de participation)
+            // Utiliser les couleurs exactes de Highcharts par défaut
+            const familyColors = this.getFamilyColors();
+
+            // Créer une map de couleurs pour chaque nœud (personne)
+            const nodeColors = [];
+            if (this.votesFilter.selectedUser) {
+                // Récupérer tous les noms uniques du graphique filtré
+                const uniqueNames = new Set();
+                votesData.forEach(vote => {
+                    const [from, to] = vote;
+                    uniqueNames.add(from);
+                    uniqueNames.add(to);
+                });
+
+                // Assigner les couleurs en fonction de la famille
+                uniqueNames.forEach(username => {
+                    const user = Object.values(this.data.users).find(u => u.username === username);
+                    if (user) {
+                        const family = user.rootFamily || 'autre';
+                        const color = username === this.votesFilter.selectedUser
+                            ? '#f15c80'  // Rouge pour la personne sélectionnée
+                            : familyColors[family] || familyColors['autre'];
+
+                        nodeColors.push({
+                            id: username,
+                            color: color
+                        });
+                    }
                 });
             }
 
@@ -1303,6 +1693,7 @@ export default {
                     keys: ['from', 'to', 'weight'],
                     data: votesData,
                     type: 'dependencywheel',
+                    nodes: nodeColors.length > 0 ? nodeColors : undefined,
                     dataLabels: {
                         color: '#333',
                         textPath: {
