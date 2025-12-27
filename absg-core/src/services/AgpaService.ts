@@ -75,10 +75,15 @@ class AgpaService {
     /**
      * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
      */
-    getSlidingPalmaresData() {
+    async getSlidingPalmaresData() {
         const maxYear = getMaxArchiveEdition();
         const fromYear = Math.max(2006, maxYear - 2); // 3 dernières années
-        return palmaresData(fromYear, maxYear);
+        const palmares = await palmaresData(fromYear, maxYear);
+        return {
+            palmares: palmares,
+            yearFrom: fromYear,
+            yearTo: maxYear
+        };
     }
 
     /**

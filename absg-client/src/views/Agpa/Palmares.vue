@@ -60,7 +60,12 @@
         >
           <v-card-title style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
             <v-icon start color="white">fas fa-chart-line</v-icon>
-            Palmarès Glissant (3 dernières éditions)
+            <span v-if="slidingYearFrom && slidingYearTo">
+              Palmarès Glissant ({{ slidingYearFrom }} - {{ slidingYearTo }})
+            </span>
+            <span v-else>
+              Palmarès Glissant (3 dernières éditions)
+            </span>
           </v-card-title>
           <v-card-text style="padding: 30px; text-align: center;">
             <div style="font-size: 4em; font-weight: bold; color: #f093fb;">
@@ -73,7 +78,12 @@
               {{ mySlidingAgpas || 0 }}
             </div>
             <div style="font-size: 1em; color: #666;">
-              AGPA sur les 3 dernières éditions
+              <span v-if="slidingYearFrom && slidingYearTo">
+                AGPA de {{ slidingYearFrom }} à {{ slidingYearTo }}
+              </span>
+              <span v-else>
+                AGPA sur les 3 dernières éditions
+              </span>
             </div>
 
             <!-- Badges Glissants (3 dernières éditions) -->
@@ -372,7 +382,12 @@
       <v-card>
         <v-card-title style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; position: sticky; top: 0; z-index: 10;">
           <v-icon start color="white">fas fa-chart-line</v-icon>
-          Palmarès Glissant - 3 Dernières Éditions
+          <span v-if="slidingYearFrom && slidingYearTo">
+            Palmarès Glissant {{ slidingYearFrom }} - {{ slidingYearTo }}
+          </span>
+          <span v-else>
+            Palmarès Glissant - 3 Dernières Éditions
+          </span>
         </v-card-title>
         <v-card-text style="padding: 20px;">
           <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
@@ -674,6 +689,8 @@ export default {
         myGlobalAgpas: null,
         mySlidingRank: null,
         mySlidingAgpas: null,
+        slidingYearFrom: null,
+        slidingYearTo: null,
         myGlobalBadges: null,
         mySlidingBadges: [],
         voteProfiles: {}
@@ -766,10 +783,23 @@ export default {
             // Charger le palmarès glissant (3 dernières éditions)
             try {
                 const response = await axios.get(`/api/agpa/palmares/sliding`);
-                this.slidingPalmares = parseAxiosResponse(response).map( e => ({
-                    ...e,
-                    ...getPeopleAvatar(e)
-                }));
+                const data = parseAxiosResponse(response);
+
+                // Extraire le tableau palmares et les années
+                if (data.palmares) {
+                    this.slidingPalmares = data.palmares.map( e => ({
+                        ...e,
+                        ...getPeopleAvatar(e)
+                    }));
+                    this.slidingYearFrom = data.yearFrom;
+                    this.slidingYearTo = data.yearTo;
+                } else {
+                    // Format ancien (fallback)
+                    this.slidingPalmares = data.map( e => ({
+                        ...e,
+                        ...getPeopleAvatar(e)
+                    }));
+                }
 
                 // Calculer ma position et mes AGPA dans le palmarès glissant
                 this.calculateMySlidingStats();
