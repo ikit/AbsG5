@@ -11,7 +11,7 @@ import {
 } from "../middleware/agpaAlgorithmsHelper";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
-import { analyzeVoteProfiles, UserData } from "../middleware/agpaVoteProfilesHelper";
+import { analyzeVoteProfiles, analyzeSlidingProfiles, UserData, YearData } from "../middleware/agpaVoteProfilesHelper";
 import { logger } from "../middleware/logger";
 import { Equal } from "typeorm";
 import { getRepository } from "../middleware/database";
@@ -619,6 +619,146 @@ class AgpaService {
         const profiles = analyzeVoteProfiles(votes, users);
 
         return profiles;
+    }
+
+    /**
+     * Analyse les badges d'évolution sur les 3 dernières éditions
+     * @param endYear l'année de fin (par défaut: dernière édition archivée)
+     */
+    async getSlidingBadges(endYear: number = null) {
+        const maxYear = endYear || getMaxArchiveEdition();
+        const years = [maxYear - 2, maxYear - 1, maxYear].filter(y => y >= 2006);
+
+        // Si on n'a pas 3 années disponibles, on retourne un objet vide
+        if (years.length < 3) {
+            return {};
+        }
+
+        // Récupérer les données pour chaque année
+        const usersYearData: Record<string, YearData[]> = {};
+
+        for (const year of years) {
+            // Récupérer les résultats de l'année
+            const resultsQuery = `
+                SELECT
+                    p."userId",
+                    p."categoryId",
+                    a.type as "awardType",
+                    SUM(v.score) as "totalPoints"
+                FROM agpa_photo p
+                LEFT JOIN agpa_vote v ON v."photoId" = p.id AND v.year = ${year}
+                LEFT JOIN agpa_award a ON a."photoId" = p.id AND a.year = ${year}
+                WHERE p.year = ${year} AND p."categoryId" > 0
+                GROUP BY p."userId", p."categoryId", a.type
+            `;
+            const resultsData = await this.catRepo.query(resultsQuery);
+
+            // Organiser les données par utilisateur
+            const userStats: Record<string, {
+                totalPoints: number;
+                golds: number;
+                sylvers: number;
+                bronzes: number;
+                diamonds: number;
+                nominated: number;
+                podiums: number;
+                categories: string[];
+                categoriesWithAwards: Record<string, string>;
+            }> = {};
+
+            resultsData.forEach(row => {
+                const userId = row.userId.toString();
+                if (!userStats[userId]) {
+                    userStats[userId] = {
+                        totalPoints: 0,
+                        golds: 0,
+                        sylvers: 0,
+                        bronzes: 0,
+                        diamonds: 0,
+                        nominated: 0,
+                        podiums: 0,
+                        categories: [],
+                        categoriesWithAwards: {}
+                    };
+                }
+
+                userStats[userId].totalPoints += parseFloat(row.totalPoints) || 0;
+
+                const categoryId = row.categoryId.toString();
+
+                if (row.awardType === AgpaAwardType.gold) {
+                    userStats[userId].golds++;
+                    userStats[userId].podiums++;
+                    userStats[userId].categories.push(categoryId);
+                    userStats[userId].categoriesWithAwards[categoryId] = 'gold';
+                } else if (row.awardType === AgpaAwardType.sylver) {
+                    userStats[userId].sylvers++;
+                    userStats[userId].podiums++;
+                    userStats[userId].categoriesWithAwards[categoryId] = 'sylver';
+                } else if (row.awardType === AgpaAwardType.bronze) {
+                    userStats[userId].bronzes++;
+                    userStats[userId].podiums++;
+                    userStats[userId].categoriesWithAwards[categoryId] = 'bronze';
+                } else if (row.awardType === AgpaAwardType.diamond) {
+                    userStats[userId].diamonds++;
+                    userStats[userId].categoriesWithAwards[categoryId] = 'diamond';
+                } else if (row.awardType === AgpaAwardType.nominated) {
+                    userStats[userId].nominated++;
+                    userStats[userId].categoriesWithAwards[categoryId] = 'nominated';
+                }
+            });
+
+            // Ajouter les données de l'année pour chaque utilisateur
+            Object.keys(userStats).forEach(userId => {
+                if (!usersYearData[userId]) {
+                    usersYearData[userId] = [];
+                }
+
+                usersYearData[userId].push({
+                    year,
+                    totalPoints: userStats[userId].totalPoints,
+                    golds: userStats[userId].golds,
+                    sylvers: userStats[userId].sylvers,
+                    bronzes: userStats[userId].bronzes,
+                    diamonds: userStats[userId].diamonds,
+                    nominated: userStats[userId].nominated,
+                    podiums: userStats[userId].podiums,
+                    categories: userStats[userId].categories,
+                    categoriesWithAwards: userStats[userId].categoriesWithAwards
+                });
+            });
+        }
+
+        // S'assurer que chaque utilisateur a des données pour les 3 années (remplir avec des 0 si absent)
+        Object.keys(usersYearData).forEach(userId => {
+            const userYears = usersYearData[userId];
+            const existingYears = new Set(userYears.map(d => d.year));
+
+            years.forEach(year => {
+                if (!existingYears.has(year)) {
+                    usersYearData[userId].push({
+                        year,
+                        totalPoints: 0,
+                        golds: 0,
+                        sylvers: 0,
+                        bronzes: 0,
+                        diamonds: 0,
+                        nominated: 0,
+                        podiums: 0,
+                        categories: [],
+                        categoriesWithAwards: {}
+                    });
+                }
+            });
+
+            // Trier par année
+            usersYearData[userId].sort((a, b) => a.year - b.year);
+        });
+
+        // Analyser les badges d'évolution
+        const slidingProfiles = analyzeSlidingProfiles(usersYearData);
+
+        return slidingProfiles;
     }
 }
 

@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Badge Combo -->
-                <div style="padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                <div style="margin-bottom: 12px; padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                       <i class="fas fa-star" style="color: #9c27b0; font-size: 1.3em;"></i>
@@ -130,6 +130,19 @@
                     </div>
                     <div style="font-size: 1.5em; font-weight: bold; color: #9c27b0;">
                       {{ countBadgesByType('combo') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Badge Évolution -->
+                <div style="padding: 12px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <i class="fas fa-chart-line" style="color: #4caf50; font-size: 1.3em;"></i>
+                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Évolution</div>
+                    </div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #4caf50;">
+                      {{ countBadgesByType('sliding') }}
                     </div>
                   </div>
                 </div>
@@ -801,7 +814,10 @@
                     <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
                     <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
                   </div>
-                  <div style="font-size: 0.9em; color: #666;">{{ badge.description }}</div>
+                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
+                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
+                  </div>
                 </div>
               </v-col>
             </v-row>
@@ -834,14 +850,17 @@
                     <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
                     <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
                   </div>
-                  <div style="font-size: 0.9em; color: #666;">{{ badge.description }}</div>
+                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
+                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
+                  </div>
                 </div>
               </v-col>
             </v-row>
           </div>
 
           <!-- Badges Combo -->
-          <div>
+          <div style="margin-bottom: 30px;">
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-star" style="color: #9c27b0;"></i>
               Badges Combo (14)
@@ -867,7 +886,50 @@
                     <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
                     <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
                   </div>
-                  <div style="font-size: 0.9em; color: #666;">{{ badge.description }}</div>
+                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
+                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
+                  </div>
+                </div>
+              </v-col>
+            </v-row>
+          </div>
+
+          <!-- Badges d'Évolution -->
+          <div>
+            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+              <i class="fas fa-chart-line" style="color: #4caf50;"></i>
+              Badges d'Évolution (14)
+            </h3>
+            <div style="font-size: 0.9em; color: #666; margin-bottom: 15px; font-style: italic;">
+              <i class="fas fa-calendar-alt" style="margin-right: 4px;"></i>
+              Badges calculés sur les 3 dernières éditions
+            </div>
+            <v-row>
+              <v-col
+                v-for="badge in slidingBadges"
+                :key="badge.badge"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <div
+                  :style="{
+                    padding: '15px',
+                    borderRadius: '8px',
+                    backgroundColor: badge.color + '20',
+                    border: '2px solid ' + badge.color,
+                    height: '100%'
+                  }"
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
+                  </div>
+                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
+                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
+                  </div>
                 </div>
               </v-col>
             </v-row>
@@ -932,44 +994,78 @@ export default {
         voteProfiles: {},
         showBadgesDialog: false,
         voterBadges: [
-            { badge: 'Le Patriote', icon: 'fas fa-flag', description: 'Vote principalement pour sa famille', color: '#3f51b5' },
-            { badge: 'L\'Amoureux Transi', icon: 'fas fa-heart', description: 'Vote beaucoup pour son/sa conjoint(e)', color: '#e91e63' },
-            { badge: 'Le Parent Fier', icon: 'fas fa-baby', description: 'Vote beaucoup pour ses enfants', color: '#ff9800' },
-            { badge: 'Le Sniper', icon: 'fas fa-bullseye', description: 'J\'ai mes favoris et je m\'y tiens', color: '#f44336' },
-            { badge: 'Féministe Convaincu', icon: 'fas fa-fist-raised', description: 'Les femmes d\'abord !', color: '#9c27b0' },
-            { badge: 'Le Philanthrope', icon: 'fas fa-hand-holding-heart', description: 'Il y a du talent partout !', color: '#9c27b0' },
-            { badge: 'L\'Anticonformiste', icon: 'fas fa-star-of-life', description: 'L\'herbe est plus verte ailleurs', color: '#00bcd4' },
-            { badge: 'Le Diplomate', icon: 'fas fa-handshake', description: 'Un vote pour chacun, équité pour tous', color: '#4caf50' },
-            { badge: 'Le Radin', icon: 'fas fa-piggy-bank', description: 'Faut le mériter !', color: '#795548' },
-            { badge: 'Le Mécène', icon: 'fas fa-gift', description: 'Tout le monde est talentueux !', color: '#ffd700' },
-            { badge: 'Le Modéré', icon: 'fas fa-check', description: 'Ni trop, ni trop peu', color: '#607d8b' }
+            { badge: 'Le Patriote', icon: 'fas fa-flag', description: 'Vote principalement pour sa famille', condition: '> 70% des votes pour sa famille', color: '#3f51b5' },
+            { badge: 'L\'Amoureux Transi', icon: 'fas fa-heart', description: 'Vote beaucoup pour son/sa conjoint(e)', condition: '> 50% des votes pour son conjoint', color: '#e91e63' },
+            { badge: 'Le Parent Fier', icon: 'fas fa-baby', description: 'Vote beaucoup pour ses enfants', condition: '> 50% des votes pour ses enfants', color: '#ff9800' },
+            { badge: 'Le Sniper', icon: 'fas fa-bullseye', description: 'J\'ai mes favoris et je m\'y tiens', condition: '> 60% des votes sur 2 personnes max', color: '#f44336' },
+            { badge: 'Féministe Convaincu', icon: 'fas fa-fist-raised', description: 'Les femmes d\'abord !', condition: '≥ 70% des votes pour des femmes + > 20 pts', color: '#9c27b0' },
+            { badge: 'Le Philanthrope', icon: 'fas fa-hand-holding-heart', description: 'Il y a du talent partout !', condition: '≥ 8 personnes différentes ont reçu des votes', color: '#9c27b0' },
+            { badge: 'L\'Anticonformiste', icon: 'fas fa-star-of-life', description: 'L\'herbe est plus verte ailleurs', condition: '< 30% des votes pour sa famille + > 20 pts', color: '#00bcd4' },
+            { badge: 'Le Diplomate', icon: 'fas fa-handshake', description: 'Un vote pour chacun, équité pour tous', condition: 'Votes équilibrés entre familles + ≥ 5 personnes', color: '#4caf50' },
+            { badge: 'Le Radin', icon: 'fas fa-piggy-bank', description: 'Faut le mériter !', condition: '< 30 points distribués au total', color: '#795548' },
+            { badge: 'Le Mécène', icon: 'fas fa-gift', description: 'Tout le monde est talentueux !', condition: '> 100 points distribués au total', color: '#ffd700' },
+            { badge: 'Le Modéré', icon: 'fas fa-check', description: 'Ni trop, ni trop peu', condition: 'Badge par défaut (équilibré)', color: '#607d8b' }
         ],
         photographerBadges: [
-            { badge: 'Le Phénomène', icon: 'fas fa-rocket', description: 'Populaire et reconnu', color: '#ff6f00' },
-            { badge: 'La Star', icon: 'fas fa-star', description: 'Très apprécié par beaucoup', color: '#ffd700' },
-            { badge: 'Le Chouchou de Famille', icon: 'fas fa-home', description: 'Très apprécié par sa famille', color: '#3f51b5' },
-            { badge: 'Le Transfuge', icon: 'fas fa-exchange-alt', description: 'Apprécié hors de sa famille', color: '#00bcd4' },
-            { badge: 'Le Protégé', icon: 'fas fa-crown', description: 'J\'ai mes champions', color: '#e91e63' },
-            { badge: 'La Coqueluche des Dames', icon: 'fas fa-heart', description: 'Apprécié par les femmes', color: '#e91e63' },
-            { badge: 'L\'Équilibré', icon: 'fas fa-balance-scale', description: 'Je plais à tout le monde modérément', color: '#4caf50' },
-            { badge: 'L\'Inconnu', icon: 'fas fa-ghost', description: 'Qui suis-je ?', color: '#9e9e9e' },
-            { badge: 'Le Talent Émergent', icon: 'fas fa-seedling', description: 'En progression', color: '#8bc34a' }
+            { badge: 'Le Phénomène', icon: 'fas fa-rocket', description: 'Populaire et reconnu', condition: '> 80 points reçus + ≥ 8 votants', color: '#ff6f00' },
+            { badge: 'La Star', icon: 'fas fa-star', description: 'Très apprécié par beaucoup', condition: '≥ 8 votants différents', color: '#ffd700' },
+            { badge: 'Le Chouchou de Famille', icon: 'fas fa-home', description: 'Très apprécié par sa famille', condition: '> 70% des votes de sa famille + > 20 pts', color: '#3f51b5' },
+            { badge: 'Le Transfuge', icon: 'fas fa-exchange-alt', description: 'Apprécié hors de sa famille', condition: '< 30% des votes de sa famille + > 30 pts', color: '#00bcd4' },
+            { badge: 'Le Protégé', icon: 'fas fa-crown', description: 'J\'ai mes champions', condition: '≤ 3 votants + > 30 points reçus', color: '#e91e63' },
+            { badge: 'La Coqueluche des Dames', icon: 'fas fa-heart', description: 'Apprécié par les femmes', condition: '≥ 70% des votes de femmes + > 20 pts', color: '#e91e63' },
+            { badge: 'L\'Équilibré', icon: 'fas fa-balance-scale', description: 'Je plais à tout le monde modérément', condition: 'Votes équilibrés entre ≥ 3 familles', color: '#4caf50' },
+            { badge: 'L\'Inconnu', icon: 'fas fa-ghost', description: 'Qui suis-je ?', condition: '< 15 points reçus au total', color: '#9e9e9e' },
+            { badge: 'Le Talent Émergent', icon: 'fas fa-seedling', description: 'En progression', condition: 'Badge par défaut', color: '#8bc34a' }
         ],
         comboBadges: [
-            { badge: 'Le Solitaire', icon: 'fas fa-island-tropical', description: 'Discret en tout point', color: '#607d8b' },
-            { badge: 'L\'Égoïste', icon: 'fas fa-user-crown', description: 'Je reçois plus que je ne donne', color: '#9c27b0' },
-            { badge: 'Le Robin des Bois', icon: 'fas fa-bow-arrow', description: 'Généreux malgré l\'oubli', color: '#4caf50' },
-            { badge: 'L\'Influenceur', icon: 'fas fa-star-shooting', description: 'Populaire et généreux', color: '#ff9800' },
-            { badge: 'Le Clan', icon: 'fas fa-users', description: 'Ma famille et moi, c\'est pour la vie', color: '#3f51b5' },
-            { badge: 'Le Rebelle', icon: 'fas fa-dragon', description: 'Loin de ma famille, dans les deux sens', color: '#00bcd4' },
-            { badge: 'Le Fan Club', icon: 'fas fa-crown', description: 'J\'ai mes favoris et ils me le rendent', color: '#e91e63' },
-            { badge: 'Le Politique', icon: 'fas fa-balance-scale-right', description: 'Équilibre parfait donné/reçu', color: '#4caf50' },
-            { badge: 'Le Phénomène Total', icon: 'fas fa-meteor', description: 'La légende absolue des AGPA', color: '#ffd700' },
-            { badge: 'Le Couple Parfait', icon: 'fas fa-heart', description: 'L\'amour est réciproque', color: '#e91e63' },
-            { badge: 'L\'Incompris', icon: 'fas fa-sad-tear', description: 'Je donne à tous mais personne ne me voit', color: '#9e9e9e' },
-            { badge: 'Le Revenant', icon: 'fas fa-ghost', description: 'Peu présent mais marquant', color: '#673ab7' },
-            { badge: 'La Superstar', icon: 'fas fa-sparkles', description: 'Excellence en tout point', color: '#ff6f00' },
-            { badge: 'Girl Power', icon: 'fas fa-venus', description: 'Engagement féministe total', color: '#9c27b0' }
+            { badge: 'Le Solitaire', icon: 'fas fa-island-tropical', description: 'Discret en tout point', condition: '< 20 pts donnés + < 20 pts reçus', color: '#607d8b' },
+            { badge: 'L\'Égoïste', icon: 'fas fa-user-crown', description: 'Je reçois plus que je ne donne', condition: 'Badge "Le Radin" + > 50 pts reçus', color: '#9c27b0' },
+            { badge: 'Le Robin des Bois', icon: 'fas fa-bow-arrow', description: 'Généreux malgré l\'oubli', condition: '> 80 pts donnés + < 30 pts reçus', color: '#4caf50' },
+            { badge: 'L\'Influenceur', icon: 'fas fa-star-shooting', description: 'Populaire et généreux', condition: 'Badge "La Star" + > 60 pts donnés', color: '#ff9800' },
+            { badge: 'Le Clan', icon: 'fas fa-users', description: 'Ma famille et moi, c\'est pour la vie', condition: 'Badges "Le Patriote" + "Chouchou de Famille"', color: '#3f51b5' },
+            { badge: 'Le Rebelle', icon: 'fas fa-dragon', description: 'Loin de ma famille, dans les deux sens', condition: 'Badges "L\'Anticonformiste" + "Le Transfuge"', color: '#00bcd4' },
+            { badge: 'Le Fan Club', icon: 'fas fa-crown', description: 'J\'ai mes favoris et ils me le rendent', condition: 'Badges "Le Sniper" + "Le Protégé"', color: '#e91e63' },
+            { badge: 'Le Politique', icon: 'fas fa-balance-scale-right', description: 'Équilibre parfait donné/reçu', condition: 'Badges "Le Diplomate" + "L\'Équilibré"', color: '#4caf50' },
+            { badge: 'Le Phénomène Total', icon: 'fas fa-meteor', description: 'La légende absolue des AGPA', condition: '> 100 pts donnés + Badge "Le Phénomène"', color: '#ffd700' },
+            { badge: 'Le Couple Parfait', icon: 'fas fa-heart', description: 'L\'amour est réciproque', condition: 'Badge "Amoureux Transi" + > 40% pts reçus du conjoint', color: '#e91e63' },
+            { badge: 'L\'Incompris', icon: 'fas fa-sad-tear', description: 'Je donne à tous mais personne ne me voit', condition: 'Badge "Le Philanthrope" + (Badge "L\'Inconnu" ou < 15 pts reçus)', color: '#9e9e9e' },
+            { badge: 'Le Revenant', icon: 'fas fa-ghost', description: 'Peu présent mais marquant', condition: '< 10 votes donnés + > 40 pts reçus', color: '#673ab7' },
+            { badge: 'La Superstar', icon: 'fas fa-sparkles', description: 'Excellence en tout point', condition: '> 70 pts donnés + > 70 pts reçus + > 7 votants', color: '#ff6f00' },
+            { badge: 'Girl Power', icon: 'fas fa-venus', description: 'Engagement féministe total', condition: 'Badges "Féministe Convaincu" + "Coqueluche des Dames"', color: '#9c27b0' }
+        ],
+        slidingBadges: [
+            { badge: 'L\'Alpiniste', icon: 'fas fa-mountain', description: 'Progression continue vers le sommet', condition: 'Progression continue sur 3 ans + ≥ 1 or en dernière année', color: '#2196f3' },
+            { badge: 'La Fusée', icon: 'fas fa-rocket-launch', description: 'Décollage spectaculaire', condition: 'Progression x3 minimum sur 3 ans', color: '#ff5722' },
+            { badge: 'Le Régulier', icon: 'fas fa-chart-line', description: 'Performance stable et constante', condition: 'Variance < 15% avec moyenne ≥ 30 pts/an', color: '#4caf50' },
+            { badge: 'Le Dinosaure', icon: 'fas fa-dragon', description: 'Les beaux jours sont derrière', condition: 'Régression continue sur 3 ans (départ ≥ 40 pts)', color: '#795548' },
+            { badge: 'Le Yoyo', icon: 'fas fa-arrows-up-down', description: 'Performance en montagnes russes', condition: 'Alternance haut/bas avec écarts > 50%', color: '#ff9800' },
+            { badge: 'L\'Incendie', icon: 'fas fa-fire', description: '3+ médailles d\'or sur 3 ans', condition: '≥ 3 médailles d\'or cumulées sur 3 ans', color: '#ffd700' },
+            { badge: 'La Révélation', icon: 'fas fa-star-shooting', description: 'De l\'ombre à la lumière', condition: '0 pts année 1 + progression forte années 2-3', color: '#9c27b0' },
+            { badge: 'Le Vétéran', icon: 'fas fa-medal', description: 'Sur le podium tous les ans', condition: 'Au moins 1 podium chaque année sur 3 ans', color: '#ff6f00' },
+            { badge: 'Le Sniper Temporel', icon: 'fas fa-bullseye', description: 'Spécialiste d\'une catégorie', condition: 'Même catégorie gagnée 2-3 fois sur 3 ans', color: '#f44336' },
+            { badge: 'Le Phoenix', icon: 'fas fa-phoenix-squadron', description: 'Renaît de ses cendres', condition: 'Chute > 50% puis remontée > 120% de l\'année 1', color: '#e91e63' },
+            { badge: 'Le Tsunami', icon: 'fas fa-water', description: 'Arrivée fracassante', condition: '0 pts année 1 + ≥ 2 ors année 2', color: '#00bcd4' },
+            { badge: 'Le Fidèle', icon: 'fas fa-handshake', description: 'Toujours présent, toujours actif', condition: '≥ 15 pts par an sur les 3 années', color: '#607d8b' },
+            { badge: 'Le Podium Addict', icon: 'fas fa-trophy', description: '5+ podiums sur 3 ans', condition: '≥ 5 podiums cumulés sur 3 ans', color: '#cddc39' },
+            { badge: 'L\'Éclair', icon: 'fas fa-bolt', description: 'Retour fracassant', condition: '0 pts années 1-2 + ≥ 40 pts année 3', color: '#ffeb3b' },
+            // Badges de Collection
+            { badge: 'Le Collectionneur', icon: 'fas fa-medal', description: 'Collection complète', condition: 'Exactement 1 Or + 1 Argent + 1 Bronze en 1 édition', color: '#9c27b0' },
+            { badge: 'Le Perfectionniste', icon: 'fas fa-crown', description: 'Ors purs', condition: 'Uniquement des Ors (≥2) sans autre récompense en 1 édition', color: '#ffd700' },
+            { badge: 'Le Monopole', icon: 'fas fa-chess-king', description: 'Domination totale', condition: '5+ Ors en 1 édition', color: '#ff6f00' },
+            { badge: 'La Razzia', icon: 'fas fa-bullseye', description: 'Catégories dominées', condition: '4+ catégories gagnées en 1 édition', color: '#e91e63' },
+            // Badges de Domination
+            { badge: 'Le Triplé', icon: 'fas fa-fire', description: 'Triple or', condition: '3+ Ors en 1 édition', color: '#ff9800' },
+            { badge: 'Le Doublé', icon: 'fas fa-gem', description: 'Double argent', condition: 'Exactement 2 Argents en 1 édition', color: '#c0c0c0' },
+            { badge: 'Le Balayage Bronze', icon: 'fas fa-broom', description: 'Collection de bronze', condition: '4+ Bronzes en 1 édition', color: '#cd7f32' },
+            { badge: 'L\'Arc-en-ciel', icon: 'fas fa-rainbow', description: 'Palette complète', condition: '≥2 de chaque type (Or + Argent + Bronze) en 1 édition', color: '#00bcd4' },
+            // Badges de Progression
+            { badge: 'L\'Escalade', icon: 'fas fa-mountain', description: 'Progression parfaite', condition: 'Bronze → Argent → Or dans la même catégorie sur 3 ans', color: '#795548' },
+            { badge: 'Le Sans-Faute', icon: 'fas fa-check-double', description: 'Constance exemplaire', condition: 'Au moins 1 AGPA chaque année sur 3 ans', color: '#4caf50' },
+            { badge: 'La Rédemption', icon: 'fas fa-redo', description: 'Retour victorieux', condition: '0 AGPA année N, puis Or année N+1 dans la même catégorie', color: '#ff5722' },
+            // Badges de Patterns Spéciaux
+            { badge: 'La Pyramide', icon: 'fas fa-caret-up', description: 'Pattern parfait', condition: '1 Or + 2 Argents + 3 Bronzes en 1 édition', color: '#607d8b' },
+            { badge: 'La Pyramide Inversée', icon: 'fas fa-caret-down', description: 'Pattern renversant', condition: '3 Ors + 2 Argents + 1 Bronze en 1 édition', color: '#3f51b5' },
+            { badge: 'Le Symétrique', icon: 'fas fa-balance-scale', description: 'Équilibre parfait', condition: 'Même nombre d\'Ors, Argents et Bronzes en 1 édition', color: '#009688' }
         ]
     }),
     computed: {
@@ -1260,6 +1356,10 @@ export default {
             } else if (type === 'combo') {
                 return this.mySlidingBadges.filter(badge =>
                     this.comboBadges.some(cb => cb.badge === badge.badge)
+                ).length;
+            } else if (type === 'sliding') {
+                return this.mySlidingBadges.filter(badge =>
+                    this.slidingBadges.some(sb => sb.badge === badge.badge)
                 ).length;
             }
             return 0;

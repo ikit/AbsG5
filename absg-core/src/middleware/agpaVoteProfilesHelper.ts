@@ -40,10 +40,31 @@ export interface ComboProfile {
     color: string;
 }
 
+export interface SlidingProfile {
+    username: string;
+    badge: string;
+    icon: string;
+    description: string;
+    color: string;
+}
+
 export interface UserProfiles {
     voterProfile: VoterProfile | null;
     photographerProfile: PhotographerProfile | null;
     comboProfile: ComboProfile | null;
+}
+
+export interface YearData {
+    year: number;
+    totalPoints: number;
+    golds: number;
+    sylvers: number;
+    bronzes: number;
+    diamonds: number;
+    nominated: number;
+    podiums: number;
+    categories: string[];
+    categoriesWithAwards: Record<string, string>; // categoryId -> awardType mapping for progression tracking
 }
 
 /**
@@ -577,6 +598,406 @@ function analyzeComboProfile(
 }
 
 /**
+ * Analyse l'évolution d'un utilisateur sur les 3 dernières années
+ * @param username nom de l'utilisateur
+ * @param yearDataList données des 3 dernières années triées par année (du plus ancien au plus récent)
+ */
+function analyzeSlidingProfile(
+    username: string,
+    yearDataList: YearData[]
+): SlidingProfile[] {
+    const badges: SlidingProfile[] = [];
+
+    // Vérifier qu'on a bien 3 années de données
+    if (yearDataList.length < 3) return badges;
+
+    const [year1, year2, year3] = yearDataList;
+
+    // 1. L'Alpiniste 🧗 - Progression continue + au moins 1 or en dernière année
+    if (year1.totalPoints < year2.totalPoints &&
+        year2.totalPoints < year3.totalPoints &&
+        year3.golds >= 1) {
+        badges.push({
+            username,
+            badge: 'L\'Alpiniste',
+            icon: 'fas fa-mountain',
+            description: 'Progression continue vers le sommet',
+            color: '#2196f3'
+        });
+    }
+
+    // 2. La Fusée 🚀 - Progression x3 minimum
+    if (year1.totalPoints > 0 && year3.totalPoints >= year1.totalPoints * 3) {
+        badges.push({
+            username,
+            badge: 'La Fusée',
+            icon: 'fas fa-rocket-launch',
+            description: 'Décollage spectaculaire (x3)',
+            color: '#ff5722'
+        });
+    }
+
+    // 3. Le Régulier 🎯 - Performance constante (variance faible)
+    const avgPoints = (year1.totalPoints + year2.totalPoints + year3.totalPoints) / 3;
+    if (avgPoints >= 30) {
+        const variance = [year1, year2, year3]
+            .reduce((sum, y) => sum + Math.pow(y.totalPoints - avgPoints, 2), 0) / 3;
+        const stdDev = Math.sqrt(variance);
+        const coeffVar = stdDev / avgPoints;
+
+        if (coeffVar < 0.15) { // Variation < 15%
+            badges.push({
+                username,
+                badge: 'Le Régulier',
+                icon: 'fas fa-chart-line',
+                description: 'Performance stable et constante',
+                color: '#4caf50'
+            });
+        }
+    }
+
+    // 4. Le Dinosaure 🦕 - Régression continue
+    if (year1.totalPoints > year2.totalPoints &&
+        year2.totalPoints > year3.totalPoints &&
+        year1.totalPoints >= 40) {
+        badges.push({
+            username,
+            badge: 'Le Dinosaure',
+            icon: 'fas fa-dragon',
+            description: 'Les beaux jours sont derrière',
+            color: '#795548'
+        });
+    }
+
+    // 5. Le Yoyo 🪀 - Alternance haut/bas
+    if ((year1.totalPoints > year2.totalPoints && year2.totalPoints < year3.totalPoints &&
+         year3.totalPoints > year2.totalPoints * 1.5) ||
+        (year1.totalPoints < year2.totalPoints && year2.totalPoints > year3.totalPoints &&
+         year2.totalPoints > year1.totalPoints * 1.5)) {
+        badges.push({
+            username,
+            badge: 'Le Yoyo',
+            icon: 'fas fa-arrows-up-down',
+            description: 'Performance en montagnes russes',
+            color: '#ff9800'
+        });
+    }
+
+    // 6. L'Incendie 🔥 - 3 ors sur les 3 années
+    const totalGolds = year1.golds + year2.golds + year3.golds;
+    if (totalGolds >= 3) {
+        badges.push({
+            username,
+            badge: 'L\'Incendie',
+            icon: 'fas fa-fire',
+            description: '3+ médailles d\'or sur 3 ans',
+            color: '#ffd700'
+        });
+    }
+
+    // 7. La Révélation 💫 - 0 points année 1, forte progression
+    if (year1.totalPoints === 0 && year2.totalPoints > 20 && year3.totalPoints > year2.totalPoints) {
+        badges.push({
+            username,
+            badge: 'La Révélation',
+            icon: 'fas fa-star-shooting',
+            description: 'De l\'ombre à la lumière',
+            color: '#9c27b0'
+        });
+    }
+
+    // 8. Le Vétéran 🎖️ - Sur le podium chaque année
+    if (year1.podiums > 0 && year2.podiums > 0 && year3.podiums > 0) {
+        badges.push({
+            username,
+            badge: 'Le Vétéran',
+            icon: 'fas fa-medal',
+            description: 'Sur le podium tous les ans',
+            color: '#ff6f00'
+        });
+    }
+
+    // 9. Le Sniper Temporel 🎯 - Même catégorie gagnée 2-3 fois
+    const allCategories = [...year1.categories, ...year2.categories, ...year3.categories];
+    const categoryCount: Record<string, number> = {};
+    allCategories.forEach(cat => {
+        categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+    });
+    const maxCategoryWins = Math.max(...Object.values(categoryCount));
+    if (maxCategoryWins >= 2) {
+        badges.push({
+            username,
+            badge: 'Le Sniper Temporel',
+            icon: 'fas fa-bullseye',
+            description: 'Spécialiste d\'une catégorie',
+            color: '#f44336'
+        });
+    }
+
+    // 10. Le Phoenix 🐦‍🔥 - Chute puis renaissance
+    if (year1.totalPoints >= 30 &&
+        year2.totalPoints < year1.totalPoints * 0.5 &&
+        year3.totalPoints >= year1.totalPoints * 1.2) {
+        badges.push({
+            username,
+            badge: 'Le Phoenix',
+            icon: 'fas fa-phoenix-squadron',
+            description: 'Renaît de ses cendres',
+            color: '#e91e63'
+        });
+    }
+
+    // 11. Le Tsunami 🌊 - Jamais participé avant, puis 2+ ors
+    if (year1.totalPoints === 0 && year2.golds >= 2) {
+        badges.push({
+            username,
+            badge: 'Le Tsunami',
+            icon: 'fas fa-water',
+            description: 'Arrivée fracassante',
+            color: '#00bcd4'
+        });
+    }
+
+    // 12. Le Fidèle 🤝 - Présent les 3 ans avec 15+ pts/an
+    if (year1.totalPoints >= 15 && year2.totalPoints >= 15 && year3.totalPoints >= 15) {
+        badges.push({
+            username,
+            badge: 'Le Fidèle',
+            icon: 'fas fa-handshake',
+            description: 'Toujours présent, toujours actif',
+            color: '#607d8b'
+        });
+    }
+
+    // 13. Le Podium Addict 🏆 - 5+ podiums sur 3 ans
+    const totalPodiums = year1.podiums + year2.podiums + year3.podiums;
+    if (totalPodiums >= 5) {
+        badges.push({
+            username,
+            badge: 'Le Podium Addict',
+            icon: 'fas fa-trophy',
+            description: '5+ podiums sur 3 ans',
+            color: '#cddc39'
+        });
+    }
+
+    // 14. L'Éclair ⚡ - Absent 2 ans, retour en force
+    if (year1.totalPoints === 0 &&
+        year2.totalPoints === 0 &&
+        year3.totalPoints >= 40) {
+        badges.push({
+            username,
+            badge: 'L\'Éclair',
+            icon: 'fas fa-bolt',
+            description: 'Retour fracassant',
+            color: '#ffeb3b'
+        });
+    }
+
+    // === BADGES DE COLLECTION ===
+    // Ces badges vérifient les combinaisons d'awards sur chaque année individuellement
+
+    yearDataList.forEach((year: YearData) => {
+        // 15. Le Collectionneur 🎖️ - Exactement 1 Or + 1 Argent + 1 Bronze en 1 édition
+        if (year.golds === 1 && year.sylvers === 1 && year.bronzes === 1) {
+            badges.push({
+                username,
+                badge: 'Le Collectionneur',
+                icon: 'fas fa-medal',
+                description: `Collection complète (${year.year})`,
+                color: '#9c27b0'
+            });
+        }
+
+        // 16. Le Perfectionniste 🏆 - Uniquement des Ors (≥2) sans autre récompense en 1 édition
+        if (year.golds >= 2 && year.sylvers === 0 && year.bronzes === 0 && year.diamonds === 0 && year.nominated === 0) {
+            badges.push({
+                username,
+                badge: 'Le Perfectionniste',
+                icon: 'fas fa-crown',
+                description: `${year.golds} Ors purs (${year.year})`,
+                color: '#ffd700'
+            });
+        }
+
+        // 17. Le Monopole 👑 - Tous les Ors d'une édition (nécessite vérification du total des catégories)
+        // Note: Pour implémenter correctement, il faudrait connaître le nombre total de catégories par année
+        // Pour l'instant, on considère que 5+ ors = monopole potentiel
+        if (year.golds >= 5) {
+            badges.push({
+                username,
+                badge: 'Le Monopole',
+                icon: 'fas fa-chess-king',
+                description: `Domination totale (${year.year})`,
+                color: '#ff6f00'
+            });
+        }
+
+        // 18. La Razzia 🎯 - Au moins 1 AGPA dans toutes les catégories d'une édition
+        // Note: categories[] contient uniquement les catégories avec un Or
+        // Pour une vraie razzia, il faudrait vérifier toutes les catégories
+        // On considère que 4+ catégories gagnées = razzia
+        if (year.categories.length >= 4) {
+            badges.push({
+                username,
+                badge: 'La Razzia',
+                icon: 'fas fa-bullseye',
+                description: `${year.categories.length} catégories dominées (${year.year})`,
+                color: '#e91e63'
+            });
+        }
+
+        // === BADGES DE DOMINATION ===
+        // 19. Le Triplé 🥇 - 3+ Ors en 1 édition
+        if (year.golds >= 3) {
+            badges.push({
+                username,
+                badge: 'Le Triplé',
+                icon: 'fas fa-fire',
+                description: `${year.golds} Ors (${year.year})`,
+                color: '#ff9800'
+            });
+        }
+
+        // 20. Le Doublé 🥈 - Exactement 2 Argents en 1 édition
+        if (year.sylvers === 2) {
+            badges.push({
+                username,
+                badge: 'Le Doublé',
+                icon: 'fas fa-gem',
+                description: `Double argent (${year.year})`,
+                color: '#c0c0c0'
+            });
+        }
+
+        // 21. Le Balayage Bronze 🥉 - 4+ Bronzes en 1 édition
+        if (year.bronzes >= 4) {
+            badges.push({
+                username,
+                badge: 'Le Balayage Bronze',
+                icon: 'fas fa-broom',
+                description: `${year.bronzes} Bronzes (${year.year})`,
+                color: '#cd7f32'
+            });
+        }
+
+        // 22. L'Arc-en-ciel 🌈 - ≥2 de chaque type (2 Or + 2 Argent + 2 Bronze) en 1 édition
+        if (year.golds >= 2 && year.sylvers >= 2 && year.bronzes >= 2) {
+            badges.push({
+                username,
+                badge: 'L\'Arc-en-ciel',
+                icon: 'fas fa-rainbow',
+                description: `Palette complète (${year.year})`,
+                color: '#00bcd4'
+            });
+        }
+    });
+
+    // === BADGES DE PROGRESSION ===
+    // Ces badges vérifient la progression sur plusieurs années
+
+    // 23. L'Escalade 🧗‍♂️ - Bronze → Argent → Or dans la même catégorie sur 3 ans
+    // Vérifier si une catégorie a progressé bronze->sylver->gold
+    const categoryProgression: Record<string, string[]> = {}; // categoryId -> [award1, award2, award3]
+
+    yearDataList.forEach((year: YearData, index: number) => {
+        Object.entries(year.categoriesWithAwards).forEach(([categoryId, awardType]) => {
+            if (!categoryProgression[categoryId]) {
+                categoryProgression[categoryId] = ['', '', ''];
+            }
+            categoryProgression[categoryId][index] = awardType;
+        });
+    });
+
+    // Vérifier si une catégorie a la progression bronze -> sylver -> gold
+    const hasEscalade = Object.values(categoryProgression).some(
+        progression => progression[0] === 'bronze' && progression[1] === 'sylver' && progression[2] === 'gold'
+    );
+
+    if (hasEscalade) {
+        badges.push({
+            username,
+            badge: 'L\'Escalade',
+            icon: 'fas fa-mountain',
+            description: 'Bronze → Argent → Or même catégorie',
+            color: '#795548'
+        });
+    }
+
+    // 24. Le Sans-Faute 🎖️ - Au moins 1 AGPA chaque édition sur 3 ans
+    const allYearsHaveAwards = yearDataList.every((year: YearData) =>
+        year.golds > 0 || year.sylvers > 0 || year.bronzes > 0
+    );
+
+    if (allYearsHaveAwards) {
+        badges.push({
+            username,
+            badge: 'Le Sans-Faute',
+            icon: 'fas fa-check-double',
+            description: 'Au moins 1 AGPA chaque année',
+            color: '#4caf50'
+        });
+    }
+
+    // 25. La Rédemption 🔄 - 0 AGPA année N, puis Or année N+1 dans la même catégorie
+    // Vérifier si une catégorie passe de rien à gold
+    const hasRedemption = Object.values(categoryProgression).some(
+        progression => (progression[0] === '' && progression[1] === 'gold') ||
+                      (progression[1] === '' && progression[2] === 'gold')
+    );
+
+    if (hasRedemption) {
+        badges.push({
+            username,
+            badge: 'La Rédemption',
+            icon: 'fas fa-redo',
+            description: 'De rien à Or dans même catégorie',
+            color: '#ff5722'
+        });
+    }
+
+    // === BADGES DE PATTERNS SPÉCIAUX ===
+    // Ces badges vérifient des patterns spécifiques sur une année
+
+    yearDataList.forEach((year: YearData) => {
+        // 26. La Pyramide 🔺 - 1 Or + 2 Argents + 3 Bronzes
+        if (year.golds === 1 && year.sylvers === 2 && year.bronzes === 3) {
+            badges.push({
+                username,
+                badge: 'La Pyramide',
+                icon: 'fas fa-caret-up',
+                description: `1-2-3 parfait (${year.year})`,
+                color: '#607d8b'
+            });
+        }
+
+        // 27. La Pyramide Inversée 🔻 - 3 Ors + 2 Argents + 1 Bronze
+        if (year.golds === 3 && year.sylvers === 2 && year.bronzes === 1) {
+            badges.push({
+                username,
+                badge: 'La Pyramide Inversée',
+                icon: 'fas fa-caret-down',
+                description: `3-2-1 renversant (${year.year})`,
+                color: '#3f51b5'
+            });
+        }
+
+        // 28. Le Symétrique ⚖️ - Même nombre d'Ors, Argents et Bronzes
+        if (year.golds > 0 && year.golds === year.sylvers && year.sylvers === year.bronzes) {
+            badges.push({
+                username,
+                badge: 'Le Symétrique',
+                icon: 'fas fa-balance-scale',
+                description: `${year.golds}-${year.sylvers}-${year.bronzes} équilibré (${year.year})`,
+                color: '#009688'
+            });
+        }
+    });
+
+    return badges;
+}
+
+/**
  * Analyse les profils de tous les utilisateurs
  * @param votes liste de tous les votes [from, to, weight]
  * @param users dictionnaire des utilisateurs avec leurs infos (famille, conjoint, enfants)
@@ -602,4 +1023,20 @@ export function analyzeVoteProfiles(
     });
 
     return profiles;
+}
+
+/**
+ * Analyse les badges d'évolution pour tous les utilisateurs sur 3 ans
+ * @param usersYearData dictionnaire des données par utilisateur sur 3 ans
+ */
+export function analyzeSlidingProfiles(
+    usersYearData: Record<string, YearData[]>
+): Record<string, SlidingProfile[]> {
+    const slidingProfiles: Record<string, SlidingProfile[]> = {};
+
+    Object.keys(usersYearData).forEach(username => {
+        slidingProfiles[username] = analyzeSlidingProfile(username, usersYearData[username]);
+    });
+
+    return slidingProfiles;
 }
