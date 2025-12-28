@@ -592,8 +592,10 @@ class AgpaService {
             SELECT
                 u.id,
                 u.username,
-                u."rootFamily"
+                u."rootFamily",
+                p.sex
             FROM public."user" u
+            LEFT JOIN person p ON u."personId" = p.id
             WHERE u.id IN (
                 SELECT DISTINCT "userId" FROM agpa_photo WHERE year = ${year}
                 UNION
@@ -607,7 +609,8 @@ class AgpaService {
         usersData.forEach(u => {
             users[u.id.toString()] = {
                 username: u.username,
-                rootFamily: u.rootFamily || 'autre'
+                rootFamily: u.rootFamily || 'autre',
+                sex: u.sex || 'undefined'
                 // TODO: Ajouter spouse et children quand ces données seront disponibles en base
             };
         });

@@ -11,6 +11,7 @@ export interface VoteData {
 export interface UserData {
     username: string;
     rootFamily: string;
+    sex?: string;
     spouse?: string;
     children?: string[];
 }
@@ -68,6 +69,7 @@ function analyzeVoterProfile(
     const votesByFamily: Record<string, number> = {};
     const votesByPerson: Record<string, number> = {};
     const recipients = new Set<string>();
+    let votesForFemales = 0;
 
     userVotes.forEach(vote => {
         const recipient = users[vote.to];
@@ -79,6 +81,11 @@ function analyzeVoterProfile(
             // Par personne
             votesByPerson[vote.to] = (votesByPerson[vote.to] || 0) + vote.weight;
             recipients.add(vote.to);
+
+            // Par sexe
+            if (recipient.sex === 'female') {
+                votesForFemales += vote.weight;
+            }
         }
     });
 
@@ -88,6 +95,7 @@ function analyzeVoterProfile(
     const childrenPercent = user.children
         ? user.children.reduce((sum, child) => sum + (votesByPerson[child] || 0), 0) / totalPoints * 100
         : 0;
+    const femaleVotesPercent = (votesForFemales / totalPoints) * 100;
 
     // Calcul de la concentration des votes
     const sortedVotes = Object.values(votesByPerson).sort((a, b) => b - a);
@@ -146,7 +154,18 @@ function analyzeVoterProfile(
         };
     }
 
-    // 5. Le Philanthrope 🌈
+    // 5. Féministe Convaincu 💪
+    if (femaleVotesPercent >= 70 && totalPoints > 20) {
+        return {
+            username,
+            badge: 'Féministe Convaincu',
+            icon: 'fas fa-fist-raised',
+            description: 'Les femmes d\'abord !',
+            color: '#9c27b0'
+        };
+    }
+
+    // 6. Le Philanthrope 🌈
     if (recipients.size >= 8) {
         return {
             username,
@@ -157,7 +176,7 @@ function analyzeVoterProfile(
         };
     }
 
-    // 6. L'Anticonformiste 🦄
+    // 7. L'Anticonformiste 🦄
     if (ownFamilyPercent < 30 && totalPoints > 20) {
         return {
             username,
@@ -168,7 +187,7 @@ function analyzeVoterProfile(
         };
     }
 
-    // 7. Le Diplomate 🤝
+    // 8. Le Diplomate 🤝
     if (isBalanced && recipients.size >= 5) {
         return {
             username,
@@ -179,7 +198,7 @@ function analyzeVoterProfile(
         };
     }
 
-    // 8. Le Radin 🤏
+    // 9. Le Radin 🤏
     if (totalPoints < 30) {
         return {
             username,
@@ -190,7 +209,7 @@ function analyzeVoterProfile(
         };
     }
 
-    // 9. Le Mécène 🎁
+    // 10. Le Mécène 🎁
     if (totalPoints > 100) {
         return {
             username,
@@ -233,6 +252,7 @@ function analyzePhotographerProfile(
     const totalPoints = receivedVotes.reduce((sum, v) => sum + v.weight, 0);
     const votesByFamily: Record<string, number> = {};
     const voters = new Set<string>();
+    let votesFromFemales = 0;
 
     receivedVotes.forEach(vote => {
         const voter = users[vote.from];
@@ -240,11 +260,17 @@ function analyzePhotographerProfile(
             const family = voter.rootFamily || 'autre';
             votesByFamily[family] = (votesByFamily[family] || 0) + vote.weight;
             voters.add(vote.from);
+
+            // Comptabiliser les votes des femmes
+            if (voter.sex === 'female') {
+                votesFromFemales += vote.weight;
+            }
         }
     });
 
     const ownFamilyPercent = (votesByFamily[user.rootFamily] || 0) / totalPoints * 100;
     const voterCount = voters.size;
+    const femaleVotesPercent = (votesFromFemales / totalPoints) * 100;
 
     // Détermination du profil
 
@@ -303,7 +329,18 @@ function analyzePhotographerProfile(
         };
     }
 
-    // 6. L'Équilibré ⚖️
+    // 6. La Coqueluche des Dames 💃
+    if (femaleVotesPercent >= 70 && totalPoints > 20) {
+        return {
+            username,
+            badge: 'La Coqueluche des Dames',
+            icon: 'fas fa-heart',
+            description: 'Apprécié par les femmes',
+            color: '#e91e63'
+        };
+    }
+
+    // 7. L'Équilibré ⚖️
     const familyValues = Object.values(votesByFamily);
     if (familyValues.length >= 3) {
         const avgFamily = familyValues.reduce((sum, v) => sum + v, 0) / familyValues.length;
@@ -321,7 +358,7 @@ function analyzePhotographerProfile(
         }
     }
 
-    // 7. L'Inconnu 👻
+    // 8. L'Inconnu 👻
     if (totalPoints < 15) {
         return {
             username,
@@ -522,6 +559,17 @@ function analyzeComboProfile(
             icon: 'fas fa-sparkles',
             description: 'Excellence en tout point',
             color: '#ff6f00'
+        };
+    }
+
+    // 14. Girl Power 💪💃 - Féministe Convaincu + La Coqueluche des Dames
+    if (voterProfile.badge === 'Féministe Convaincu' && photographerProfile.badge === 'La Coqueluche des Dames') {
+        return {
+            username,
+            badge: 'Girl Power',
+            icon: 'fas fa-venus',
+            description: 'Engagement féministe total',
+            color: '#9c27b0'
         };
     }
 

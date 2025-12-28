@@ -1,146 +1,277 @@
 <template>
   <div>
     <v-container>
-      <!-- Section 1: Palmarès -->
-      <div style="margin-bottom: 30px;">
-        <!-- Palmarès (Glissant par défaut) -->
-        <v-card
-          style="cursor: pointer; transition: transform 0.2s;"
-          @click="showPalmaresDialog = true"
-          hover
-        >
-          <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <v-icon start color="white">fas fa-trophy</v-icon>
-            <span v-if="slidingYearFrom && slidingYearTo">
-              Palmarès ({{ slidingYearFrom }} - {{ slidingYearTo }})
-            </span>
-            <span v-else>
-              Palmarès (3 dernières éditions)
-            </span>
-          </v-card-title>
-          <v-card-text style="padding: 30px; text-align: center;">
-            <div style="font-size: 4em; font-weight: bold; color: #667eea; margin-bottom: 20px;">
-              <template v-if="mySlidingRank">
-                {{ mySlidingRank }}<sup style="font-size: 0.5em;">{{ getOrdinalSuffix(mySlidingRank) }}</sup>
-              </template>
-              <template v-else>
-                -
-              </template>
-            </div>
-
-            <!-- Breakdown des récompenses AGPA -->
-            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 10px;">
-              <div style="text-align: center;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                  <i class="fas fa-circle" style="color: #c68b00; font-size: 0.8em;"></i>
-                  <span style="font-size: 1.8em; font-weight: bold; color: #c68b00;">{{ mySlidingAwards.gold }}</span>
-                </div>
-              </div>
-              <div style="text-align: center;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                  <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.8em;"></i>
-                  <span style="font-size: 1.8em; font-weight: bold; color: #9b9b9b;">{{ mySlidingAwards.sylver }}</span>
-                </div>
-              </div>
-              <div style="text-align: center;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                  <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.8em;"></i>
-                  <span style="font-size: 1.8em; font-weight: bold; color: #cd7f32;">{{ mySlidingAwards.bronze }}</span>
-                </div>
-              </div>
-              <div style="text-align: center;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                  <i class="far fa-circle" style="color: #764ba2; font-size: 0.8em;"></i>
-                  <span style="font-size: 1.8em; font-weight: bold; color: #764ba2;">{{ mySlidingAwards.nominated }}</span>
-                </div>
-              </div>
-            </div>
-            <div style="font-size: 0.9em; color: #666;">
+      <!-- Première ligne: Palmarès, Mon Palmarès Personnel, Fun Facts -->
+      <v-row style="margin-bottom: 30px;">
+        <!-- Section 1: Palmarès -->
+        <v-col cols="12" md="4">
+          <v-card
+            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
+            @click="showPalmaresDialog = true"
+            hover
+          >
+            <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+              <v-icon start color="white">fas fa-trophy</v-icon>
               <span v-if="slidingYearFrom && slidingYearTo">
-                AGPA de {{ slidingYearFrom }} à {{ slidingYearTo }}
+                Palmarès ({{ slidingYearFrom }} - {{ slidingYearTo }})
               </span>
               <span v-else>
-                AGPA sur les 3 dernières éditions
+                Palmarès (3 dernières éditions)
               </span>
-            </div>
-
-            <!-- Badges Glissants (3 dernières éditions) -->
-            <div v-if="mySlidingBadges && mySlidingBadges.length > 0" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-              <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
-                Badges des 3 dernières éditions
+            </v-card-title>
+            <v-card-text style="padding: 30px; text-align: center;">
+              <div style="font-size: 4em; font-weight: bold; color: #667eea; margin-bottom: 20px;">
+                <template v-if="mySlidingRank">
+                  {{ mySlidingRank }}<sup style="font-size: 0.5em;">{{ getOrdinalSuffix(mySlidingRank) }}</sup>
+                </template>
+                <template v-else>
+                  -
+                </template>
               </div>
-              <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px;">
-                <v-tooltip
-                  v-for="(badge, index) in mySlidingBadges"
-                  :key="index"
-                  location="bottom"
-                >
-                  <template #activator="{ props }">
-                    <div
-                      v-bind="props"
-                      :style="{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        backgroundColor: badge.color + '20',
-                        border: '1px solid ' + badge.color
-                      }"
-                    >
-                      <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1em' }"></i>
-                      <span style="font-size: 0.75em; font-weight: 500; color: #333;">{{ badge.badge }}</span>
-                      <span style="font-size: 0.65em; color: #999;">({{ badge.year }})</span>
+
+              <!-- Breakdown des récompenses AGPA -->
+              <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 10px;">
+                <div style="text-align: center;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <i class="fas fa-circle" style="color: #c68b00; font-size: 0.8em;"></i>
+                    <span style="font-size: 1.8em; font-weight: bold; color: #c68b00;">{{ mySlidingAwards.gold }}</span>
+                  </div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.8em;"></i>
+                    <span style="font-size: 1.8em; font-weight: bold; color: #9b9b9b;">{{ mySlidingAwards.sylver }}</span>
+                  </div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.8em;"></i>
+                    <span style="font-size: 1.8em; font-weight: bold; color: #cd7f32;">{{ mySlidingAwards.bronze }}</span>
+                  </div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <i class="far fa-circle" style="color: #764ba2; font-size: 0.8em;"></i>
+                    <span style="font-size: 1.8em; font-weight: bold; color: #764ba2;">{{ mySlidingAwards.nominated }}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size: 0.9em; color: #666;">
+                <span v-if="slidingYearFrom && slidingYearTo">
+                  AGPA de {{ slidingYearFrom }} à {{ slidingYearTo }}
+                </span>
+                <span v-else>
+                  AGPA sur les 3 dernières éditions
+                </span>
+              </div>
+
+              <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
+                Cliquez pour voir le tableau complet
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Section 2: Mes Badges -->
+        <v-col cols="12" md="4">
+          <v-card
+            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
+            @click="showBadgesDialog = true"
+            hover
+          >
+            <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+              <v-icon start color="white">fas fa-award</v-icon>
+              Mes Badges
+            </v-card-title>
+            <v-card-text style="padding: 30px; text-align: center;">
+              <!-- Compteurs de badges par type -->
+              <div style="margin-bottom: 25px;">
+                <div style="font-size: 0.9em; color: #666; margin-bottom: 15px;">
+                  <span v-if="slidingYearFrom && slidingYearTo">
+                    Badges obtenus ({{ slidingYearFrom }} - {{ slidingYearTo }})
+                  </span>
+                  <span v-else>
+                    Badges obtenus (3 dernières éditions)
+                  </span>
+                </div>
+
+                <!-- Badge Votant -->
+                <div style="margin-bottom: 12px; padding: 12px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <i class="fas fa-vote-yea" style="color: #2196f3; font-size: 1.3em;"></i>
+                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Votant</div>
                     </div>
-                  </template>
-                  <span>{{ badge.description }}</span>
-                </v-tooltip>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2196f3;">
+                      {{ countBadgesByType('voter') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Badge Photographe -->
+                <div style="margin-bottom: 12px; padding: 12px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <i class="fas fa-camera" style="color: #ff9800; font-size: 1.3em;"></i>
+                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Photographe</div>
+                    </div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #ff9800;">
+                      {{ countBadgesByType('photographer') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Badge Combo -->
+                <div style="padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <i class="fas fa-star" style="color: #9c27b0; font-size: 1.3em;"></i>
+                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Combo</div>
+                    </div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #9c27b0;">
+                      {{ countBadgesByType('combo') }}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
-              Cliquez pour voir le tableau complet
-            </div>
-          </v-card-text>
-        </v-card>
-      </div>
+              <!-- Total -->
+              <div style="padding: 15px; background: linear-gradient(135deg, #fa709a20 0%, #fee14020 100%); border-radius: 8px; margin-bottom: 15px;">
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total des badges</div>
+                <div style="font-size: 2.5em; font-weight: bold; color: #fa709a;">
+                  {{ mySlidingBadges.length }}
+                </div>
+              </div>
 
-      <!-- Section 2: Analyse des Votes -->
+              <div style="font-size: 0.9em; color: #999; font-style: italic;">
+                Cliquez pour voir tous les badges disponibles
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Section: Statistiques Générales (pleine largeur) -->
       <v-card style="margin-bottom: 30px;">
         <v-card-title style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
-          <v-icon start color="white">fas fa-chart-pie</v-icon>
-          Analyse des Votes
+          <v-icon start color="white">fas fa-chart-line</v-icon>
+          Statistiques Générales
         </v-card-title>
         <v-card-text style="padding: 20px;">
-          <p style="text-align: center; color: #999; font-style: italic; padding: 40px;">
-            Section en cours de développement - Analyse détaillée de vos votes donnés et reçus
-          </p>
-        </v-card-text>
-      </v-card>
+          <v-row>
+            <!-- Meilleure catégorie -->
+            <v-col cols="12" md="3">
+              <div style="padding: 15px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800; height: 100%;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <i class="fas fa-crown" style="color: #ff9800; font-size: 1.5em;"></i>
+                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Catégorie favorite</div>
+                </div>
+                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">Animaux</div>
+                <div style="font-size: 0.85em; color: #666;">
+                  3 <i class="fas fa-circle" style="color: #c68b00; font-size: 0.7em;"></i> ·
+                  2 <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.7em;"></i> ·
+                  1 <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.7em;"></i>
+                </div>
+              </div>
+            </v-col>
 
-      <!-- Section 3: Mon Palmarès -->
-      <v-card style="margin-bottom: 30px;">
-        <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
-          <v-icon start color="white">fas fa-medal</v-icon>
-          Mon Palmarès Personnel
-        </v-card-title>
-        <v-card-text style="padding: 20px;">
-          <p style="text-align: center; color: #999; font-style: italic; padding: 40px;">
-            Section en cours de développement - Votre historique complet par catégorie et par année
-          </p>
-        </v-card-text>
-      </v-card>
+            <!-- Meilleure année -->
+            <v-col cols="12" md="3">
+              <div style="padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50; height: 100%;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <i class="fas fa-calendar-star" style="color: #4caf50; font-size: 1.5em;"></i>
+                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Meilleure année</div>
+                </div>
+                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">2023</div>
+                <div style="font-size: 0.85em; color: #666;">
+                  5 récompenses · 42 points
+                </div>
+              </div>
+            </v-col>
 
-      <!-- Section 4: Fun Facts -->
-      <v-card style="margin-bottom: 30px;">
-        <v-card-title style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333;">
-          <v-icon start color="#333">fas fa-smile-beam</v-icon>
-          Fun Facts
-        </v-card-title>
-        <v-card-text style="padding: 20px;">
-          <p style="text-align: center; color: #999; font-style: italic; padding: 40px;">
-            Section en cours de développement - Anecdotes et statistiques amusantes
-          </p>
+            <!-- Éditions participées -->
+            <v-col cols="12" md="3">
+              <div style="padding: 15px; background: #fce4ec; border-radius: 8px; border-left: 4px solid #e91e63; height: 100%;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <i class="fas fa-calendar-check" style="color: #e91e63; font-size: 1.5em;"></i>
+                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Éditions</div>
+                </div>
+                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">18</div>
+                <div style="font-size: 0.85em; color: #666;">
+                  Participation totale
+                </div>
+              </div>
+            </v-col>
+
+            <!-- Photos soumises -->
+            <v-col cols="12" md="3">
+              <div style="padding: 15px; background: #e1f5fe; border-radius: 8px; border-left: 4px solid #03a9f4; height: 100%;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <i class="fas fa-images" style="color: #03a9f4; font-size: 1.5em;"></i>
+                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Photos soumises</div>
+                </div>
+                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">156</div>
+                <div style="font-size: 0.85em; color: #666;">
+                  Au total
+                </div>
+              </div>
+            </v-col>
+          </v-row>
+
+          <!-- Fun Facts -->
+          <v-row style="margin-top: 20px;">
+            <v-col cols="12" md="3">
+              <div style="padding: 12px; background: #fff9e6; border-radius: 8px;">
+                <div style="display: flex; align-items: flex-start; gap: 10px;">
+                  <i class="fas fa-lightbulb" style="color: #ffc107; font-size: 1.3em; margin-top: 2px;"></i>
+                  <div style="flex: 1;">
+                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
+                      Vous avez voté pour <strong>127 photos</strong> différentes lors de l'édition 2024
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="3">
+              <div style="padding: 12px; background: #f3e5f5; border-radius: 8px;">
+                <div style="display: flex; align-items: flex-start; gap: 10px;">
+                  <i class="fas fa-fire" style="color: #9c27b0; font-size: 1.3em; margin-top: 2px;"></i>
+                  <div style="flex: 1;">
+                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
+                      Votre série la plus longue: <strong>12 éditions</strong> consécutives
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="3">
+              <div style="padding: 12px; background: #e3f2fd; border-radius: 8px;">
+                <div style="display: flex; align-items: flex-start; gap: 10px;">
+                  <i class="fas fa-trophy" style="color: #2196f3; font-size: 1.3em; margin-top: 2px;"></i>
+                  <div style="flex: 1;">
+                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
+                      Premier podium en <strong>2015</strong> dans la catégorie "Nature"
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </v-col>
+
+            <v-col cols="12" md="3">
+              <div style="padding: 12px; background: #e8f5e9; border-radius: 8px;">
+                <div style="display: flex; align-items: flex-start; gap: 10px;">
+                  <i class="fas fa-heart" style="color: #e91e63; font-size: 1.3em; margin-top: 2px;"></i>
+                  <div style="flex: 1;">
+                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
+                      Photographe préféré: <strong>Jean-Michel</strong> (23 votes donnés)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-container>
@@ -160,7 +291,6 @@
         <!-- Tabs pour basculer entre Glissant et Global -->
         <v-tabs
           v-model="palmaresTab"
-          bg-color="primary"
           color="white"
         >
           <v-tab value="sliding">
@@ -630,6 +760,132 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Dialog Liste des Badges -->
+    <v-dialog
+      v-model="showBadgesDialog"
+      max-width="1200px"
+      scrollable
+    >
+      <v-card>
+        <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; position: sticky; top: 0; z-index: 10;">
+          <v-icon start color="white">fas fa-award</v-icon>
+          Tous les badges disponibles
+        </v-card-title>
+
+        <v-card-text style="padding: 20px;">
+          <!-- Badges Votant -->
+          <div style="margin-bottom: 30px;">
+            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+              <i class="fas fa-vote-yea" style="color: #2196f3;"></i>
+              Badges Votant (11)
+            </h3>
+            <v-row>
+              <v-col
+                v-for="badge in voterBadges"
+                :key="badge.badge"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <div
+                  :style="{
+                    padding: '15px',
+                    borderRadius: '8px',
+                    backgroundColor: badge.color + '20',
+                    border: '2px solid ' + badge.color,
+                    height: '100%'
+                  }"
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
+                  </div>
+                  <div style="font-size: 0.9em; color: #666;">{{ badge.description }}</div>
+                </div>
+              </v-col>
+            </v-row>
+          </div>
+
+          <!-- Badges Photographe -->
+          <div style="margin-bottom: 30px;">
+            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+              <i class="fas fa-camera" style="color: #ff9800;"></i>
+              Badges Photographe (9)
+            </h3>
+            <v-row>
+              <v-col
+                v-for="badge in photographerBadges"
+                :key="badge.badge"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <div
+                  :style="{
+                    padding: '15px',
+                    borderRadius: '8px',
+                    backgroundColor: badge.color + '20',
+                    border: '2px solid ' + badge.color,
+                    height: '100%'
+                  }"
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
+                  </div>
+                  <div style="font-size: 0.9em; color: #666;">{{ badge.description }}</div>
+                </div>
+              </v-col>
+            </v-row>
+          </div>
+
+          <!-- Badges Combo -->
+          <div>
+            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+              <i class="fas fa-star" style="color: #9c27b0;"></i>
+              Badges Combo (14)
+            </h3>
+            <v-row>
+              <v-col
+                v-for="badge in comboBadges"
+                :key="badge.badge"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <div
+                  :style="{
+                    padding: '15px',
+                    borderRadius: '8px',
+                    backgroundColor: badge.color + '20',
+                    border: '2px solid ' + badge.color,
+                    height: '100%'
+                  }"
+                >
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
+                  </div>
+                  <div style="font-size: 0.9em; color: #666;">{{ badge.description }}</div>
+                </div>
+              </v-col>
+            </v-row>
+          </div>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            color="primary"
+            @click="showBadgesDialog = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -673,7 +929,48 @@ export default {
         slidingYearTo: null,
         myGlobalBadges: null,
         mySlidingBadges: [],
-        voteProfiles: {}
+        voteProfiles: {},
+        showBadgesDialog: false,
+        voterBadges: [
+            { badge: 'Le Patriote', icon: 'fas fa-flag', description: 'Vote principalement pour sa famille', color: '#3f51b5' },
+            { badge: 'L\'Amoureux Transi', icon: 'fas fa-heart', description: 'Vote beaucoup pour son/sa conjoint(e)', color: '#e91e63' },
+            { badge: 'Le Parent Fier', icon: 'fas fa-baby', description: 'Vote beaucoup pour ses enfants', color: '#ff9800' },
+            { badge: 'Le Sniper', icon: 'fas fa-bullseye', description: 'J\'ai mes favoris et je m\'y tiens', color: '#f44336' },
+            { badge: 'Féministe Convaincu', icon: 'fas fa-fist-raised', description: 'Les femmes d\'abord !', color: '#9c27b0' },
+            { badge: 'Le Philanthrope', icon: 'fas fa-hand-holding-heart', description: 'Il y a du talent partout !', color: '#9c27b0' },
+            { badge: 'L\'Anticonformiste', icon: 'fas fa-star-of-life', description: 'L\'herbe est plus verte ailleurs', color: '#00bcd4' },
+            { badge: 'Le Diplomate', icon: 'fas fa-handshake', description: 'Un vote pour chacun, équité pour tous', color: '#4caf50' },
+            { badge: 'Le Radin', icon: 'fas fa-piggy-bank', description: 'Faut le mériter !', color: '#795548' },
+            { badge: 'Le Mécène', icon: 'fas fa-gift', description: 'Tout le monde est talentueux !', color: '#ffd700' },
+            { badge: 'Le Modéré', icon: 'fas fa-check', description: 'Ni trop, ni trop peu', color: '#607d8b' }
+        ],
+        photographerBadges: [
+            { badge: 'Le Phénomène', icon: 'fas fa-rocket', description: 'Populaire et reconnu', color: '#ff6f00' },
+            { badge: 'La Star', icon: 'fas fa-star', description: 'Très apprécié par beaucoup', color: '#ffd700' },
+            { badge: 'Le Chouchou de Famille', icon: 'fas fa-home', description: 'Très apprécié par sa famille', color: '#3f51b5' },
+            { badge: 'Le Transfuge', icon: 'fas fa-exchange-alt', description: 'Apprécié hors de sa famille', color: '#00bcd4' },
+            { badge: 'Le Protégé', icon: 'fas fa-crown', description: 'J\'ai mes champions', color: '#e91e63' },
+            { badge: 'La Coqueluche des Dames', icon: 'fas fa-heart', description: 'Apprécié par les femmes', color: '#e91e63' },
+            { badge: 'L\'Équilibré', icon: 'fas fa-balance-scale', description: 'Je plais à tout le monde modérément', color: '#4caf50' },
+            { badge: 'L\'Inconnu', icon: 'fas fa-ghost', description: 'Qui suis-je ?', color: '#9e9e9e' },
+            { badge: 'Le Talent Émergent', icon: 'fas fa-seedling', description: 'En progression', color: '#8bc34a' }
+        ],
+        comboBadges: [
+            { badge: 'Le Solitaire', icon: 'fas fa-island-tropical', description: 'Discret en tout point', color: '#607d8b' },
+            { badge: 'L\'Égoïste', icon: 'fas fa-user-crown', description: 'Je reçois plus que je ne donne', color: '#9c27b0' },
+            { badge: 'Le Robin des Bois', icon: 'fas fa-bow-arrow', description: 'Généreux malgré l\'oubli', color: '#4caf50' },
+            { badge: 'L\'Influenceur', icon: 'fas fa-star-shooting', description: 'Populaire et généreux', color: '#ff9800' },
+            { badge: 'Le Clan', icon: 'fas fa-users', description: 'Ma famille et moi, c\'est pour la vie', color: '#3f51b5' },
+            { badge: 'Le Rebelle', icon: 'fas fa-dragon', description: 'Loin de ma famille, dans les deux sens', color: '#00bcd4' },
+            { badge: 'Le Fan Club', icon: 'fas fa-crown', description: 'J\'ai mes favoris et ils me le rendent', color: '#e91e63' },
+            { badge: 'Le Politique', icon: 'fas fa-balance-scale-right', description: 'Équilibre parfait donné/reçu', color: '#4caf50' },
+            { badge: 'Le Phénomène Total', icon: 'fas fa-meteor', description: 'La légende absolue des AGPA', color: '#ffd700' },
+            { badge: 'Le Couple Parfait', icon: 'fas fa-heart', description: 'L\'amour est réciproque', color: '#e91e63' },
+            { badge: 'L\'Incompris', icon: 'fas fa-sad-tear', description: 'Je donne à tous mais personne ne me voit', color: '#9e9e9e' },
+            { badge: 'Le Revenant', icon: 'fas fa-ghost', description: 'Peu présent mais marquant', color: '#673ab7' },
+            { badge: 'La Superstar', icon: 'fas fa-sparkles', description: 'Excellence en tout point', color: '#ff6f00' },
+            { badge: 'Girl Power', icon: 'fas fa-venus', description: 'Engagement féministe total', color: '#9c27b0' }
+        ]
     }),
     computed: {
         ...mapState(['user']),
@@ -746,10 +1043,16 @@ export default {
             // Charger le palmarès global
             try {
                 const response = await axios.get(`/api/agpa/palmares`);
-                this.palmares = parseAxiosResponse(response).map( e => ({
-                    ...e,
-                    ...getPeopleAvatar(e)
-                }));
+                const palmaresData = parseAxiosResponse(response);
+
+                if (palmaresData && Array.isArray(palmaresData)) {
+                    this.palmares = palmaresData.map( e => ({
+                        ...e,
+                        ...getPeopleAvatar(e)
+                    }));
+                } else {
+                    this.palmares = [];
+                }
 
                 // Calculer ma position et mes AGPA dans le palmarès global
                 this.calculateMyGlobalStats();
@@ -757,6 +1060,7 @@ export default {
                 this.isLoading = false;
             } catch (err) {
                 console.error(err);
+                this.palmares = [];
                 this.isLoading = false;
             }
 
@@ -765,8 +1069,16 @@ export default {
                 const response = await axios.get(`/api/agpa/palmares/sliding`);
                 const data = parseAxiosResponse(response);
 
-                // Extraire le tableau palmares et les années
-                if (data.palmares) {
+                if (!data) {
+                    this.slidingPalmares = [];
+                } else if (Array.isArray(data)) {
+                    // Format ancien (fallback) - tableau direct
+                    this.slidingPalmares = data.map( e => ({
+                        ...e,
+                        ...getPeopleAvatar(e)
+                    }));
+                } else if (data?.palmares && Array.isArray(data.palmares)) {
+                    // Format avec années - objet avec propriété palmares
                     this.slidingPalmares = data.palmares.map( e => ({
                         ...e,
                         ...getPeopleAvatar(e)
@@ -774,11 +1086,7 @@ export default {
                     this.slidingYearFrom = data.yearFrom;
                     this.slidingYearTo = data.yearTo;
                 } else {
-                    // Format ancien (fallback)
-                    this.slidingPalmares = data.map( e => ({
-                        ...e,
-                        ...getPeopleAvatar(e)
-                    }));
+                    this.slidingPalmares = [];
                 }
 
                 // Calculer ma position et mes AGPA dans le palmarès glissant
@@ -786,7 +1094,7 @@ export default {
             } catch (err) {
                 console.error('Palmarès glissant non disponible:', err);
                 // Pour l'instant, utiliser le palmarès global comme fallback
-                this.slidingPalmares = this.palmares;
+                this.slidingPalmares = this.palmares || [];
                 this.calculateMySlidingStats();
             }
 
@@ -869,8 +1177,8 @@ export default {
             if (userProfiles.photographerProfile) allBadges.push(userProfiles.photographerProfile);
             if (userProfiles.comboProfile) allBadges.push(userProfiles.comboProfile);
 
-            // Total possible: 10 voter + 8 photographer + 13 combo = 31 badges
-            const totalPossible = 31;
+            // Total possible: 11 voter + 9 photographer + 14 combo = 34 badges
+            const totalPossible = 34;
 
             // Dernier badge = combo si existe, sinon photographe, sinon voter
             const lastBadge = userProfiles.comboProfile ||
@@ -933,6 +1241,28 @@ export default {
                 return 'er';
             }
             return 'ème';
+        },
+
+        countBadgesByType(type) {
+            if (!this.mySlidingBadges || this.mySlidingBadges.length === 0) {
+                return 0;
+            }
+
+            // Déterminer quel type de badge compter en fonction du type demandé
+            if (type === 'voter') {
+                return this.mySlidingBadges.filter(badge =>
+                    this.voterBadges.some(vb => vb.badge === badge.badge)
+                ).length;
+            } else if (type === 'photographer') {
+                return this.mySlidingBadges.filter(badge =>
+                    this.photographerBadges.some(pb => pb.badge === badge.badge)
+                ).length;
+            } else if (type === 'combo') {
+                return this.mySlidingBadges.filter(badge =>
+                    this.comboBadges.some(cb => cb.badge === badge.badge)
+                ).length;
+            }
+            return 0;
         }
     }
 };
