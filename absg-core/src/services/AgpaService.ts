@@ -760,6 +760,137 @@ class AgpaService {
 
         return slidingProfiles;
     }
+
+    /**
+     * Récupère l'historique complet des badges d'un utilisateur
+     * Permet de savoir quels badges ont été obtenus et sur quelles années
+     * @param user l'utilisateur concerné
+     */
+    async getMyBadgesHistory(user: User) {
+        const maxYear = getMaxArchiveEdition();
+
+        // On va chercher les badges pour toutes les années depuis 2006
+        const allYears = [];
+        for (let year = 2006; year <= maxYear; year++) {
+            allYears.push(year);
+        }
+
+        const badgeHistory: Record<string, {
+            badge: string;
+            years: number[];
+            isActive: boolean; // Obtenu au moins une fois sur les 3 dernières éditions
+            everObtained: boolean; // Obtenu au moins une fois toutes éditions confondues
+            type: 'voter' | 'photographer' | 'combo';
+        }> = {};
+
+        const last3Years = [maxYear - 2, maxYear - 1, maxYear].filter(y => y >= 2006);
+
+        // Récupérer les profils de vote pour toutes les années
+        for (const year of allYears) {
+            const profiles = await this.getVoteProfiles(year);
+
+            if (profiles && profiles[user.id]) {
+                const userProfiles = profiles[user.id];
+
+                // Traiter le badge votant
+                if (userProfiles.voterProfile) {
+                    const badgeName = userProfiles.voterProfile.badge;
+                    if (!badgeHistory[badgeName]) {
+                        badgeHistory[badgeName] = {
+                            badge: badgeName,
+                            years: [],
+                            isActive: false,
+                            everObtained: false,
+                            type: 'voter'
+                        };
+                    }
+                    badgeHistory[badgeName].years.push(year);
+                    badgeHistory[badgeName].everObtained = true;
+                    if (last3Years.includes(year)) {
+                        badgeHistory[badgeName].isActive = true;
+                    }
+                }
+
+                // Traiter le badge photographe
+                if (userProfiles.photographerProfile) {
+                    const badgeName = userProfiles.photographerProfile.badge;
+                    if (!badgeHistory[badgeName]) {
+                        badgeHistory[badgeName] = {
+                            badge: badgeName,
+                            years: [],
+                            isActive: false,
+                            everObtained: false,
+                            type: 'photographer'
+                        };
+                    }
+                    badgeHistory[badgeName].years.push(year);
+                    badgeHistory[badgeName].everObtained = true;
+                    if (last3Years.includes(year)) {
+                        badgeHistory[badgeName].isActive = true;
+                    }
+                }
+
+                // Traiter le badge combo
+                if (userProfiles.comboProfile) {
+                    const badgeName = userProfiles.comboProfile.badge;
+                    if (!badgeHistory[badgeName]) {
+                        badgeHistory[badgeName] = {
+                            badge: badgeName,
+                            years: [],
+                            isActive: false,
+                            everObtained: false,
+                            type: 'combo'
+                        };
+                    }
+                    badgeHistory[badgeName].years.push(year);
+                    badgeHistory[badgeName].everObtained = true;
+                    if (last3Years.includes(year)) {
+                        badgeHistory[badgeName].isActive = true;
+                    }
+                }
+            }
+        }
+
+        // Récupérer aussi les badges de progression (basés sur 3 ans)
+        // On va analyser toutes les fenêtres glissantes de 3 ans
+        for (let endYear = 2008; endYear <= maxYear; endYear++) {
+            const slidingBadges = await this.getSlidingBadges(endYear);
+
+            if (slidingBadges && slidingBadges[user.id]) {
+                const userBadges = slidingBadges[user.id];
+
+                userBadges.forEach(badge => {
+                    const badgeName = badge.badge;
+
+                    // On considère que le badge est obtenu l'année de fin de la fenêtre
+                    if (!badgeHistory[badgeName]) {
+                        badgeHistory[badgeName] = {
+                            badge: badgeName,
+                            years: [],
+                            isActive: false,
+                            everObtained: false,
+                            type: 'combo' // Les badges de progression sont dans la catégorie combo
+                        };
+                    }
+
+                    // Éviter les doublons d'années
+                    if (!badgeHistory[badgeName].years.includes(endYear)) {
+                        badgeHistory[badgeName].years.push(endYear);
+                        badgeHistory[badgeName].everObtained = true;
+                        if (last3Years.includes(endYear)) {
+                            badgeHistory[badgeName].isActive = true;
+                        }
+                    }
+                });
+            }
+        }
+
+        return {
+            badgeHistory,
+            last3Years,
+            allYears
+        };
+    }
 }
 
 export const agpaService = new AgpaService();

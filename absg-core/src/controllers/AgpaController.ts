@@ -108,6 +108,15 @@ export class AgpaController {
     }
 
     /**
+     * Récupère l'historique complet des badges d'un utilisateur
+     * @param user l'utilisateur qui effectue la demande
+     */
+    @Get("/my-badges-history")
+    getMyBadgesHistory(@CurrentUser() user: User) {
+        return agpaService.getMyBadgesHistory(user);
+    }
+
+    /**
      * Récupère les informations de l'utilisateur pour la phase 1
      * @param user l'utilisateur qui effectue la demande
      */

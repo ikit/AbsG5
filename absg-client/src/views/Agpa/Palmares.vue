@@ -122,27 +122,14 @@
                 </div>
 
                 <!-- Badge Combo -->
-                <div style="margin-bottom: 12px; padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                <div style="padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-star" style="color: #9c27b0; font-size: 1.3em;"></i>
+                      <i class="fas fa-puzzle-piece" style="color: #9c27b0; font-size: 1.3em;"></i>
                       <div style="font-size: 0.9em; font-weight: 600; color: #666;">Combo</div>
                     </div>
                     <div style="font-size: 1.5em; font-weight: bold; color: #9c27b0;">
                       {{ countBadgesByType('combo') }}
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Badge Progression -->
-                <div style="padding: 12px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50;">
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-chart-line" style="color: #4caf50; font-size: 1.3em;"></i>
-                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Progression</div>
-                    </div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #4caf50;">
-                      {{ countBadgesByType('sliding') }}
                     </div>
                   </div>
                 </div>
@@ -787,11 +774,36 @@
         </v-card-title>
 
         <v-card-text style="padding: 20px;">
+          <!-- Légende -->
+          <div style="margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+            <div style="font-size: 0.9em; color: #666; margin-bottom: 10px; font-weight: 600;">Légende:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.85em;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 20px; height: 20px; borderRadius: 50%; background: #4caf50; display: flex; alignItems: center; justifyContent: center; color: white; fontSize: 0.7em;">
+                  <i class="fas fa-check"></i>
+                </div>
+                <span>Obtenu au moins une fois</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 20px; height: 20px; borderRadius: 50%; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; alignItems: center; justifyContent: center; color: white; fontSize: 0.7em;">
+                  <i class="fas fa-fire"></i>
+                </div>
+                <span>Actif (obtenu ces 3 dernières éditions)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 20px; height: 20px; borderRadius: 50%; background: #2196f3; display: flex; alignItems: center; justifyContent: center; color: white; fontSize: 0.6em; fontWeight: bold;">
+                  3Y
+                </div>
+                <span>Badge progressif (sur 3 ans)</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Badges Votant -->
           <div style="margin-bottom: 30px;">
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-vote-yea" style="color: #2196f3;"></i>
-              Badges Votant (11)
+              Badges Votant ({{ voterBadges.length }})
             </h3>
             <v-row>
               <v-col
@@ -801,24 +813,11 @@
                 sm="6"
                 md="4"
               >
-                <div
-                  :style="{
-                    padding: '15px',
-                    borderRadius: '8px',
-                    backgroundColor: badge.color + '20',
-                    border: '2px solid ' + badge.color,
-                    height: '100%'
-                  }"
-                >
-                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
-                  </div>
-                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
-                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
-                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
-                  </div>
-                </div>
+                <BadgeCard
+                  :badge="badge"
+                  :badge-status="badgesHistory[badge.badge]"
+                  :all-badges-status="badgesHistory"
+                />
               </v-col>
             </v-row>
           </div>
@@ -827,7 +826,7 @@
           <div style="margin-bottom: 30px;">
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-camera" style="color: #ff9800;"></i>
-              Badges Photographe (9)
+              Badges Photographe ({{ photographerBadges.length }})
             </h3>
             <v-row>
               <v-col
@@ -837,34 +836,25 @@
                 sm="6"
                 md="4"
               >
-                <div
-                  :style="{
-                    padding: '15px',
-                    borderRadius: '8px',
-                    backgroundColor: badge.color + '20',
-                    border: '2px solid ' + badge.color,
-                    height: '100%'
-                  }"
-                >
-                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
-                  </div>
-                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
-                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
-                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
-                  </div>
-                </div>
+                <BadgeCard
+                  :badge="badge"
+                  :badge-status="badgesHistory[badge.badge]"
+                  :all-badges-status="badgesHistory"
+                />
               </v-col>
             </v-row>
           </div>
 
           <!-- Badges Combo -->
-          <div style="margin-bottom: 30px;">
+          <div>
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-              <i class="fas fa-star" style="color: #9c27b0;"></i>
-              Badges Combo (14)
+              <i class="fas fa-puzzle-piece" style="color: #9c27b0;"></i>
+              Badges Combo ({{ comboBadges.length }})
             </h3>
+            <div style="font-size: 0.9em; color: #666; margin-bottom: 15px; font-style: italic;">
+              <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
+              Les badges combo nécessitent des prérequis (badges votant ou photographe)
+            </div>
             <v-row>
               <v-col
                 v-for="badge in comboBadges"
@@ -873,64 +863,12 @@
                 sm="6"
                 md="4"
               >
-                <div
-                  :style="{
-                    padding: '15px',
-                    borderRadius: '8px',
-                    backgroundColor: badge.color + '20',
-                    border: '2px solid ' + badge.color,
-                    height: '100%'
-                  }"
-                >
-                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
-                  </div>
-                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
-                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
-                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
-          </div>
-
-          <!-- Badges de Progression -->
-          <div>
-            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-              <i class="fas fa-chart-line" style="color: #4caf50;"></i>
-              Badges de Progression (27)
-            </h3>
-            <div style="font-size: 0.9em; color: #666; margin-bottom: 15px; font-style: italic;">
-              <i class="fas fa-calendar-alt" style="margin-right: 4px;"></i>
-              Badges calculés sur les 3 dernières éditions
-            </div>
-            <v-row>
-              <v-col
-                v-for="badge in slidingBadges"
-                :key="badge.badge"
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <div
-                  :style="{
-                    padding: '15px',
-                    borderRadius: '8px',
-                    backgroundColor: badge.color + '20',
-                    border: '2px solid ' + badge.color,
-                    height: '100%'
-                  }"
-                >
-                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <i :class="badge.icon" :style="{ color: badge.color, fontSize: '1.5em' }"></i>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333;">{{ badge.badge }}</div>
-                  </div>
-                  <div style="font-size: 0.9em; color: #666; margin-bottom: 8px;">{{ badge.description }}</div>
-                  <div style="font-size: 0.75em; color: #999; font-style: italic; padding: 6px 8px; background: rgba(0,0,0,0.05); border-radius: 4px;">
-                    <i class="fas fa-info-circle" style="margin-right: 4px;"></i>{{ badge.condition }}
-                  </div>
-                </div>
+                <BadgeCard
+                  :badge="badge"
+                  :badge-status="badgesHistory[badge.badge]"
+                  :all-badges-status="badgesHistory"
+                  :progression-data="getProgressionData(badge)"
+                />
               </v-col>
             </v-row>
           </div>
