@@ -613,18 +613,8 @@ function analyzeSlidingProfile(
 
     const [year1, year2, year3] = yearDataList;
 
-    // 1. L'Alpiniste 🧗 - Progression continue + au moins 1 or en dernière année
-    if (year1.totalPoints < year2.totalPoints &&
-        year2.totalPoints < year3.totalPoints &&
-        year3.golds >= 1) {
-        badges.push({
-            username,
-            badge: 'L\'Alpiniste',
-            icon: 'fas fa-mountain',
-            description: 'Progression continue vers le sommet',
-            color: '#2196f3'
-        });
-    }
+    // 1. L'Alpiniste 🧗 - Bronze → Argent → Or dans la même catégorie sur 3 ans
+    // (Ce badge sera ajouté plus bas dans la section PROGRESSION)
 
     // 2. La Fusée 🚀 - Progression x3 minimum
     if (year1.totalPoints > 0 && year3.totalPoints >= year1.totalPoints * 3) {
@@ -683,17 +673,7 @@ function analyzeSlidingProfile(
         });
     }
 
-    // 6. L'Incendie 🔥 - 3 ors sur les 3 années
-    const totalGolds = year1.golds + year2.golds + year3.golds;
-    if (totalGolds >= 3) {
-        badges.push({
-            username,
-            badge: 'L\'Incendie',
-            icon: 'fas fa-fire',
-            description: '3+ médailles d\'or sur 3 ans',
-            color: '#ffd700'
-        });
-    }
+    // 6. Badge supprimé (L'Incendie était redondant avec Le Triplé)
 
     // 7. La Révélation 💫 - 0 points année 1, forte progression
     if (year1.totalPoints === 0 && year2.totalPoints > 20 && year3.totalPoints > year2.totalPoints) {
@@ -820,15 +800,13 @@ function analyzeSlidingProfile(
             });
         }
 
-        // 17. Le Monopole 👑 - Tous les Ors d'une édition (nécessite vérification du total des catégories)
-        // Note: Pour implémenter correctement, il faudrait connaître le nombre total de catégories par année
-        // Pour l'instant, on considère que 5+ ors = monopole potentiel
-        if (year.golds >= 5) {
+        // 17. Le Monopole 👑 - Au moins 6 Ors sur les 8 catégories normales en 1 édition
+        if (year.golds >= 6) {
             badges.push({
                 username,
                 badge: 'Le Monopole',
                 icon: 'fas fa-chess-king',
-                description: `Domination totale (${year.year})`,
+                description: `${year.golds} Ors - Quasi monopole (${year.year})`,
                 color: '#ff6f00'
             });
         }
@@ -896,7 +874,7 @@ function analyzeSlidingProfile(
     // === BADGES DE PROGRESSION ===
     // Ces badges vérifient la progression sur plusieurs années
 
-    // 23. L'Escalade 🧗‍♂️ - Bronze → Argent → Or dans la même catégorie sur 3 ans
+    // 23. L'Alpiniste 🧗 - Bronze → Argent → Or dans la même catégorie sur 3 ans
     // Vérifier si une catégorie a progressé bronze->sylver->gold
     const categoryProgression: Record<string, string[]> = {}; // categoryId -> [award1, award2, award3]
 
@@ -910,31 +888,31 @@ function analyzeSlidingProfile(
     });
 
     // Vérifier si une catégorie a la progression bronze -> sylver -> gold
-    const hasEscalade = Object.values(categoryProgression).some(
+    const hasAlpiniste = Object.values(categoryProgression).some(
         progression => progression[0] === 'bronze' && progression[1] === 'sylver' && progression[2] === 'gold'
     );
 
-    if (hasEscalade) {
+    if (hasAlpiniste) {
         badges.push({
             username,
-            badge: 'L\'Escalade',
+            badge: 'L\'Alpiniste',
             icon: 'fas fa-mountain',
             description: 'Bronze → Argent → Or même catégorie',
-            color: '#795548'
+            color: '#2196f3'
         });
     }
 
-    // 24. Le Sans-Faute 🎖️ - Au moins 1 AGPA chaque édition sur 3 ans
-    const allYearsHaveAwards = yearDataList.every((year: YearData) =>
-        year.golds > 0 || year.sylvers > 0 || year.bronzes > 0
-    );
+    // 24. Le Constant 🎖️ - Même nombre d'AGPA (au moins 1) chaque année sur 3 ans
+    const awardsCount1 = year1.golds + year1.sylvers + year1.bronzes + year1.diamonds + year1.nominated;
+    const awardsCount2 = year2.golds + year2.sylvers + year2.bronzes + year2.diamonds + year2.nominated;
+    const awardsCount3 = year3.golds + year3.sylvers + year3.bronzes + year3.diamonds + year3.nominated;
 
-    if (allYearsHaveAwards) {
+    if (awardsCount1 > 0 && awardsCount1 === awardsCount2 && awardsCount2 === awardsCount3) {
         badges.push({
             username,
-            badge: 'Le Sans-Faute',
+            badge: 'Le Constant',
             icon: 'fas fa-check-double',
-            description: 'Au moins 1 AGPA chaque année',
+            description: `${awardsCount1} AGPA chaque année`,
             color: '#4caf50'
         });
     }

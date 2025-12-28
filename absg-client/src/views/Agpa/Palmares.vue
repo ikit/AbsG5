@@ -899,11 +899,11 @@
           <div>
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-chart-line" style="color: #4caf50;"></i>
-              Badges d'Évolution (14)
+              Badges d'Évolution (27)
             </h3>
             <div style="font-size: 0.9em; color: #666; margin-bottom: 15px; font-style: italic;">
               <i class="fas fa-calendar-alt" style="margin-right: 4px;"></i>
-              Badges calculés sur les 3 dernières éditions
+              Badges calculés sur les 3 dernières éditions (12 évolution + 15 awards)
             </div>
             <v-row>
               <v-col
@@ -1034,12 +1034,10 @@ export default {
             { badge: 'Girl Power', icon: 'fas fa-venus', description: 'Engagement féministe total', condition: 'Badges "Féministe Convaincu" + "Coqueluche des Dames"', color: '#9c27b0' }
         ],
         slidingBadges: [
-            { badge: 'L\'Alpiniste', icon: 'fas fa-mountain', description: 'Progression continue vers le sommet', condition: 'Progression continue sur 3 ans + ≥ 1 or en dernière année', color: '#2196f3' },
             { badge: 'La Fusée', icon: 'fas fa-rocket-launch', description: 'Décollage spectaculaire', condition: 'Progression x3 minimum sur 3 ans', color: '#ff5722' },
             { badge: 'Le Régulier', icon: 'fas fa-chart-line', description: 'Performance stable et constante', condition: 'Variance < 15% avec moyenne ≥ 30 pts/an', color: '#4caf50' },
             { badge: 'Le Dinosaure', icon: 'fas fa-dragon', description: 'Les beaux jours sont derrière', condition: 'Régression continue sur 3 ans (départ ≥ 40 pts)', color: '#795548' },
             { badge: 'Le Yoyo', icon: 'fas fa-arrows-up-down', description: 'Performance en montagnes russes', condition: 'Alternance haut/bas avec écarts > 50%', color: '#ff9800' },
-            { badge: 'L\'Incendie', icon: 'fas fa-fire', description: '3+ médailles d\'or sur 3 ans', condition: '≥ 3 médailles d\'or cumulées sur 3 ans', color: '#ffd700' },
             { badge: 'La Révélation', icon: 'fas fa-star-shooting', description: 'De l\'ombre à la lumière', condition: '0 pts année 1 + progression forte années 2-3', color: '#9c27b0' },
             { badge: 'Le Vétéran', icon: 'fas fa-medal', description: 'Sur le podium tous les ans', condition: 'Au moins 1 podium chaque année sur 3 ans', color: '#ff6f00' },
             { badge: 'Le Sniper Temporel', icon: 'fas fa-bullseye', description: 'Spécialiste d\'une catégorie', condition: 'Même catégorie gagnée 2-3 fois sur 3 ans', color: '#f44336' },
@@ -1051,7 +1049,7 @@ export default {
             // Badges de Collection
             { badge: 'Le Collectionneur', icon: 'fas fa-medal', description: 'Collection complète', condition: 'Exactement 1 Or + 1 Argent + 1 Bronze en 1 édition', color: '#9c27b0' },
             { badge: 'Le Perfectionniste', icon: 'fas fa-crown', description: 'Ors purs', condition: 'Uniquement des Ors (≥2) sans autre récompense en 1 édition', color: '#ffd700' },
-            { badge: 'Le Monopole', icon: 'fas fa-chess-king', description: 'Domination totale', condition: '5+ Ors en 1 édition', color: '#ff6f00' },
+            { badge: 'Le Monopole', icon: 'fas fa-chess-king', description: 'Quasi monopole', condition: '≥6 Ors sur les 8 catégories en 1 édition', color: '#ff6f00' },
             { badge: 'La Razzia', icon: 'fas fa-bullseye', description: 'Catégories dominées', condition: '4+ catégories gagnées en 1 édition', color: '#e91e63' },
             // Badges de Domination
             { badge: 'Le Triplé', icon: 'fas fa-fire', description: 'Triple or', condition: '3+ Ors en 1 édition', color: '#ff9800' },
@@ -1059,8 +1057,8 @@ export default {
             { badge: 'Le Balayage Bronze', icon: 'fas fa-broom', description: 'Collection de bronze', condition: '4+ Bronzes en 1 édition', color: '#cd7f32' },
             { badge: 'L\'Arc-en-ciel', icon: 'fas fa-rainbow', description: 'Palette complète', condition: '≥2 de chaque type (Or + Argent + Bronze) en 1 édition', color: '#00bcd4' },
             // Badges de Progression
-            { badge: 'L\'Escalade', icon: 'fas fa-mountain', description: 'Progression parfaite', condition: 'Bronze → Argent → Or dans la même catégorie sur 3 ans', color: '#795548' },
-            { badge: 'Le Sans-Faute', icon: 'fas fa-check-double', description: 'Constance exemplaire', condition: 'Au moins 1 AGPA chaque année sur 3 ans', color: '#4caf50' },
+            { badge: 'L\'Alpiniste', icon: 'fas fa-mountain', description: 'Progression parfaite', condition: 'Bronze → Argent → Or dans la même catégorie sur 3 ans', color: '#2196f3' },
+            { badge: 'Le Constant', icon: 'fas fa-check-double', description: 'Régularité exemplaire', condition: 'Même nombre d\'AGPA (≥1) chaque année sur 3 ans', color: '#4caf50' },
             { badge: 'La Rédemption', icon: 'fas fa-redo', description: 'Retour victorieux', condition: '0 AGPA année N, puis Or année N+1 dans la même catégorie', color: '#ff5722' },
             // Badges de Patterns Spéciaux
             { badge: 'La Pyramide', icon: 'fas fa-caret-up', description: 'Pattern parfait', condition: '1 Or + 2 Argents + 3 Bronzes en 1 édition', color: '#607d8b' },
