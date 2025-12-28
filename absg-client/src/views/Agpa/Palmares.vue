@@ -134,12 +134,12 @@
                   </div>
                 </div>
 
-                <!-- Badge Évolution -->
+                <!-- Badge Progression -->
                 <div style="padding: 12px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                       <i class="fas fa-chart-line" style="color: #4caf50; font-size: 1.3em;"></i>
-                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Évolution</div>
+                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Progression</div>
                     </div>
                     <div style="font-size: 1.5em; font-weight: bold; color: #4caf50;">
                       {{ countBadgesByType('sliding') }}
@@ -895,15 +895,15 @@
             </v-row>
           </div>
 
-          <!-- Badges d'Évolution -->
+          <!-- Badges de Progression -->
           <div>
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-chart-line" style="color: #4caf50;"></i>
-              Badges d'Évolution (27)
+              Badges de Progression (27)
             </h3>
             <div style="font-size: 0.9em; color: #666; margin-bottom: 15px; font-style: italic;">
               <i class="fas fa-calendar-alt" style="margin-right: 4px;"></i>
-              Badges calculés sur les 3 dernières éditions (12 évolution + 15 awards)
+              Badges calculés sur les 3 dernières éditions
             </div>
             <v-row>
               <v-col
