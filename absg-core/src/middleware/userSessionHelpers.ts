@@ -229,14 +229,14 @@ export async function getUserFromHeader(request) {
  */
 export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
     // on récupère le user si il est défini dans le header
-    let user = await getUserFromHeader(action.request);
+    const user = await getUserFromHeader(action.request);
 
     try {
-        // on vérifie que le token est valide
-        user = checkToken(user.token);
+        // on vérifie que le token est valide (sans écraser l'objet user)
+        const tokenPayload = checkToken(user.token);
 
         // on vérifie les droits
-        const isAuthorized = !!user && user.id && checkRoles([], roles);
+        const isAuthorized = !!user && !!tokenPayload && user.id && checkRoles([], roles);
 
         return isAuthorized;
     } catch (e) {
