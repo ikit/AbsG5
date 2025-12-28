@@ -1,83 +1,61 @@
 <template>
   <div>
     <v-container>
-      <!-- Section 1: Palmarès Global et Glissant -->
-      <div :style="{
-        display: 'grid',
-        gridTemplateColumns: $vuetify.display.mobile ? '1fr' : '1fr 1fr',
-        gap: '20px',
-        marginBottom: '30px'
-      }">
-        <!-- Palmarès Global -->
+      <!-- Section 1: Palmarès -->
+      <div style="margin-bottom: 30px;">
+        <!-- Palmarès (Glissant par défaut) -->
         <v-card
           style="cursor: pointer; transition: transform 0.2s;"
-          @click="showGlobalPalmaresDialog = true"
+          @click="showPalmaresDialog = true"
           hover
         >
           <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
             <v-icon start color="white">fas fa-trophy</v-icon>
-            Palmarès Global
+            <span v-if="slidingYearFrom && slidingYearTo">
+              Palmarès ({{ slidingYearFrom }} - {{ slidingYearTo }})
+            </span>
+            <span v-else>
+              Palmarès (3 dernières éditions)
+            </span>
           </v-card-title>
           <v-card-text style="padding: 30px; text-align: center;">
-            <div style="font-size: 4em; font-weight: bold; color: #667eea;">
-              {{ myGlobalRank || '-' }}
-            </div>
-            <div style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
-              Ma position actuelle
-            </div>
-            <div style="font-size: 2em; font-weight: bold; color: #764ba2;">
-              {{ myGlobalAgpas || 0 }}
-            </div>
-            <div style="font-size: 1em; color: #666;">
-              AGPA depuis le début
+            <div style="font-size: 4em; font-weight: bold; color: #667eea; margin-bottom: 20px;">
+              <template v-if="mySlidingRank">
+                {{ mySlidingRank }}<sup style="font-size: 0.5em;">{{ getOrdinalSuffix(mySlidingRank) }}</sup>
+              </template>
+              <template v-else>
+                -
+              </template>
             </div>
 
-            <!-- Badges Global -->
-            <div v-if="myGlobalBadges" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-              <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
-                Badges collectés: {{ myGlobalBadges.totalCount }}/{{ myGlobalBadges.totalPossible }}
+            <!-- Breakdown des récompenses AGPA -->
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 10px;">
+              <div style="text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                  <i class="fas fa-circle" style="color: #c68b00; font-size: 0.8em;"></i>
+                  <span style="font-size: 1.8em; font-weight: bold; color: #c68b00;">{{ mySlidingAwards.gold }}</span>
+                </div>
               </div>
-              <div v-if="myGlobalBadges.lastBadge" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;">
-                <i :class="myGlobalBadges.lastBadge.icon" :style="{ color: myGlobalBadges.lastBadge.color, fontSize: '1.5em' }"></i>
-                <div style="text-align: left;">
-                  <div style="font-weight: bold; font-size: 0.9em;">{{ myGlobalBadges.lastBadge.badge }}</div>
-                  <div style="font-size: 0.75em; color: #999; font-style: italic;">{{ myGlobalBadges.lastBadge.description }}</div>
+              <div style="text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                  <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.8em;"></i>
+                  <span style="font-size: 1.8em; font-weight: bold; color: #9b9b9b;">{{ mySlidingAwards.sylver }}</span>
+                </div>
+              </div>
+              <div style="text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                  <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.8em;"></i>
+                  <span style="font-size: 1.8em; font-weight: bold; color: #cd7f32;">{{ mySlidingAwards.bronze }}</span>
+                </div>
+              </div>
+              <div style="text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                  <i class="far fa-circle" style="color: #764ba2; font-size: 0.8em;"></i>
+                  <span style="font-size: 1.8em; font-weight: bold; color: #764ba2;">{{ mySlidingAwards.nominated }}</span>
                 </div>
               </div>
             </div>
-
-            <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
-              Cliquez pour voir le tableau complet
-            </div>
-          </v-card-text>
-        </v-card>
-
-        <!-- Palmarès Glissant (3 dernières éditions) -->
-        <v-card
-          style="cursor: pointer; transition: transform 0.2s;"
-          @click="showSlidingPalmaresDialog = true"
-          hover
-        >
-          <v-card-title style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
-            <v-icon start color="white">fas fa-chart-line</v-icon>
-            <span v-if="slidingYearFrom && slidingYearTo">
-              Palmarès Glissant ({{ slidingYearFrom }} - {{ slidingYearTo }})
-            </span>
-            <span v-else>
-              Palmarès Glissant (3 dernières éditions)
-            </span>
-          </v-card-title>
-          <v-card-text style="padding: 30px; text-align: center;">
-            <div style="font-size: 4em; font-weight: bold; color: #f093fb;">
-              {{ mySlidingRank || '-' }}
-            </div>
-            <div style="font-size: 1.2em; color: #666; margin-bottom: 20px;">
-              Ma position glissante
-            </div>
-            <div style="font-size: 2em; font-weight: bold; color: #f5576c;">
-              {{ mySlidingAgpas || 0 }}
-            </div>
-            <div style="font-size: 1em; color: #666;">
+            <div style="font-size: 0.9em; color: #666;">
               <span v-if="slidingYearFrom && slidingYearTo">
                 AGPA de {{ slidingYearFrom }} à {{ slidingYearTo }}
               </span>
@@ -167,36 +145,243 @@
       </v-card>
     </v-container>
 
-    <!-- Dialog Palmarès Global -->
+    <!-- Dialog Palmarès Unifié -->
     <v-dialog
-      v-model="showGlobalPalmaresDialog"
+      v-model="showPalmaresDialog"
       max-width="1200px"
       scrollable
     >
       <v-card>
         <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; position: sticky; top: 0; z-index: 10;">
           <v-icon start color="white">fas fa-trophy</v-icon>
-          Palmarès Global Complet
+          Palmarès Complet
         </v-card-title>
+
+        <!-- Tabs pour basculer entre Glissant et Global -->
+        <v-tabs
+          v-model="palmaresTab"
+          bg-color="primary"
+          color="white"
+        >
+          <v-tab value="sliding">
+            <v-icon start>fas fa-chart-line</v-icon>
+            <span v-if="slidingYearFrom && slidingYearTo">
+              {{ slidingYearFrom }} - {{ slidingYearTo }}
+            </span>
+            <span v-else>
+              3 dernières éditions
+            </span>
+          </v-tab>
+          <v-tab value="global">
+            <v-icon start>fas fa-history</v-icon>
+            Depuis le début
+          </v-tab>
+        </v-tabs>
+
         <v-card-text style="padding: 20px;">
-          <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-            <v-text-field
-              v-model="filter.search"
-              prepend-icon="fas fa-search"
-              label="Rechercher"
-              single-line
-              hide-details
-              style="flex: 1; min-width: 250px;"
-            />
-            <v-select
-              v-model="filter.familyFilter"
-              :items="familyOptions"
-              label="Filtrer par famille"
-              clearable
-              hide-details
-              style="flex: 0 0 200px; min-width: 200px;"
-            />
-          </div>
+          <v-window v-model="palmaresTab">
+            <!-- Tab Palmarès Glissant -->
+            <v-window-item value="sliding">
+              <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <v-text-field
+                  v-model="filter.searchSliding"
+                  prepend-icon="fas fa-search"
+                  label="Rechercher"
+                  single-line
+                  hide-details
+                  style="flex: 1; min-width: 250px;"
+                />
+                <v-select
+                  v-model="filter.familyFilterSliding"
+                  :items="familyOptions"
+                  label="Filtrer par famille"
+                  clearable
+                  hide-details
+                  style="flex: 0 0 200px; min-width: 200px;"
+                />
+              </div>
+              <v-data-table
+                :headers="headers"
+                :items="filteredSlidingPalmares"
+                :loading="isLoading"
+                loading-text="Récupération des données..."
+                no-data-text="Aucun palmarès disponible."
+                no-results-text="Aucune personne trouvée."
+                disable-sort
+              >
+              <template #[`item.photographe`]="{ item }">
+                <img
+                  :src="item.url"
+                  style="height: 40px; margin-right: 15px; vertical-align: middle"
+                >
+                <span style="font-size: 1.2em">{{ item.username }}</span>
+              </template>
+
+              <template #[`item.awards`]="{ item }">
+                <template v-if="item.awards.diamond">
+                  <i
+                    class="fas fa-circle"
+                    style="color: #c3f1ff"
+                  /> {{ item.awards.diamond }}
+                </template>
+                <template v-if="item.awards.gold">
+                  <i
+                    class="fas fa-circle"
+                    style="color: #c68b00"
+                  /> {{ item.awards.gold }}
+                </template>
+                <template v-if="item.awards.sylver">
+                  <i
+                    class="fas fa-circle"
+                    style="color: #9b9b9b"
+                  /> {{ item.awards.sylver }}
+                </template>
+                <template v-if="item.awards.bronze">
+                  <i
+                    class="fas fa-circle"
+                    style="color: #964c31"
+                  /> {{ item.awards.bronze }}
+                </template>
+                <template v-if="item.awards.nominated">
+                  <i class="far fa-circle" /> {{ item.awards.nominated }}
+                </template>
+                <template v-if="item.awards.honor">
+                  <i class="far fa-smile" /> {{ item.awards.honor }}
+                </template>
+              </template>
+
+              <template #[`item.score`]="{ item }">
+                <span style="font-weight: bold">{{ item.totalPoints }} </span> <template v-if="item.totalPoints > 1">
+                  pts
+                </template><template v-else>
+                  pt
+                </template>
+              </template>
+
+              <template #[`item.participation`]="{ item }">
+                <span style="font-weight: bold">{{ item.participation.total }}</span> fois
+                <template v-if="item.participation.first != item.participation.last">
+                  <span style="font-style: italic; opacity: 0.5">(de {{ item.participation.first }} à {{ item.participation.last }})</span>
+                </template>
+                <template v-else>
+                  <span style="font-style: italic; opacity: 0.5">(en {{ item.participation.first }})</span>
+                </template>
+              </template>
+
+              <template #[`item.bestYear`]="{ item }">
+                <v-tooltip
+                  v-if="item.bestYear && item.bestYear.stats && item.bestYear.stats[7] > 0"
+                  right
+                >
+                  <template #activator="{ props }">
+                    <span v-bind="props">{{ item.bestYear.year }}
+                      <span style="opacity: 0.5">({{ item.bestYear.stats[6] }} awards - {{ item.bestYear.stats[7] }} pts)</span>
+                    </span>
+                  </template>
+
+                  <template v-if="item.bestYear.stats[5]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #c3f1ff"
+                    /> {{ item.bestYear.stats[5] }}
+                  </template>
+                  <template v-if="item.bestYear.stats[4]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #c68b00"
+                    /> {{ item.bestYear.stats[4] }}
+                  </template>
+                  <template v-if="item.bestYear.stats[3]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #9b9b9b"
+                    /> {{ item.bestYear.stats[3] }}
+                  </template>
+                  <template v-if="item.bestYear.stats[2]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #964c31"
+                    /> {{ item.bestYear.stats[2] }}
+                  </template>
+                  <template v-if="item.bestYear.stats[0]">
+                    <i class="far fa-smile" /> {{ item.bestYear.stats[0] }}
+                  </template>
+                </v-tooltip>
+              </template>
+
+              <template #[`item.bestCat`]="{ item }">
+                <v-tooltip
+                  v-if="item.bestCat && item.bestCat.stats && item.bestCat.stats[6] > 0"
+                  right
+                >
+                  <template #activator="{ props }">
+                    <span v-bind="props">{{ item.bestCat.title }}
+                      <span style="opacity: 0.5">({{ item.bestCat.stats[5] }} awards - {{ item.bestCat.stats[6] }} pts)</span>
+                    </span>
+                  </template>
+
+                  <template v-if="item.bestCat.stats[4]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #c3f1ff"
+                    /> {{ item.bestCat.stats[4] }}
+                  </template>
+                  <template v-if="item.bestCat.stats[3]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #c68b00"
+                    /> {{ item.bestCat.stats[3] }}
+                  </template>
+                  <template v-if="item.bestCat.stats[2]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #9b9b9b"
+                    /> {{ item.bestCat.stats[2] }}
+                  </template>
+                  <template v-if="item.bestCat.stats[1]">
+                    <i
+                      class="fas fa-circle"
+                      style="color: #964c31"
+                    /> {{ item.bestCat.stats[1] }}
+                  </template>
+                  <template v-if="item.bestCat.stats[0]">
+                    <i class="far fa-circle" /> {{ item.bestCat.stats[0] }}
+                  </template>
+                </v-tooltip>
+              </template>
+
+              <template #[`item.actions`]="{ item }">
+                <v-icon
+                  small
+                  class="mr-2"
+                  @click="displaydetails(item)"
+                >
+                  fa-search
+                </v-icon>
+              </template>
+            </v-data-table>
+            </v-window-item>
+
+            <!-- Tab Palmarès Global -->
+            <v-window-item value="global">
+              <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <v-text-field
+                  v-model="filter.search"
+                  prepend-icon="fas fa-search"
+                  label="Rechercher"
+                  single-line
+                  hide-details
+                  style="flex: 1; min-width: 250px;"
+                />
+                <v-select
+                  v-model="filter.familyFilter"
+                  :items="familyOptions"
+                  label="Filtrer par famille"
+                  clearable
+                  hide-details
+                  style="flex: 0 0 200px; min-width: 200px;"
+                />
+              </div>
           <v-data-table
             :headers="headers"
             :items="filteredPalmares"
@@ -358,223 +543,16 @@
               fa-search
             </v-icon>
           </template>
-        </v-data-table>
+            </v-data-table>
+            </v-window-item>
+          </v-window>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn
             variant="text"
             color="primary"
-            @click="showGlobalPalmaresDialog = false"
-          >
-            Fermer
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Dialog Palmarès Glissant -->
-    <v-dialog
-      v-model="showSlidingPalmaresDialog"
-      max-width="1200px"
-      scrollable
-    >
-      <v-card>
-        <v-card-title style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; position: sticky; top: 0; z-index: 10;">
-          <v-icon start color="white">fas fa-chart-line</v-icon>
-          <span v-if="slidingYearFrom && slidingYearTo">
-            Palmarès Glissant {{ slidingYearFrom }} - {{ slidingYearTo }}
-          </span>
-          <span v-else>
-            Palmarès Glissant - 3 Dernières Éditions
-          </span>
-        </v-card-title>
-        <v-card-text style="padding: 20px;">
-          <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
-            <v-text-field
-              v-model="filter.searchSliding"
-              prepend-icon="fas fa-search"
-              label="Rechercher"
-              single-line
-              hide-details
-              style="flex: 1; min-width: 250px;"
-            />
-            <v-select
-              v-model="filter.familyFilterSliding"
-              :items="familyOptions"
-              label="Filtrer par famille"
-              clearable
-              hide-details
-              style="flex: 0 0 200px; min-width: 200px;"
-            />
-          </div>
-          <v-data-table
-            :headers="headers"
-            :items="filteredSlidingPalmares"
-            :loading="isLoading"
-            loading-text="Récupération des données..."
-            no-data-text="Aucun palmarès disponible."
-            no-results-text="Aucune personne trouvée."
-            disable-sort
-          >
-          <template #[`item.photographe`]="{ item }">
-            <img
-              :src="item.url"
-              style="height: 40px; margin-right: 15px; vertical-align: middle"
-            >
-            <span style="font-size: 1.2em">{{ item.username }}</span>
-          </template>
-
-          <template #[`item.awards`]="{ item }">
-            <template v-if="item.awards.diamond">
-              <i
-                class="fas fa-circle"
-                style="color: #c3f1ff"
-              /> {{ item.awards.diamond }}
-            </template>
-            <template v-if="item.awards.gold">
-              <i
-                class="fas fa-circle"
-                style="color: #c68b00"
-              /> {{ item.awards.gold }}
-            </template>
-            <template v-if="item.awards.sylver">
-              <i
-                class="fas fa-circle"
-                style="color: #9b9b9b"
-              /> {{ item.awards.sylver }}
-            </template>
-            <template v-if="item.awards.bronze">
-              <i
-                class="fas fa-circle"
-                style="color: #964c31"
-              /> {{ item.awards.bronze }}
-            </template>
-            <template v-if="item.awards.nominated">
-              <i class="far fa-circle" /> {{ item.awards.nominated }}
-            </template>
-            <template v-if="item.awards.honor">
-              <i class="far fa-smile" /> {{ item.awards.honor }}
-            </template>
-          </template>
-
-          <template #[`item.score`]="{ item }">
-            <span style="font-weight: bold">{{ item.totalPoints }} </span> <template v-if="item.totalPoints > 1">
-              pts
-            </template><template v-else>
-              pt
-            </template>
-          </template>
-
-          <template #[`item.participation`]="{ item }">
-            <span style="font-weight: bold">{{ item.participation.total }}</span> fois
-            <template v-if="item.participation.first != item.participation.last">
-              <span style="font-style: italic; opacity: 0.5">(de {{ item.participation.first }} à {{ item.participation.last }})</span>
-            </template>
-            <template v-else>
-              <span style="font-style: italic; opacity: 0.5">(en {{ item.participation.first }})</span>
-            </template>
-          </template>
-
-          <template #[`item.bestYear`]="{ item }">
-            <v-tooltip
-              v-if="item.bestYear && item.bestYear.stats && item.bestYear.stats[7] > 0"
-              right
-            >
-              <template #activator="{ props }">
-                <span v-bind="props">{{ item.bestYear.year }}
-                  <span style="opacity: 0.5">({{ item.bestYear.stats[6] }} awards - {{ item.bestYear.stats[7] }} pts)</span>
-                </span>
-              </template>
-
-              <template v-if="item.bestYear.stats[5]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #c3f1ff"
-                /> {{ item.bestYear.stats[5] }}
-              </template>
-              <template v-if="item.bestYear.stats[4]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #c68b00"
-                /> {{ item.bestYear.stats[4] }}
-              </template>
-              <template v-if="item.bestYear.stats[3]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #9b9b9b"
-                /> {{ item.bestYear.stats[3] }}
-              </template>
-              <template v-if="item.bestYear.stats[2]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #964c31"
-                /> {{ item.bestYear.stats[2] }}
-              </template>
-              <template v-if="item.bestYear.stats[0]">
-                <i class="far fa-smile" /> {{ item.bestYear.stats[0] }}
-              </template>
-            </v-tooltip>
-          </template>
-
-          <template #[`item.bestCat`]="{ item }">
-            <v-tooltip
-              v-if="item.bestCat && item.bestCat.stats && item.bestCat.stats[6] > 0"
-              right
-            >
-              <template #activator="{ props }">
-                <span v-bind="props">{{ item.bestCat.title }}
-                  <span style="opacity: 0.5">({{ item.bestCat.stats[5] }} awards - {{ item.bestCat.stats[6] }} pts)</span>
-                </span>
-              </template>
-
-              <template v-if="item.bestCat.stats[4]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #c3f1ff"
-                /> {{ item.bestCat.stats[4] }}
-              </template>
-              <template v-if="item.bestCat.stats[3]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #c68b00"
-                /> {{ item.bestCat.stats[3] }}
-              </template>
-              <template v-if="item.bestCat.stats[2]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #9b9b9b"
-                /> {{ item.bestCat.stats[2] }}
-              </template>
-              <template v-if="item.bestCat.stats[1]">
-                <i
-                  class="fas fa-circle"
-                  style="color: #964c31"
-                /> {{ item.bestCat.stats[1] }}
-              </template>
-              <template v-if="item.bestCat.stats[0]">
-                <i class="far fa-circle" /> {{ item.bestCat.stats[0] }}
-              </template>
-            </v-tooltip>
-          </template>
-
-          <template #[`item.actions`]="{ item }">
-            <v-icon
-              small
-              class="mr-2"
-              @click="displaydetails(item)"
-            >
-              fa-search
-            </v-icon>
-          </template>
-        </v-data-table>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            variant="text"
-            color="primary"
-            @click="showSlidingPalmaresDialog = false"
+            @click="showPalmaresDialog = false"
           >
             Fermer
           </v-btn>
@@ -683,12 +661,14 @@ export default {
         palmares: [],
         slidingPalmares: [],
         palmaresDetails: null,
-        showGlobalPalmaresDialog: false,
-        showSlidingPalmaresDialog: false,
+        showPalmaresDialog: false,
+        palmaresTab: 'sliding',
         myGlobalRank: null,
         myGlobalAgpas: null,
+        myGlobalAwards: { gold: 0, sylver: 0, bronze: 0, nominated: 0 },
         mySlidingRank: null,
         mySlidingAgpas: null,
+        mySlidingAwards: { gold: 0, sylver: 0, bronze: 0, nominated: 0 },
         slidingYearFrom: null,
         slidingYearTo: null,
         myGlobalBadges: null,
@@ -822,6 +802,12 @@ export default {
             if (myEntry) {
                 this.myGlobalRank = this.palmares.indexOf(myEntry) + 1;
                 this.myGlobalAgpas = myEntry.totalPoints || 0;
+                this.myGlobalAwards = {
+                    gold: myEntry.awards?.gold || 0,
+                    sylver: myEntry.awards?.sylver || 0,
+                    bronze: myEntry.awards?.bronze || 0,
+                    nominated: myEntry.awards?.nominated || 0
+                };
             }
         },
 
@@ -832,6 +818,12 @@ export default {
             if (myEntry) {
                 this.mySlidingRank = this.slidingPalmares.indexOf(myEntry) + 1;
                 this.mySlidingAgpas = myEntry.totalPoints || 0;
+                this.mySlidingAwards = {
+                    gold: myEntry.awards?.gold || 0,
+                    sylver: myEntry.awards?.sylver || 0,
+                    bronze: myEntry.awards?.bronze || 0,
+                    nominated: myEntry.awards?.nominated || 0
+                };
             }
         },
 
@@ -934,6 +926,13 @@ export default {
                 return `${item.username} ${item.rootFamily}`.toLowerCase().indexOf(search.toLowerCase()) > -1;
             }
             return false
+        },
+
+        getOrdinalSuffix(rank) {
+            if (rank === 1) {
+                return 'er';
+            }
+            return 'ème';
         }
     }
 };
