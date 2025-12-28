@@ -894,9 +894,14 @@
 import axios from 'axios';
 import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
+import BadgeCard from '../../components/BadgeCard.vue';
+import { getBadgesByType } from '../../middleware/badgesMetadata';
 
 export default {
     name: 'Palmares',
+    components: {
+        BadgeCard
+    },
     data: () => ({
         isLoading: false,
         headers: [
@@ -931,81 +936,21 @@ export default {
         mySlidingBadges: [],
         voteProfiles: {},
         showBadgesDialog: false,
-        voterBadges: [
-            { badge: 'Le Patriote', icon: 'fas fa-flag', description: 'Vote principalement pour sa famille', condition: '> 70% des votes pour sa famille', color: '#3f51b5' },
-            { badge: 'L\'Amoureux Transi', icon: 'fas fa-heart', description: 'Vote beaucoup pour son/sa conjoint(e)', condition: '> 50% des votes pour son conjoint', color: '#e91e63' },
-            { badge: 'Le Parent Fier', icon: 'fas fa-baby', description: 'Vote beaucoup pour ses enfants', condition: '> 50% des votes pour ses enfants', color: '#ff9800' },
-            { badge: 'Le Sniper', icon: 'fas fa-bullseye', description: 'J\'ai mes favoris et je m\'y tiens', condition: '> 60% des votes sur 2 personnes max', color: '#f44336' },
-            { badge: 'Féministe Convaincu', icon: 'fas fa-fist-raised', description: 'Les femmes d\'abord !', condition: '≥ 70% des votes pour des femmes + > 20 pts', color: '#9c27b0' },
-            { badge: 'Le Philanthrope', icon: 'fas fa-hand-holding-heart', description: 'Il y a du talent partout !', condition: '≥ 8 personnes différentes ont reçu des votes', color: '#9c27b0' },
-            { badge: 'L\'Anticonformiste', icon: 'fas fa-star-of-life', description: 'L\'herbe est plus verte ailleurs', condition: '< 30% des votes pour sa famille + > 20 pts', color: '#00bcd4' },
-            { badge: 'Le Diplomate', icon: 'fas fa-handshake', description: 'Un vote pour chacun, équité pour tous', condition: 'Votes équilibrés entre familles + ≥ 5 personnes', color: '#4caf50' },
-            { badge: 'Le Radin', icon: 'fas fa-piggy-bank', description: 'Faut le mériter !', condition: '< 30 points distribués au total', color: '#795548' },
-            { badge: 'Le Mécène', icon: 'fas fa-gift', description: 'Tout le monde est talentueux !', condition: '> 100 points distribués au total', color: '#ffd700' },
-            { badge: 'Le Modéré', icon: 'fas fa-check', description: 'Ni trop, ni trop peu', condition: 'Badge par défaut (équilibré)', color: '#607d8b' }
-        ],
-        photographerBadges: [
-            { badge: 'Le Phénomène', icon: 'fas fa-rocket', description: 'Populaire et reconnu', condition: '> 80 points reçus + ≥ 8 votants', color: '#ff6f00' },
-            { badge: 'La Star', icon: 'fas fa-star', description: 'Très apprécié par beaucoup', condition: '≥ 8 votants différents', color: '#ffd700' },
-            { badge: 'Le Chouchou de Famille', icon: 'fas fa-home', description: 'Très apprécié par sa famille', condition: '> 70% des votes de sa famille + > 20 pts', color: '#3f51b5' },
-            { badge: 'Le Transfuge', icon: 'fas fa-exchange-alt', description: 'Apprécié hors de sa famille', condition: '< 30% des votes de sa famille + > 30 pts', color: '#00bcd4' },
-            { badge: 'Le Protégé', icon: 'fas fa-crown', description: 'J\'ai mes champions', condition: '≤ 3 votants + > 30 points reçus', color: '#e91e63' },
-            { badge: 'La Coqueluche des Dames', icon: 'fas fa-heart', description: 'Apprécié par les femmes', condition: '≥ 70% des votes de femmes + > 20 pts', color: '#e91e63' },
-            { badge: 'L\'Équilibré', icon: 'fas fa-balance-scale', description: 'Je plais à tout le monde modérément', condition: 'Votes équilibrés entre ≥ 3 familles', color: '#4caf50' },
-            { badge: 'L\'Inconnu', icon: 'fas fa-ghost', description: 'Qui suis-je ?', condition: '< 15 points reçus au total', color: '#9e9e9e' },
-            { badge: 'Le Talent Émergent', icon: 'fas fa-seedling', description: 'En progression', condition: 'Badge par défaut', color: '#8bc34a' }
-        ],
-        comboBadges: [
-            { badge: 'Le Solitaire', icon: 'fas fa-island-tropical', description: 'Discret en tout point', condition: '< 20 pts donnés + < 20 pts reçus', color: '#607d8b' },
-            { badge: 'L\'Égoïste', icon: 'fas fa-user-crown', description: 'Je reçois plus que je ne donne', condition: 'Badge "Le Radin" + > 50 pts reçus', color: '#9c27b0' },
-            { badge: 'Le Robin des Bois', icon: 'fas fa-bow-arrow', description: 'Généreux malgré l\'oubli', condition: '> 80 pts donnés + < 30 pts reçus', color: '#4caf50' },
-            { badge: 'L\'Influenceur', icon: 'fas fa-star-shooting', description: 'Populaire et généreux', condition: 'Badge "La Star" + > 60 pts donnés', color: '#ff9800' },
-            { badge: 'Le Clan', icon: 'fas fa-users', description: 'Ma famille et moi, c\'est pour la vie', condition: 'Badges "Le Patriote" + "Chouchou de Famille"', color: '#3f51b5' },
-            { badge: 'Le Rebelle', icon: 'fas fa-dragon', description: 'Loin de ma famille, dans les deux sens', condition: 'Badges "L\'Anticonformiste" + "Le Transfuge"', color: '#00bcd4' },
-            { badge: 'Le Fan Club', icon: 'fas fa-crown', description: 'J\'ai mes favoris et ils me le rendent', condition: 'Badges "Le Sniper" + "Le Protégé"', color: '#e91e63' },
-            { badge: 'Le Politique', icon: 'fas fa-balance-scale-right', description: 'Équilibre parfait donné/reçu', condition: 'Badges "Le Diplomate" + "L\'Équilibré"', color: '#4caf50' },
-            { badge: 'Le Phénomène Total', icon: 'fas fa-meteor', description: 'La légende absolue des AGPA', condition: '> 100 pts donnés + Badge "Le Phénomène"', color: '#ffd700' },
-            { badge: 'Le Couple Parfait', icon: 'fas fa-heart', description: 'L\'amour est réciproque', condition: 'Badge "Amoureux Transi" + > 40% pts reçus du conjoint', color: '#e91e63' },
-            { badge: 'L\'Incompris', icon: 'fas fa-sad-tear', description: 'Je donne à tous mais personne ne me voit', condition: 'Badge "Le Philanthrope" + (Badge "L\'Inconnu" ou < 15 pts reçus)', color: '#9e9e9e' },
-            { badge: 'Le Revenant', icon: 'fas fa-ghost', description: 'Peu présent mais marquant', condition: '< 10 votes donnés + > 40 pts reçus', color: '#673ab7' },
-            { badge: 'La Superstar', icon: 'fas fa-sparkles', description: 'Excellence en tout point', condition: '> 70 pts donnés + > 70 pts reçus + > 7 votants', color: '#ff6f00' },
-            { badge: 'Girl Power', icon: 'fas fa-venus', description: 'Engagement féministe total', condition: 'Badges "Féministe Convaincu" + "Coqueluche des Dames"', color: '#9c27b0' }
-        ],
-        slidingBadges: [
-            { badge: 'La Fusée', icon: 'fas fa-rocket-launch', description: 'Décollage spectaculaire', condition: 'Progression x3 minimum sur 3 ans', color: '#ff5722' },
-            { badge: 'Le Régulier', icon: 'fas fa-chart-line', description: 'Performance stable et constante', condition: 'Variance < 15% avec moyenne ≥ 30 pts/an', color: '#4caf50' },
-            { badge: 'Le Dinosaure', icon: 'fas fa-dragon', description: 'Les beaux jours sont derrière', condition: 'Régression continue sur 3 ans (départ ≥ 40 pts)', color: '#795548' },
-            { badge: 'Le Yoyo', icon: 'fas fa-arrows-up-down', description: 'Performance en montagnes russes', condition: 'Alternance haut/bas avec écarts > 50%', color: '#ff9800' },
-            { badge: 'La Révélation', icon: 'fas fa-star-shooting', description: 'De l\'ombre à la lumière', condition: '0 pts année 1 + progression forte années 2-3', color: '#9c27b0' },
-            { badge: 'Le Vétéran', icon: 'fas fa-medal', description: 'Sur le podium tous les ans', condition: 'Au moins 1 podium chaque année sur 3 ans', color: '#ff6f00' },
-            { badge: 'Le Sniper Temporel', icon: 'fas fa-bullseye', description: 'Spécialiste d\'une catégorie', condition: 'Même catégorie gagnée 2-3 fois sur 3 ans', color: '#f44336' },
-            { badge: 'Le Phoenix', icon: 'fas fa-phoenix-squadron', description: 'Renaît de ses cendres', condition: 'Chute > 50% puis remontée > 120% de l\'année 1', color: '#e91e63' },
-            { badge: 'Le Tsunami', icon: 'fas fa-water', description: 'Arrivée fracassante', condition: '0 pts année 1 + ≥ 2 ors année 2', color: '#00bcd4' },
-            { badge: 'Le Fidèle', icon: 'fas fa-handshake', description: 'Toujours présent, toujours actif', condition: '≥ 15 pts par an sur les 3 années', color: '#607d8b' },
-            { badge: 'Le Podium Addict', icon: 'fas fa-trophy', description: '5+ podiums sur 3 ans', condition: '≥ 5 podiums cumulés sur 3 ans', color: '#cddc39' },
-            { badge: 'L\'Éclair', icon: 'fas fa-bolt', description: 'Retour fracassant', condition: '0 pts années 1-2 + ≥ 40 pts année 3', color: '#ffeb3b' },
-            // Badges de Collection
-            { badge: 'Le Collectionneur', icon: 'fas fa-medal', description: 'Collection complète', condition: 'Exactement 1 Or + 1 Argent + 1 Bronze en 1 édition', color: '#9c27b0' },
-            { badge: 'Le Perfectionniste', icon: 'fas fa-crown', description: 'Ors purs', condition: 'Uniquement des Ors (≥2) sans autre récompense en 1 édition', color: '#ffd700' },
-            { badge: 'Le Monopole', icon: 'fas fa-chess-king', description: 'Quasi monopole', condition: '≥6 Ors sur les 8 catégories en 1 édition', color: '#ff6f00' },
-            { badge: 'La Razzia', icon: 'fas fa-bullseye', description: 'Catégories dominées', condition: '4+ catégories gagnées en 1 édition', color: '#e91e63' },
-            // Badges de Domination
-            { badge: 'Le Triplé', icon: 'fas fa-fire', description: 'Triple or', condition: '3+ Ors en 1 édition', color: '#ff9800' },
-            { badge: 'Le Doublé', icon: 'fas fa-gem', description: 'Double argent', condition: 'Exactement 2 Argents en 1 édition', color: '#c0c0c0' },
-            { badge: 'Le Balayage Bronze', icon: 'fas fa-broom', description: 'Collection de bronze', condition: '4+ Bronzes en 1 édition', color: '#cd7f32' },
-            { badge: 'L\'Arc-en-ciel', icon: 'fas fa-rainbow', description: 'Palette complète', condition: '≥2 de chaque type (Or + Argent + Bronze) en 1 édition', color: '#00bcd4' },
-            // Badges de Progression
-            { badge: 'L\'Alpiniste', icon: 'fas fa-mountain', description: 'Progression parfaite', condition: 'Bronze → Argent → Or dans la même catégorie sur 3 ans', color: '#2196f3' },
-            { badge: 'Le Constant', icon: 'fas fa-check-double', description: 'Régularité exemplaire', condition: 'Même nombre d\'AGPA (≥1) chaque année sur 3 ans', color: '#4caf50' },
-            { badge: 'La Rédemption', icon: 'fas fa-redo', description: 'Retour victorieux', condition: '0 AGPA année N, puis Or année N+1 dans la même catégorie', color: '#ff5722' },
-            // Badges de Patterns Spéciaux
-            { badge: 'La Pyramide', icon: 'fas fa-caret-up', description: 'Pattern parfait', condition: '1 Or + 2 Argents + 3 Bronzes en 1 édition', color: '#607d8b' },
-            { badge: 'La Pyramide Inversée', icon: 'fas fa-caret-down', description: 'Pattern renversant', condition: '3 Ors + 2 Argents + 1 Bronze en 1 édition', color: '#3f51b5' },
-            { badge: 'Le Symétrique', icon: 'fas fa-balance-scale', description: 'Équilibre parfait', condition: 'Même nombre d\'Ors, Argents et Bronzes en 1 édition', color: '#009688' }
-        ]
+        badgesHistory: {}, // Will hold badge status for each badge from API
     }),
     computed: {
         ...mapState(['user']),
+
+        // Badges arrays from metadata
+        voterBadges() {
+            return getBadgesByType('voter');
+        },
+        photographerBadges() {
+            return getBadgesByType('photographer');
+        },
+        comboBadges() {
+            return getBadgesByType('combo');
+        },
 
         // Options pour le select de filtrage par famille
         familyOptions() {
@@ -1133,6 +1078,9 @@ export default {
             // Charger les badges
             await this.calculateMyGlobalBadges();
             await this.calculateMySlidingBadges();
+
+            // Charger l'historique des badges
+            await this.loadBadgeHistory();
         },
 
         calculateMyGlobalStats() {
@@ -1275,30 +1223,78 @@ export default {
             return 'ème';
         },
 
+        async loadBadgeHistory() {
+            if (!this.user) return;
+
+            try {
+                const response = await axios.get('/api/agpa/my-badges-history');
+                const data = parseAxiosResponse(response);
+
+                if (data && data.badgeHistory) {
+                    this.badgesHistory = data.badgeHistory;
+                }
+            } catch (err) {
+                console.error('Erreur chargement historique badges:', err);
+                this.badgesHistory = {};
+            }
+        },
+
+        getProgressionData(badge) {
+            // Only progressive badges have progression data
+            if (badge.timing !== 'progressive') {
+                return null;
+            }
+
+            // Check if this badge exists in history
+            const badgeStatus = this.badgesHistory[badge.badge];
+            if (!badgeStatus) {
+                return {
+                    percentage: 0,
+                    description: 'Aucune progression pour le moment'
+                };
+            }
+
+            // For progressive badges obtained, show 100%
+            if (badgeStatus.isActive) {
+                return {
+                    percentage: 100,
+                    description: `Badge actif (obtenu ${badgeStatus.years.length} fois)`
+                };
+            }
+
+            if (badgeStatus.everObtained) {
+                return {
+                    percentage: 50,
+                    description: `Badge obtenu dans le passé (${badgeStatus.years.join(', ')})`
+                };
+            }
+
+            // Not obtained yet - could add more specific progression logic here
+            return {
+                percentage: 0,
+                description: 'Non obtenu'
+            };
+        },
+
         countBadgesByType(type) {
-            if (!this.mySlidingBadges || this.mySlidingBadges.length === 0) {
+            if (!this.badgesHistory || Object.keys(this.badgesHistory).length === 0) {
                 return 0;
             }
 
-            // Déterminer quel type de badge compter en fonction du type demandé
-            if (type === 'voter') {
-                return this.mySlidingBadges.filter(badge =>
-                    this.voterBadges.some(vb => vb.badge === badge.badge)
-                ).length;
-            } else if (type === 'photographer') {
-                return this.mySlidingBadges.filter(badge =>
-                    this.photographerBadges.some(pb => pb.badge === badge.badge)
-                ).length;
-            } else if (type === 'combo') {
-                return this.mySlidingBadges.filter(badge =>
-                    this.comboBadges.some(cb => cb.badge === badge.badge)
-                ).length;
-            } else if (type === 'sliding') {
-                return this.mySlidingBadges.filter(badge =>
-                    this.slidingBadges.some(sb => sb.badge === badge.badge)
-                ).length;
+            // Count active badges (obtained in last 3 editions) of the given type
+            let count = 0;
+            const badgesToCheck = type === 'voter' ? this.voterBadges :
+                                 type === 'photographer' ? this.photographerBadges :
+                                 type === 'combo' ? this.comboBadges : [];
+
+            for (const badge of badgesToCheck) {
+                const badgeStatus = this.badgesHistory[badge.badge];
+                if (badgeStatus && badgeStatus.isActive) {
+                    count++;
+                }
             }
-            return 0;
+
+            return count;
         }
     }
 };
