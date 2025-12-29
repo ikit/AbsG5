@@ -643,13 +643,13 @@ class AgpaService {
                 SELECT
                     p."userId",
                     p."categoryId",
-                    a.type as "awardType",
+                    a.award as "awardType",
                     SUM(v.score) as "totalPoints"
                 FROM agpa_photo p
                 LEFT JOIN agpa_vote v ON v."photoId" = p.id AND v.year = ${year}
                 LEFT JOIN agpa_award a ON a."photoId" = p.id AND a.year = ${year}
                 WHERE p.year = ${year} AND p."categoryId" > 0
-                GROUP BY p."userId", p."categoryId", a.type
+                GROUP BY p."userId", p."categoryId", a.award
             `;
             const resultsData = await this.catRepo.query(resultsQuery);
 
