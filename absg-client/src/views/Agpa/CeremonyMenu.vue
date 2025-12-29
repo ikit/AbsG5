@@ -114,6 +114,7 @@
           }"
         >
           <a
+            v-if="edition.photos && edition.photos.length > 0"
             :href="`/agpa/ceremony/${edition.year}`"
             target="_blank"
             style="text-decoration: none"
