@@ -104,13 +104,65 @@
         <v-expansion-panel-text>
           <p>
             <span class="details">
-              La cérémonie sera accessible et démarrera automatiquement à partir de l'heure indiqué, en nombre de seconde, à partir de minuit une fois la phase 4 terminée.
+              La cérémonie sera accessible et démarrera automatiquement à l'heure indiquée, une fois la phase 4 terminée.
             </span>
-            <v-text-field
-              v-model="settings.agpaCeremonyStartTime"
-              :label="`Heure d'ouverture de la cérémonie => Débute le ${agpaPhase5Start}`"
-              @change="updateAgpaPhasesBoundaries()"
-            />
+
+            <div style="margin: 20px 0;">
+              <div style="font-weight: bold; margin-bottom: 10px; text-align: center; font-size: 1.2em; color: #1976d2;">
+                Heure de début : {{ ceremonyHourDisplay }}
+              </div>
+              <div style="font-size: 0.9em; color: #666; text-align: center; margin-bottom: 15px;">
+                La cérémonie débutera le {{ agpaPhase5Start }}
+              </div>
+            </div>
+
+            <v-row>
+              <v-col cols="12" md="6">
+                <div style="padding: 0 15px;">
+                  <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    <i class="far fa-clock" style="margin-right: 5px;"></i>
+                    Heure : {{ ceremonyHour }}h
+                  </label>
+                  <v-slider
+                    v-model="ceremonyHour"
+                    :min="10"
+                    :max="23"
+                    :step="1"
+                    thumb-label
+                    color="primary"
+                    track-color="grey-lighten-2"
+                    @update:model-value="updateCeremonyTime()"
+                  >
+                    <template #thumb-label="{ modelValue }">
+                      {{ modelValue }}h
+                    </template>
+                  </v-slider>
+                </div>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <div style="padding: 0 15px;">
+                  <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    <i class="far fa-clock" style="margin-right: 5px;"></i>
+                    Minutes : {{ ceremonyMinute }}min
+                  </label>
+                  <v-slider
+                    v-model="ceremonyMinute"
+                    :min="0"
+                    :max="55"
+                    :step="5"
+                    thumb-label
+                    color="primary"
+                    track-color="grey-lighten-2"
+                    @update:model-value="updateCeremonyTime()"
+                  >
+                    <template #thumb-label="{ modelValue }">
+                      {{ modelValue }}min
+                    </template>
+                  </v-slider>
+                </div>
+              </v-col>
+            </v-row>
           </p>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -146,6 +198,10 @@ export default {
         agpaPhase4Start: "1/10",
         agpaPhase5Start: "1/10",
 
+    // Ceremony time sliders
+        ceremonyHour: 20,
+        ceremonyMinute: 0,
+
     // IHM models
         agpaPhaseRules: [
             value => !!value || 'Ce champs est obligatoire',
@@ -156,9 +212,17 @@ export default {
             value => (+value > 0 && +value < 201) || 'Doit être compris entre 1 et 200',
         ],
     }),
+    computed: {
+        ceremonyHourDisplay() {
+            const h = String(this.ceremonyHour).padStart(2, '0');
+            const m = String(this.ceremonyMinute).padStart(2, '0');
+            return `${h}h${m}`;
+        }
+    },
     mounted() {
         axios.get(`/api/settings`).then(response => {
             this.settings = parseAxiosResponse(response);
+            this.initCeremonySliders();
             this.updateAgpaPhasesBoundaries();
         }).catch( err => {
             store.commit('onError', err);
@@ -166,6 +230,20 @@ export default {
 
     },
     methods: {
+        initCeremonySliders() {
+            // Convertir les secondes en heures et minutes
+            const totalSeconds = +this.settings.agpaCeremonyStartTime;
+            this.ceremonyHour = Math.floor(totalSeconds / 3600);
+            this.ceremonyMinute = Math.floor((totalSeconds % 3600) / 60);
+        },
+
+        updateCeremonyTime() {
+            // Convertir heures et minutes en secondes
+            const totalSeconds = (this.ceremonyHour * 3600) + (this.ceremonyMinute * 60);
+            this.settings.agpaCeremonyStartTime = totalSeconds;
+            this.updateAgpaPhasesBoundaries();
+        },
+
         updateAgpaPhasesBoundaries() {
             // Phase 1 démarre le 1er octobre à minuit
             const p1 = new Date(new Date().getFullYear(), 9, 1, 0, 0, 0);
@@ -195,6 +273,7 @@ export default {
         save() {
             axios.post(`/api/settings`, this.settings).then(response => {
                 this.settings = parseAxiosResponse(response);
+                this.initCeremonySliders();
                 this.updateAgpaPhasesBoundaries();
             }).catch( err => {
                 store.commit('onError', err);
