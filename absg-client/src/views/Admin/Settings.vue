@@ -3,34 +3,69 @@
     v-if="settings"
     fluid
   >
-    <v-expansion-panels style="padding: 10px; max-width: 500px; margin: auto">
-      <v-expansion-panel>
-        <v-expansion-panel-title>
-          <span><i
-            class="fas fa-bullhorn"
-            style="display: inline-block; width: 40px"
-          /> Mettre une annonce</span>
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <p>
-            <span class="details">
-              Met en avant sur le site une annonce visible par tous.
-              En cliquand sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (html autorisé)
-            </span>
-            <v-text-field
-              v-model="settings.announcementTitle"
-              label="Accroche de l'annonce"
-            />
-            <v-textarea
-              v-model="settings.announcementBody"
-              label="Corps de l'annonce"
-              hint="HTML autorisé"
-            />
-          </p>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+    <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Comfortaa', sans-serif;">
+      <i class="fas fa-cog" style="margin-right: 10px;"></i>
+      Configuration du site
+    </h1>
 
-      <v-expansion-panel>
+    <v-tabs
+      v-model="activeTab"
+      centered
+      color="primary"
+      style="margin-bottom: 20px;"
+    >
+      <v-tab value="general">
+        <i class="fas fa-sliders-h" style="margin-right: 8px;"></i>
+        Paramètres généraux
+      </v-tab>
+      <v-tab value="agpa">
+        <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>
+        Configuration AGPA
+      </v-tab>
+    </v-tabs>
+
+    <v-window v-model="activeTab">
+      <!-- Onglet Paramètres généraux -->
+      <v-window-item value="general">
+        <v-expansion-panels style="padding: 10px; max-width: 800px; margin: auto" model-value="0">
+          <v-expansion-panel>
+            <v-expansion-panel-title>
+              <span><i
+                class="fas fa-bullhorn"
+                style="display: inline-block; width: 40px"
+              /> Annonces du site</span>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <p>
+                <span class="details">
+                  Met en avant sur le site une annonce visible par tous.
+                  En cliquant sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (HTML autorisé).
+                </span>
+                <v-text-field
+                  v-model="settings.announcementTitle"
+                  label="Accroche de l'annonce"
+                  variant="outlined"
+                  density="comfortable"
+                  style="margin-top: 15px;"
+                />
+                <v-textarea
+                  v-model="settings.announcementBody"
+                  label="Corps de l'annonce"
+                  hint="HTML autorisé"
+                  variant="outlined"
+                  density="comfortable"
+                  rows="4"
+                />
+              </p>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-window-item>
+
+      <!-- Onglet AGPA -->
+      <v-window-item value="agpa">
+        <v-expansion-panels style="padding: 10px; max-width: 800px; margin: auto">
+          <v-expansion-panel>
         <v-expansion-panel-title>
           <span><i
             class="fas fa-star"
@@ -167,12 +202,17 @@
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
+      </v-window-item>
+    </v-window>
 
     <v-btn
-      style="margin: 10px auto; display: block;"
-      color="accent"
+      style="margin: 20px auto; display: block;"
+      color="primary"
+      size="large"
+      elevation="2"
       @click="save()"
     >
+      <i class="fas fa-save" style="margin-right: 8px;"></i>
       Sauvegarder les paramètres
     </v-btn>
   </v-container>
@@ -190,6 +230,7 @@ export default {
     data: () => ({
     // Settings
         settings: null,
+        activeTab: 'general', // Onglet par défaut
 
     // Computed
         agpaPhase1Start: "1/10",
