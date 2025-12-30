@@ -76,39 +76,58 @@ class AgpaBadgeService {
 
                     // Badge Votant
                     if (userProfiles.voterProfile) {
+                        // TODO: Actuellement les profils ne retournent pas les stats détaillées
+                        // Il faudra modifier agpaVoteProfilesHelper.ts pour retourner les stats calculées
+                        // Pour l'instant, on stocke un objet vide en attendant l'implémentation complète
+                        const statsSnapshot = {
+                            year: year,
+                            badgeType: 'voter',
+                            // Les stats détaillées seront ajoutées plus tard (totalPoints, ownFamilyPercent, etc.)
+                        };
+
                         await this.createBadge(
                             user,
                             year,
                             userProfiles.voterProfile.badge,
                             BadgeType.voter,
                             BadgeTiming.direct,
-                            userProfiles.voterProfile
+                            statsSnapshot
                         );
                         createdCount++;
                     }
 
                     // Badge Photographe
                     if (userProfiles.photographerProfile) {
+                        const statsSnapshot = {
+                            year: year,
+                            badgeType: 'photographer',
+                        };
+
                         await this.createBadge(
                             user,
                             year,
                             userProfiles.photographerProfile.badge,
                             BadgeType.photographer,
                             BadgeTiming.direct,
-                            userProfiles.photographerProfile
+                            statsSnapshot
                         );
                         createdCount++;
                     }
 
                     // Badge Combo
                     if (userProfiles.comboProfile) {
+                        const statsSnapshot = {
+                            year: year,
+                            badgeType: 'combo',
+                        };
+
                         await this.createBadge(
                             user,
                             year,
                             userProfiles.comboProfile.badge,
                             BadgeType.combo,
                             BadgeTiming.direct,
-                            userProfiles.comboProfile
+                            statsSnapshot
                         );
                         createdCount++;
                     }
@@ -133,13 +152,21 @@ class AgpaBadgeService {
                             const userBadges = slidingBadges[userId];
                             for (const badge of userBadges) {
                                 try {
+                                    // TODO: Actuellement les profils ne retournent pas les stats détaillées
+                                    const statsSnapshot = {
+                                        year: year,
+                                        badgeType: 'combo',
+                                        badgeTiming: 'progressive',
+                                        // Les stats détaillées seront ajoutées plus tard
+                                    };
+
                                     await this.createBadge(
                                         user,
                                         year,
                                         badge.badge,
                                         BadgeType.combo,
                                         BadgeTiming.progressive,
-                                        badge
+                                        statsSnapshot
                                     );
                                     createdCount++;
                                 } catch (error) {
