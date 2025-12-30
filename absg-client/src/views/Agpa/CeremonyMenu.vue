@@ -443,8 +443,8 @@ export default {
 
         openCeremonySlideShow() {
             this.$refs.video.pause();
-            // Rediriger vers la page de cérémonie (plein écran)
-            window.location.href = `/agpa/ceremony/${this.agpaMeta.year}`;
+            // Rediriger vers la page de cérémonie (plein écran) via le router
+            this.$router.push(`/agpa/ceremony/${this.agpaMeta.year}`);
         },
 
         preloadIntro() {
