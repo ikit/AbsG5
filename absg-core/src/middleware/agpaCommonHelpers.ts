@@ -19,16 +19,31 @@ export function getCurrentEdition(): number {
         }
     }
 
-    // Une édition commence toujours au 1er octobre et se termine fin septembre de l'année suivante (phase 5)
-    // Si on est avant le 1er octobre, on est encore sur l'édition de l'année précédente
-    // Si on est après le 1er octobre, on est sur l'édition de l'année courante
+    // Timeline d'une édition:
+    // - Phase 1-4: 1er octobre année N → cérémonie (décembre N ou janvier N+1)
+    // - Phase 5: Fin cérémonie → fin janvier année N+1
+    // - Interlude: Février-Septembre → affichage "prochaine édition année N+1"
+    // - Phase 1 nouvelle édition: 1er octobre année N+1
+
     const date = new Date();
-    let editionYear = date.getFullYear();
-    // Si on est entre janvier et septembre (mois 0-8), on est encore sur l'édition de l'année précédente
-    if (date.getMonth() < 9) {
-        editionYear--;
+    const currentYear = date.getFullYear();
+    const currentMonth = date.getMonth(); // 0-11
+
+    // Si on est entre février et septembre (mois 1-8), on est dans l'interlude
+    // On affiche donc l'édition qui démarrera en octobre
+    if (currentMonth >= 1 && currentMonth <= 8) {
+        return currentYear;
     }
-    return editionYear;
+
+    // Si on est en octobre, novembre, décembre ou janvier
+    // On est dans l'édition de l'année où a démarré le 1er octobre
+    if (currentMonth >= 9) {
+        // Octobre, novembre, décembre de l'année N = édition N
+        return currentYear;
+    } else {
+        // Janvier de l'année N+1 = édition N (phase 5)
+        return currentYear - 1;
+    }
 }
 
 /**
@@ -98,8 +113,9 @@ export async function getPhasesBoundaries(): Promise<AgpaPhase[]> {
             startDate = addSeconds(startDate, -3600 + agpaCeremonyStartTime);
             p.endDate = new Date(startDate);
         } else {
-            // Phase 5: jusqu'à fin septembre de l'année suivante
-            p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
+            // Phase 5: post-cérémonie jusqu'à fin janvier de l'année suivante
+            // Permet aux gens de revoir la cérémonie
+            p.endDate = new Date(startDate.getFullYear() + 1, 0, 31, 23, 59, 59);
         }
         phases.push(p);
     }
