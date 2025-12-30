@@ -1,19 +1,22 @@
 <template>
   <div>
     <v-container>
-      <!-- Première ligne: Mes AGPA, Mes Badges, Statistiques -->
+      <!-- Première ligne: Layout 2 colonnes -->
       <v-row style="margin-bottom: 30px;">
-        <!-- Section 1: Mes AGPA (Récompenses) -->
-        <v-col cols="12" md="4">
-          <v-card
-            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
-            @click="showPalmaresDialog = true"
-            hover
-          >
-            <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-              <v-icon start color="white">fas fa-trophy</v-icon>
-              Mes AGPA
-            </v-card-title>
+        <!-- Colonne gauche: Mes AGPA + Mes Succès -->
+        <v-col cols="12" md="6">
+          <v-row>
+            <!-- Section 1: Mes AGPA (Récompenses) -->
+            <v-col cols="12">
+              <v-card
+                style="cursor: pointer; transition: transform 0.2s; height: 100%; margin-bottom: 20px;"
+                @click="showPalmaresDialog = true"
+                hover
+              >
+                <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                  <v-icon start color="white">fas fa-trophy</v-icon>
+                  Mes AGPA
+                </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
               <!-- Total points cumulés -->
               <div style="margin-bottom: 25px;">
@@ -75,20 +78,20 @@
                 Cliquez pour voir le palmarès complet
               </div>
             </v-card-text>
-          </v-card>
-        </v-col>
+              </v-card>
+            </v-col>
 
-        <!-- Section 2: Mes Badges & Combos -->
-        <v-col cols="12" md="4">
-          <v-card
-            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
-            @click="showBadgesDialog = true"
-            hover
-          >
-            <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
-              <v-icon start color="white">fas fa-award</v-icon>
-              Mes Badges & Combos
-            </v-card-title>
+            <!-- Section 2: Mes Succès -->
+            <v-col cols="12">
+              <v-card
+                style="cursor: pointer; transition: transform 0.2s; height: 100%;"
+                @click="showBadgesDialog = true"
+                hover
+              >
+                <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                  <v-icon start color="white">fas fa-award</v-icon>
+                  Mes Succès
+                </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
               <!-- Total badges débloqués -->
               <div style="margin-bottom: 25px;">
@@ -154,184 +157,158 @@
                 Cliquez pour découvrir tous les achievements
               </div>
             </v-card-text>
-          </v-card>
+              </v-card>
+            </v-col>
+          </v-row>
         </v-col>
 
-        <!-- Section 3: Statistiques Personnelles & Familiales -->
-        <v-col cols="12" md="4">
+        <!-- Colonne droite: Statistiques Complètes -->
+        <v-col cols="12" md="6">
           <v-card style="height: 100%;">
             <v-card-title style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
               <v-icon start color="white">fas fa-chart-line</v-icon>
               Mes Statistiques
             </v-card-title>
             <v-card-text style="padding: 20px;">
-              <!-- Stats personnelles -->
-              <div style="margin-bottom: 20px;">
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 12px; font-weight: 600;">
-                  Ma participation
-                </div>
-
-                <div style="padding: 12px; background: #e1f5fe; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #03a9f4;">
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <i class="fas fa-calendar-check" style="color: #03a9f4; font-size: 1.1em;"></i>
-                      <div style="font-size: 0.85em; color: #666;">Éditions participées</div>
+              <!-- Stats générales en grille -->
+              <v-row style="margin-bottom: 20px;">
+                <!-- Meilleure catégorie -->
+                <v-col cols="6">
+                  <div style="padding: 12px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800; height: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                      <i class="fas fa-crown" style="color: #ff9800; font-size: 1.2em;"></i>
+                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Catégorie favorite</div>
                     </div>
-                    <div style="font-size: 1.3em; font-weight: bold; color: #03a9f4;">18</div>
-                  </div>
-                </div>
-
-                <div style="padding: 12px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <i class="fas fa-images" style="color: #ff9800; font-size: 1.1em;"></i>
-                      <div style="font-size: 0.85em; color: #666;">Photos soumises</div>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">Animaux</div>
+                    <div style="font-size: 0.75em; color: #666;">
+                      3 <i class="fas fa-circle" style="color: #c68b00; font-size: 0.7em;"></i> ·
+                      2 <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.7em;"></i> ·
+                      1 <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.7em;"></i>
                     </div>
-                    <div style="font-size: 1.3em; font-weight: bold; color: #ff9800;">156</div>
                   </div>
-                </div>
-              </div>
+                </v-col>
+
+                <!-- Meilleure année -->
+                <v-col cols="6">
+                  <div style="padding: 12px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50; height: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                      <i class="fas fa-calendar-star" style="color: #4caf50; font-size: 1.2em;"></i>
+                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Meilleure année</div>
+                    </div>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">2023</div>
+                    <div style="font-size: 0.75em; color: #666;">
+                      5 récompenses · 42 points
+                    </div>
+                  </div>
+                </v-col>
+
+                <!-- Éditions participées -->
+                <v-col cols="6">
+                  <div style="padding: 12px; background: #fce4ec; border-radius: 8px; border-left: 4px solid #e91e63; height: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                      <i class="fas fa-calendar-check" style="color: #e91e63; font-size: 1.2em;"></i>
+                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Éditions</div>
+                    </div>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">18</div>
+                    <div style="font-size: 0.75em; color: #666;">
+                      Participation totale
+                    </div>
+                  </div>
+                </v-col>
+
+                <!-- Photos soumises -->
+                <v-col cols="6">
+                  <div style="padding: 12px; background: #e1f5fe; border-radius: 8px; border-left: 4px solid #03a9f4; height: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                      <i class="fas fa-images" style="color: #03a9f4; font-size: 1.2em;"></i>
+                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Photos soumises</div>
+                    </div>
+                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">156</div>
+                    <div style="font-size: 0.75em; color: #666;">
+                      Au total
+                    </div>
+                  </div>
+                </v-col>
+              </v-row>
+
+              <!-- Séparateur -->
+              <v-divider style="margin: 20px 0;" />
 
               <!-- Stats familiales -->
-              <div>
+              <div style="margin-bottom: 20px;">
                 <div style="font-size: 0.85em; color: #666; margin-bottom: 12px; font-weight: 600;">
                   <i class="fas fa-users" style="margin-right: 5px;"></i>
                   Ma famille
                 </div>
 
-                <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                <div style="padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
                   <div style="font-size: 0.8em; color: #666; margin-bottom: 5px;">Classement famille Gueudelot</div>
                   <div style="font-size: 1.1em; font-weight: bold; color: #9c27b0;">3ème position</div>
+                </div>
+              </div>
+
+              <!-- Séparateur -->
+              <v-divider style="margin: 20px 0;" />
+
+              <!-- Fun Facts -->
+              <div>
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 12px; font-weight: 600;">
+                  <i class="fas fa-lightbulb" style="margin-right: 5px;"></i>
+                  Fun Facts
+                </div>
+
+                <!-- Fact 1 -->
+                <div style="padding: 10px; background: #fff9e6; border-radius: 8px; margin-bottom: 10px;">
+                  <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <i class="fas fa-vote-yea" style="color: #ffc107; font-size: 1.1em; margin-top: 2px;"></i>
+                    <div style="flex: 1;">
+                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                        Vous avez voté pour <strong>127 photos</strong> différentes lors de l'édition 2024
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fact 2 -->
+                <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; margin-bottom: 10px;">
+                  <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <i class="fas fa-fire" style="color: #9c27b0; font-size: 1.1em; margin-top: 2px;"></i>
+                    <div style="flex: 1;">
+                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                        Votre série la plus longue: <strong>12 éditions</strong> consécutives
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fact 3 -->
+                <div style="padding: 10px; background: #e3f2fd; border-radius: 8px; margin-bottom: 10px;">
+                  <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <i class="fas fa-trophy" style="color: #2196f3; font-size: 1.1em; margin-top: 2px;"></i>
+                    <div style="flex: 1;">
+                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                        Premier podium en <strong>2015</strong> dans la catégorie "Nature"
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fact 4 -->
+                <div style="padding: 10px; background: #e8f5e9; border-radius: 8px;">
+                  <div style="display: flex; align-items: flex-start; gap: 8px;">
+                    <i class="fas fa-heart" style="color: #e91e63; font-size: 1.1em; margin-top: 2px;"></i>
+                    <div style="flex: 1;">
+                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                        Photographe préféré: <strong>Jean-Michel</strong> (23 votes donnés)
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </v-card-text>
           </v-card>
         </v-col>
       </v-row>
-
-      <!-- Section: Statistiques Générales (pleine largeur) -->
-      <v-card style="margin-bottom: 30px;">
-        <v-card-title style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
-          <v-icon start color="white">fas fa-chart-line</v-icon>
-          Statistiques Générales
-        </v-card-title>
-        <v-card-text style="padding: 20px;">
-          <v-row>
-            <!-- Meilleure catégorie -->
-            <v-col cols="12" md="3">
-              <div style="padding: 15px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800; height: 100%;">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                  <i class="fas fa-crown" style="color: #ff9800; font-size: 1.5em;"></i>
-                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Catégorie favorite</div>
-                </div>
-                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">Animaux</div>
-                <div style="font-size: 0.85em; color: #666;">
-                  3 <i class="fas fa-circle" style="color: #c68b00; font-size: 0.7em;"></i> ·
-                  2 <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.7em;"></i> ·
-                  1 <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.7em;"></i>
-                </div>
-              </div>
-            </v-col>
-
-            <!-- Meilleure année -->
-            <v-col cols="12" md="3">
-              <div style="padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50; height: 100%;">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                  <i class="fas fa-calendar-star" style="color: #4caf50; font-size: 1.5em;"></i>
-                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Meilleure année</div>
-                </div>
-                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">2023</div>
-                <div style="font-size: 0.85em; color: #666;">
-                  5 récompenses · 42 points
-                </div>
-              </div>
-            </v-col>
-
-            <!-- Éditions participées -->
-            <v-col cols="12" md="3">
-              <div style="padding: 15px; background: #fce4ec; border-radius: 8px; border-left: 4px solid #e91e63; height: 100%;">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                  <i class="fas fa-calendar-check" style="color: #e91e63; font-size: 1.5em;"></i>
-                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Éditions</div>
-                </div>
-                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">18</div>
-                <div style="font-size: 0.85em; color: #666;">
-                  Participation totale
-                </div>
-              </div>
-            </v-col>
-
-            <!-- Photos soumises -->
-            <v-col cols="12" md="3">
-              <div style="padding: 15px; background: #e1f5fe; border-radius: 8px; border-left: 4px solid #03a9f4; height: 100%;">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                  <i class="fas fa-images" style="color: #03a9f4; font-size: 1.5em;"></i>
-                  <div style="font-size: 0.9em; font-weight: 600; color: #666;">Photos soumises</div>
-                </div>
-                <div style="font-size: 1.3em; font-weight: bold; color: #333; margin-bottom: 5px;">156</div>
-                <div style="font-size: 0.85em; color: #666;">
-                  Au total
-                </div>
-              </div>
-            </v-col>
-          </v-row>
-
-          <!-- Fun Facts -->
-          <v-row style="margin-top: 20px;">
-            <v-col cols="12" md="3">
-              <div style="padding: 12px; background: #fff9e6; border-radius: 8px;">
-                <div style="display: flex; align-items: flex-start; gap: 10px;">
-                  <i class="fas fa-lightbulb" style="color: #ffc107; font-size: 1.3em; margin-top: 2px;"></i>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
-                      Vous avez voté pour <strong>127 photos</strong> différentes lors de l'édition 2024
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </v-col>
-
-            <v-col cols="12" md="3">
-              <div style="padding: 12px; background: #f3e5f5; border-radius: 8px;">
-                <div style="display: flex; align-items: flex-start; gap: 10px;">
-                  <i class="fas fa-fire" style="color: #9c27b0; font-size: 1.3em; margin-top: 2px;"></i>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
-                      Votre série la plus longue: <strong>12 éditions</strong> consécutives
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </v-col>
-
-            <v-col cols="12" md="3">
-              <div style="padding: 12px; background: #e3f2fd; border-radius: 8px;">
-                <div style="display: flex; align-items: flex-start; gap: 10px;">
-                  <i class="fas fa-trophy" style="color: #2196f3; font-size: 1.3em; margin-top: 2px;"></i>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
-                      Premier podium en <strong>2015</strong> dans la catégorie "Nature"
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </v-col>
-
-            <v-col cols="12" md="3">
-              <div style="padding: 12px; background: #e8f5e9; border-radius: 8px;">
-                <div style="display: flex; align-items: flex-start; gap: 10px;">
-                  <i class="fas fa-heart" style="color: #e91e63; font-size: 1.3em; margin-top: 2px;"></i>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.85em; color: #666; line-height: 1.4;">
-                      Photographe préféré: <strong>Jean-Michel</strong> (23 votes donnés)
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
     </v-container>
 
     <!-- Dialog Palmarès Unifié -->
