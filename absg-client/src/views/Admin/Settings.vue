@@ -2,75 +2,53 @@
   <v-container
     v-if="settings"
     fluid
+    :style="{ padding: $vuetify.display.xs ? '10px' : '20px' }"
   >
-    <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Comfortaa', sans-serif;">
-      <i class="fas fa-cog" style="margin-right: 10px;"></i>
-      Configuration du site
-    </h1>
-
-    <v-tabs
-      v-model="activeTab"
-      centered
-      color="primary"
-      style="margin-bottom: 20px;"
+    <v-expansion-panels
+      :style="{
+        padding: $vuetify.display.xs ? '5px' : '10px',
+        maxWidth: $vuetify.display.xs ? '100%' : '600px',
+        margin: 'auto'
+      }"
     >
-      <v-tab value="general">
-        <i class="fas fa-sliders-h" style="margin-right: 8px;"></i>
-        Paramètres généraux
-      </v-tab>
-      <v-tab value="agpa">
-        <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>
-        Configuration AGPA
-      </v-tab>
-    </v-tabs>
-
-    <v-window v-model="activeTab">
-      <!-- Onglet Paramètres généraux -->
-      <v-window-item value="general">
-        <v-expansion-panels style="padding: 10px; max-width: 800px; margin: auto" model-value="0">
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              <span><i
-                class="fas fa-bullhorn"
-                style="display: inline-block; width: 40px"
-              /> Annonces du site</span>
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <p>
-                <span class="details">
-                  Met en avant sur le site une annonce visible par tous.
-                  En cliquant sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (HTML autorisé).
-                </span>
-                <v-text-field
-                  v-model="settings.announcementTitle"
-                  label="Accroche de l'annonce"
-                  variant="outlined"
-                  density="comfortable"
-                  style="margin-top: 15px;"
-                />
-                <v-textarea
-                  v-model="settings.announcementBody"
-                  label="Corps de l'annonce"
-                  hint="HTML autorisé"
-                  variant="outlined"
-                  density="comfortable"
-                  rows="4"
-                />
-              </p>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-window-item>
-
-      <!-- Onglet AGPA -->
-      <v-window-item value="agpa">
-        <v-expansion-panels style="padding: 10px; max-width: 800px; margin: auto">
-          <v-expansion-panel>
+      <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i
-            class="fas fa-star"
-            style="display: inline-block; width: 40px"
-          /> Edition spéciale des AGPA {{ settings.agpaSpecialEdition ? settings.agpaSpecialEdition.year : '' }}</span>
+          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
+            <i
+              class="fas fa-bullhorn"
+              style="display: inline-block; width: 40px"
+            />
+            Mettre une annonce
+          </span>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <p>
+            <span class="details">
+              Met en avant sur le site une annonce visible par tous.
+              En cliquand sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (html autorisé)
+            </span>
+            <v-text-field
+              v-model="settings.announcementTitle"
+              label="Accroche de l'annonce"
+            />
+            <v-textarea
+              v-model="settings.announcementBody"
+              label="Corps de l'annonce"
+              hint="HTML autorisé"
+            />
+          </p>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
+            <i
+              class="fas fa-star"
+              style="display: inline-block; width: 40px"
+            />
+            Edition spéciale des AGPA {{ settings.agpaSpecialEdition ? settings.agpaSpecialEdition.year : '' }}
+          </span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -91,10 +69,13 @@
 
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i
-            class="far fa-calendar-alt"
-            style="display: inline-block; width: 40px"
-          /> Durées des phases des AGPA</span>
+          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
+            <i
+              class="far fa-calendar-alt"
+              style="display: inline-block; width: 40px"
+            />
+            Durées des phases des AGPA
+          </span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -131,10 +112,13 @@
 
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i
-            class="fas fa-desktop"
-            style="display: inline-block; width: 40px"
-          /> Début de la cérémonie</span>
+          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
+            <i
+              class="fas fa-desktop"
+              style="display: inline-block; width: 40px"
+            />
+            Début de la cérémonie
+          </span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -142,19 +126,35 @@
               La cérémonie sera accessible et démarrera automatiquement à l'heure indiquée, une fois la phase 4 terminée.
             </span>
 
-            <div style="margin: 20px 0;">
-              <div style="font-weight: bold; margin-bottom: 10px; text-align: center; font-size: 1.2em; color: #1976d2;">
+            <div :style="{ margin: $vuetify.display.xs ? '15px 0' : '20px 0' }">
+              <div :style="{
+                fontWeight: 'bold',
+                marginBottom: '10px',
+                textAlign: 'center',
+                fontSize: $vuetify.display.xs ? '1em' : '1.2em',
+                color: '#1976d2'
+              }">
                 Heure de début : {{ ceremonyHourDisplay }}
               </div>
-              <div style="font-size: 0.9em; color: #666; text-align: center; margin-bottom: 15px;">
+              <div :style="{
+                fontSize: $vuetify.display.xs ? '0.8em' : '0.9em',
+                color: '#666',
+                textAlign: 'center',
+                marginBottom: '15px'
+              }">
                 La cérémonie débutera le {{ agpaPhase5Start }}
               </div>
             </div>
 
             <v-row>
               <v-col cols="12" md="6">
-                <div style="padding: 0 15px;">
-                  <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                <div :style="{ padding: $vuetify.display.xs ? '0 5px' : '0 15px' }">
+                  <label :style="{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '500',
+                    fontSize: $vuetify.display.xs ? '0.9em' : '1em'
+                  }">
                     <i class="far fa-clock" style="margin-right: 5px;"></i>
                     Heure : {{ ceremonyHour }}h
                   </label>
@@ -176,8 +176,13 @@
               </v-col>
 
               <v-col cols="12" md="6">
-                <div style="padding: 0 15px;">
-                  <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                <div :style="{ padding: $vuetify.display.xs ? '0 5px' : '0 15px' }">
+                  <label :style="{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: '500',
+                    fontSize: $vuetify.display.xs ? '0.9em' : '1em'
+                  }">
                     <i class="far fa-clock" style="margin-right: 5px;"></i>
                     Minutes : {{ ceremonyMinute }}min
                   </label>
@@ -202,13 +207,14 @@
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
-      </v-window-item>
-    </v-window>
 
     <v-btn
-      style="margin: 20px auto; display: block;"
+      :style="{
+        margin: $vuetify.display.xs ? '15px auto' : '20px auto',
+        display: 'block'
+      }"
       color="primary"
-      size="large"
+      :size="$vuetify.display.xs ? 'default' : 'large'"
       elevation="2"
       @click="save()"
     >
@@ -230,7 +236,6 @@ export default {
     data: () => ({
     // Settings
         settings: null,
-        activeTab: 'general', // Onglet par défaut
 
     // Computed
         agpaPhase1Start: "1/10",
