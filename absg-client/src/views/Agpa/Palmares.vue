@@ -1035,7 +1035,7 @@ export default {
                 }
 
                 // Charger le palmarès glissant
-                const slidingResponse = await axios.get('/api/agpa/palmares-sliding');
+                const slidingResponse = await axios.get('/api/agpa/palmares/sliding');
                 const slidingData = parseAxiosResponse(slidingResponse);
                 if (slidingData) {
                     this.slidingPalmares = slidingData.palmares || [];
