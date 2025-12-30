@@ -74,15 +74,52 @@ class AgpaService {
 
     /**
      * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
+     * avec calcul de la variation du rang par rapport à la période précédente
      */
     async getSlidingPalmaresData() {
         const maxYear = getMaxArchiveEdition();
         const fromYear = Math.max(2006, maxYear - 2); // 3 dernières années
-        const palmares = await palmaresData(fromYear, maxYear);
+
+        // Palmarès de la période actuelle (3 dernières éditions)
+        const currentPalmares = await palmaresData(fromYear, maxYear);
+
+        // Palmarès de la période précédente (3 éditions d'avant)
+        const prevFromYear = Math.max(2006, fromYear - 3);
+        const prevToYear = Math.max(2006, maxYear - 3);
+        const previousPalmares = prevToYear >= 2006 ? await palmaresData(prevFromYear, prevToYear) : [];
+
+        // Créer un mapping userId -> rang pour la période précédente
+        const previousRankMap = new Map();
+        previousPalmares.forEach((entry, index) => {
+            previousRankMap.set(entry.userId, index + 1);
+        });
+
+        // Ajouter l'info de variation de rang pour chaque participant
+        const palmaresWithRankChange = currentPalmares.map((entry, index) => {
+            const currentRank = index + 1;
+            const previousRank = previousRankMap.get(entry.userId);
+
+            let rankChange = null;
+            if (previousRank !== undefined) {
+                // Calcul: négatif = descente, positif = montée
+                // Ex: 4ème -> 6ème = +2 (descente de 2 places)
+                // Ex: 6ème -> 4ème = -2 (montée de 2 places)
+                rankChange = currentRank - previousRank;
+            }
+            // Si previousRank === undefined, c'est un nouveau participant
+
+            return {
+                ...entry,
+                rankChange: rankChange
+            };
+        });
+
         return {
-            palmares: palmares,
+            palmares: palmaresWithRankChange,
             yearFrom: fromYear,
-            yearTo: maxYear
+            yearTo: maxYear,
+            previousYearFrom: prevFromYear,
+            previousYearTo: prevToYear
         };
     }
 

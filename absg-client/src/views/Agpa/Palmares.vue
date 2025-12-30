@@ -20,13 +20,42 @@
               </span>
             </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
-              <div style="font-size: 4em; font-weight: bold; color: #667eea; margin-bottom: 20px;">
-                <template v-if="mySlidingRank">
-                  {{ mySlidingRank }}<sup style="font-size: 0.5em;">{{ getOrdinalSuffix(mySlidingRank) }}</sup>
-                </template>
-                <template v-else>
-                  -
-                </template>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <div style="font-size: 4em; font-weight: bold; color: #667eea;">
+                  <template v-if="mySlidingRank">
+                    {{ mySlidingRank }}<sup style="font-size: 0.5em;">{{ getOrdinalSuffix(mySlidingRank) }}</sup>
+                  </template>
+                  <template v-else>
+                    -
+                  </template>
+                </div>
+
+                <!-- Indicateur de variation de mon rang -->
+                <div v-if="myRankChange !== null && myRankChange !== undefined" style="display: flex; flex-direction: column; align-items: center;">
+                  <!-- Montée au classement (rankChange négatif) -->
+                  <div v-if="myRankChange < 0" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #e8f5e9; border-radius: 16px;">
+                    <i class="fas fa-arrow-up" style="color: #4caf50; font-size: 1.5em;"></i>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                      <span style="color: #4caf50; font-weight: bold; font-size: 1.3em;">+{{ Math.abs(myRankChange) }}</span>
+                      <span style="color: #4caf50; font-size: 0.7em;">place{{ Math.abs(myRankChange) > 1 ? 's' : '' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Descente au classement (rankChange positif) -->
+                  <div v-else-if="myRankChange > 0" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #ffebee; border-radius: 16px;">
+                    <i class="fas fa-arrow-down" style="color: #f44336; font-size: 1.5em;"></i>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                      <span style="color: #f44336; font-weight: bold; font-size: 1.3em;">-{{ myRankChange }}</span>
+                      <span style="color: #f44336; font-size: 0.7em;">place{{ myRankChange > 1 ? 's' : '' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Aucun changement (rankChange === 0) -->
+                  <div v-else style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #f5f5f5; border-radius: 16px;">
+                    <i class="fas fa-minus" style="color: #9e9e9e; font-size: 1.2em;"></i>
+                    <span style="color: #9e9e9e; font-size: 0.8em;">Stable</span>
+                  </div>
+                </div>
               </div>
 
               <!-- Breakdown des récompenses AGPA -->
@@ -340,11 +369,58 @@
                 disable-sort
               >
               <template #[`item.photographe`]="{ item }">
-                <img
-                  :src="item.url"
-                  style="height: 40px; margin-right: 15px; vertical-align: middle"
-                >
-                <span style="font-size: 1.2em">{{ item.username }}</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <img
+                    :src="item.url"
+                    style="height: 40px;"
+                  >
+                  <span style="font-size: 1.2em">{{ item.username }}</span>
+
+                  <!-- Indicateur de variation de rang -->
+                  <div v-if="item.rankChange !== null && item.rankChange !== undefined" style="display: flex; align-items: center;">
+                    <!-- Montée au classement (rankChange négatif) -->
+                    <v-tooltip v-if="item.rankChange < 0" location="top">
+                      <template #activator="{ props }">
+                        <div v-bind="props" style="display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: #e8f5e9; border-radius: 12px;">
+                          <i class="fas fa-arrow-up" style="color: #4caf50; font-size: 0.9em;"></i>
+                          <span style="color: #4caf50; font-weight: bold; font-size: 0.85em;">{{ Math.abs(item.rankChange) }}</span>
+                        </div>
+                      </template>
+                      <span>Montée de {{ Math.abs(item.rankChange) }} place{{ Math.abs(item.rankChange) > 1 ? 's' : '' }}</span>
+                    </v-tooltip>
+
+                    <!-- Descente au classement (rankChange positif) -->
+                    <v-tooltip v-else-if="item.rankChange > 0" location="top">
+                      <template #activator="{ props }">
+                        <div v-bind="props" style="display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: #ffebee; border-radius: 12px;">
+                          <i class="fas fa-arrow-down" style="color: #f44336; font-size: 0.9em;"></i>
+                          <span style="color: #f44336; font-weight: bold; font-size: 0.85em;">{{ item.rankChange }}</span>
+                        </div>
+                      </template>
+                      <span>Descente de {{ item.rankChange }} place{{ item.rankChange > 1 ? 's' : '' }}</span>
+                    </v-tooltip>
+
+                    <!-- Aucun changement (rankChange === 0) -->
+                    <v-tooltip v-else location="top">
+                      <template #activator="{ props }">
+                        <div v-bind="props" style="display: flex; align-items: center; padding: 4px 8px; background: #f5f5f5; border-radius: 12px;">
+                          <i class="fas fa-minus" style="color: #9e9e9e; font-size: 0.9em;"></i>
+                        </div>
+                      </template>
+                      <span>Position stable</span>
+                    </v-tooltip>
+                  </div>
+
+                  <!-- Badge "Nouveau" pour les participants sans historique -->
+                  <v-tooltip v-else-if="item.rankChange === null" location="top">
+                    <template #activator="{ props }">
+                      <div v-bind="props" style="padding: 4px 8px; background: #fff3e0; border-radius: 12px;">
+                        <i class="fas fa-star" style="color: #ff9800; font-size: 0.9em;"></i>
+                      </div>
+                    </template>
+                    <span>Nouveau dans le classement</span>
+                  </v-tooltip>
+                </div>
               </template>
 
               <template #[`item.awards`]="{ item }">
@@ -930,6 +1006,7 @@ export default {
         mySlidingRank: null,
         mySlidingAgpas: null,
         mySlidingAwards: { gold: 0, sylver: 0, bronze: 0, nominated: 0 },
+        myRankChange: null,
         slidingYearFrom: null,
         slidingYearTo: null,
         myGlobalBadges: null,
@@ -1112,6 +1189,8 @@ export default {
                     bronze: myEntry.awards?.bronze || 0,
                     nominated: myEntry.awards?.nominated || 0
                 };
+                // Récupérer la variation de rang depuis l'API
+                this.myRankChange = myEntry.rankChange !== undefined ? myEntry.rankChange : null;
             }
         },
 
