@@ -190,6 +190,7 @@ class AgpaBadgeService {
 
     /**
      * Crée un badge pour un utilisateur
+     * Vérifie d'abord si le badge existe déjà pour éviter les doublons
      * @param user l'utilisateur
      * @param year l'année
      * @param badgeName le nom du badge
@@ -205,6 +206,28 @@ class AgpaBadgeService {
         badgeTiming: BadgeTiming,
         statsSnapshot: any
     ): Promise<AgpaUserBadge> {
+        // Vérifier si le badge existe déjà (même user, année et nom)
+        const existing = await this.badgeRepo.findOne({
+            where: {
+                user: { id: user.id },
+                year: year,
+                badgeName: badgeName
+            }
+        });
+
+        if (existing) {
+            // Le badge existe déjà, on met à jour ses informations si nécessaire
+            // Priorité au badge progressif sur le badge direct
+            if (badgeTiming === BadgeTiming.progressive && existing.badgeTiming === BadgeTiming.direct) {
+                existing.badgeTiming = badgeTiming;
+                existing.statsSnapshot = statsSnapshot;
+                return await this.badgeRepo.save(existing);
+            }
+            // Sinon on garde le badge existant
+            return existing;
+        }
+
+        // Créer un nouveau badge
         const badge = new AgpaUserBadge();
         badge.user = user;
         badge.year = year;
