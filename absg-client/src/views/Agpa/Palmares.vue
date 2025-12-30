@@ -996,8 +996,8 @@ export default {
             try {
                 const response = await axios.get('/api/users/list');
                 const data = parseAxiosResponse(response);
-                if (data) {
-                    this.allUsers = data.sort((a, b) => a.username.localeCompare(b.username));
+                if (data && data.users) {
+                    this.allUsers = data.users.sort((a, b) => a.username.localeCompare(b.username));
                 }
             } catch (error) {
                 console.error('Erreur lors du chargement des utilisateurs:', error);
