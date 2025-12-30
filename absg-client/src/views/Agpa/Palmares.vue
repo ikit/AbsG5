@@ -49,22 +49,19 @@
         </v-card-text>
       </v-card>
 
-      <!-- Première ligne: Layout 2 colonnes -->
-      <v-row style="margin-bottom: 30px;">
-        <!-- Colonne gauche: Mes AGPA + Mes Succès -->
+      <!-- Première ligne: Mes AGPA et Mes Succès côte à côte -->
+      <v-row style="margin-bottom: 20px;">
+        <!-- Mes AGPA -->
         <v-col cols="12" md="6">
-          <v-row>
-            <!-- Section 1: Mes AGPA (Récompenses) -->
-            <v-col cols="12">
-              <v-card
-                style="cursor: pointer; transition: transform 0.2s; height: 100%; margin-bottom: 20px;"
-                @click="showPalmaresDialog = true"
-                hover
-              >
-                <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                  <v-icon start color="white">fas fa-trophy</v-icon>
-                  Mes AGPA
-                </v-card-title>
+          <v-card
+            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
+            @click="showPalmaresDialog = true"
+            hover
+          >
+            <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+              <v-icon start color="white">fas fa-trophy</v-icon>
+              Mes AGPA
+            </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
               <!-- Total points cumulés -->
               <div style="margin-bottom: 25px;">
@@ -126,20 +123,20 @@
                 Cliquez pour voir le palmarès complet
               </div>
             </v-card-text>
-              </v-card>
-            </v-col>
+          </v-card>
+        </v-col>
 
-            <!-- Section 2: Mes Succès -->
-            <v-col cols="12">
-              <v-card
-                style="cursor: pointer; transition: transform 0.2s; height: 100%;"
-                @click="showBadgesDialog = true"
-                hover
-              >
-                <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
-                  <v-icon start color="white">fas fa-award</v-icon>
-                  Mes Succès
-                </v-card-title>
+        <!-- Mes Succès -->
+        <v-col cols="12" md="6">
+          <v-card
+            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
+            @click="showBadgesDialog = true"
+            hover
+          >
+            <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+              <v-icon start color="white">fas fa-award</v-icon>
+              Mes Succès
+            </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
               <!-- Total badges débloqués -->
               <div style="margin-bottom: 25px;">
@@ -205,14 +202,14 @@
                 Cliquez pour découvrir tous les achievements
               </div>
             </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
+          </v-card>
         </v-col>
+      </v-row>
 
-        <!-- Colonne droite: Statistiques Complètes -->
-        <v-col cols="12" md="6">
-          <v-card style="height: 100%;">
+      <!-- Deuxième ligne: Mes Statistiques sur toute la largeur -->
+      <v-row>
+        <v-col cols="12">
+          <v-card>
             <v-card-title style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
               <v-icon start color="white">fas fa-chart-line</v-icon>
               Mes Statistiques
@@ -221,7 +218,7 @@
               <!-- Stats générales en grille -->
               <v-row style="margin-bottom: 20px;">
                 <!-- Meilleure catégorie -->
-                <v-col cols="6">
+                <v-col cols="12" sm="6" md="3">
                   <div style="padding: 12px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800; height: 100%;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                       <i class="fas fa-crown" style="color: #ff9800; font-size: 1.2em;"></i>
@@ -237,7 +234,7 @@
                 </v-col>
 
                 <!-- Meilleure année -->
-                <v-col cols="6">
+                <v-col cols="12" sm="6" md="3">
                   <div style="padding: 12px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50; height: 100%;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                       <i class="fas fa-calendar-star" style="color: #4caf50; font-size: 1.2em;"></i>
@@ -251,7 +248,7 @@
                 </v-col>
 
                 <!-- Éditions participées -->
-                <v-col cols="6">
+                <v-col cols="12" sm="6" md="3">
                   <div style="padding: 12px; background: #fce4ec; border-radius: 8px; border-left: 4px solid #e91e63; height: 100%;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                       <i class="fas fa-calendar-check" style="color: #e91e63; font-size: 1.2em;"></i>
@@ -265,7 +262,7 @@
                 </v-col>
 
                 <!-- Photos soumises -->
-                <v-col cols="6">
+                <v-col cols="12" sm="6" md="3">
                   <div style="padding: 12px; background: #e1f5fe; border-radius: 8px; border-left: 4px solid #03a9f4; height: 100%;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                       <i class="fas fa-images" style="color: #03a9f4; font-size: 1.2em;"></i>
@@ -305,53 +302,63 @@
                   Fun Facts
                 </div>
 
-                <!-- Fact 1 -->
-                <div style="padding: 10px; background: #fff9e6; border-radius: 8px; margin-bottom: 10px;">
-                  <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <i class="fas fa-vote-yea" style="color: #ffc107; font-size: 1.1em; margin-top: 2px;"></i>
-                    <div style="flex: 1;">
-                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                        Vous avez voté pour <strong>127 photos</strong> différentes lors de l'édition 2024
+                <v-row>
+                  <!-- Fact 1 -->
+                  <v-col cols="12" sm="6">
+                    <div style="padding: 10px; background: #fff9e6; border-radius: 8px; height: 100%;">
+                      <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <i class="fas fa-vote-yea" style="color: #ffc107; font-size: 1.1em; margin-top: 2px;"></i>
+                        <div style="flex: 1;">
+                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                            Vous avez voté pour <strong>127 photos</strong> différentes lors de l'édition 2024
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </v-col>
 
-                <!-- Fact 2 -->
-                <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; margin-bottom: 10px;">
-                  <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <i class="fas fa-fire" style="color: #9c27b0; font-size: 1.1em; margin-top: 2px;"></i>
-                    <div style="flex: 1;">
-                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                        Votre série la plus longue: <strong>12 éditions</strong> consécutives
+                  <!-- Fact 2 -->
+                  <v-col cols="12" sm="6">
+                    <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; height: 100%;">
+                      <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <i class="fas fa-fire" style="color: #9c27b0; font-size: 1.1em; margin-top: 2px;"></i>
+                        <div style="flex: 1;">
+                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                            Votre série la plus longue: <strong>12 éditions</strong> consécutives
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </v-col>
 
-                <!-- Fact 3 -->
-                <div style="padding: 10px; background: #e3f2fd; border-radius: 8px; margin-bottom: 10px;">
-                  <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <i class="fas fa-trophy" style="color: #2196f3; font-size: 1.1em; margin-top: 2px;"></i>
-                    <div style="flex: 1;">
-                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                        Premier podium en <strong>2015</strong> dans la catégorie "Nature"
+                  <!-- Fact 3 -->
+                  <v-col cols="12" sm="6">
+                    <div style="padding: 10px; background: #e3f2fd; border-radius: 8px; height: 100%;">
+                      <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <i class="fas fa-trophy" style="color: #2196f3; font-size: 1.1em; margin-top: 2px;"></i>
+                        <div style="flex: 1;">
+                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                            Premier podium en <strong>2015</strong> dans la catégorie "Nature"
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </v-col>
 
-                <!-- Fact 4 -->
-                <div style="padding: 10px; background: #e8f5e9; border-radius: 8px;">
-                  <div style="display: flex; align-items: flex-start; gap: 8px;">
-                    <i class="fas fa-heart" style="color: #e91e63; font-size: 1.1em; margin-top: 2px;"></i>
-                    <div style="flex: 1;">
-                      <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                        Photographe préféré: <strong>Jean-Michel</strong> (23 votes donnés)
+                  <!-- Fact 4 -->
+                  <v-col cols="12" sm="6">
+                    <div style="padding: 10px; background: #e8f5e9; border-radius: 8px; height: 100%;">
+                      <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <i class="fas fa-heart" style="color: #e91e63; font-size: 1.1em; margin-top: 2px;"></i>
+                        <div style="flex: 1;">
+                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
+                            Photographe préféré: <strong>Jean-Michel</strong> (23 votes donnés)
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </v-col>
+                </v-row>
               </div>
             </v-card-text>
           </v-card>
