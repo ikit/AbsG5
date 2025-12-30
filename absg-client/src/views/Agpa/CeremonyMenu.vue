@@ -1,9 +1,71 @@
 <template>
   <v-container>
+    <!-- Debug Panel -->
+    <v-card
+      v-if="debugMode"
+      :style="{
+        margin: '10px auto',
+        marginTop: '60px',
+        padding: '15px',
+        maxWidth: '600px',
+        background: '#fff3cd',
+        border: '2px solid #ffc107'
+      }"
+    >
+      <div style="text-align: center; margin-bottom: 10px;">
+        <strong>🔧 Mode Debug - Simulation de Phase</strong>
+      </div>
+      <v-row dense>
+        <v-col cols="12" sm="6">
+          <v-btn
+            block
+            size="small"
+            :color="debugPhase === 'before' ? 'primary' : 'default'"
+            @click="setDebugPhase('before')"
+          >
+            Avant cérémonie (timer)
+          </v-btn>
+        </v-col>
+        <v-col cols="12" sm="6">
+          <v-btn
+            block
+            size="small"
+            :color="debugPhase === 'ready' ? 'primary' : 'default'"
+            @click="setDebugPhase('ready')"
+          >
+            Cérémonie prête (bouton)
+          </v-btn>
+        </v-col>
+        <v-col cols="12" sm="6">
+          <v-btn
+            block
+            size="small"
+            :color="debugPhase === 'phase5' ? 'primary' : 'default'"
+            @click="setDebugPhase('phase5')"
+          >
+            Phase 5 (revoir)
+          </v-btn>
+        </v-col>
+        <v-col cols="12" sm="6">
+          <v-btn
+            block
+            size="small"
+            color="error"
+            @click="toggleDebugMode()"
+          >
+            Désactiver debug
+          </v-btn>
+        </v-col>
+      </v-row>
+      <div style="margin-top: 10px; font-size: 0.8em; text-align: center; opacity: 0.7;">
+        Date simulée: {{ debugPhase === 'before' ? 'J-7 avant cérémonie' : debugPhase === 'ready' ? 'Jour J' : 'Phase 5 post-cérémonie' }}
+      </div>
+    </v-card>
+
     <v-card
       :style="{
         margin: $vuetify.display.smAndDown ? '10px auto' : '20px auto',
-        marginTop: $vuetify.display.smAndDown ? '60px' : '100px',
+        marginTop: debugMode ? '20px' : ($vuetify.display.smAndDown ? '60px' : '100px'),
         width: $vuetify.display.smAndDown ? '100%' : '600px',
         maxWidth: $vuetify.display.smAndDown ? '100%' : '600px',
         display: 'relative',
@@ -200,7 +262,11 @@ export default {
             ceremonyDate: null,
             displayed: false
         },
-        vlf: null
+        vlf: null,
+
+        // Debug mode
+        debugMode: false,
+        debugPhase: null
 
     }),
     computed: {
@@ -227,6 +293,21 @@ export default {
         this.vlf = localforage.createInstance({
             storeName: 'absg5'
         });
+
+        // Activer le mode debug si URL contient ?debug=true (pour les admins uniquement)
+        if (this.isAdmin && this.$route.query.debug === 'true') {
+            this.debugMode = true;
+        }
+
+        // Ajouter un raccourci clavier pour les admins (Ctrl+Shift+D)
+        if (this.isAdmin) {
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                    e.preventDefault();
+                    this.toggleDebugMode();
+                }
+            });
+        }
 
         if (this.agpaMeta && this.settings) {
             // On récupère la date de la cérémonie depuis les settings du site
@@ -374,6 +455,33 @@ export default {
 
         introReady(){
             this.preloadProgress = 100;
+        },
+
+        // Debug mode methods
+        toggleDebugMode() {
+            this.debugMode = !this.debugMode;
+            if (!this.debugMode) {
+                this.debugPhase = null;
+                this.resetTimer(); // Recalculer avec les vraies dates
+            }
+        },
+
+        setDebugPhase(phase) {
+            this.debugPhase = phase;
+            // Override ceremony date based on selected phase
+            if (phase === 'before') {
+                // Set ceremony date 7 days in future (show timer)
+                this.current.ceremonyDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+                this.timerEnable = true;
+            } else if (phase === 'ready') {
+                // Set ceremony date in past (show button)
+                this.current.ceremonyDate = new Date(Date.now() - 1000);
+                this.timerEnable = false;
+            } else if (phase === 'phase5') {
+                // Simulate phase 5 (post-ceremony)
+                this.current.ceremonyDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                this.timerEnable = false;
+            }
         }
     }
 };
