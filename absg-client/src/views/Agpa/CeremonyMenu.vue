@@ -20,20 +20,10 @@
           <v-btn
             block
             size="small"
-            :color="debugPhase === 'before' ? 'primary' : 'default'"
-            @click="setDebugPhase('before')"
+            :color="debugPhase === 'phase1-4' ? 'primary' : 'default'"
+            @click="setDebugPhase('phase1-4')"
           >
-            Avant cérémonie (timer)
-          </v-btn>
-        </v-col>
-        <v-col cols="12" sm="6">
-          <v-btn
-            block
-            size="small"
-            :color="debugPhase === 'ready' ? 'primary' : 'default'"
-            @click="setDebugPhase('ready')"
-          >
-            Cérémonie prête (bouton)
+            Phase 1-4 (timer)
           </v-btn>
         </v-col>
         <v-col cols="12" sm="6">
@@ -50,6 +40,16 @@
           <v-btn
             block
             size="small"
+            :color="debugPhase === 'interlude' ? 'primary' : 'default'"
+            @click="setDebugPhase('interlude')"
+          >
+            Interlude (annonce)
+          </v-btn>
+        </v-col>
+        <v-col cols="12" sm="6">
+          <v-btn
+            block
+            size="small"
             color="error"
             @click="toggleDebugMode()"
           >
@@ -58,7 +58,9 @@
         </v-col>
       </v-row>
       <div style="margin-top: 10px; font-size: 0.8em; text-align: center; opacity: 0.7;">
-        Date simulée: {{ debugPhase === 'before' ? 'J-7 avant cérémonie' : debugPhase === 'ready' ? 'Jour J' : 'Phase 5 post-cérémonie' }}
+        <span v-if="debugPhase === 'phase1-4'">Période 1: Nouvelle édition (oct-déc/jan) - Affiche timer</span>
+        <span v-else-if="debugPhase === 'phase5'">Période 2: Post-cérémonie (janv) - Revoir la cérémonie</span>
+        <span v-else-if="debugPhase === 'interlude'">Période 3: Interlude (fév-sept) - Annonce prochaine édition</span>
       </div>
     </v-card>
 
@@ -137,6 +139,48 @@
       </div>
     </v-card>
 
+    <!-- Panneau annonce prochaine édition (Période Interlude: février à septembre) -->
+    <v-card
+      v-if="!current.displayed && isInterludePeriod"
+      :style="{
+        margin: $vuetify.display.smAndDown ? '20px auto' : '40px auto',
+        width: $vuetify.display.smAndDown ? '100%' : '600px',
+        maxWidth: $vuetify.display.smAndDown ? '100%' : '600px',
+        padding: $vuetify.display.smAndDown ? '20px' : '30px',
+        textAlign: 'center'
+      }"
+    >
+      <h3
+        :style="{
+          fontSize: $vuetify.display.smAndDown ? '1.5em' : '2em',
+          fontWeight: 'bold',
+          fontFamily: 'Tangerine, serif',
+          color: '#c0b44f',
+          marginBottom: '15px'
+        }"
+      >
+        Prochaine édition des A.G.P.A.
+      </h3>
+      <p
+        :style="{
+          fontSize: $vuetify.display.smAndDown ? '1em' : '1.2em',
+          marginBottom: '10px',
+          opacity: 0.8
+        }"
+      >
+        La {{ agpaMeta ? (agpaMeta.year - 2005) : '?' }}<sup>ème</sup> édition des A.G.P.A. débutera le <strong>1er octobre {{ agpaMeta ? agpaMeta.year : '' }}</strong>
+      </p>
+      <p
+        v-if="settings && settings.agpaSpecialEdition && settings.agpaSpecialEdition.title"
+        :style="{
+          fontSize: $vuetify.display.smAndDown ? '0.9em' : '1.1em',
+          fontStyle: 'italic',
+          opacity: 0.7
+        }"
+      >
+        Thème de la catégorie spéciale : <strong>{{ settings.agpaSpecialEdition.title }}</strong>
+      </p>
+    </v-card>
 
     <div
       v-if="!current.displayed"
@@ -274,7 +318,26 @@ export default {
             'settings',
             'agpaMeta',
             'user'
-        ])
+        ]),
+
+        isInterludePeriod() {
+            // En mode debug, vérifier si on est en période interlude
+            if (this.debugMode && this.debugPhase === 'interlude') {
+                return true;
+            }
+
+            // En mode normal, vérifier si on est entre février et septembre
+            if (!this.debugMode && this.current.ceremonyDate) {
+                const now = new Date();
+                const month = now.getMonth(); // 0-11
+                // Février (1) à septembre (8)
+                // Et la cérémonie doit être très loin dans le futur (plus de 60 jours)
+                const daysUntilCeremony = (this.current.ceremonyDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+                return month >= 1 && month <= 8 && daysUntilCeremony > 60;
+            }
+
+            return false;
+        }
     },
     watch: {
         'settings': function () {
@@ -468,19 +531,32 @@ export default {
 
         setDebugPhase(phase) {
             this.debugPhase = phase;
-            // Override ceremony date based on selected phase
-            if (phase === 'before') {
-                // Set ceremony date 7 days in future (show timer)
-                this.current.ceremonyDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            if (phase === 'phase1-4') {
+                // Période 1: Nouvelle édition (phases 1-4: octobre à cérémonie)
+                // Simuler qu'on est le 15 novembre avec cérémonie dans 1 mois
+                this.current.ceremonyDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
                 this.timerEnable = true;
-            } else if (phase === 'ready') {
-                // Set ceremony date in past (show button)
-                this.current.ceremonyDate = new Date(Date.now() - 1000);
-                this.timerEnable = false;
+                this.current.displayed = false;
             } else if (phase === 'phase5') {
-                // Simulate phase 5 (post-ceremony)
+                // Période 2: Post-cérémonie (phase 5: de fin cérémonie à fin janvier)
+                // Simuler qu'on est en janvier, cérémonie passée
                 this.current.ceremonyDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
                 this.timerEnable = false;
+                this.current.displayed = false;
+            } else if (phase === 'interlude') {
+                // Période 3: Interlude (février à septembre)
+                // Simuler qu'on est en mars, cérémonie très loin dans le futur (octobre prochain)
+                const nextOctober = new Date(currentYear, 9, 1, 0, 0, 0);
+                // Si on est déjà passé octobre, prendre l'année suivante
+                if (now.getMonth() >= 9) {
+                    nextOctober.setFullYear(currentYear + 1);
+                }
+                this.current.ceremonyDate = nextOctober;
+                this.timerEnable = true;
+                this.current.displayed = false;
             }
         }
     }
