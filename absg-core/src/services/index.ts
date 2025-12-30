@@ -1,4 +1,5 @@
 export * from "./AgpaService";
+export * from "./AgpaBadgeService";
 export * from "./CitationService";
 export * from "./EventService";
 export * from "./ForumService";

@@ -2,6 +2,7 @@ export * from "./AgpaAward";
 export * from "./AgpaCategory";
 export * from "./AgpaCategoryVariation";
 export * from "./AgpaPhoto";
+export * from "./AgpaUserBadge";
 export * from "./AgpaVote";
 export * from "./Citation";
 export * from "./ForumTopic";

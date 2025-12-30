@@ -11,6 +11,7 @@ import {
 } from "routing-controllers";
 import { AgpaPhoto, User } from "../entities";
 import { agpaService } from "../services/AgpaService";
+import { agpaBadgeService } from "../services/AgpaBadgeService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
 import { AppDataSource } from "../data-source";
 
@@ -127,6 +128,20 @@ export class AgpaController {
             throw new Error("Accès refusé - Admin uniquement");
         }
         return agpaService.getBadgesHistoryForUser(userId);
+    }
+
+    /**
+     * Recalcule tous les badges pour une année donnée (admin only)
+     * Supprime les badges existants et les recalcule pour tous les utilisateurs
+     * @param year l'année pour laquelle recalculer les badges
+     * @param currentUser l'utilisateur qui effectue la demande
+     */
+    @Post("/compute-badges/:year([0-9]{4})")
+    async computeBadges(@Param("year") year: number, @CurrentUser() currentUser: User) {
+        if (!currentUser.is("admin")) {
+            throw new Error("Accès refusé - Admin uniquement");
+        }
+        return await agpaBadgeService.computeBadgesForYear(year);
     }
 
     /**
