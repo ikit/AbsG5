@@ -247,15 +247,28 @@ export default {
     methods: {
         resetTimer() {
             if (!this.agpaMeta) return;
-            const p1 = new Date(this.agpaMeta.year, 9, 1) // le 1er octobre à minuit
-            const p2 = addDays(p1, this.settings.agpaPhase1Duration);
-            const p3 = addDays(p2, this.settings.agpaPhase2Duration);
-            const p4 = addDays(p3, this.settings.agpaPhase3Duration);
-            let p5 = addDays(p4, this.settings.agpaPhase4Duration);
-            p5 = addSeconds(p5, this.settings.agpaCeremonyStartTime);
 
-            this.current.ceremonyDate = p5; // new Date( new Date().getTime() + 1000000);
-            const delta = new Date().getTime() - p5.getTime();
+            // Calcul identique à agpaCommonHelpers.ts du backend
+            // Phase 1 démarre le 1er octobre à minuit
+            let startDate = new Date(this.agpaMeta.year, 9, 1, 0, 0, 0);
+
+            // Phase 1 se termine X1 jours plus tard à 1h du matin
+            startDate = addDays(startDate, this.settings.agpaPhase1Duration);
+            startDate = addSeconds(startDate, 3600); // +1h pour terminer à 1h
+
+            // Phase 2 se termine X2 jours plus tard à 1h du matin (addDays préserve l'heure)
+            startDate = addDays(startDate, this.settings.agpaPhase2Duration);
+
+            // Phase 3 se termine X3 jours plus tard à 1h du matin
+            startDate = addDays(startDate, this.settings.agpaPhase3Duration);
+
+            // Phase 4 se termine X4 jours plus tard à l'heure de la cérémonie
+            startDate = addDays(startDate, this.settings.agpaPhase4Duration);
+            // On retire 1h (revenir à minuit) puis on ajoute l'heure de la cérémonie
+            startDate = addSeconds(startDate, -3600 + this.settings.agpaCeremonyStartTime);
+
+            this.current.ceremonyDate = startDate;
+            const delta = new Date().getTime() - startDate.getTime();
             this.prealoadInfoDisplay = delta > 0 && delta < 86400000;
             if (new Date() > this.current.ceremonyDate) {
                 this.timerEnable = false;
