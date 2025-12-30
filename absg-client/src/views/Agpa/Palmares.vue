@@ -2,7 +2,7 @@
   <div>
     <v-container>
       <!-- Mode Debug Admin -->
-      <v-card v-if="isAdmin" style="margin-bottom: 20px; border: 2px solid #ff9800;">
+      <v-card v-if="showDebugPanel" style="margin-bottom: 20px; border: 2px solid #ff9800;">
         <v-card-title style="background: #ff9800; color: white; padding: 10px 20px;">
           <v-icon start color="white">fas fa-user-secret</v-icon>
           Mode Debug Admin
@@ -627,6 +627,7 @@ export default {
         showBadgesDialog: false,
         badgesHistory: {}, // Will hold badge status for each badge from API
         // Mode debug admin
+        debugModeEnabled: false,
         debugUserId: null,
         debugUserName: '',
         allUsers: [],
@@ -635,6 +636,9 @@ export default {
         ...mapState(['user']),
         isAdmin() {
             return this.user?.roles?.includes('admin') || false;
+        },
+        showDebugPanel() {
+            return this.isAdmin && this.debugModeEnabled;
         },
 
         // Badges arrays from metadata
@@ -709,6 +713,11 @@ export default {
     mounted () {
         this.initView();
         this.loadAllUsers(); // Charger la liste des utilisateurs pour le mode debug admin
+        this.checkDebugMode();
+        this.setupKeyboardShortcut();
+    },
+    beforeUnmount() {
+        this.removeKeyboardShortcut();
     },
     methods: {
         async initView() {
@@ -997,6 +1006,47 @@ export default {
         },
 
         // Mode debug admin
+        checkDebugMode() {
+            if (!this.isAdmin) return;
+
+            // Vérifier si le query parameter debug=true est présent
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('debug') === 'true') {
+                this.debugModeEnabled = true;
+            }
+        },
+
+        setupKeyboardShortcut() {
+            if (!this.isAdmin) return;
+
+            this.handleKeyDown = (event) => {
+                // Ctrl+Shift+D
+                if (event.ctrlKey && event.shiftKey && event.key === 'D') {
+                    event.preventDefault();
+                    this.debugModeEnabled = !this.debugModeEnabled;
+
+                    // Afficher un message de confirmation
+                    if (this.debugModeEnabled) {
+                        console.log('[Debug Mode] Activé');
+                    } else {
+                        console.log('[Debug Mode] Désactivé');
+                        // Réinitialiser le mode debug si désactivé
+                        if (this.debugUserId) {
+                            this.clearDebugMode();
+                        }
+                    }
+                }
+            };
+
+            window.addEventListener('keydown', this.handleKeyDown);
+        },
+
+        removeKeyboardShortcut() {
+            if (this.handleKeyDown) {
+                window.removeEventListener('keydown', this.handleKeyDown);
+            }
+        },
+
         async loadAllUsers() {
             if (!this.isAdmin) return;
 
