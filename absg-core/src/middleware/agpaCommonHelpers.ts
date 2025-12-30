@@ -19,13 +19,13 @@ export function getCurrentEdition(): number {
         }
     }
 
-    // Une édition commence toujours au 1er octobre pour se terminer fin décembre
-    // Mais en fonction du calendrier, peut déborder sur janvier de l'année suivante
-    // Donc si on est avant 1er février, il s'agit de l'édition précédente, sinon il s'agit de l'année courante
+    // Une édition commence toujours au 1er octobre et se termine fin septembre de l'année suivante (phase 5)
+    // Si on est avant le 1er octobre, on est encore sur l'édition de l'année précédente
+    // Si on est après le 1er octobre, on est sur l'édition de l'année courante
     const date = new Date();
     let editionYear = date.getFullYear();
-    // Si en janvier
-    if (date.getMonth() == 0) {
+    // Si on est entre janvier et septembre (mois 0-8), on est encore sur l'édition de l'année précédente
+    if (date.getMonth() < 9) {
         editionYear--;
     }
     return editionYear;
