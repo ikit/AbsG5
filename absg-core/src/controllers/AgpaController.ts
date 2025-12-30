@@ -117,6 +117,19 @@ export class AgpaController {
     }
 
     /**
+     * Récupère l'historique des badges d'un utilisateur spécifique (admin only)
+     * @param userId l'identifiant de l'utilisateur
+     * @param currentUser l'utilisateur qui effectue la demande
+     */
+    @Get("/badges-history/:userId([0-9]+)")
+    getBadgesHistoryForUser(@Param("userId") userId: number, @CurrentUser() currentUser: User) {
+        if (!currentUser.is("admin")) {
+            throw new Error("Accès refusé - Admin uniquement");
+        }
+        return agpaService.getBadgesHistoryForUser(userId);
+    }
+
+    /**
      * Récupère les informations de l'utilisateur pour la phase 1
      * @param user l'utilisateur qui effectue la demande
      */

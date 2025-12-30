@@ -20,7 +20,10 @@
       "Bash(do sed -i \"s|from ''../../store''|from ''../../stores/helpers''|g\" \"$file\")",
       "Bash(do sed -i \"s|from ''../store''|from ''../stores/helpers''|g\" \"$file\")",
       "Bash(timeout 180 npm run build)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(awk:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

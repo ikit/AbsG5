@@ -1,6 +1,54 @@
 <template>
   <div>
     <v-container>
+      <!-- Mode Debug Admin -->
+      <v-card v-if="isAdmin" style="margin-bottom: 20px; border: 2px solid #ff9800;">
+        <v-card-title style="background: #ff9800; color: white; padding: 10px 20px;">
+          <v-icon start color="white">fas fa-user-secret</v-icon>
+          Mode Debug Admin
+        </v-card-title>
+        <v-card-text style="padding: 15px 20px;">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <v-autocomplete
+              v-model="debugUserId"
+              :items="allUsers"
+              item-title="username"
+              item-value="id"
+              label="Voir le palmarès d'un utilisateur"
+              prepend-icon="fas fa-user"
+              clearable
+              density="comfortable"
+              style="flex: 1;"
+              @update:model-value="onDebugUserChange"
+            >
+              <template #item="{ props, item }">
+                <v-list-item
+                  v-bind="props"
+                  :title="item.raw.username"
+                  :subtitle="`${item.raw.rootFamily || 'Aucune famille'} - ID: ${item.raw.id}`"
+                >
+                  <template #prepend>
+                    <v-avatar size="32">
+                      <img :src="`/files/avatars/${String(item.raw.id).padStart(3, '0')}.png`" :alt="item.raw.username">
+                    </v-avatar>
+                  </template>
+                </v-list-item>
+              </template>
+            </v-autocomplete>
+            <v-chip v-if="debugUserId" color="warning" style="font-weight: bold;">
+              Affichage: {{ debugUserName }}
+            </v-chip>
+            <v-btn
+              v-if="debugUserId"
+              icon="fas fa-times"
+              color="error"
+              size="small"
+              @click="clearDebugMode"
+            />
+          </div>
+        </v-card-text>
+      </v-card>
+
       <!-- Première ligne: Layout 2 colonnes -->
       <v-row style="margin-bottom: 30px;">
         <!-- Colonne gauche: Mes AGPA + Mes Succès -->
@@ -571,9 +619,16 @@ export default {
         voteProfiles: {},
         showBadgesDialog: false,
         badgesHistory: {}, // Will hold badge status for each badge from API
+        // Mode debug admin
+        debugUserId: null,
+        debugUserName: '',
+        allUsers: [],
     }),
     computed: {
         ...mapState(['user']),
+        isAdmin() {
+            return this.user?.roles?.includes('admin') || false;
+        },
 
         // Badges arrays from metadata
         voterBadges() {
@@ -646,6 +701,7 @@ export default {
     },
     mounted () {
         this.initView();
+        this.loadAllUsers(); // Charger la liste des utilisateurs pour le mode debug admin
     },
     methods: {
         async initView() {
@@ -931,6 +987,140 @@ export default {
             }
 
             return count;
+        },
+
+        // Mode debug admin
+        async loadAllUsers() {
+            if (!this.isAdmin) return;
+
+            try {
+                const response = await axios.get('/api/users/list');
+                const data = parseAxiosResponse(response);
+                if (data) {
+                    this.allUsers = data.sort((a, b) => a.username.localeCompare(b.username));
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des utilisateurs:', error);
+            }
+        },
+
+        onDebugUserChange(userId) {
+            if (userId) {
+                const selectedUser = this.allUsers.find(u => u.id === userId);
+                this.debugUserName = selectedUser ? selectedUser.username : '';
+                // Recharger les données avec l'utilisateur sélectionné
+                this.loadPalmaresData(userId);
+            } else {
+                this.clearDebugMode();
+            }
+        },
+
+        clearDebugMode() {
+            this.debugUserId = null;
+            this.debugUserName = '';
+            // Recharger les données de l'utilisateur connecté
+            this.loadPalmaresData(this.user.id);
+        },
+
+        async loadPalmaresData(userId) {
+            this.isLoading = true;
+
+            try {
+                // Charger le palmarès global
+                const globalResponse = await axios.get('/api/agpa/palmares');
+                const globalData = parseAxiosResponse(globalResponse);
+                if (globalData) {
+                    this.palmares = globalData;
+                    this.updateMyGlobalStats(userId);
+                }
+
+                // Charger le palmarès glissant
+                const slidingResponse = await axios.get('/api/agpa/palmares-sliding');
+                const slidingData = parseAxiosResponse(slidingResponse);
+                if (slidingData) {
+                    this.slidingPalmares = slidingData.palmares || [];
+                    this.slidingYearFrom = slidingData.yearFrom;
+                    this.slidingYearTo = slidingData.yearTo;
+                    this.updateMySlidingStats(userId);
+                }
+
+                // Charger l'historique des badges pour cet utilisateur
+                await this.loadBadgeHistoryForUser(userId);
+                await this.loadMySlidingBadgesForUser(userId);
+
+            } catch (error) {
+                console.error('Erreur lors du chargement du palmarès:', error);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        updateMyGlobalStats(userId) {
+            const myEntry = this.palmares.find(p => p.userId === userId);
+            if (myEntry) {
+                this.myGlobalRank = this.palmares.indexOf(myEntry) + 1;
+                this.myGlobalAgpas = myEntry.totalPoints || 0;
+                this.myGlobalAwards = {
+                    gold: myEntry.awards?.gold || 0,
+                    sylver: myEntry.awards?.sylver || 0,
+                    bronze: myEntry.awards?.bronze || 0,
+                    nominated: myEntry.awards?.nominated || 0
+                };
+            }
+        },
+
+        updateMySlidingStats(userId) {
+            const myEntry = this.slidingPalmares.find(p => p.userId === userId);
+            if (myEntry) {
+                this.mySlidingRank = this.slidingPalmares.indexOf(myEntry) + 1;
+                this.mySlidingAgpas = myEntry.totalPoints || 0;
+                this.mySlidingAwards = {
+                    gold: myEntry.awards?.gold || 0,
+                    sylver: myEntry.awards?.sylver || 0,
+                    bronze: myEntry.awards?.bronze || 0,
+                    nominated: myEntry.awards?.nominated || 0
+                };
+                this.myRankChange = myEntry.rankChange !== undefined ? myEntry.rankChange : null;
+            }
+        },
+
+        async loadBadgeHistoryForUser(userId) {
+            try {
+                const response = await axios.get(`/api/agpa/badges-history/${userId}`);
+                const data = parseAxiosResponse(response);
+
+                if (data && data.badgeHistory) {
+                    this.badgesHistory = data.badgeHistory;
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement de l\'historique des badges:', error);
+            }
+        },
+
+        async loadMySlidingBadgesForUser(userId) {
+            if (!this.slidingYearFrom || !this.slidingYearTo) return;
+
+            const slidingBadges = [];
+            for (let year = this.slidingYearFrom; year <= this.slidingYearTo; year++) {
+                const profiles = await this.loadVoteProfiles(year);
+
+                if (profiles && profiles[userId]) {
+                    const userProfiles = profiles[userId];
+
+                    const badge = userProfiles.comboProfile ||
+                                 userProfiles.photographerProfile ||
+                                 userProfiles.voterProfile;
+
+                    if (badge) {
+                        slidingBadges.push({
+                            ...badge,
+                            year: year
+                        });
+                    }
+                }
+            }
+
+            this.mySlidingBadges = slidingBadges;
         }
     }
 };
