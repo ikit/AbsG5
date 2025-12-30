@@ -74,18 +74,31 @@ export async function getPhasesBoundaries(): Promise<AgpaPhase[]> {
     }
 
     // Calcul des échéances
+    // Toutes les phases 1-3 se terminent à 1h du matin pour éviter toute ambiguïté
+    // Phase 4 se termine à l'heure de début de la cérémonie (personnalisable)
     for (let idx = 0; idx < phasesDayDurations.length; idx++) {
         const p = new AgpaPhase();
         p.id = idx + 1;
         p.startDate = new Date(startDate);
+
         if (idx <= 2) {
+            // Phases 1-3: toutes se terminent à 1h du matin
             startDate = addDays(startDate, phasesDayDurations[idx]);
+            if (idx === 0) {
+                // Phase 1 démarre à minuit, on ajoute 1h pour terminer à 1h
+                startDate = addSeconds(startDate, 3600);
+            }
+            // Phases 2-3 démarrent déjà à 1h, addDays préserve l'heure
             p.endDate = new Date(startDate);
         } else if (idx === 3) {
+            // Phase 4: se termine à l'heure de début de la cérémonie
+            // On repart de 1h du matin, on ajoute X jours (reste à 1h), puis l'offset de l'heure
             startDate = addDays(startDate, phasesDayDurations[idx]);
-            startDate = addSeconds(startDate, agpaCeremonyStartTime);
+            // On retire 1h (pour revenir à minuit) puis on ajoute l'heure de la cérémonie
+            startDate = addSeconds(startDate, -3600 + agpaCeremonyStartTime);
             p.endDate = new Date(startDate);
         } else {
+            // Phase 5: jusqu'à fin septembre de l'année suivante
             p.endDate = new Date(startDate.getFullYear() + 1, 8, 31);
         }
         phases.push(p);

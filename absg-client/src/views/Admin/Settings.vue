@@ -167,17 +167,28 @@ export default {
     },
     methods: {
         updateAgpaPhasesBoundaries() {
-            const p1 = new Date(new Date().getFullYear(), 9, 1) // le 1er octobre à minuit
-            const p2 = addDays(p1, this.settings.agpaPhase1Duration);
-            const p3 = addDays(p2, this.settings.agpaPhase2Duration);
-            const p4 = addDays(p3, this.settings.agpaPhase3Duration);
-            let p5 = addDays(p4, this.settings.agpaPhase4Duration);
-            p5 = addSeconds(p5, this.settings.agpaCeremonyStartTime);
+            // Phase 1 démarre le 1er octobre à minuit
+            const p1 = new Date(new Date().getFullYear(), 9, 1, 0, 0, 0);
 
-            this.agpaPhase1Start = format(p1, "dd MMM", {locale: fr});
-            this.agpaPhase2Start = format(p2, "dd MMM", {locale: fr});
-            this.agpaPhase3Start = format(p3, "dd MMM", {locale: fr});
-            this.agpaPhase4Start = format(p4, "dd MMM", {locale: fr});
+            // Phase 2 démarre après X1 jours à 1h du matin (fin phase 1)
+            let p2 = addDays(p1, +this.settings.agpaPhase1Duration);
+            p2 = addSeconds(p2, 3600); // +1 heure
+
+            // Phase 3 démarre après X2 jours à 1h du matin (fin phase 2)
+            const p3 = addDays(p2, +this.settings.agpaPhase2Duration);
+
+            // Phase 4 démarre après X3 jours à 1h du matin (fin phase 3)
+            const p4 = addDays(p3, +this.settings.agpaPhase3Duration);
+
+            // Phase 5 (cérémonie) démarre après X4 jours à l'heure personnalisée
+            let p5 = addDays(p4, +this.settings.agpaPhase4Duration);
+            // Retirer 1h (revenir à minuit) puis ajouter l'heure de la cérémonie
+            p5 = addSeconds(p5, -3600 + (+this.settings.agpaCeremonyStartTime));
+
+            this.agpaPhase1Start = format(p1, "dd MMM 'à' H'h'mm", {locale: fr});
+            this.agpaPhase2Start = format(p2, "dd MMM 'à' H'h'mm", {locale: fr});
+            this.agpaPhase3Start = format(p3, "dd MMM 'à' H'h'mm", {locale: fr});
+            this.agpaPhase4Start = format(p4, "dd MMM 'à' H'h'mm", {locale: fr});
             this.agpaPhase5Start = format(p5, "dd MMM 'à' H'h'mm", {locale: fr});
         },
 
