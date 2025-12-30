@@ -32,7 +32,12 @@ export const router = createRouter({
             children: [
                 {
                     path: "",
-                    redirect: "/admin/resetpwd"
+                    redirect: (to) => {
+                        // Rediriger vers settings pour les admins, resetpwd pour les autres
+                        const user = store.state.user;
+                        const isAdmin = user?.roles?.includes("admin") || false;
+                        return isAdmin ? "/admin/settings" : "/admin/resetpwd";
+                    }
                 },
                 {
                     path: "profile",
