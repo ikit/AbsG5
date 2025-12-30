@@ -5,6 +5,7 @@
     :style="{ padding: $vuetify.display.xs ? '10px' : '20px' }"
   >
     <v-expansion-panels
+      v-model="openedPanel"
       :style="{
         padding: $vuetify.display.xs ? '5px' : '10px',
         maxWidth: $vuetify.display.xs ? '100%' : '600px',
@@ -236,6 +237,7 @@ export default {
     data: () => ({
     // Settings
         settings: null,
+        openedPanel: 0, // Ouvre le premier panneau (annonces) par défaut
 
     // Computed
         agpaPhase1Start: "1/10",
