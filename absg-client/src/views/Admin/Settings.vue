@@ -8,34 +8,6 @@
       margin: 'auto'
     }"
   >
-    <!-- Section Annonce -->
-    <v-card
-      :style="{ marginBottom: $vuetify.display.xs ? '15px' : '20px' }"
-      elevation="2"
-    >
-      <v-card-title class="bg-grey-lighten-4">
-        <i class="fas fa-bullhorn" style="margin-right: 10px;" />
-        Mettre une annonce
-      </v-card-title>
-      <v-card-text>
-        <p class="details">
-          Met en avant sur le site une annonce visible par tous.
-          En cliquand sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (html autorisé)
-        </p>
-        <v-text-field
-          v-model="settings.announcementTitle"
-          label="Accroche de l'annonce"
-          density="comfortable"
-        />
-        <v-textarea
-          v-model="settings.announcementBody"
-          label="Corps de l'annonce"
-          hint="HTML autorisé"
-          density="comfortable"
-        />
-      </v-card-text>
-    </v-card>
-
     <!-- Section Edition Spéciale -->
     <v-card
       :style="{ marginBottom: $vuetify.display.xs ? '15px' : '20px' }"

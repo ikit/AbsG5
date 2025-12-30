@@ -15,7 +15,7 @@ export class UserController {
      * Récupère l'ensemble des informations de la page d'accueil:
      *  - Une citation aléatoire
      *  - Les 50 dernières notifications
-     *  - Les paramètres de configuration du site (notament si il y a une annonce à afficher)
+     *  - Les paramètres de configuration du site
      */
     @Authorized()
     @Get("/welcome")
