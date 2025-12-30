@@ -2,212 +2,203 @@
   <v-container
     v-if="settings"
     fluid
-    :style="{ padding: $vuetify.display.xs ? '10px' : '20px' }"
+    :style="{
+      padding: $vuetify.display.xs ? '10px' : '20px',
+      maxWidth: '800px',
+      margin: 'auto'
+    }"
   >
-    <v-expansion-panels
-      v-model="openedPanel"
-      :style="{
-        padding: $vuetify.display.xs ? '5px' : '10px',
-        maxWidth: $vuetify.display.xs ? '100%' : '600px',
-        margin: 'auto'
-      }"
+    <!-- Section Annonce -->
+    <v-card
+      :style="{ marginBottom: $vuetify.display.xs ? '15px' : '20px' }"
+      elevation="2"
     >
-      <v-expansion-panel>
-        <v-expansion-panel-title>
-          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
-            <i
-              class="fas fa-bullhorn"
-              style="display: inline-block; width: 40px"
-            />
-            Mettre une annonce
-          </span>
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <p>
-            <span class="details">
-              Met en avant sur le site une annonce visible par tous.
-              En cliquand sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (html autorisé)
-            </span>
-            <v-text-field
-              v-model="settings.announcementTitle"
-              label="Accroche de l'annonce"
-            />
-            <v-textarea
-              v-model="settings.announcementBody"
-              label="Corps de l'annonce"
-              hint="HTML autorisé"
-            />
-          </p>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+      <v-card-title class="bg-grey-lighten-4">
+        <i class="fas fa-bullhorn" style="margin-right: 10px;" />
+        Mettre une annonce
+      </v-card-title>
+      <v-card-text>
+        <p class="details">
+          Met en avant sur le site une annonce visible par tous.
+          En cliquand sur l'accroche, les utilisateurs verront une popup avec le corps de l'annonce (html autorisé)
+        </p>
+        <v-text-field
+          v-model="settings.announcementTitle"
+          label="Accroche de l'annonce"
+          density="comfortable"
+        />
+        <v-textarea
+          v-model="settings.announcementBody"
+          label="Corps de l'annonce"
+          hint="HTML autorisé"
+          density="comfortable"
+        />
+      </v-card-text>
+    </v-card>
 
-      <v-expansion-panel>
-        <v-expansion-panel-title>
-          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
-            <i
-              class="fas fa-star"
-              style="display: inline-block; width: 40px"
-            />
-            Edition spéciale des AGPA {{ settings.agpaSpecialEdition ? settings.agpaSpecialEdition.year : '' }}
-          </span>
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <p>
-            <span class="details">
-              Configurer la catégorie spéciale de l'année en cours.
-            </span>
-            <v-text-field
-              v-model="settings.agpaSpecialEdition.title"
-              label="Thème de la catégorie spéciale"
-            />
-            <v-text-field
-              v-model="settings.agpaSpecialEdition.description"
-              label="Description"
-            />
-          </p>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+    <!-- Section Edition Spéciale -->
+    <v-card
+      :style="{ marginBottom: $vuetify.display.xs ? '15px' : '20px' }"
+      elevation="2"
+    >
+      <v-card-title class="bg-grey-lighten-4">
+        <i class="fas fa-star" style="margin-right: 10px;" />
+        Edition spéciale des AGPA {{ settings.agpaSpecialEdition ? settings.agpaSpecialEdition.year : '' }}
+      </v-card-title>
+      <v-card-text>
+        <p class="details">
+          Configurer la catégorie spéciale de l'année en cours.
+        </p>
+        <v-text-field
+          v-model="settings.agpaSpecialEdition.title"
+          label="Thème de la catégorie spéciale"
+          density="comfortable"
+        />
+        <v-text-field
+          v-model="settings.agpaSpecialEdition.description"
+          label="Description"
+          density="comfortable"
+        />
+      </v-card-text>
+    </v-card>
 
-      <v-expansion-panel>
-        <v-expansion-panel-title>
-          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
-            <i
-              class="far fa-calendar-alt"
-              style="display: inline-block; width: 40px"
-            />
-            Durées des phases des AGPA
-          </span>
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <p>
-            <span class="details">
-              Configurer les durées en jours des différentes phases. La phase n°1 commence obligatoirement le 1er octobre.
-            </span>
-            <v-text-field
-              v-model="settings.agpaPhase1Duration"
-              :label="`Durée de la phase 1 => Débute le ${agpaPhase1Start}`"
-              :rules="agpaPhaseRules"
-              @change="updateAgpaPhasesBoundaries()"
-            />
-            <v-text-field
-              v-model="settings.agpaPhase2Duration"
-              :label="`Durée de la phase 2 => Débute le ${agpaPhase2Start}`"
-              :rules="agpaPhaseRules"
-              @change="updateAgpaPhasesBoundaries()"
-            />
-            <v-text-field
-              v-model="settings.agpaPhase3Duration"
-              :label="`Durée de la phase 3 => Débute le ${agpaPhase3Start}`"
-              :rules="agpaPhaseRules"
-              @change="updateAgpaPhasesBoundaries()"
-            />
-            <v-text-field
-              v-model="settings.agpaPhase4Duration"
-              :label="`Durée de la phase 4 => Débute le ${agpaPhase4Start}`"
-              :rules="agpaPhaseRules"
-              @change="updateAgpaPhasesBoundaries()"
-            />
-          </p>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+    <!-- Section Phases AGPA -->
+    <v-card
+      :style="{ marginBottom: $vuetify.display.xs ? '15px' : '20px' }"
+      elevation="2"
+    >
+      <v-card-title class="bg-grey-lighten-4">
+        <i class="far fa-calendar-alt" style="margin-right: 10px;" />
+        Durées des phases des AGPA
+      </v-card-title>
+      <v-card-text>
+        <p class="details">
+          Configurer les durées en jours des différentes phases. La phase n°1 commence obligatoirement le 1er octobre.
+        </p>
+        <v-text-field
+          v-model="settings.agpaPhase1Duration"
+          :label="`Durée de la phase 1 => Débute le ${agpaPhase1Start}`"
+          :rules="agpaPhaseRules"
+          density="comfortable"
+          @change="updateAgpaPhasesBoundaries()"
+        />
+        <v-text-field
+          v-model="settings.agpaPhase2Duration"
+          :label="`Durée de la phase 2 => Débute le ${agpaPhase2Start}`"
+          :rules="agpaPhaseRules"
+          density="comfortable"
+          @change="updateAgpaPhasesBoundaries()"
+        />
+        <v-text-field
+          v-model="settings.agpaPhase3Duration"
+          :label="`Durée de la phase 3 => Débute le ${agpaPhase3Start}`"
+          :rules="agpaPhaseRules"
+          density="comfortable"
+          @change="updateAgpaPhasesBoundaries()"
+        />
+        <v-text-field
+          v-model="settings.agpaPhase4Duration"
+          :label="`Durée de la phase 4 => Débute le ${agpaPhase4Start}`"
+          :rules="agpaPhaseRules"
+          density="comfortable"
+          @change="updateAgpaPhasesBoundaries()"
+        />
+      </v-card-text>
+    </v-card>
 
-      <v-expansion-panel>
-        <v-expansion-panel-title>
-          <span :style="{ fontSize: $vuetify.display.xs ? '0.9em' : '1em' }">
-            <i
-              class="fas fa-desktop"
-              style="display: inline-block; width: 40px"
-            />
-            Début de la cérémonie
-          </span>
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <p>
-            <span class="details">
-              La cérémonie sera accessible et démarrera automatiquement à l'heure indiquée, une fois la phase 4 terminée.
-            </span>
+    <!-- Section Début Cérémonie -->
+    <v-card
+      :style="{ marginBottom: $vuetify.display.xs ? '15px' : '20px' }"
+      elevation="2"
+    >
+      <v-card-title class="bg-grey-lighten-4">
+        <i class="fas fa-desktop" style="margin-right: 10px;" />
+        Début de la cérémonie
+      </v-card-title>
+      <v-card-text>
+        <p class="details">
+          La cérémonie sera accessible et démarrera automatiquement à l'heure indiquée, une fois la phase 4 terminée.
+        </p>
 
-            <div :style="{ margin: $vuetify.display.xs ? '15px 0' : '20px 0' }">
-              <div :style="{
-                fontWeight: 'bold',
-                marginBottom: '10px',
-                textAlign: 'center',
-                fontSize: $vuetify.display.xs ? '1em' : '1.2em',
-                color: '#1976d2'
+        <div :style="{ margin: $vuetify.display.xs ? '15px 0' : '20px 0' }">
+          <div :style="{
+            fontWeight: 'bold',
+            marginBottom: '10px',
+            textAlign: 'center',
+            fontSize: $vuetify.display.xs ? '1em' : '1.2em',
+            color: '#1976d2'
+          }">
+            Heure de début : {{ ceremonyHourDisplay }}
+          </div>
+          <div :style="{
+            fontSize: $vuetify.display.xs ? '0.8em' : '0.9em',
+            color: '#666',
+            textAlign: 'center',
+            marginBottom: '15px'
+          }">
+            La cérémonie débutera le {{ agpaPhase5Start }}
+          </div>
+        </div>
+
+        <v-row>
+          <v-col cols="12" md="6">
+            <div :style="{ padding: $vuetify.display.xs ? '0 5px' : '0 15px' }">
+              <label :style="{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '500',
+                fontSize: $vuetify.display.xs ? '0.9em' : '1em'
               }">
-                Heure de début : {{ ceremonyHourDisplay }}
-              </div>
-              <div :style="{
-                fontSize: $vuetify.display.xs ? '0.8em' : '0.9em',
-                color: '#666',
-                textAlign: 'center',
-                marginBottom: '15px'
-              }">
-                La cérémonie débutera le {{ agpaPhase5Start }}
-              </div>
+                <i class="far fa-clock" style="margin-right: 5px;"></i>
+                Heure : {{ ceremonyHour }}h
+              </label>
+              <v-slider
+                v-model="ceremonyHour"
+                :min="10"
+                :max="23"
+                :step="1"
+                thumb-label
+                color="primary"
+                track-color="grey-lighten-2"
+                @update:model-value="updateCeremonyTime()"
+              >
+                <template #thumb-label="{ modelValue }">
+                  {{ modelValue }}h
+                </template>
+              </v-slider>
             </div>
+          </v-col>
 
-            <v-row>
-              <v-col cols="12" md="6">
-                <div :style="{ padding: $vuetify.display.xs ? '0 5px' : '0 15px' }">
-                  <label :style="{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontWeight: '500',
-                    fontSize: $vuetify.display.xs ? '0.9em' : '1em'
-                  }">
-                    <i class="far fa-clock" style="margin-right: 5px;"></i>
-                    Heure : {{ ceremonyHour }}h
-                  </label>
-                  <v-slider
-                    v-model="ceremonyHour"
-                    :min="10"
-                    :max="23"
-                    :step="1"
-                    thumb-label
-                    color="primary"
-                    track-color="grey-lighten-2"
-                    @update:model-value="updateCeremonyTime()"
-                  >
-                    <template #thumb-label="{ modelValue }">
-                      {{ modelValue }}h
-                    </template>
-                  </v-slider>
-                </div>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <div :style="{ padding: $vuetify.display.xs ? '0 5px' : '0 15px' }">
-                  <label :style="{
-                    display: 'block',
-                    marginBottom: '8px',
-                    fontWeight: '500',
-                    fontSize: $vuetify.display.xs ? '0.9em' : '1em'
-                  }">
-                    <i class="far fa-clock" style="margin-right: 5px;"></i>
-                    Minutes : {{ ceremonyMinute }}min
-                  </label>
-                  <v-slider
-                    v-model="ceremonyMinute"
-                    :min="0"
-                    :max="55"
-                    :step="5"
-                    thumb-label
-                    color="primary"
-                    track-color="grey-lighten-2"
-                    @update:model-value="updateCeremonyTime()"
-                  >
-                    <template #thumb-label="{ modelValue }">
-                      {{ modelValue }}min
-                    </template>
-                  </v-slider>
-                </div>
-              </v-col>
-            </v-row>
-          </p>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
+          <v-col cols="12" md="6">
+            <div :style="{ padding: $vuetify.display.xs ? '0 5px' : '0 15px' }">
+              <label :style="{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '500',
+                fontSize: $vuetify.display.xs ? '0.9em' : '1em'
+              }">
+                <i class="far fa-clock" style="margin-right: 5px;"></i>
+                Minutes : {{ ceremonyMinute }}min
+              </label>
+              <v-slider
+                v-model="ceremonyMinute"
+                :min="0"
+                :max="55"
+                :step="5"
+                thumb-label
+                color="primary"
+                track-color="grey-lighten-2"
+                @update:model-value="updateCeremonyTime()"
+              >
+                <template #thumb-label="{ modelValue }">
+                  {{ modelValue }}min
+                </template>
+              </v-slider>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
 
     <v-btn
       :style="{
@@ -237,7 +228,6 @@ export default {
     data: () => ({
     // Settings
         settings: null,
-        openedPanel: 0, // Ouvre le premier panneau (annonces) par défaut
 
     // Computed
         agpaPhase1Start: "1/10",
@@ -341,11 +331,13 @@ h2 {
     display: inline-block;
     margin-left: 17px;
     font-family: "Comfortaa", sans-serif;
-
 }
 
-p {
-    margin-left: 45px;
+.details {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    display: block;
 }
 
 
