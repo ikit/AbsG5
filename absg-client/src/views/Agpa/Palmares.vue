@@ -1043,16 +1043,15 @@ export default {
                     this.slidingYearTo = slidingData.yearTo;
                     this.updateMySlidingStats(userId);
                 }
-
-                // Charger l'historique des badges pour cet utilisateur
-                await this.loadBadgeHistoryForUser(userId);
-                await this.loadMySlidingBadgesForUser(userId);
-
             } catch (error) {
                 console.error('Erreur lors du chargement du palmarès:', error);
-            } finally {
-                this.isLoading = false;
             }
+
+            // Charger l'historique des badges (en dehors du try principal pour ne pas bloquer)
+            await this.loadBadgeHistoryForUser(userId);
+            await this.loadMySlidingBadgesForUser(userId);
+
+            this.isLoading = false;
         },
 
         updateMyGlobalStats(userId) {
