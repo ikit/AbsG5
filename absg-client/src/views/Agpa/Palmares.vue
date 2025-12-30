@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-container>
-      <!-- Première ligne: Palmarès, Mon Palmarès Personnel, Fun Facts -->
+      <!-- Première ligne: Mes AGPA, Mes Badges, Statistiques -->
       <v-row style="margin-bottom: 30px;">
-        <!-- Section 1: Palmarès -->
+        <!-- Section 1: Mes AGPA (Récompenses) -->
         <v-col cols="12" md="4">
           <v-card
             style="cursor: pointer; transition: transform 0.2s; height: 100%;"
@@ -12,96 +12,73 @@
           >
             <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
               <v-icon start color="white">fas fa-trophy</v-icon>
-              <span v-if="slidingYearFrom && slidingYearTo">
-                Palmarès ({{ slidingYearFrom }} - {{ slidingYearTo }})
-              </span>
-              <span v-else>
-                Palmarès (3 dernières éditions)
-              </span>
+              Mes AGPA
             </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
-              <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
-                <div style="font-size: 4em; font-weight: bold; color: #667eea;">
-                  <template v-if="mySlidingRank">
-                    {{ mySlidingRank }}<sup style="font-size: 0.5em;">{{ getOrdinalSuffix(mySlidingRank) }}</sup>
-                  </template>
-                  <template v-else>
-                    -
-                  </template>
+              <!-- Total points cumulés -->
+              <div style="margin-bottom: 25px;">
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
+                  <span v-if="slidingYearFrom && slidingYearTo">
+                    {{ slidingYearFrom }} - {{ slidingYearTo }}
+                  </span>
+                  <span v-else>
+                    3 dernières éditions
+                  </span>
                 </div>
-
-                <!-- Indicateur de variation de mon rang -->
-                <div v-if="myRankChange !== null && myRankChange !== undefined" style="display: flex; flex-direction: column; align-items: center;">
-                  <!-- Montée au classement (rankChange négatif) -->
-                  <div v-if="myRankChange < 0" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #e8f5e9; border-radius: 16px;">
-                    <i class="fas fa-arrow-up" style="color: #4caf50; font-size: 1.5em;"></i>
-                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                      <span style="color: #4caf50; font-weight: bold; font-size: 1.3em;">+{{ Math.abs(myRankChange) }}</span>
-                      <span style="color: #4caf50; font-size: 0.7em;">place{{ Math.abs(myRankChange) > 1 ? 's' : '' }}</span>
-                    </div>
+                <template v-if="mySlidingAgpas > 0">
+                  <div style="font-size: 3em; font-weight: bold; color: #667eea; margin-bottom: 5px;">
+                    {{ mySlidingAgpas }}
                   </div>
-
-                  <!-- Descente au classement (rankChange positif) -->
-                  <div v-else-if="myRankChange > 0" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #ffebee; border-radius: 16px;">
-                    <i class="fas fa-arrow-down" style="color: #f44336; font-size: 1.5em;"></i>
-                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                      <span style="color: #f44336; font-weight: bold; font-size: 1.3em;">-{{ myRankChange }}</span>
-                      <span style="color: #f44336; font-size: 0.7em;">place{{ myRankChange > 1 ? 's' : '' }}</span>
-                    </div>
+                  <div style="font-size: 0.9em; color: #666;">
+                    point{{ mySlidingAgpas > 1 ? 's' : '' }} cumulé{{ mySlidingAgpas > 1 ? 's' : '' }}
                   </div>
-
-                  <!-- Aucun changement (rankChange === 0) -->
-                  <div v-else style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #f5f5f5; border-radius: 16px;">
-                    <i class="fas fa-minus" style="color: #9e9e9e; font-size: 1.2em;"></i>
-                    <span style="color: #9e9e9e; font-size: 0.8em;">Stable</span>
+                </template>
+                <template v-else>
+                  <div style="font-size: 2.5em; margin-bottom: 10px;">
+                    <i class="far fa-smile" style="color: #ffa726;"></i>
                   </div>
-                </div>
+                  <div style="font-size: 1em; color: #666; font-style: italic;">
+                    Ton heure viendra :)
+                  </div>
+                </template>
               </div>
 
-              <!-- Breakdown des récompenses AGPA -->
-              <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 10px;">
+              <!-- Répartition des récompenses -->
+              <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;">
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="fas fa-circle" style="color: #c68b00; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.8em; font-weight: bold; color: #c68b00;">{{ mySlidingAwards.gold }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #c68b00;">{{ mySlidingAwards.gold }}</span>
                   </div>
                 </div>
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.8em; font-weight: bold; color: #9b9b9b;">{{ mySlidingAwards.sylver }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #9b9b9b;">{{ mySlidingAwards.sylver }}</span>
                   </div>
                 </div>
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.8em; font-weight: bold; color: #cd7f32;">{{ mySlidingAwards.bronze }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #cd7f32;">{{ mySlidingAwards.bronze }}</span>
                   </div>
                 </div>
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="far fa-circle" style="color: #764ba2; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.8em; font-weight: bold; color: #764ba2;">{{ mySlidingAwards.nominated }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #764ba2;">{{ mySlidingAwards.nominated }}</span>
                   </div>
                 </div>
               </div>
-              <div style="font-size: 0.9em; color: #666;">
-                <span v-if="slidingYearFrom && slidingYearTo">
-                  AGPA de {{ slidingYearFrom }} à {{ slidingYearTo }}
-                </span>
-                <span v-else>
-                  AGPA sur les 3 dernières éditions
-                </span>
-              </div>
 
               <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
-                Cliquez pour voir le tableau complet
+                Cliquez pour voir le palmarès complet
               </div>
             </v-card-text>
           </v-card>
         </v-col>
 
-        <!-- Section 2: Mes Badges -->
+        <!-- Section 2: Mes Badges & Combos -->
         <v-col cols="12" md="4">
           <v-card
             style="cursor: pointer; transition: transform 0.2s; height: 100%;"
@@ -110,70 +87,122 @@
           >
             <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
               <v-icon start color="white">fas fa-award</v-icon>
-              Mes Badges
+              Mes Badges & Combos
             </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
-              <!-- Compteurs de badges par type -->
+              <!-- Total badges débloqués -->
               <div style="margin-bottom: 25px;">
-                <div style="font-size: 0.9em; color: #666; margin-bottom: 15px;">
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
                   <span v-if="slidingYearFrom && slidingYearTo">
-                    Badges obtenus ({{ slidingYearFrom }} - {{ slidingYearTo }})
+                    {{ slidingYearFrom }} - {{ slidingYearTo }}
                   </span>
                   <span v-else>
-                    Badges obtenus (3 dernières éditions)
+                    3 dernières éditions
                   </span>
                 </div>
+                <div style="font-size: 3em; font-weight: bold; color: #fa709a; margin-bottom: 5px;">
+                  {{ mySlidingBadges.length }}
+                </div>
+                <div style="font-size: 0.9em; color: #666;">
+                  Badge{{ mySlidingBadges.length > 1 ? 's' : '' }} débloqué{{ mySlidingBadges.length > 1 ? 's' : '' }}
+                </div>
+              </div>
 
+              <!-- Répartition par type -->
+              <div style="margin-bottom: 15px;">
                 <!-- Badge Votant -->
-                <div style="margin-bottom: 12px; padding: 12px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
+                <div style="margin-bottom: 10px; padding: 10px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-vote-yea" style="color: #2196f3; font-size: 1.3em;"></i>
-                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Votant</div>
+                      <i class="fas fa-vote-yea" style="color: #2196f3; font-size: 1.2em;"></i>
+                      <div style="font-size: 0.85em; font-weight: 600; color: #666;">Votant</div>
                     </div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #2196f3;">
+                    <div style="font-size: 1.3em; font-weight: bold; color: #2196f3;">
                       {{ countBadgesByType('voter') }}
                     </div>
                   </div>
                 </div>
 
                 <!-- Badge Photographe -->
-                <div style="margin-bottom: 12px; padding: 12px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+                <div style="margin-bottom: 10px; padding: 10px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-camera" style="color: #ff9800; font-size: 1.3em;"></i>
-                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Photographe</div>
+                      <i class="fas fa-camera" style="color: #ff9800; font-size: 1.2em;"></i>
+                      <div style="font-size: 0.85em; font-weight: 600; color: #666;">Photographe</div>
                     </div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #ff9800;">
+                    <div style="font-size: 1.3em; font-weight: bold; color: #ff9800;">
                       {{ countBadgesByType('photographer') }}
                     </div>
                   </div>
                 </div>
 
                 <!-- Badge Combo -->
-                <div style="padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-puzzle-piece" style="color: #9c27b0; font-size: 1.3em;"></i>
-                      <div style="font-size: 0.9em; font-weight: 600; color: #666;">Combo</div>
+                      <i class="fas fa-puzzle-piece" style="color: #9c27b0; font-size: 1.2em;"></i>
+                      <div style="font-size: 0.85em; font-weight: 600; color: #666;">Combo</div>
                     </div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #9c27b0;">
+                    <div style="font-size: 1.3em; font-weight: bold; color: #9c27b0;">
                       {{ countBadgesByType('combo') }}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Total -->
-              <div style="padding: 15px; background: linear-gradient(135deg, #fa709a20 0%, #fee14020 100%); border-radius: 8px; margin-bottom: 15px;">
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Total des badges</div>
-                <div style="font-size: 2.5em; font-weight: bold; color: #fa709a;">
-                  {{ mySlidingBadges.length }}
+              <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
+                Cliquez pour découvrir tous les achievements
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Section 3: Statistiques Personnelles & Familiales -->
+        <v-col cols="12" md="4">
+          <v-card style="height: 100%;">
+            <v-card-title style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+              <v-icon start color="white">fas fa-chart-line</v-icon>
+              Mes Statistiques
+            </v-card-title>
+            <v-card-text style="padding: 20px;">
+              <!-- Stats personnelles -->
+              <div style="margin-bottom: 20px;">
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 12px; font-weight: 600;">
+                  Ma participation
+                </div>
+
+                <div style="padding: 12px; background: #e1f5fe; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #03a9f4;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <i class="fas fa-calendar-check" style="color: #03a9f4; font-size: 1.1em;"></i>
+                      <div style="font-size: 0.85em; color: #666;">Éditions participées</div>
+                    </div>
+                    <div style="font-size: 1.3em; font-weight: bold; color: #03a9f4;">18</div>
+                  </div>
+                </div>
+
+                <div style="padding: 12px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <i class="fas fa-images" style="color: #ff9800; font-size: 1.1em;"></i>
+                      <div style="font-size: 0.85em; color: #666;">Photos soumises</div>
+                    </div>
+                    <div style="font-size: 1.3em; font-weight: bold; color: #ff9800;">156</div>
+                  </div>
                 </div>
               </div>
 
-              <div style="font-size: 0.9em; color: #999; font-style: italic;">
-                Cliquez pour voir tous les badges disponibles
+              <!-- Stats familiales -->
+              <div>
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 12px; font-weight: 600;">
+                  <i class="fas fa-users" style="margin-right: 5px;"></i>
+                  Ma famille
+                </div>
+
+                <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                  <div style="font-size: 0.8em; color: #666; margin-bottom: 5px;">Classement famille Gueudelot</div>
+                  <div style="font-size: 1.1em; font-weight: bold; color: #9c27b0;">3ème position</div>
+                </div>
               </div>
             </v-card-text>
           </v-card>
