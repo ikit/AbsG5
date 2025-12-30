@@ -88,9 +88,16 @@ export class AgpaContext {
         for (const row of result) {
             // On vérifie que la photo n'est pas déjà enregistré (peux arriver si la photo à plusieurs award (Agpa bronze + meilleur titre par exemple)
             if (!this.photos.has(row.id)) {
+                // On vérifie que la catégorie existe bien
+                const category = this.categories.get(row.categoryId);
+                if (!category) {
+                    console.error(`[AgpaContext] Photo ${row.id} référence une catégorie inexistante: ${row.categoryId}`);
+                    continue;
+                }
+
                 // On augmente le nombre de photo inscrite dans la catégorie concernée
-                this.categories.get(row.categoryId).photos.push(row.id);
-                this.categories.get(row.categoryId).nbrPhotos++;
+                category.photos.push(row.id);
+                category.nbrPhotos++;
                 this.totalPhotos++;
 
                 // On ajoute l'autheur si il ne l'a pas déjà été
