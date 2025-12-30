@@ -9,8 +9,8 @@
           </section>
 
           <section>
-            <h3>Participation</h3>Reveal.layout();
-            <highcharts :options="stats.diag1" />
+            <h3>Participation</h3>
+            <highcharts ref="statsChart" :options="stats.diag1" />
           </section>
 
           <section
@@ -377,6 +377,17 @@ export default {
 
                 // On s'abonne aux événements
                 Reveal.on( 'slidechanged', event => {
+                    // Reflow du graphique Highcharts quand on arrive sur le slide des stats (index 1)
+                    if (event.indexh === 1 && this.$refs.statsChart) {
+                        // Attendre que le DOM soit mis à jour et que le slide soit visible
+                        this.$nextTick(() => {
+                            const chart = this.$refs.statsChart.chart;
+                            if (chart) {
+                                chart.reflow();
+                            }
+                        });
+                    }
+
                     if (this.isMaster) {
                         const slide = this.slides[event.indexh - 2];
                         let hash = slide ? slide.hash : "-";
