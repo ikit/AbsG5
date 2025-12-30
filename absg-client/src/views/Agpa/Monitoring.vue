@@ -40,6 +40,12 @@
           </v-icon>
           <span v-if="!$vuetify.display.mobile">Stats</span>
         </v-tab>
+        <v-tab>
+          <v-icon :start="!$vuetify.display.mobile">
+            fas fa-award
+          </v-icon>
+          <span v-if="!$vuetify.display.mobile">Badges</span>
+        </v-tab>
 
 
       </v-tabs>
@@ -709,6 +715,105 @@
 
           </div>
         </v-window-item>
+
+        <!-- Gestion des Badges -->
+        <v-window-item>
+          <h2>Gestion des Badges</h2>
+
+          <v-card style="margin: 20px; padding: 20px;">
+            <v-card-title>
+              <v-icon start color="primary">fas fa-calculator</v-icon>
+              Recalcul des Badges
+            </v-card-title>
+            <v-card-text>
+              <v-alert
+                type="info"
+                variant="tonal"
+                style="margin-bottom: 20px;"
+              >
+                <div style="font-size: 0.9em;">
+                  <strong>Information:</strong> Cette action va supprimer tous les badges existants pour l'année sélectionnée
+                  et les recalculer pour tous les utilisateurs en se basant sur les profils de votes et les statistiques disponibles.
+                </div>
+              </v-alert>
+
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-select
+                    v-model="badgeComputation.selectedYear"
+                    :items="badgeComputation.availableYears"
+                    label="Année à recalculer"
+                    density="comfortable"
+                    prepend-icon="fas fa-calendar"
+                  />
+                </v-col>
+                <v-col cols="12" md="8" style="display: flex; align-items: center; gap: 10px;">
+                  <v-btn
+                    color="primary"
+                    :loading="badgeComputation.isComputing"
+                    :disabled="!badgeComputation.selectedYear || badgeComputation.isComputing"
+                    @click="computeBadges"
+                  >
+                    <v-icon start>fas fa-sync</v-icon>
+                    Lancer le calcul
+                  </v-btn>
+
+                  <div v-if="badgeComputation.isComputing" style="display: flex; align-items: center; gap: 10px;">
+                    <v-progress-circular indeterminate color="primary" size="20" />
+                    <span style="font-size: 0.9em; color: #666;">Calcul en cours...</span>
+                  </div>
+                </v-col>
+              </v-row>
+
+              <!-- Résultat du calcul -->
+              <v-alert
+                v-if="badgeComputation.result"
+                :type="badgeComputation.result.success ? 'success' : 'error'"
+                variant="tonal"
+                style="margin-top: 20px;"
+                closable
+                @click:close="badgeComputation.result = null"
+              >
+                <div style="font-size: 0.9em;">
+                  <div style="font-weight: bold; margin-bottom: 10px;">
+                    {{ badgeComputation.result.message }}
+                  </div>
+
+                  <div v-if="badgeComputation.result.success" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+                    <div>
+                      <i class="fas fa-trash" style="color: #ff9800; margin-right: 5px;"></i>
+                      <strong>Supprimés:</strong> {{ badgeComputation.result.deletedCount }}
+                    </div>
+                    <div>
+                      <i class="fas fa-plus-circle" style="color: #4caf50; margin-right: 5px;"></i>
+                      <strong>Créés:</strong> {{ badgeComputation.result.createdCount }}
+                    </div>
+                    <div>
+                      <i class="fas fa-users" style="color: #2196f3; margin-right: 5px;"></i>
+                      <strong>Utilisateurs:</strong> {{ badgeComputation.result.processedUsers }}
+                    </div>
+                    <div>
+                      <i class="fas fa-clock" style="color: #9c27b0; margin-right: 5px;"></i>
+                      <strong>Durée:</strong> {{ (badgeComputation.result.duration / 1000).toFixed(2) }}s
+                    </div>
+                  </div>
+
+                  <!-- Affichage des erreurs -->
+                  <div v-if="badgeComputation.result.errors && badgeComputation.result.errors.length > 0" style="margin-top: 15px;">
+                    <div style="font-weight: bold; color: #f44336; margin-bottom: 5px;">
+                      <i class="fas fa-exclamation-triangle"></i> Erreurs détectées:
+                    </div>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                      <li v-for="(error, idx) in badgeComputation.result.errors" :key="idx" style="font-size: 0.85em;">
+                        {{ error }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </v-alert>
+            </v-card-text>
+          </v-card>
+        </v-window-item>
       </v-window>
     </v-card>
 
@@ -1074,6 +1179,14 @@ export default {
         },
         palmares: [],
 
+        // Gestion du calcul des badges
+        badgeComputation: {
+            selectedYear: null,
+            availableYears: [],
+            isComputing: false,
+            result: null
+        },
+
         data: {
             categories: {},
             photosStats: [],
@@ -1433,6 +1546,15 @@ export default {
         } else {
             store.dispatch('initAGPA');
         }
+
+        // Initialiser les années disponibles pour le calcul des badges (depuis 2006)
+        const currentYear = new Date().getFullYear();
+        this.badgeComputation.availableYears = [];
+        for (let year = 2006; year <= currentYear; year++) {
+            this.badgeComputation.availableYears.push(year);
+        }
+        // Sélectionner l'année la plus récente par défaut
+        this.badgeComputation.selectedYear = currentYear;
     },
     methods: {
         refresh() {
@@ -1875,6 +1997,29 @@ export default {
                     size: '95%'
                 }]
             };
+        },
+
+        async computeBadges() {
+            if (!this.badgeComputation.selectedYear) {
+                return;
+            }
+
+            this.badgeComputation.isComputing = true;
+            this.badgeComputation.result = null;
+
+            try {
+                const response = await axios.post(`/api/agpa/compute-badges/${this.badgeComputation.selectedYear}`);
+                this.badgeComputation.result = response.data;
+            } catch (error) {
+                console.error('Erreur lors du calcul des badges:', error);
+                this.badgeComputation.result = {
+                    success: false,
+                    message: `Erreur: ${error.response?.data?.message || error.message}`,
+                    errors: [error.response?.data?.message || error.message]
+                };
+            } finally {
+                this.badgeComputation.isComputing = false;
+            }
         },
 
         closeEdition() {
