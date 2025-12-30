@@ -425,19 +425,26 @@ export default {
         },
 
         startCeremony() {
-            this.current.displayed = true;
-            this.$refs.video.play();
             if (this.$refs.timer) {
                 this.$refs.timer.stop();
+            }
+
+            // Vérifier si la vidéo d'intro a une source
+            const video = this.$refs.video;
+            if (video && video.src && video.src.length > 0) {
+                // La vidéo d'intro est disponible, la lancer avec fondu au noir
+                this.current.displayed = true;
+                video.play();
+            } else {
+                // Pas de vidéo d'intro, rediriger directement vers la cérémonie
+                this.openCeremonySlideShow();
             }
         },
 
         openCeremonySlideShow() {
-            this.re
             this.$refs.video.pause();
-            window.open(`/agpa/ceremony/${this.agpaMeta.year}`, '_blank');
-            this.current.displayed = false;
-            this.timerEnable = false;
+            // Rediriger vers la page de cérémonie (plein écran)
+            window.location.href = `/agpa/ceremony/${this.agpaMeta.year}`;
         },
 
         preloadIntro() {
