@@ -69,6 +69,8 @@
                 class="member-card"
                 hover
                 elevation="2"
+                @click="showMemberDetails(member)"
+                style="cursor: pointer;"
               >
                 <!-- Avatar -->
                 <div style="text-align: center; padding: 20px 20px 10px 20px;">
@@ -163,6 +165,123 @@
         </v-card-text>
       </v-card>
     </v-container>
+
+    <!-- Dialog modale pour afficher tous les badges d'un membre -->
+    <v-dialog
+      v-model="detailsDialog"
+      max-width="800"
+      scrollable
+    >
+      <v-card v-if="selectedMember">
+        <!-- En-tête avec avatar et nom -->
+        <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px;">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <v-avatar size="80" style="border: 3px solid white;">
+              <img
+                :src="`/files/avatars/${String(selectedMember.userId).padStart(3, '0')}.png`"
+                :alt="selectedMember.username"
+                @error="onAvatarError"
+              >
+            </v-avatar>
+            <div>
+              <div style="font-size: 1.5em; font-weight: 600;">
+                {{ selectedMember.username }}
+              </div>
+              <div style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">
+                <v-icon start color="white" size="small">fas fa-award</v-icon>
+                {{ selectedMember.totalBadges }} badge{{ selectedMember.totalBadges > 1 ? 's' : '' }} obtenu{{ selectedMember.totalBadges > 1 ? 's' : '' }}
+              </div>
+            </div>
+          </div>
+        </v-card-title>
+
+        <!-- Corps avec la liste des badges -->
+        <v-card-text style="padding: 25px; max-height: 500px;">
+          <div v-if="selectedMember.allBadges && selectedMember.allBadges.length > 0">
+            <div
+              v-for="(badge, index) in selectedMember.allBadges"
+              :key="`${badge.badge}_${badge.year}_${badge.type}`"
+              style="margin-bottom: 15px;"
+            >
+              <v-card
+                :style="{
+                  border: `2px solid ${badge.color || '#ccc'}`,
+                  background: `linear-gradient(135deg, ${badge.color || '#ccc'}22 0%, ${badge.color || '#ccc'}11 100%)`
+                }"
+                elevation="1"
+              >
+                <v-card-text style="padding: 20px;">
+                  <div style="display: flex; align-items: center; gap: 20px;">
+                    <!-- Icône du badge -->
+                    <div
+                      style="
+                        min-width: 60px;
+                        height: 60px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        background: white;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                      "
+                    >
+                      <i
+                        :class="badge.icon"
+                        style="font-size: 1.8em;"
+                        :style="{ color: badge.color || '#666' }"
+                      ></i>
+                    </div>
+
+                    <!-- Infos du badge -->
+                    <div style="flex: 1;">
+                      <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 5px;">
+                        {{ badge.badge }}
+                      </div>
+                      <div style="color: #666; font-size: 0.9em; margin-bottom: 8px;">
+                        {{ badge.description }}
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <v-chip
+                          size="small"
+                          :color="getBadgeTypeColor(badge.type)"
+                          variant="flat"
+                        >
+                          <v-icon start size="x-small">{{ getBadgeTypeIcon(badge.type) }}</v-icon>
+                          {{ getBadgeTypeLabel(badge.type) }}
+                        </v-chip>
+                        <v-chip size="small" color="grey" variant="tonal">
+                          <v-icon start size="x-small">fas fa-calendar</v-icon>
+                          {{ badge.year }}
+                        </v-chip>
+                      </div>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </div>
+          </div>
+
+          <!-- Message si aucun badge -->
+          <div v-else style="text-align: center; padding: 50px; color: #999;">
+            <v-icon size="64" color="grey-lighten-2">fas fa-medal</v-icon>
+            <div style="margin-top: 20px; font-size: 1.1em;">
+              Aucun badge obtenu sur les 3 dernières années
+            </div>
+          </div>
+        </v-card-text>
+
+        <!-- Actions -->
+        <v-card-actions style="padding: 15px 25px; justify-content: flex-end;">
+          <v-btn
+            color="primary"
+            variant="text"
+            @click="detailsDialog = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -176,7 +295,9 @@ export default {
       selectedFamily: 'gueudelot',
       familyMembers: [],
       loading: false,
-      currentYear: new Date().getFullYear()
+      currentYear: new Date().getFullYear(),
+      detailsDialog: false,
+      selectedMember: null
     };
   },
   watch: {
@@ -208,6 +329,34 @@ export default {
     onAvatarError(event) {
       // Fallback to default avatar if image not found
       event.target.src = '/files/avatars/default.png';
+    },
+    showMemberDetails(member) {
+      this.selectedMember = member;
+      this.detailsDialog = true;
+    },
+    getBadgeTypeLabel(type) {
+      const labels = {
+        voter: 'Votant',
+        photographer: 'Photographe',
+        combo: 'Combo'
+      };
+      return labels[type] || type;
+    },
+    getBadgeTypeColor(type) {
+      const colors = {
+        voter: 'blue',
+        photographer: 'green',
+        combo: 'purple'
+      };
+      return colors[type] || 'grey';
+    },
+    getBadgeTypeIcon(type) {
+      const icons = {
+        voter: 'fas fa-vote-yea',
+        photographer: 'fas fa-camera',
+        combo: 'fas fa-star'
+      };
+      return icons[type] || 'fas fa-medal';
     }
   }
 };

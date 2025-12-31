@@ -1154,7 +1154,7 @@ class AgpaService {
                 .getMany();
 
             // Pour chaque utilisateur, récupérer ses badges récents
-            const familyMembers = [];
+            const familyMembersData = [];
 
             for (const user of users) {
                 // Vérifier si l'utilisateur a participé aux AGPA ces 3 dernières années
@@ -1204,43 +1204,76 @@ class AgpaService {
                     }
                 }
 
-                // Si l'utilisateur a participé, l'ajouter à la liste
-                if (hasParticipated) {
-                    // Trouver le badge le plus rare/récent
-                    // Priorité: combo > photographer > voter, et année la plus récente
-                    let mainBadge = null;
+                // Si l'utilisateur a participé, l'ajouter à la liste avec TOUS ses badges
+                if (hasParticipated && allBadges.length > 0) {
+                    // Tri des badges par priorité: combo > photographer > voter, puis par année
+                    allBadges.sort((a, b) => {
+                        const typeOrder = { combo: 3, photographer: 2, voter: 1 };
+                        const typeCompare = typeOrder[b.type] - typeOrder[a.type];
+                        if (typeCompare !== 0) return typeCompare;
+                        return b.year - a.year;
+                    });
 
-                    if (allBadges.length > 0) {
-                        // Tri par priorité de type puis par année
-                        allBadges.sort((a, b) => {
-                            // D'abord par type (combo > photographer > voter)
-                            const typeOrder = { combo: 3, photographer: 2, voter: 1 };
-                            const typeCompare = typeOrder[b.type] - typeOrder[a.type];
-                            if (typeCompare !== 0) return typeCompare;
-
-                            // Ensuite par année (plus récente en premier)
-                            return b.year - a.year;
-                        });
-
-                        mainBadge = allBadges[0];
+                    // Dédupliquer les badges : garder seulement la version la plus récente de chaque badge unique
+                    const uniqueBadgesMap = new Map<string, any>();
+                    for (const badge of allBadges) {
+                        const badgeKey = `${badge.badge}_${badge.type}`; // Clé unique par nom + type
+                        if (!uniqueBadgesMap.has(badgeKey)) {
+                            uniqueBadgesMap.set(badgeKey, badge); // Garde le premier (le plus récent grâce au tri)
+                        }
                     }
+                    const uniqueBadges = Array.from(uniqueBadgesMap.values());
 
-                    familyMembers.push({
+                    familyMembersData.push({
                         userId: user.id,
                         username: user.username,
-                        mainBadge,
-                        totalBadges: allBadges.length
+                        allBadges: uniqueBadges, // Badges uniques pour l'affichage
+                        totalBadges: uniqueBadges.length
                     });
                 }
             }
 
             // Tri par nombre de badges décroissant, puis par nom
-            familyMembers.sort((a, b) => {
+            familyMembersData.sort((a, b) => {
                 if (b.totalBadges !== a.totalBadges) {
                     return b.totalBadges - a.totalBadges;
                 }
                 return a.username.localeCompare(b.username);
             });
+
+            // Attribution intelligente des badges pour garantir la diversité
+            // Chaque membre doit avoir un badge différent au sein de la famille
+            // Note: les badges sont déjà uniques par membre (pas de doublons d'années)
+            const usedBadges = new Set<string>();
+            const familyMembers = [];
+
+            for (const memberData of familyMembersData) {
+                // Chercher le badge le plus prioritaire qui n'est pas déjà utilisé
+                let selectedBadge = null;
+
+                for (const badge of memberData.allBadges) {
+                    const badgeKey = `${badge.badge}_${badge.type}`; // Clé sans année (déjà unique)
+                    if (!usedBadges.has(badgeKey)) {
+                        selectedBadge = badge;
+                        usedBadges.add(badgeKey);
+                        break;
+                    }
+                }
+
+                // Si tous les badges sont déjà pris, prendre le premier quand même
+                // (cas très rare où il y a plus de membres que de badges uniques)
+                if (!selectedBadge && memberData.allBadges.length > 0) {
+                    selectedBadge = memberData.allBadges[0];
+                }
+
+                familyMembers.push({
+                    userId: memberData.userId,
+                    username: memberData.username,
+                    mainBadge: selectedBadge,
+                    totalBadges: memberData.totalBadges,
+                    allBadges: memberData.allBadges // Inclure TOUS les badges pour l'affichage détaillé
+                });
+            }
 
             return {
                 success: true,
