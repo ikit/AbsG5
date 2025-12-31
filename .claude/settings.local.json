@@ -23,7 +23,8 @@
       "Bash(grep:*)",
       "Bash(awk:*)",
       "Bash(npx vue-tsc:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npx tsc --noEmit)"
     ]
   }
 }

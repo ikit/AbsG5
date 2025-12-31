@@ -22,6 +22,19 @@ export interface VoterProfile {
     icon: string;
     description: string;
     color: string;
+    stats: {
+        totalPoints: number;
+        totalVotes: number;
+        recipients: number;
+        ownFamilyPercent: number;
+        spousePercent: number;
+        childrenPercent: number;
+        femaleVotesPercent: number;
+        top2Percent: number;
+        top1Percent: number;
+        familyBalance: number;
+        uniqueFamilies: number;
+    };
 }
 
 export interface PhotographerProfile {
@@ -30,6 +43,15 @@ export interface PhotographerProfile {
     icon: string;
     description: string;
     color: string;
+    stats: {
+        totalPoints: number;
+        voterCount: number;
+        ownFamilyPercent: number;
+        femaleVotesPercent: number;
+        spousePercent: number;
+        familyBalance: number;
+        uniqueFamilies: number;
+    };
 }
 
 export interface ComboProfile {
@@ -38,6 +60,12 @@ export interface ComboProfile {
     icon: string;
     description: string;
     color: string;
+    stats: {
+        pointsGiven: number;
+        pointsReceived: number;
+        voterCount: number;
+        requiredBadges?: string[];
+    };
 }
 
 export interface SlidingProfile {
@@ -46,6 +74,10 @@ export interface SlidingProfile {
     icon: string;
     description: string;
     color: string;
+    stats: {
+        years: number[];
+        condition: string;
+    };
 }
 
 export interface UserProfiles {
@@ -129,6 +161,21 @@ function analyzeVoterProfile(
     const variance = familyValues.reduce((sum, v) => sum + Math.pow(v - avgFamily, 2), 0) / familyValues.length;
     const isBalanced = Math.sqrt(variance) / avgFamily < 0.3; // Coefficient de variation < 30%
 
+    // Construire l'objet stats une seule fois pour tous les badges
+    const stats = {
+        totalPoints,
+        totalVotes: userVotes.length,
+        recipients: recipients.size,
+        ownFamilyPercent,
+        spousePercent,
+        childrenPercent,
+        femaleVotesPercent,
+        top2Percent,
+        top1Percent,
+        familyBalance: variance,
+        uniqueFamilies: Object.keys(votesByFamily).length
+    };
+
     // Détermination du profil
 
     // 1. Le Patriote 🏰
@@ -138,7 +185,8 @@ function analyzeVoterProfile(
             badge: 'Le Patriote',
             icon: 'fas fa-fort-awesome',
             description: 'Ma famille d\'abord !',
-            color: '#3f51b5'
+            color: '#3f51b5',
+            stats
         };
     }
 
@@ -149,7 +197,8 @@ function analyzeVoterProfile(
             badge: 'L\'Amoureux Transi',
             icon: 'fas fa-heart',
             description: 'Mon amour mérite tous les trophées',
-            color: '#e91e63'
+            color: '#e91e63',
+            stats
         };
     }
 
@@ -160,7 +209,8 @@ function analyzeVoterProfile(
             badge: 'Le Parent Fier',
             icon: 'fas fa-baby',
             description: 'Ce sont les plus doués, c\'est normal',
-            color: '#ff9800'
+            color: '#ff9800',
+            stats
         };
     }
 
@@ -171,7 +221,8 @@ function analyzeVoterProfile(
             badge: 'Le Sniper',
             icon: 'fas fa-bullseye',
             description: 'J\'ai mes favoris et je m\'y tiens',
-            color: '#f44336'
+            color: '#f44336',
+            stats
         };
     }
 
@@ -182,7 +233,8 @@ function analyzeVoterProfile(
             badge: 'Féministe Convaincu',
             icon: 'fas fa-fist-raised',
             description: 'Les femmes d\'abord !',
-            color: '#9c27b0'
+            color: '#9c27b0',
+            stats
         };
     }
 
@@ -193,7 +245,8 @@ function analyzeVoterProfile(
             badge: 'Le Philanthrope',
             icon: 'fas fa-hand-holding-heart',
             description: 'Il y a du talent partout !',
-            color: '#9c27b0'
+            color: '#9c27b0',
+            stats
         };
     }
 
@@ -204,7 +257,8 @@ function analyzeVoterProfile(
             badge: 'L\'Anticonformiste',
             icon: 'fas fa-star-of-life',
             description: 'L\'herbe est plus verte ailleurs',
-            color: '#00bcd4'
+            color: '#00bcd4',
+            stats
         };
     }
 
@@ -215,7 +269,8 @@ function analyzeVoterProfile(
             badge: 'Le Diplomate',
             icon: 'fas fa-handshake',
             description: 'Un vote pour chacun, équité pour tous',
-            color: '#4caf50'
+            color: '#4caf50',
+            stats
         };
     }
 
@@ -226,7 +281,8 @@ function analyzeVoterProfile(
             badge: 'Le Radin',
             icon: 'fas fa-piggy-bank',
             description: 'Faut le mériter !',
-            color: '#795548'
+            color: '#795548',
+            stats
         };
     }
 
@@ -237,7 +293,8 @@ function analyzeVoterProfile(
             badge: 'Le Mécène',
             icon: 'fas fa-gift',
             description: 'Tout le monde est talentueux !',
-            color: '#ffd700'
+            color: '#ffd700',
+            stats
         };
     }
 
@@ -247,7 +304,8 @@ function analyzeVoterProfile(
         badge: 'Le Modéré',
         icon: 'fas fa-balance-scale',
         description: 'Ni trop, ni trop peu',
-        color: '#607d8b'
+        color: '#607d8b',
+        stats
     };
 }
 
@@ -293,6 +351,30 @@ function analyzePhotographerProfile(
     const voterCount = voters.size;
     const femaleVotesPercent = (votesFromFemales / totalPoints) * 100;
 
+    // Calculer le spouse percent
+    let spousePercent = 0;
+    if (user.spouse) {
+        const spouseVotes = receivedVotes.filter(v => v.from === user.spouse);
+        const spouseTotal = spouseVotes.reduce((sum, v) => sum + v.weight, 0);
+        spousePercent = (spouseTotal / totalPoints) * 100;
+    }
+
+    // Calculer variance (family balance)
+    const familyVals = Object.values(votesByFamily);
+    const avgFamily = familyVals.reduce((sum, v) => sum + v, 0) / familyVals.length;
+    const variance = familyVals.reduce((sum, v) => sum + Math.pow(v - avgFamily, 2), 0) / familyVals.length;
+
+    // Construire l'objet stats une seule fois pour tous les badges
+    const stats = {
+        totalPoints,
+        voterCount,
+        ownFamilyPercent,
+        femaleVotesPercent,
+        spousePercent,
+        familyBalance: variance,
+        uniqueFamilies: Object.keys(votesByFamily).length
+    };
+
     // Détermination du profil
 
     // 1. Le Phénomène 🚀
@@ -302,7 +384,8 @@ function analyzePhotographerProfile(
             badge: 'Le Phénomène',
             icon: 'fas fa-rocket',
             description: 'La légende vivante',
-            color: '#ffd700'
+            color: '#ffd700',
+            stats
         };
     }
 
@@ -313,7 +396,8 @@ function analyzePhotographerProfile(
             badge: 'La Star',
             icon: 'fas fa-star',
             description: 'Tout le monde m\'aime',
-            color: '#ff9800'
+            color: '#ff9800',
+            stats
         };
     }
 
@@ -324,7 +408,8 @@ function analyzePhotographerProfile(
             badge: 'Le Chouchou de Famille',
             icon: 'fas fa-home',
             description: 'Ma famille croit en moi',
-            color: '#3f51b5'
+            color: '#3f51b5',
+            stats
         };
     }
 
@@ -335,7 +420,8 @@ function analyzePhotographerProfile(
             badge: 'Le Transfuge',
             icon: 'fas fa-globe',
             description: 'Je plais aux voisins',
-            color: '#00bcd4'
+            color: '#00bcd4',
+            stats
         };
     }
 
@@ -346,7 +432,8 @@ function analyzePhotographerProfile(
             badge: 'Le Protégé',
             icon: 'fas fa-crown',
             description: 'J\'ai mes champions',
-            color: '#e91e63'
+            color: '#e91e63',
+            stats
         };
     }
 
@@ -357,16 +444,17 @@ function analyzePhotographerProfile(
             badge: 'La Coqueluche des Dames',
             icon: 'fas fa-heart',
             description: 'Apprécié par les femmes',
-            color: '#e91e63'
+            color: '#e91e63',
+            stats
         };
     }
 
     // 7. L'Équilibré ⚖️
     const familyValues = Object.values(votesByFamily);
     if (familyValues.length >= 3) {
-        const avgFamily = familyValues.reduce((sum, v) => sum + v, 0) / familyValues.length;
-        const variance = familyValues.reduce((sum, v) => sum + Math.pow(v - avgFamily, 2), 0) / familyValues.length;
-        const isBalanced = Math.sqrt(variance) / avgFamily < 0.4;
+        const avgFam = familyValues.reduce((sum, v) => sum + v, 0) / familyValues.length;
+        const vari = familyValues.reduce((sum, v) => sum + Math.pow(v - avgFam, 2), 0) / familyValues.length;
+        const isBalanced = Math.sqrt(vari) / avgFam < 0.4;
 
         if (isBalanced) {
             return {
@@ -374,7 +462,8 @@ function analyzePhotographerProfile(
                 badge: 'L\'Équilibré',
                 icon: 'fas fa-balance-scale',
                 description: 'Je plais à tout le monde modérément',
-                color: '#4caf50'
+                color: '#4caf50',
+                stats
             };
         }
     }
@@ -386,7 +475,8 @@ function analyzePhotographerProfile(
             badge: 'L\'Inconnu',
             icon: 'fas fa-ghost',
             description: 'Qui suis-je ?',
-            color: '#9e9e9e'
+            color: '#9e9e9e',
+            stats
         };
     }
 
@@ -396,7 +486,8 @@ function analyzePhotographerProfile(
         badge: 'Le Talent Émergent',
         icon: 'fas fa-seedling',
         description: 'En progression',
-        color: '#8bc34a'
+        color: '#8bc34a',
+        stats
     };
 }
 
@@ -421,6 +512,15 @@ function analyzeComboProfile(
     const receivedVotes = votes.filter(v => v.to === username);
     const totalGiven = userVotes.reduce((sum, v) => sum + v.weight, 0);
     const totalReceived = receivedVotes.reduce((sum, v) => sum + v.weight, 0);
+    const voterCount = new Set(receivedVotes.map(v => v.from)).size;
+
+    // Construire l'objet stats pour les badges combo
+    const stats = {
+        pointsGiven: totalGiven,
+        pointsReceived: totalReceived,
+        voterCount,
+        requiredBadges: [voterProfile?.badge, photographerProfile?.badge].filter(Boolean) as string[]
+    };
 
     // 1. Le Solitaire 🏝️ - Peu de votes donnés ET peu de votes reçus
     if (totalGiven < 20 && totalReceived < 20) {
@@ -429,7 +529,8 @@ function analyzeComboProfile(
             badge: 'Le Solitaire',
             icon: 'fas fa-island-tropical',
             description: 'Discret en tout point',
-            color: '#607d8b'
+            color: '#607d8b',
+            stats
         };
     }
 
@@ -440,7 +541,8 @@ function analyzeComboProfile(
             badge: 'L\'Égoïste',
             icon: 'fas fa-user-crown',
             description: 'Je reçois plus que je ne donne',
-            color: '#9c27b0'
+            color: '#9c27b0',
+            stats
         };
     }
 
@@ -451,7 +553,8 @@ function analyzeComboProfile(
             badge: 'Le Robin des Bois',
             icon: 'fas fa-bow-arrow',
             description: 'Généreux malgré l\'oubli',
-            color: '#4caf50'
+            color: '#4caf50',
+            stats
         };
     }
 
@@ -462,7 +565,8 @@ function analyzeComboProfile(
             badge: 'L\'Influenceur',
             icon: 'fas fa-star-shooting',
             description: 'Populaire et généreux',
-            color: '#ff9800'
+            color: '#ff9800',
+            stats
         };
     }
 
@@ -474,7 +578,8 @@ function analyzeComboProfile(
             badge: 'Le Clan',
             icon: 'fas fa-users',
             description: 'Ma famille et moi, c\'est pour la vie',
-            color: '#3f51b5'
+            color: '#3f51b5',
+            stats
         };
     }
 
@@ -486,7 +591,8 @@ function analyzeComboProfile(
             badge: 'Le Rebelle',
             icon: 'fas fa-dragon',
             description: 'Loin de ma famille, dans les deux sens',
-            color: '#00bcd4'
+            color: '#00bcd4',
+            stats
         };
     }
 
@@ -498,7 +604,8 @@ function analyzeComboProfile(
             badge: 'Le Fan Club',
             icon: 'fas fa-crown',
             description: 'J\'ai mes favoris et ils me le rendent',
-            color: '#e91e63'
+            color: '#e91e63',
+            stats
         };
     }
 
@@ -510,7 +617,8 @@ function analyzeComboProfile(
             badge: 'Le Politique',
             icon: 'fas fa-balance-scale-right',
             description: 'Équilibre parfait donné/reçu',
-            color: '#4caf50'
+            color: '#4caf50',
+            stats
         };
     }
 
@@ -522,7 +630,8 @@ function analyzeComboProfile(
             badge: 'Le Phénomène Total',
             icon: 'fas fa-meteor',
             description: 'La légende absolue des AGPA',
-            color: '#ffd700'
+            color: '#ffd700',
+            stats
         };
     }
 
@@ -541,7 +650,8 @@ function analyzeComboProfile(
                     badge: 'Le Couple Parfait',
                     icon: 'fas fa-heart',
                     description: 'L\'amour est réciproque',
-                    color: '#e91e63'
+                    color: '#e91e63',
+                    stats
                 };
             }
         }
@@ -555,7 +665,8 @@ function analyzeComboProfile(
             badge: 'L\'Incompris',
             icon: 'fas fa-sad-tear',
             description: 'Je donne à tous mais personne ne me voit',
-            color: '#9e9e9e'
+            color: '#9e9e9e',
+            stats
         };
     }
 
@@ -567,7 +678,8 @@ function analyzeComboProfile(
             badge: 'Le Revenant',
             icon: 'fas fa-ghost',
             description: 'Peu présent mais marquant',
-            color: '#673ab7'
+            color: '#673ab7',
+            stats
         };
     }
 
@@ -579,7 +691,8 @@ function analyzeComboProfile(
             badge: 'La Superstar',
             icon: 'fas fa-sparkles',
             description: 'Excellence en tout point',
-            color: '#ff6f00'
+            color: '#ff6f00',
+            stats
         };
     }
 
@@ -590,7 +703,8 @@ function analyzeComboProfile(
             badge: 'Girl Power',
             icon: 'fas fa-venus',
             description: 'Engagement féministe total',
-            color: '#9c27b0'
+            color: '#9c27b0',
+            stats
         };
     }
 
@@ -612,6 +726,7 @@ function analyzeSlidingProfile(
     if (yearDataList.length < 3) return badges;
 
     const [year1, year2, year3] = yearDataList;
+    const years = yearDataList.map(y => y.year);
 
     // 1. L'Alpiniste 🧗 - Bronze → Argent → Or dans la même catégorie sur 3 ans
     // (Ce badge sera ajouté plus bas dans la section PROGRESSION)
@@ -623,7 +738,11 @@ function analyzeSlidingProfile(
             badge: 'La Fusée',
             icon: 'fas fa-rocket-launch',
             description: 'Décollage spectaculaire (x3)',
-            color: '#ff5722'
+            color: '#ff5722',
+            stats: {
+                years,
+                condition: `Progression x3: ${year1.totalPoints} → ${year3.totalPoints} pts`
+            }
         });
     }
 
@@ -641,7 +760,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Régulier',
                 icon: 'fas fa-chart-line',
                 description: 'Performance stable et constante',
-                color: '#4caf50'
+                color: '#4caf50',
+                stats: {
+                    years,
+                    condition: `Moyenne ${avgPoints.toFixed(1)} pts, variance ${(coeffVar * 100).toFixed(1)}%`
+                }
             });
         }
     }
@@ -655,7 +778,11 @@ function analyzeSlidingProfile(
             badge: 'Le Dinosaure',
             icon: 'fas fa-dragon',
             description: 'Les beaux jours sont derrière',
-            color: '#795548'
+            color: '#795548',
+            stats: {
+                years,
+                condition: `Régression: ${year1.totalPoints} → ${year2.totalPoints} → ${year3.totalPoints} pts`
+            }
         });
     }
 
@@ -669,7 +796,11 @@ function analyzeSlidingProfile(
             badge: 'Le Yoyo',
             icon: 'fas fa-arrows-up-down',
             description: 'Performance en montagnes russes',
-            color: '#ff9800'
+            color: '#ff9800',
+            stats: {
+                years,
+                condition: `${year1.totalPoints} → ${year2.totalPoints} → ${year3.totalPoints} pts`
+            }
         });
     }
 
@@ -682,7 +813,11 @@ function analyzeSlidingProfile(
             badge: 'La Révélation',
             icon: 'fas fa-star-shooting',
             description: 'De l\'ombre à la lumière',
-            color: '#9c27b0'
+            color: '#9c27b0',
+            stats: {
+                years,
+                condition: `0 → ${year2.totalPoints} → ${year3.totalPoints} pts`
+            }
         });
     }
 
@@ -693,7 +828,11 @@ function analyzeSlidingProfile(
             badge: 'Le Vétéran',
             icon: 'fas fa-medal',
             description: 'Sur le podium tous les ans',
-            color: '#ff6f00'
+            color: '#ff6f00',
+            stats: {
+                years,
+                condition: `${year1.podiums} + ${year2.podiums} + ${year3.podiums} podiums`
+            }
         });
     }
 
@@ -710,7 +849,11 @@ function analyzeSlidingProfile(
             badge: 'Le Sniper Temporel',
             icon: 'fas fa-bullseye',
             description: 'Spécialiste d\'une catégorie',
-            color: '#f44336'
+            color: '#f44336',
+            stats: {
+                years,
+                condition: `${maxCategoryWins} victoires dans même catégorie`
+            }
         });
     }
 
@@ -723,7 +866,11 @@ function analyzeSlidingProfile(
             badge: 'Le Phoenix',
             icon: 'fas fa-phoenix-squadron',
             description: 'Renaît de ses cendres',
-            color: '#e91e63'
+            color: '#e91e63',
+            stats: {
+                years,
+                condition: `${year1.totalPoints} → ${year2.totalPoints} → ${year3.totalPoints} pts`
+            }
         });
     }
 
@@ -734,7 +881,11 @@ function analyzeSlidingProfile(
             badge: 'Le Tsunami',
             icon: 'fas fa-water',
             description: 'Arrivée fracassante',
-            color: '#00bcd4'
+            color: '#00bcd4',
+            stats: {
+                years,
+                condition: `${year2.golds} ors en année 2`
+            }
         });
     }
 
@@ -745,7 +896,11 @@ function analyzeSlidingProfile(
             badge: 'Le Fidèle',
             icon: 'fas fa-handshake',
             description: 'Toujours présent, toujours actif',
-            color: '#607d8b'
+            color: '#607d8b',
+            stats: {
+                years,
+                condition: `${year1.totalPoints} + ${year2.totalPoints} + ${year3.totalPoints} pts`
+            }
         });
     }
 
@@ -757,7 +912,11 @@ function analyzeSlidingProfile(
             badge: 'Le Podium Addict',
             icon: 'fas fa-trophy',
             description: '5+ podiums sur 3 ans',
-            color: '#cddc39'
+            color: '#cddc39',
+            stats: {
+                years,
+                condition: `${totalPodiums} podiums total`
+            }
         });
     }
 
@@ -770,7 +929,11 @@ function analyzeSlidingProfile(
             badge: 'L\'Éclair',
             icon: 'fas fa-bolt',
             description: 'Retour fracassant',
-            color: '#ffeb3b'
+            color: '#ffeb3b',
+            stats: {
+                years,
+                condition: `${year3.totalPoints} pts année 3`
+            }
         });
     }
 
@@ -785,7 +948,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Collectionneur',
                 icon: 'fas fa-medal',
                 description: `Collection complète (${year.year})`,
-                color: '#9c27b0'
+                color: '#9c27b0',
+                stats: {
+                    years: [year.year],
+                    condition: '1 Or + 1 Argent + 1 Bronze'
+                }
             });
         }
 
@@ -796,7 +963,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Perfectionniste',
                 icon: 'fas fa-crown',
                 description: `${year.golds} Ors purs (${year.year})`,
-                color: '#ffd700'
+                color: '#ffd700',
+                stats: {
+                    years: [year.year],
+                    condition: `${year.golds} Ors uniquement`
+                }
             });
         }
 
@@ -807,7 +978,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Monopole',
                 icon: 'fas fa-chess-king',
                 description: `${year.golds} Ors - Quasi monopole (${year.year})`,
-                color: '#ff6f00'
+                color: '#ff6f00',
+                stats: {
+                    years: [year.year],
+                    condition: `${year.golds} Ors / 8 catégories`
+                }
             });
         }
 
@@ -821,7 +996,11 @@ function analyzeSlidingProfile(
                 badge: 'La Razzia',
                 icon: 'fas fa-bullseye',
                 description: `${year.categories.length} catégories dominées (${year.year})`,
-                color: '#e91e63'
+                color: '#e91e63',
+                stats: {
+                    years: [year.year],
+                    condition: `${year.categories.length} catégories gagnées`
+                }
             });
         }
 
@@ -833,7 +1012,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Triplé',
                 icon: 'fas fa-fire',
                 description: `${year.golds} Ors (${year.year})`,
-                color: '#ff9800'
+                color: '#ff9800',
+                stats: {
+                    years: [year.year],
+                    condition: `${year.golds} médailles d'or`
+                }
             });
         }
 
@@ -844,7 +1027,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Doublé',
                 icon: 'fas fa-gem',
                 description: `Double argent (${year.year})`,
-                color: '#c0c0c0'
+                color: '#c0c0c0',
+                stats: {
+                    years: [year.year],
+                    condition: '2 médailles d\'argent'
+                }
             });
         }
 
@@ -855,7 +1042,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Balayage Bronze',
                 icon: 'fas fa-broom',
                 description: `${year.bronzes} Bronzes (${year.year})`,
-                color: '#cd7f32'
+                color: '#cd7f32',
+                stats: {
+                    years: [year.year],
+                    condition: `${year.bronzes} médailles de bronze`
+                }
             });
         }
 
@@ -866,7 +1057,11 @@ function analyzeSlidingProfile(
                 badge: 'L\'Arc-en-ciel',
                 icon: 'fas fa-rainbow',
                 description: `Palette complète (${year.year})`,
-                color: '#00bcd4'
+                color: '#00bcd4',
+                stats: {
+                    years: [year.year],
+                    condition: `${year.golds}Or + ${year.sylvers}Ag + ${year.bronzes}Br`
+                }
             });
         }
     });
@@ -898,7 +1093,11 @@ function analyzeSlidingProfile(
             badge: 'L\'Alpiniste',
             icon: 'fas fa-mountain',
             description: 'Bronze → Argent → Or même catégorie',
-            color: '#2196f3'
+            color: '#2196f3',
+            stats: {
+                years,
+                condition: 'Bronze → Argent → Or dans même catégorie'
+            }
         });
     }
 
@@ -913,7 +1112,11 @@ function analyzeSlidingProfile(
             badge: 'Le Constant',
             icon: 'fas fa-check-double',
             description: `${awardsCount1} AGPA chaque année`,
-            color: '#4caf50'
+            color: '#4caf50',
+            stats: {
+                years,
+                condition: `${awardsCount1} AGPA par an sur 3 ans`
+            }
         });
     }
 
@@ -930,7 +1133,11 @@ function analyzeSlidingProfile(
             badge: 'La Rédemption',
             icon: 'fas fa-redo',
             description: 'De rien à Or dans même catégorie',
-            color: '#ff5722'
+            color: '#ff5722',
+            stats: {
+                years,
+                condition: 'Rien → Or dans même catégorie'
+            }
         });
     }
 
@@ -945,7 +1152,11 @@ function analyzeSlidingProfile(
                 badge: 'La Pyramide',
                 icon: 'fas fa-caret-up',
                 description: `1-2-3 parfait (${year.year})`,
-                color: '#607d8b'
+                color: '#607d8b',
+                stats: {
+                    years: [year.year],
+                    condition: '1 Or + 2 Argent + 3 Bronze'
+                }
             });
         }
 
@@ -956,7 +1167,11 @@ function analyzeSlidingProfile(
                 badge: 'La Pyramide Inversée',
                 icon: 'fas fa-caret-down',
                 description: `3-2-1 renversant (${year.year})`,
-                color: '#3f51b5'
+                color: '#3f51b5',
+                stats: {
+                    years: [year.year],
+                    condition: '3 Or + 2 Argent + 1 Bronze'
+                }
             });
         }
 
@@ -967,7 +1182,11 @@ function analyzeSlidingProfile(
                 badge: 'Le Symétrique',
                 icon: 'fas fa-balance-scale',
                 description: `${year.golds}-${year.sylvers}-${year.bronzes} équilibré (${year.year})`,
-                color: '#009688'
+                color: '#009688',
+                stats: {
+                    years: [year.year],
+                    condition: `${year.golds}Or = ${year.sylvers}Ag = ${year.bronzes}Br`
+                }
             });
         }
     });
