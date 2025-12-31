@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import { differenceInMonths } from "date-fns";
 
 export enum Sex {
@@ -53,6 +53,28 @@ export class Person {
 
     @Column("json", { nullable: true, comment: "Liste des photos du trombinoscope concernant la personne" })
     trombis: any[];
+
+    // Relations familiales
+    @Column({ nullable: true, comment: "ID du conjoint (référence à Person)" })
+    spouseId: number;
+
+    @ManyToOne(() => Person, { nullable: true })
+    @JoinColumn({ name: "spouseId" })
+    spouse: Person;
+
+    @Column({ nullable: true, comment: "ID de la mère (référence à Person)" })
+    motherId: number;
+
+    @ManyToOne(() => Person, { nullable: true })
+    @JoinColumn({ name: "motherId" })
+    mother: Person;
+
+    @Column({ nullable: true, comment: "ID du père (référence à Person)" })
+    fatherId: number;
+
+    @ManyToOne(() => Person, { nullable: true })
+    @JoinColumn({ name: "fatherId" })
+    father: Person;
 
     fromJSON(json: any): Person {
         Object.assign(this, json);

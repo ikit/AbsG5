@@ -1,5 +1,6 @@
 // Pinia helpers that mimic Vuex mapState/mapActions
-// OPTIMIZED: Lazy loading - stores are only imported when helpers.js is used
+// OPTIMIZED: Lazy loading - helpers.js itself is lazy-loaded by router and components
+// Stores are imported statically here, but this file is only loaded when actually needed
 
 import { useMainStore } from './main'
 import { useUserStore } from './user'
@@ -16,7 +17,7 @@ let wsStoreCache = null
 
 /**
  * Get store instance synchronously (uses cache to avoid multiple instantiations)
- * Stores are imported statically but helpers.js itself is lazy-loaded
+ * helpers.js is lazy-loaded, so these stores are only imported when helpers is used
  */
 function getMainStoreSync() {
   if (!mainStoreCache) {

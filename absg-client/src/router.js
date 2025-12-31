@@ -189,6 +189,10 @@ export const router = createRouter({
                     component: () => import("./views/Agpa/Palmares.vue"),
                 },
                 {
+                    path: "badges-gallery",
+                    component: () => import("./views/Agpa/BadgesGallery.vue"),
+                },
+                {
                     path: "ceremony",
                     component: () => import("./views/Agpa/CeremonyMenu.vue"),
                 },

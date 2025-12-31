@@ -610,7 +610,8 @@ class AgpaService {
             SELECT
                 v."userId" as "from",
                 p."userId" as "to",
-                v.score as weight
+                v.score as weight,
+                v."categoryId" as "categoryId"
             FROM agpa_vote v
             INNER JOIN agpa_photo p ON v."photoId" = p.id
             WHERE v.year = ${year} AND v."categoryId" > 0
@@ -618,19 +619,55 @@ class AgpaService {
         const votesData = await this.catRepo.query(votesQuery);
 
         // Transformation des votes au format attendu par l'helper
-        const votes: Array<[string, string, number]> = votesData.map(v => [
+        const votes: Array<[string, string, number, number?]> = votesData.map(v => [
             v.from.toString(),
             v.to.toString(),
-            v.weight
+            v.weight,
+            v.categoryId
         ]);
 
-        // Récupération des données utilisateurs
+        // Récupération du nombre de photos par utilisateur
+        const photosQuery = `
+            SELECT
+                "userId",
+                COUNT(*) as "photoCount"
+            FROM agpa_photo
+            WHERE year = ${year} AND "categoryId" > 0
+            GROUP BY "userId"
+        `;
+        const photosData = await this.catRepo.query(photosQuery);
+        const photoCountByUser: Record<string, number> = {};
+        photosData.forEach((p: any) => {
+            photoCountByUser[p.userId.toString()] = parseInt(p.photoCount);
+        });
+
+        // Récupération du nombre de photos par catégorie pour calculer le maximum de points distribuables
+        const photosByCategoryQuery = `
+            SELECT
+                "categoryId",
+                COUNT(*) as "photoCount"
+            FROM agpa_photo
+            WHERE year = ${year} AND "categoryId" > 0
+            GROUP BY "categoryId"
+        `;
+        const photosByCategoryData = await this.catRepo.query(photosByCategoryQuery);
+        const photoCountByCategory: Record<number, number> = {};
+        photosByCategoryData.forEach((p: any) => {
+            photoCountByCategory[p.categoryId] = parseInt(p.photoCount);
+        });
+
+        // Récupération des données utilisateurs avec relations familiales
         const usersQuery = `
             SELECT
                 u.id,
                 u.username,
                 u."rootFamily",
-                p.sex
+                u."personId",
+                p.sex,
+                p."spouseId",
+                p."motherId",
+                p."fatherId",
+                p."dateOfBirth"
             FROM public."user" u
             LEFT JOIN person p ON u."personId" = p.id
             WHERE u.id IN (
@@ -641,19 +678,57 @@ class AgpaService {
         `;
         const usersData = await this.catRepo.query(usersQuery);
 
+        // Construire un mapping personId -> userId pour résoudre les relations familiales
+        const personToUser: Record<number, string> = {};
+        usersData.forEach((u: any) => {
+            if (u.personId) {
+                personToUser[u.personId] = u.id.toString();
+            }
+        });
+
         // Transformation des utilisateurs au format attendu par l'helper
         const users: Record<string, UserData> = {};
-        usersData.forEach(u => {
-            users[u.id.toString()] = {
+        usersData.forEach((u: any) => {
+            const userId = u.id.toString();
+
+            // Déterminer le spouse (userId du conjoint)
+            const spouseUserId = u.spouseId ? personToUser[u.spouseId] : undefined;
+
+            // Déterminer les children (userId des enfants dont motherId ou fatherId = personId de u)
+            const children: string[] = [];
+            if (u.personId) {
+                usersData.forEach((other: any) => {
+                    if (other.motherId === u.personId || other.fatherId === u.personId) {
+                        children.push(other.id.toString());
+                    }
+                });
+            }
+
+            // Calculer l'âge au 31 décembre de l'année de l'édition
+            let age = undefined;
+            if (u.dateOfBirth) {
+                const birthDate = new Date(u.dateOfBirth);
+                const lastDayOfYear = new Date(year, 11, 31);
+                age = lastDayOfYear.getFullYear() - birthDate.getFullYear();
+                // Ajuster si l'anniversaire n'est pas encore passé au 31 décembre
+                const birthdayThisYear = new Date(year, birthDate.getMonth(), birthDate.getDate());
+                if (birthdayThisYear > lastDayOfYear) {
+                    age--;
+                }
+            }
+
+            users[userId] = {
                 username: u.username,
                 rootFamily: u.rootFamily || 'autre',
-                sex: u.sex || 'undefined'
-                // TODO: Ajouter spouse et children quand ces données seront disponibles en base
+                sex: u.sex || 'undefined',
+                spouse: spouseUserId,
+                children: children.length > 0 ? children : undefined,
+                age
             };
         });
 
         // Analyse des profils via l'helper
-        const profiles = analyzeVoteProfiles(votes, users);
+        const profiles = analyzeVoteProfiles(votes, users, photoCountByUser, photoCountByCategory);
 
         return profiles;
     }
@@ -1055,6 +1130,132 @@ class AgpaService {
             last3Years,
             allYears
         };
+    }
+
+    /**
+     * Récupère les membres actifs d'une famille avec leurs badges principaux
+     * Un membre est considéré actif s'il a participé aux AGPA ces 3 dernières années
+     * Le badge principal est le badge le plus rare obtenu récemment
+     * @param family le nom de la famille (gueudelot, guyomard, guibert)
+     */
+    async getFamilyBadges(family: string) {
+        try {
+            const maxYear = getMaxArchiveEdition();
+            const last3Years = [maxYear - 2, maxYear - 1, maxYear].filter(y => y >= 2006);
+
+            // Récupérer tous les utilisateurs de la famille
+            const userRepo = getRepository(User);
+            const users = await userRepo
+                .createQueryBuilder('user')
+                .innerJoin('user.person', 'person')
+                .where('LOWER(person.rootFamily) = LOWER(:family)', { family })
+                .andWhere('user.isActive = :isActive', { isActive: true })
+                .select(['user.id', 'user.username', 'person.rootFamily'])
+                .getMany();
+
+            // Pour chaque utilisateur, récupérer ses badges récents
+            const familyMembers = [];
+
+            for (const user of users) {
+                // Vérifier si l'utilisateur a participé aux AGPA ces 3 dernières années
+                let hasParticipated = false;
+                const allBadges = [];
+
+                for (const year of last3Years) {
+                    const profiles = await this.getVoteProfiles(year);
+
+                    if (profiles && profiles[user.id]) {
+                        hasParticipated = true;
+                        const userProfiles = profiles[user.id];
+
+                        // Collecter tous les badges de cette année
+                        if (userProfiles.voterProfile) {
+                            allBadges.push({
+                                badge: userProfiles.voterProfile.badge,
+                                type: 'voter',
+                                year,
+                                icon: userProfiles.voterProfile.icon,
+                                description: userProfiles.voterProfile.description,
+                                color: userProfiles.voterProfile.color
+                            });
+                        }
+
+                        if (userProfiles.photographerProfile) {
+                            allBadges.push({
+                                badge: userProfiles.photographerProfile.badge,
+                                type: 'photographer',
+                                year,
+                                icon: userProfiles.photographerProfile.icon,
+                                description: userProfiles.photographerProfile.description,
+                                color: userProfiles.photographerProfile.color
+                            });
+                        }
+
+                        if (userProfiles.comboProfile) {
+                            allBadges.push({
+                                badge: userProfiles.comboProfile.badge,
+                                type: 'combo',
+                                year,
+                                icon: userProfiles.comboProfile.icon,
+                                description: userProfiles.comboProfile.description,
+                                color: userProfiles.comboProfile.color
+                            });
+                        }
+                    }
+                }
+
+                // Si l'utilisateur a participé, l'ajouter à la liste
+                if (hasParticipated) {
+                    // Trouver le badge le plus rare/récent
+                    // Priorité: combo > photographer > voter, et année la plus récente
+                    let mainBadge = null;
+
+                    if (allBadges.length > 0) {
+                        // Tri par priorité de type puis par année
+                        allBadges.sort((a, b) => {
+                            // D'abord par type (combo > photographer > voter)
+                            const typeOrder = { combo: 3, photographer: 2, voter: 1 };
+                            const typeCompare = typeOrder[b.type] - typeOrder[a.type];
+                            if (typeCompare !== 0) return typeCompare;
+
+                            // Ensuite par année (plus récente en premier)
+                            return b.year - a.year;
+                        });
+
+                        mainBadge = allBadges[0];
+                    }
+
+                    familyMembers.push({
+                        userId: user.id,
+                        username: user.username,
+                        mainBadge,
+                        totalBadges: allBadges.length
+                    });
+                }
+            }
+
+            // Tri par nombre de badges décroissant, puis par nom
+            familyMembers.sort((a, b) => {
+                if (b.totalBadges !== a.totalBadges) {
+                    return b.totalBadges - a.totalBadges;
+                }
+                return a.username.localeCompare(b.username);
+            });
+
+            return {
+                success: true,
+                family,
+                members: familyMembers,
+                last3Years
+            };
+        } catch (error) {
+            logger.error('Error in getFamilyBadges:', error);
+            return {
+                success: false,
+                error: error.message,
+                members: []
+            };
+        }
     }
 }
 

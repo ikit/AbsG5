@@ -201,6 +201,21 @@
               <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
                 Cliquez pour découvrir tous les achievements
               </div>
+
+              <!-- Lien vers la galerie des badges par famille -->
+              <div style="margin-top: 15px;">
+                <v-btn
+                  :to="'/agpa/badges-gallery'"
+                  target="_blank"
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  append-icon="fas fa-external-link-alt"
+                >
+                  <v-icon start>fas fa-users</v-icon>
+                  Galerie par famille
+                </v-btn>
+              </div>
             </v-card-text>
           </v-card>
         </v-col>

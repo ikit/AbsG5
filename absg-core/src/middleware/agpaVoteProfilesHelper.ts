@@ -6,6 +6,7 @@ export interface VoteData {
     from: string;
     to: string;
     weight: number;
+    categoryId?: number;
 }
 
 export interface UserData {
@@ -14,6 +15,7 @@ export interface UserData {
     sex?: string;
     spouse?: string;
     children?: string[];
+    age?: number;
 }
 
 export interface VoterProfile {
@@ -104,11 +106,15 @@ export interface YearData {
  * @param username nom de l'utilisateur
  * @param votes tous les votes de l'édition
  * @param users tous les utilisateurs participants
+ * @param photoCountByUser nombre de photos par utilisateur
+ * @param photoCountByCategory nombre de photos par catégorie
  */
 function analyzeVoterProfile(
     username: string,
     votes: VoteData[],
-    users: Record<string, UserData>
+    users: Record<string, UserData>,
+    photoCountByUser: Record<string, number>,
+    photoCountByCategory: Record<number, number>
 ): VoterProfile | null {
     const userVotes = votes.filter(v => v.from === username);
 
@@ -191,7 +197,18 @@ function analyzeVoterProfile(
     }
 
     // 2. L'Amoureux Transi 💕
-    if (spousePercent > 50) {
+    // Vérifier que l'utilisateur a voté 2 points pour TOUTES les photos de son conjoint
+    let hasAmoureuxTransi = false;
+    if (user.spouse && photoCountByUser[user.spouse]) {
+        const spousePhotoCount = photoCountByUser[user.spouse];
+        const votesForSpouse = userVotes.filter(v => v.to === user.spouse);
+        const votesAt2Points = votesForSpouse.filter(v => v.weight === 2);
+
+        // L'utilisateur doit avoir voté 2 points pour exactement toutes les photos du conjoint
+        hasAmoureuxTransi = votesAt2Points.length === spousePhotoCount;
+    }
+
+    if (hasAmoureuxTransi) {
         return {
             username,
             badge: 'L\'Amoureux Transi',
@@ -239,7 +256,17 @@ function analyzeVoterProfile(
     }
 
     // 6. Le Philanthrope 🌈
-    if (recipients.size >= 8) {
+    // Compter les photographes de plus de 12 ans (ayant soumis des photos)
+    const photographersOver12 = Object.keys(photoCountByUser).filter(userId => {
+        const photographer = users[userId];
+        return photographer && photographer.age !== undefined && photographer.age > 12;
+    });
+
+    // Vérifier que l'utilisateur a voté pour TOUS les photographes de plus de 12 ans
+    const hasPhilanthrope = photographersOver12.length > 0 &&
+        photographersOver12.every(photographerId => recipients.has(photographerId));
+
+    if (hasPhilanthrope) {
         return {
             username,
             badge: 'Le Philanthrope',
@@ -287,7 +314,35 @@ function analyzeVoterProfile(
     }
 
     // 10. Le Mécène 🎁
-    if (totalPoints > 100) {
+    // Vérifier que l'utilisateur donne TOUS ses points disponibles
+    // avec maximum un vote à 2 points par catégorie
+    const votesAt2Points = userVotes.filter(v => v.weight === 2);
+
+    // Compter les votes à 2 points par catégorie
+    const twoPointVotesByCategory: Record<number, number> = {};
+    votesAt2Points.forEach(v => {
+        if (v.categoryId !== undefined) {
+            twoPointVotesByCategory[v.categoryId] = (twoPointVotesByCategory[v.categoryId] || 0) + 1;
+        }
+    });
+
+    // Calculer le maximum de points théoriquement distribuables
+    // Règle: pour chaque catégorie, max = round(nbPhotos / 2)
+    let maxPointsAvailable = 0;
+    Object.entries(photoCountByCategory).forEach(([categoryId, photoCount]) => {
+        maxPointsAvailable += Math.round(photoCount / 2);
+    });
+
+    // Vérifier que chaque catégorie a au plus un vote à 2 points
+    const maxTwoPointsPerCategory = Math.max(0, ...Object.values(twoPointVotesByCategory));
+
+    // Le Mécène: a distribué TOUS ses points disponibles
+    // et au maximum un vote à 2 points par catégorie
+    const hasMecene = totalPoints === maxPointsAvailable &&
+                      maxTwoPointsPerCategory <= 1 &&
+                      maxPointsAvailable >= 80; // Minimum 80 points disponibles pour éviter les petites éditions
+
+    if (hasMecene) {
         return {
             username,
             badge: 'Le Mécène',
@@ -298,15 +353,72 @@ function analyzeVoterProfile(
         };
     }
 
-    // Par défaut - Équilibré
-    return {
-        username,
-        badge: 'Le Modéré',
-        icon: 'fas fa-balance-scale',
-        description: 'Ni trop, ni trop peu',
-        color: '#607d8b',
-        stats
-    };
+    // 11. Le Modéré ⚖️
+    // Vérifier que l'utilisateur distribue une valeur moyenne par catégorie
+    // avec au maximum 50% de votes à 2 points par catégorie
+
+    // Calculer les points distribués par catégorie
+    const pointsByCategory: Record<number, number> = {};
+    const twoPointCountByCategory: Record<number, number> = {};
+    const totalVotesByCategory: Record<number, number> = {};
+
+    userVotes.forEach(v => {
+        if (v.categoryId !== undefined) {
+            pointsByCategory[v.categoryId] = (pointsByCategory[v.categoryId] || 0) + v.weight;
+            totalVotesByCategory[v.categoryId] = (totalVotesByCategory[v.categoryId] || 0) + 1;
+            if (v.weight === 2) {
+                twoPointCountByCategory[v.categoryId] = (twoPointCountByCategory[v.categoryId] || 0) + 1;
+            }
+        }
+    });
+
+    // Vérifier les conditions pour chaque catégorie
+    let isModere = true;
+    let categoriesChecked = 0;
+
+    Object.entries(photoCountByCategory).forEach(([categoryId, photoCount]) => {
+        const catId = parseInt(categoryId);
+        const pointsInCategory = pointsByCategory[catId] || 0;
+
+        // Si l'utilisateur a voté dans cette catégorie
+        if (pointsInCategory > 0) {
+            categoriesChecked++;
+
+            // Calcul des bornes pour la catégorie
+            const maxForCategory = Math.round(photoCount / 2);
+            const minForCategory = Math.round(maxForCategory / 2);
+            const avgForCategory = (maxForCategory + minForCategory) / 2;
+
+            // Vérifier que les points sont dans la moyenne ±5 points
+            if (Math.abs(pointsInCategory - avgForCategory) > 5) {
+                isModere = false;
+            }
+
+            // Vérifier que max 50% de votes à 2 points dans cette catégorie
+            const totalVotesInCat = totalVotesByCategory[catId] || 0;
+            const twoPointVotesInCat = twoPointCountByCategory[catId] || 0;
+            const twoPointPercent = totalVotesInCat > 0 ? (twoPointVotesInCat / totalVotesInCat) * 100 : 0;
+
+            if (twoPointPercent > 50) {
+                isModere = false;
+            }
+        }
+    });
+
+    // Le Modéré: doit avoir voté dans au moins 3 catégories et respecter les règles
+    if (isModere && categoriesChecked >= 3) {
+        return {
+            username,
+            badge: 'Le Modéré',
+            icon: 'fas fa-balance-scale',
+            description: 'Ni trop, ni trop peu',
+            color: '#607d8b',
+            stats
+        };
+    }
+
+    // Aucun badge ne correspond - retourner null
+    return null;
 }
 
 /**
@@ -314,11 +426,13 @@ function analyzeVoterProfile(
  * @param username nom de l'utilisateur
  * @param votes tous les votes de l'édition
  * @param users tous les utilisateurs participants
+ * @param photoCountByUser nombre de photos par utilisateur
  */
 function analyzePhotographerProfile(
     username: string,
     votes: VoteData[],
-    users: Record<string, UserData>
+    users: Record<string, UserData>,
+    photoCountByUser: Record<string, number>
 ): PhotographerProfile | null {
     const receivedVotes = votes.filter(v => v.to === username);
 
@@ -401,7 +515,30 @@ function analyzePhotographerProfile(
         };
     }
 
-    // 3. Le Chouchou de Famille 🏠
+    // 3. Le Chéri(e) de Mon Cœur 💝
+    // Vérifier que le conjoint a voté 2 points pour TOUTES les photos de l'utilisateur
+    let hasCheriDeMonCoeur = false;
+    if (user.spouse && photoCountByUser[username]) {
+        const userPhotoCount = photoCountByUser[username];
+        const votesFromSpouse = receivedVotes.filter(v => v.from === user.spouse);
+        const votesAt2Points = votesFromSpouse.filter(v => v.weight === 2);
+
+        // Le conjoint doit avoir voté 2 points pour exactement toutes les photos de l'utilisateur
+        hasCheriDeMonCoeur = votesAt2Points.length === userPhotoCount;
+    }
+
+    if (hasCheriDeMonCoeur) {
+        return {
+            username,
+            badge: 'Le Chéri(e) de Mon Cœur',
+            icon: 'fas fa-heart-pulse',
+            description: 'Mon conjoint me soutient inconditionnellement',
+            color: '#e91e63',
+            stats
+        };
+    }
+
+    // 4. Le Chouchou de Famille 🏠
     if (ownFamilyPercent > 70 && totalPoints > 20) {
         return {
             username,
@@ -413,7 +550,7 @@ function analyzePhotographerProfile(
         };
     }
 
-    // 4. Le Transfuge 🌍
+    // 5. Le Transfuge 🌍
     if (ownFamilyPercent < 30 && totalPoints > 30) {
         return {
             username,
@@ -425,7 +562,7 @@ function analyzePhotographerProfile(
         };
     }
 
-    // 5. Le Protégé 👑
+    // 6. Le Protégé 👑
     if (voterCount <= 3 && totalPoints > 30) {
         return {
             username,
@@ -437,7 +574,7 @@ function analyzePhotographerProfile(
         };
     }
 
-    // 6. La Coqueluche des Dames 💃
+    // 7. La Coqueluche des Dames 💃
     if (femaleVotesPercent >= 70 && totalPoints > 20) {
         return {
             username,
@@ -449,7 +586,7 @@ function analyzePhotographerProfile(
         };
     }
 
-    // 7. L'Équilibré ⚖️
+    // 8. L'Équilibré ⚖️
     const familyValues = Object.values(votesByFamily);
     if (familyValues.length >= 3) {
         const avgFam = familyValues.reduce((sum, v) => sum + v, 0) / familyValues.length;
@@ -468,7 +605,7 @@ function analyzePhotographerProfile(
         }
     }
 
-    // 8. L'Inconnu 👻
+    // 9. L'Inconnu 👻
     if (totalPoints < 15) {
         return {
             username,
@@ -480,15 +617,8 @@ function analyzePhotographerProfile(
         };
     }
 
-    // Par défaut - Talent Émergent
-    return {
-        username,
-        badge: 'Le Talent Émergent',
-        icon: 'fas fa-seedling',
-        description: 'En progression',
-        color: '#8bc34a',
-        stats
-    };
+    // Aucun badge ne correspond - retourner null
+    return null;
 }
 
 /**
@@ -497,14 +627,12 @@ function analyzePhotographerProfile(
  * @param voterProfile profil de votant
  * @param photographerProfile profil de photographe
  * @param votes tous les votes de l'édition
- * @param users tous les utilisateurs participants
  */
 function analyzeComboProfile(
     username: string,
     voterProfile: VoterProfile | null,
     photographerProfile: PhotographerProfile | null,
-    votes: VoteData[],
-    users: Record<string, UserData>
+    votes: VoteData[]
 ): ComboProfile | null {
     if (!voterProfile || !photographerProfile) return null;
 
@@ -635,26 +763,17 @@ function analyzeComboProfile(
         };
     }
 
-    // 10. Le Couple Parfait 💑 - Amoureux Transi votant avec réciprocité
-    if (voterProfile.badge === 'L\'Amoureux Transi') {
-        const user = users[username];
-        if (user.spouse) {
-            // Vérifier si le conjoint lui rend la pareille
-            const spouseVotes = votes.filter(v => v.from === user.spouse && v.to === username);
-            const spouseTotal = spouseVotes.reduce((sum, v) => sum + v.weight, 0);
-            const spousePercent = totalReceived > 0 ? (spouseTotal / totalReceived * 100) : 0;
-
-            if (spousePercent > 40) {
-                return {
-                    username,
-                    badge: 'Le Couple Parfait',
-                    icon: 'fas fa-heart',
-                    description: 'L\'amour est réciproque',
-                    color: '#e91e63',
-                    stats
-                };
-            }
-        }
+    // 10. Le Couple Parfait 💑 - Amoureux Transi votant ET Chéri(e) de Mon Cœur photographe
+    if (voterProfile.badge === 'L\'Amoureux Transi' &&
+        photographerProfile.badge === 'Le Chéri(e) de Mon Cœur') {
+        return {
+            username,
+            badge: 'Le Couple Parfait',
+            icon: 'fas fa-rings-wedding',
+            description: 'Amour inconditionnel et réciproque',
+            color: '#e91e63',
+            stats
+        };
     }
 
     // 11. L'Incompris 😢 - Philanthrope votant MAIS Inconnu photographe
@@ -1196,21 +1315,25 @@ function analyzeSlidingProfile(
 
 /**
  * Analyse les profils de tous les utilisateurs
- * @param votes liste de tous les votes [from, to, weight]
+ * @param votes liste de tous les votes [from, to, weight, categoryId]
  * @param users dictionnaire des utilisateurs avec leurs infos (famille, conjoint, enfants)
+ * @param photoCountByUser nombre de photos par utilisateur
+ * @param photoCountByCategory nombre de photos par catégorie
  */
 export function analyzeVoteProfiles(
-    votes: Array<[string, string, number]>,
-    users: Record<string, UserData>
+    votes: Array<[string, string, number, number?]>,
+    users: Record<string, UserData>,
+    photoCountByUser: Record<string, number>,
+    photoCountByCategory: Record<number, number>
 ): Record<string, UserProfiles> {
-    const voteData: VoteData[] = votes.map(([from, to, weight]) => ({ from, to, weight }));
+    const voteData: VoteData[] = votes.map(([from, to, weight, categoryId]) => ({ from, to, weight, categoryId }));
     const profiles: Record<string, UserProfiles> = {};
 
     // Analyser chaque utilisateur
     Object.keys(users).forEach(username => {
-        const voterProfile = analyzeVoterProfile(username, voteData, users);
-        const photographerProfile = analyzePhotographerProfile(username, voteData, users);
-        const comboProfile = analyzeComboProfile(username, voterProfile, photographerProfile, voteData, users);
+        const voterProfile = analyzeVoterProfile(username, voteData, users, photoCountByUser, photoCountByCategory);
+        const photographerProfile = analyzePhotographerProfile(username, voteData, users, photoCountByUser);
+        const comboProfile = analyzeComboProfile(username, voterProfile, photographerProfile, voteData);
 
         profiles[username] = {
             voterProfile,

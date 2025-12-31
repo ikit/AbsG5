@@ -131,6 +131,15 @@ export class AgpaController {
     }
 
     /**
+     * Récupère les membres actifs d'une famille avec leurs badges principaux
+     * @param family le nom de la famille (gueudelot, guyomard, guibert)
+     */
+    @Get("/family-badges/:family")
+    getFamilyBadges(@Param("family") family: string) {
+        return agpaService.getFamilyBadges(family);
+    }
+
+    /**
      * Recalcule tous les badges pour une année donnée (admin only)
      * Supprime les badges existants et les recalcule pour tous les utilisateurs
      * @param year l'année pour laquelle recalculer les badges

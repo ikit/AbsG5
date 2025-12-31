@@ -20,7 +20,7 @@ export const BADGES_METADATA = [
         timing: 'direct',
         icon: 'fas fa-heart',
         description: 'Vote beaucoup pour son/sa conjoint(e)',
-        condition: '> 50% des votes pour son conjoint',
+        condition: '2 points pour TOUTES les photos du conjoint',
         color: '#e91e63'
     },
     {
@@ -56,7 +56,7 @@ export const BADGES_METADATA = [
         timing: 'direct',
         icon: 'fas fa-hand-holding-heart',
         description: 'Il y a du talent partout !',
-        condition: '≥ 8 personnes différentes ont reçu des votes',
+        condition: 'A voté pour TOUS les photographes de plus de 12 ans',
         color: '#9c27b0'
     },
     {
@@ -92,20 +92,20 @@ export const BADGES_METADATA = [
         timing: 'direct',
         icon: 'fas fa-gift',
         description: 'Tout le monde est talentueux !',
-        condition: '> 100 points distribués au total',
+        condition: 'A distribué TOUS ses points disponibles + maximum un vote à 2 points par catégorie',
         color: '#ffd700'
     },
     {
         badge: 'Le Modéré',
         type: 'voter',
         timing: 'direct',
-        icon: 'fas fa-check',
+        icon: 'fas fa-balance-scale',
         description: 'Ni trop, ni trop peu',
-        condition: 'Badge par défaut (équilibré)',
+        condition: 'Valeur moyenne par catégorie (±5 pts) + max 50% votes à 2 pts/catégorie',
         color: '#607d8b'
     },
 
-    // ===== BADGES PHOTOGRAPHE (9) =====
+    // ===== BADGES PHOTOGRAPHE (10) =====
     {
         badge: 'Le Phénomène',
         type: 'photographer',
@@ -123,6 +123,15 @@ export const BADGES_METADATA = [
         description: 'Très apprécié par beaucoup',
         condition: '≥ 8 votants différents',
         color: '#ffd700'
+    },
+    {
+        badge: 'Le Chéri(e) de Mon Cœur',
+        type: 'photographer',
+        timing: 'direct',
+        icon: 'fas fa-heart-pulse',
+        description: 'Mon conjoint me soutient inconditionnellement',
+        condition: 'Conjoint a voté 2 points pour TOUTES vos photos',
+        color: '#e91e63'
     },
     {
         badge: 'Le Chouchou de Famille',
@@ -177,15 +186,6 @@ export const BADGES_METADATA = [
         description: 'Qui suis-je ?',
         condition: '< 15 points reçus au total',
         color: '#9e9e9e'
-    },
-    {
-        badge: 'Le Talent Émergent',
-        type: 'photographer',
-        timing: 'direct',
-        icon: 'fas fa-seedling',
-        description: 'En progression',
-        condition: 'Badge par défaut',
-        color: '#8bc34a'
     },
 
     // ===== BADGES COMBO - Directs (14) =====
@@ -281,11 +281,11 @@ export const BADGES_METADATA = [
         badge: 'Le Couple Parfait',
         type: 'combo',
         timing: 'direct',
-        icon: 'fas fa-heart',
-        description: 'L\'amour est réciproque',
-        condition: 'Badge "Amoureux Transi" + > 40% pts reçus du conjoint',
+        icon: 'fas fa-rings-wedding',
+        description: 'Amour inconditionnel et réciproque',
+        condition: 'Vous et votre conjoint avez voté 2 points pour TOUTES les photos de l\'autre',
         color: '#e91e63',
-        requires: ['L\'Amoureux Transi']
+        requires: ['L\'Amoureux Transi', 'Le Chéri(e) de Mon Cœur']
     },
     {
         badge: 'L\'Incompris',

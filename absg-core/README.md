@@ -344,6 +344,10 @@ kill -9 <PID>
 - [Migration Guide](../.kiro/specs/modernization-stack/MIGRATION_GUIDE.md)
 - [Security Audit](../.kiro/specs/modernization-stack/SECURITY_AUDIT.md)
 - [Performance Testing](../.kiro/specs/modernization-stack/PERFORMANCE_TESTING.md)
+- [Family Relations in AGPA Badges](CHANGELOG_FAMILY_RELATIONS.md) - Intégration des relations familiales (spouse/children) dans le calcul des badges
+- [Love Badges System](CHANGELOG_LOVE_BADGES.md) - Système de badges amoureux (L'Amoureux Transi, Le Chéri(e) de Mon Cœur, Le Couple Parfait)
+- [Le Mécène Badge Update](CHANGELOG_MECENE_BADGE.md) - Modification du badge "Le Mécène" pour distribuer TOUS les points disponibles avec max 1 vote à 2pts/catégorie
+- [Le Modéré Badge Update](CHANGELOG_MODERE_BADGE.md) - Transformation de "Le Modéré" en badge critérié (valeur moyenne ±5pts + max 50% votes 2pts) + suppression des badges par défaut
 
 ## Licence
 

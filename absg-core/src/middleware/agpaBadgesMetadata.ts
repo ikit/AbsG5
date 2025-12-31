@@ -104,20 +104,20 @@ export const BADGES_METADATA: BadgeMetadata[] = [
         timing: 'direct',
         icon: 'fas fa-gift',
         description: 'Tout le monde est talentueux !',
-        condition: '> 100 points distribués au total',
+        condition: 'A distribué TOUS ses points disponibles + maximum un vote à 2 points par catégorie',
         color: '#ffd700'
     },
     {
         badge: 'Le Modéré',
         type: 'voter',
         timing: 'direct',
-        icon: 'fas fa-check',
+        icon: 'fas fa-balance-scale',
         description: 'Ni trop, ni trop peu',
-        condition: 'Badge par défaut (équilibré)',
+        condition: 'Valeur moyenne par catégorie (±5 pts) + max 50% votes à 2 pts/catégorie',
         color: '#607d8b'
     },
 
-    // ===== BADGES PHOTOGRAPHE (9) =====
+    // ===== BADGES PHOTOGRAPHE (10) =====
     {
         badge: 'Le Phénomène',
         type: 'photographer',
@@ -189,15 +189,6 @@ export const BADGES_METADATA: BadgeMetadata[] = [
         description: 'Qui suis-je ?',
         condition: '< 15 points reçus au total',
         color: '#9e9e9e'
-    },
-    {
-        badge: 'Le Talent Émergent',
-        type: 'photographer',
-        timing: 'direct',
-        icon: 'fas fa-seedling',
-        description: 'En progression',
-        condition: 'Badge par défaut',
-        color: '#8bc34a'
     },
 
     // ===== BADGES COMBO - Directs (14) =====
