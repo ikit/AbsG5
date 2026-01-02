@@ -130,7 +130,7 @@
         <v-col cols="12" md="6">
           <v-card
             style="cursor: pointer; transition: transform 0.2s; height: 100%;"
-            @click="showBadgesDialog = true"
+            @click="showFamilyGalleryDialog = true"
             hover
           >
             <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
@@ -138,7 +138,7 @@
               Mes Succès
             </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
-              <!-- Total badges débloqués -->
+              <!-- Total badges actifs -->
               <div style="margin-bottom: 25px;">
                 <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
                   <span v-if="slidingYearFrom && slidingYearTo">
@@ -149,72 +149,79 @@
                   </span>
                 </div>
                 <div style="font-size: 3em; font-weight: bold; color: #fa709a; margin-bottom: 5px;">
-                  {{ mySlidingBadges.length }}
+                  {{ totalActiveBadges }}
                 </div>
                 <div style="font-size: 0.9em; color: #666;">
-                  Badge{{ mySlidingBadges.length > 1 ? 's' : '' }} débloqué{{ mySlidingBadges.length > 1 ? 's' : '' }}
+                  Badge{{ totalActiveBadges > 1 ? 's' : '' }} actif{{ totalActiveBadges > 1 ? 's' : '' }}
                 </div>
               </div>
 
-              <!-- Répartition par type -->
-              <div style="margin-bottom: 15px;">
-                <!-- Badge Votant -->
-                <div style="margin-bottom: 10px; padding: 10px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-vote-yea" style="color: #2196f3; font-size: 1.2em;"></i>
-                      <div style="font-size: 0.85em; font-weight: 600; color: #666;">Votant</div>
+              <!-- Top 3 badges les plus rares -->
+              <div v-if="topRarestBadges.length > 0" style="margin-bottom: 15px;">
+                <div
+                  v-for="(badgeData, index) in topRarestBadges"
+                  :key="badgeData.badge.badge"
+                  style="margin-bottom: 10px; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                  :style="{
+                    background: `linear-gradient(135deg, ${badgeData.badge.color}22 0%, ${badgeData.badge.color}11 100%)`,
+                    border: `2px solid ${badgeData.badge.color}`
+                  }"
+                  @click.stop="showBadgesDialog = true"
+                  @mouseenter="$event.currentTarget.style.transform = 'scale(1.02)'"
+                  @mouseleave="$event.currentTarget.style.transform = 'scale(1)'"
+                >
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <!-- Icône du badge -->
+                    <div
+                      style="
+                        min-width: 50px;
+                        height: 50px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        background: white;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                      "
+                    >
+                      <i
+                        :class="badgeData.badge.icon"
+                        style="font-size: 1.5em;"
+                        :style="{ color: badgeData.badge.color }"
+                      ></i>
                     </div>
-                    <div style="font-size: 1.3em; font-weight: bold; color: #2196f3;">
-                      {{ countBadgesByType('voter') }}
-                    </div>
-                  </div>
-                </div>
 
-                <!-- Badge Photographe -->
-                <div style="margin-bottom: 10px; padding: 10px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-camera" style="color: #ff9800; font-size: 1.2em;"></i>
-                      <div style="font-size: 0.85em; font-weight: 600; color: #666;">Photographe</div>
+                    <!-- Infos du badge -->
+                    <div style="flex: 1; text-align: left;">
+                      <div style="font-weight: 600; font-size: 0.95em; color: #333; margin-bottom: 2px;">
+                        {{ badgeData.badge.badge }}
+                      </div>
+                      <div style="font-size: 0.75em; color: #666;">
+                        {{ badgeData.badge.description }}
+                      </div>
                     </div>
-                    <div style="font-size: 1.3em; font-weight: bold; color: #ff9800;">
-                      {{ countBadgesByType('photographer') }}
-                    </div>
-                  </div>
-                </div>
 
-                <!-- Badge Combo -->
-                <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      <i class="fas fa-puzzle-piece" style="color: #9c27b0; font-size: 1.2em;"></i>
-                      <div style="font-size: 0.85em; font-weight: 600; color: #666;">Combo</div>
-                    </div>
-                    <div style="font-size: 1.3em; font-weight: bold; color: #9c27b0;">
-                      {{ countBadgesByType('combo') }}
-                    </div>
+                    <!-- Badge type chip -->
+                    <v-chip
+                      size="x-small"
+                      :color="getBadgeTypeColor(badgeData.badge.type)"
+                      variant="flat"
+                      style="min-width: 70px;"
+                    >
+                      {{ getBadgeTypeLabel(badgeData.badge.type) }}
+                    </v-chip>
                   </div>
                 </div>
+              </div>
+
+              <!-- Si moins de 3 badges -->
+              <div v-else style="padding: 30px; color: #999; font-style: italic;">
+                <i class="fas fa-trophy" style="font-size: 2em; opacity: 0.3; margin-bottom: 10px;"></i>
+                <div>Obtenez des badges en participant aux AGPA !</div>
               </div>
 
               <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
-                Cliquez pour découvrir tous les achievements
-              </div>
-
-              <!-- Lien vers la galerie des badges par famille -->
-              <div style="margin-top: 15px;">
-                <v-btn
-                  :to="'/agpa/badges-gallery'"
-                  target="_blank"
-                  color="primary"
-                  variant="outlined"
-                  size="small"
-                  append-icon="fas fa-external-link-alt"
-                >
-                  <v-icon start>fas fa-users</v-icon>
-                  Galerie par famille
-                </v-btn>
+                Cliquez pour voir la galerie par famille
               </div>
             </v-card-text>
           </v-card>
@@ -475,40 +482,46 @@
         </v-card-title>
 
         <v-card-text style="padding: 20px;">
-          <!-- Légende -->
-          <div style="margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
-            <div style="font-size: 0.9em; color: #666; margin-bottom: 10px; font-weight: 600;">Légende:</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.85em;">
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 20px; height: 20px; borderRadius: 50%; background: #4caf50; display: flex; alignItems: center; justifyContent: center; color: white; fontSize: 0.7em;">
-                  <i class="fas fa-check"></i>
-                </div>
-                <span>Obtenu au moins une fois</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 20px; height: 20px; borderRadius: 50%; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; alignItems: center; justifyContent: center; color: white; fontSize: 0.7em;">
-                  <i class="fas fa-fire"></i>
-                </div>
-                <span>Actif (obtenu ces 3 dernières éditions)</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 20px; height: 20px; borderRadius: 50%; background: #2196f3; display: flex; alignItems: center; justifyContent: center; color: white; fontSize: 0.6em; fontWeight: bold;">
-                  3Y
-                </div>
-                <span>Badge progressif (sur 3 ans)</span>
-              </div>
-            </div>
+          <!-- Filtres -->
+          <div style="margin-bottom: 25px;">
+            <v-chip-group
+              v-model="badgeFilter"
+              mandatory
+              selected-class="text-primary"
+              color="primary"
+            >
+              <v-chip value="all" variant="outlined">
+                <v-icon start size="small">fas fa-globe</v-icon>
+                Tous ({{ allBadgesCount }})
+              </v-chip>
+              <v-chip value="obtained" variant="outlined">
+                <v-icon start size="small">fas fa-check-circle</v-icon>
+                Obtenus ({{ obtainedBadgesCount }})
+              </v-chip>
+              <v-chip value="active" variant="outlined">
+                <v-icon start size="small">fas fa-fire</v-icon>
+                Actifs 3 ans ({{ activeBadgesCount }})
+              </v-chip>
+              <v-chip value="almostCombo" variant="outlined">
+                <v-icon start size="small">fas fa-hourglass-half</v-icon>
+                Combos en cours ({{ almostComboBadgesCount }})
+              </v-chip>
+              <v-chip value="neverObtained" variant="outlined">
+                <v-icon start size="small">fas fa-lock</v-icon>
+                Jamais obtenus ({{ neverObtainedBadgesCount }})
+              </v-chip>
+            </v-chip-group>
           </div>
 
           <!-- Badges Votant -->
-          <div style="margin-bottom: 30px;">
+          <div v-if="filteredVoterBadges.length > 0" style="margin-bottom: 30px;">
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-vote-yea" style="color: #2196f3;"></i>
-              Badges Votant ({{ voterBadges.length }})
+              Badges Votant ({{ filteredVoterBadges.length }})
             </h3>
             <v-row>
               <v-col
-                v-for="badge in voterBadges"
+                v-for="badge in filteredVoterBadges"
                 :key="badge.badge"
                 cols="12"
                 sm="6"
@@ -524,14 +537,14 @@
           </div>
 
           <!-- Badges Photographe -->
-          <div style="margin-bottom: 30px;">
+          <div v-if="filteredPhotographerBadges.length > 0" style="margin-bottom: 30px;">
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-camera" style="color: #ff9800;"></i>
-              Badges Photographe ({{ photographerBadges.length }})
+              Badges Photographe ({{ filteredPhotographerBadges.length }})
             </h3>
             <v-row>
               <v-col
-                v-for="badge in photographerBadges"
+                v-for="badge in filteredPhotographerBadges"
                 :key="badge.badge"
                 cols="12"
                 sm="6"
@@ -547,10 +560,10 @@
           </div>
 
           <!-- Badges Combo -->
-          <div>
+          <div v-if="filteredComboBadges.length > 0">
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
               <i class="fas fa-puzzle-piece" style="color: #9c27b0;"></i>
-              Badges Combo ({{ comboBadges.length }})
+              Badges Combo ({{ filteredComboBadges.length }})
             </h3>
             <div style="font-size: 0.9em; color: #666; margin-bottom: 15px; font-style: italic;">
               <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
@@ -558,7 +571,7 @@
             </div>
             <v-row>
               <v-col
-                v-for="badge in comboBadges"
+                v-for="badge in filteredComboBadges"
                 :key="badge.badge"
                 cols="12"
                 sm="6"
@@ -573,6 +586,17 @@
               </v-col>
             </v-row>
           </div>
+
+          <!-- Message si aucun badge ne correspond au filtre -->
+          <div
+            v-if="filteredVoterBadges.length === 0 && filteredPhotographerBadges.length === 0 && filteredComboBadges.length === 0"
+            style="text-align: center; padding: 50px; color: #999;"
+          >
+            <v-icon size="64" color="grey-lighten-2">fas fa-filter</v-icon>
+            <div style="margin-top: 20px; font-size: 1.1em;">
+              Aucun badge ne correspond à ce filtre
+            </div>
+          </div>
         </v-card-text>
 
         <v-card-actions>
@@ -581,6 +605,305 @@
             variant="text"
             color="primary"
             @click="showBadgesDialog = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Dialog Galerie par Famille -->
+    <v-dialog
+      v-model="showFamilyGalleryDialog"
+      max-width="1200px"
+      scrollable
+    >
+      <v-card>
+        <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; position: sticky; top: 0; z-index: 10;">
+          <v-icon start color="white">fas fa-users</v-icon>
+          Galerie des Badges par Famille
+        </v-card-title>
+
+        <v-card-text style="padding: 30px;">
+          <!-- Sélecteur de famille -->
+          <div style="margin-bottom: 30px; text-align: center;">
+            <v-btn-toggle
+              v-model="selectedFamily"
+              mandatory
+              color="primary"
+              variant="outlined"
+              divided
+            >
+              <v-btn value="gueudelot" size="large">
+                <v-icon start>fas fa-users</v-icon>
+                Gueudelot
+              </v-btn>
+              <v-btn value="guyomard" size="large">
+                <v-icon start>fas fa-users</v-icon>
+                Guyomard
+              </v-btn>
+              <v-btn value="guibert" size="large">
+                <v-icon start>fas fa-users</v-icon>
+                Guibert
+              </v-btn>
+            </v-btn-toggle>
+          </div>
+
+          <!-- Message de chargement -->
+          <div v-if="loadingFamilyMembers" style="text-align: center; padding: 50px;">
+            <v-progress-circular
+              indeterminate
+              color="primary"
+              size="64"
+            />
+            <div style="margin-top: 20px; color: #666;">
+              Chargement des membres de la famille...
+            </div>
+          </div>
+
+          <!-- Message si pas de membres -->
+          <div v-else-if="!loadingFamilyMembers && familyMembers.length === 0" style="text-align: center; padding: 50px;">
+            <v-icon size="64" color="grey">fas fa-user-slash</v-icon>
+            <div style="margin-top: 20px; color: #666; font-size: 1.1em;">
+              Aucun membre actif trouvé pour cette famille
+            </div>
+            <div style="margin-top: 10px; color: #999; font-size: 0.9em;">
+              (Actif = ayant participé aux AGPA ces 3 dernières années)
+            </div>
+          </div>
+
+          <!-- Galerie des membres -->
+          <v-row v-else>
+            <v-col
+              v-for="member in familyMembers"
+              :key="member.userId"
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+            >
+              <v-card
+                class="member-card"
+                hover
+                elevation="2"
+                @click="showMemberDetails(member)"
+                style="cursor: pointer;"
+              >
+                <!-- Avatar -->
+                <div style="text-align: center; padding: 20px 20px 10px 20px;">
+                  <v-avatar
+                    size="120"
+                    style="border: 4px solid #f5f5f5; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                  >
+                    <img
+                      :src="`/files/avatars/${String(member.userId).padStart(3, '0')}.png`"
+                      :alt="member.username"
+                      @error="onAvatarError"
+                    >
+                  </v-avatar>
+                </div>
+
+                <!-- Nom d'utilisateur -->
+                <v-card-title style="text-align: center; padding: 10px 15px; font-size: 1.1em;">
+                  {{ member.username }}
+                </v-card-title>
+
+                <!-- Badge principal (le plus rare) -->
+                <v-card-text v-if="member.mainBadge" style="text-align: center; padding: 15px;">
+                  <div
+                    style="
+                      padding: 15px;
+                      border-radius: 12px;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                    "
+                  >
+                    <div style="margin-bottom: 8px;">
+                      <i
+                        :class="member.mainBadge.icon"
+                        style="font-size: 2em;"
+                        :style="{ color: member.mainBadge.color || '#ffffff' }"
+                      ></i>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.95em; margin-bottom: 4px;">
+                      {{ member.mainBadge.badge }}
+                    </div>
+                    <div style="font-size: 0.75em; opacity: 0.9;">
+                      {{ member.mainBadge.description }}
+                    </div>
+                    <div style="font-size: 0.7em; opacity: 0.7; margin-top: 6px;">
+                      Édition {{ member.mainBadge.year }}
+                    </div>
+                  </div>
+                </v-card-text>
+
+                <!-- Si pas de badge -->
+                <v-card-text v-else style="text-align: center; padding: 15px;">
+                  <div
+                    style="
+                      padding: 15px;
+                      border-radius: 12px;
+                      background: #f5f5f5;
+                      color: #999;
+                    "
+                  >
+                    <i class="fas fa-medal" style="font-size: 2em; opacity: 0.3;"></i>
+                    <div style="font-size: 0.85em; margin-top: 8px;">
+                      Aucun badge obtenu
+                    </div>
+                  </div>
+                </v-card-text>
+
+                <!-- Nombre total de badges obtenus -->
+                <v-card-actions style="justify-content: center; padding: 10px;">
+                  <v-chip
+                    v-if="member.totalBadges > 0"
+                    color="primary"
+                    variant="tonal"
+                    size="small"
+                  >
+                    <v-icon start size="small">fas fa-award</v-icon>
+                    {{ member.totalBadges }} badge{{ member.totalBadges > 1 ? 's' : '' }}
+                  </v-chip>
+                  <v-chip
+                    v-else
+                    color="grey"
+                    variant="tonal"
+                    size="small"
+                  >
+                    <v-icon start size="small">fas fa-medal</v-icon>
+                    En attente
+                  </v-chip>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            color="primary"
+            @click="showFamilyGalleryDialog = false"
+          >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Dialog modale pour afficher tous les badges d'un membre -->
+    <v-dialog
+      v-model="memberDetailsDialog"
+      max-width="800"
+      scrollable
+    >
+      <v-card v-if="selectedMember">
+        <!-- En-tête avec avatar et nom -->
+        <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px;">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <v-avatar size="80" style="border: 3px solid white;">
+              <img
+                :src="`/files/avatars/${String(selectedMember.userId).padStart(3, '0')}.png`"
+                :alt="selectedMember.username"
+                @error="onAvatarError"
+              >
+            </v-avatar>
+            <div>
+              <div style="font-size: 1.5em; font-weight: 600;">
+                {{ selectedMember.username }}
+              </div>
+              <div style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">
+                <v-icon start color="white" size="small">fas fa-award</v-icon>
+                {{ selectedMember.totalBadges }} badge{{ selectedMember.totalBadges > 1 ? 's' : '' }} obtenu{{ selectedMember.totalBadges > 1 ? 's' : '' }}
+              </div>
+            </div>
+          </div>
+        </v-card-title>
+
+        <!-- Corps avec la liste des badges -->
+        <v-card-text style="padding: 25px; max-height: 500px;">
+          <div v-if="selectedMember.allBadges && selectedMember.allBadges.length > 0">
+            <div
+              v-for="(badge, index) in selectedMember.allBadges"
+              :key="`${badge.badge}_${badge.year}_${badge.type}`"
+              style="margin-bottom: 15px;"
+            >
+              <v-card
+                :style="{
+                  border: `2px solid ${badge.color || '#ccc'}`,
+                  background: `linear-gradient(135deg, ${badge.color || '#ccc'}22 0%, ${badge.color || '#ccc'}11 100%)`
+                }"
+                elevation="1"
+              >
+                <v-card-text style="padding: 20px;">
+                  <div style="display: flex; align-items: center; gap: 20px;">
+                    <!-- Icône du badge -->
+                    <div
+                      style="
+                        min-width: 60px;
+                        height: 60px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        background: white;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                      "
+                    >
+                      <i
+                        :class="badge.icon"
+                        style="font-size: 1.8em;"
+                        :style="{ color: badge.color || '#666' }"
+                      ></i>
+                    </div>
+
+                    <!-- Infos du badge -->
+                    <div style="flex: 1;">
+                      <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 5px;">
+                        {{ badge.badge }}
+                      </div>
+                      <div style="color: #666; font-size: 0.9em; margin-bottom: 8px;">
+                        {{ badge.description }}
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <v-chip
+                          size="small"
+                          :color="getBadgeTypeColor(badge.type)"
+                          variant="flat"
+                        >
+                          <v-icon start size="x-small">{{ getBadgeTypeIcon(badge.type) }}</v-icon>
+                          {{ getBadgeTypeLabel(badge.type) }}
+                        </v-chip>
+                        <v-chip size="small" color="grey" variant="tonal">
+                          <v-icon start size="x-small">fas fa-calendar</v-icon>
+                          {{ badge.year }}
+                        </v-chip>
+                      </div>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </div>
+          </div>
+
+          <!-- Message si aucun badge -->
+          <div v-else style="text-align: center; padding: 50px; color: #999;">
+            <v-icon size="64" color="grey-lighten-2">fas fa-medal</v-icon>
+            <div style="margin-top: 20px; font-size: 1.1em;">
+              Aucun badge obtenu sur les 3 dernières années
+            </div>
+          </div>
+        </v-card-text>
+
+        <!-- Actions -->
+        <v-card-actions style="padding: 15px 25px; justify-content: flex-end;">
+          <v-btn
+            color="primary"
+            variant="text"
+            @click="memberDetailsDialog = false"
           >
             Fermer
           </v-btn>
@@ -641,6 +964,14 @@ export default {
         voteProfiles: {},
         showBadgesDialog: false,
         badgesHistory: {}, // Will hold badge status for each badge from API
+        badgeFilter: 'all', // Filter for badges dialog: all, obtained, active, almostCombo, neverObtained
+        // Galerie par famille
+        showFamilyGalleryDialog: false,
+        selectedFamily: 'gueudelot',
+        familyMembers: [],
+        loadingFamilyMembers: false,
+        memberDetailsDialog: false,
+        selectedMember: null,
         // Mode debug admin
         debugModeEnabled: false,
         debugUserId: null,
@@ -665,6 +996,205 @@ export default {
         },
         comboBadges() {
             return getBadgesByType('combo');
+        },
+
+        // Top 3 badges les plus rares obtenus par l'utilisateur
+        topRarestBadges() {
+            if (!this.badgesHistory || Object.keys(this.badgesHistory).length === 0) {
+                return [];
+            }
+
+            // Récupérer tous les badges actifs avec leurs métadonnées
+            const activeBadges = [];
+            const allBadges = [...this.voterBadges, ...this.photographerBadges, ...this.comboBadges];
+
+            for (const badge of allBadges) {
+                const badgeStatus = this.badgesHistory[badge.badge];
+                if (badgeStatus && badgeStatus.isActive) {
+                    activeBadges.push({
+                        badge: badge,
+                        status: badgeStatus
+                    });
+                }
+            }
+
+            // Trier par priorité: combo > progressive > rare badges
+            // Priorité 1: Badges combo (les plus difficiles)
+            // Priorité 2: Badges progressifs (nécessitent plusieurs années)
+            // Priorité 3: Badges directs dans cet ordre de rareté
+            const rarityOrder = {
+                // Combo badges (très rares)
+                'L\'Incompris': 1,
+                'Le Couple Parfait': 2,
+                'Le Perfectionniste': 3,
+                'La Force Tranquille': 4,
+                'L\'Expert Oublié': 5,
+                'Le Solitaire': 6,
+                'Le Modeste': 7,
+                'Le Phénomène Discret': 8,
+                'Le Philanthrope Méconnu': 9,
+                'Le Généreux Invisible': 10,
+                'L\'Iconoclaste': 11,
+                'Le Prodige': 12,
+                'Le Diplomate Étoilé': 13,
+                'La Légende': 14,
+
+                // Progressive badges (rares car nécessitent du temps)
+                'L\'Habitué': 50,
+                'Le Fidèle': 51,
+                'Le Vétéran': 52,
+                'Le Polyvalent': 53,
+                'L\'Éclectique': 54,
+                'L\'Artiste Complet': 55,
+                'Le Productif': 56,
+                'Le Prolifique': 57,
+                'L\'Auteur': 58,
+                'Le Créateur': 59,
+                'L\'Influent': 60,
+                'Le Collectionneur': 61,
+                'Le Grand Collectionneur': 62,
+                'Le Maître Collectionneur': 63,
+
+                // Photographer badges (moyennement rares)
+                'Le Phénomène': 100,
+                'La Star': 101,
+                'Le Chéri(e) de Mon Cœur': 102,
+                'Le Chouchou de Famille': 103,
+                'Le Transfuge': 104,
+                'Le Protégé': 105,
+                'La Coqueluche des Dames': 106,
+                'L\'Équilibré': 107,
+                'L\'Inconnu': 108,
+
+                // Voter badges (plus communs)
+                'L\'Admirateur': 150,
+                'L\'Amoureux Transi': 151,
+                'Le Parent Fier': 152,
+                'Le Sniper': 153,
+                'Féministe Convaincu': 154,
+                'Le Philanthrope': 155,
+                'L\'Anticonformiste': 156,
+                'Le Diplomate': 157,
+                'Le Radin': 158,
+                'Le Mécène': 159,
+                'Le Modéré': 160
+            };
+
+            activeBadges.sort((a, b) => {
+                const rarityA = rarityOrder[a.badge.badge] || 999;
+                const rarityB = rarityOrder[b.badge.badge] || 999;
+                return rarityA - rarityB;
+            });
+
+            // Retourner les 3 premiers
+            return activeBadges.slice(0, 3);
+        },
+
+        // Nombre total de badges actifs (obtenus sur les 3 dernières éditions)
+        totalActiveBadges() {
+            if (!this.badgesHistory || Object.keys(this.badgesHistory).length === 0) {
+                return 0;
+            }
+
+            // Compter tous les badges actifs (isActive = true)
+            let count = 0;
+            for (const badgeName in this.badgesHistory) {
+                const badgeStatus = this.badgesHistory[badgeName];
+                if (badgeStatus && badgeStatus.isActive) {
+                    count++;
+                }
+            }
+
+            return count;
+        },
+
+        // Badge filter counts
+        allBadgesCount() {
+            return this.voterBadges.length + this.photographerBadges.length + this.comboBadges.length;
+        },
+
+        obtainedBadgesCount() {
+            if (!this.badgesHistory || Object.keys(this.badgesHistory).length === 0) {
+                return 0;
+            }
+            let count = 0;
+            for (const badgeName in this.badgesHistory) {
+                const badgeStatus = this.badgesHistory[badgeName];
+                if (badgeStatus && badgeStatus.everObtained) {
+                    count++;
+                }
+            }
+            return count;
+        },
+
+        activeBadgesCount() {
+            return this.totalActiveBadges; // Reuse existing computed property
+        },
+
+        almostComboBadgesCount() {
+            if (!this.badgesHistory || Object.keys(this.badgesHistory).length === 0) {
+                return 0;
+            }
+
+            let count = 0;
+            for (const comboBadge of this.comboBadges) {
+                const badgeStatus = this.badgesHistory[comboBadge.badge];
+
+                // Skip if combo badge is already obtained
+                if (badgeStatus && badgeStatus.isActive) {
+                    continue;
+                }
+
+                // Check if combo has prerequisites defined
+                if (!comboBadge.requires || comboBadge.requires.length === 0) {
+                    continue;
+                }
+
+                // Check if user has at least one ACTIVE required badge (but not all)
+                let activeCount = 0;
+                for (const requiredBadge of comboBadge.requires) {
+                    const requiredStatus = this.badgesHistory[requiredBadge];
+                    if (requiredStatus && requiredStatus.isActive) {
+                        activeCount++;
+                    }
+                }
+
+                // "Almost complete" = has at least 1 active prerequisite but not all of them
+                if (activeCount > 0 && activeCount < comboBadge.requires.length) {
+                    count++;
+                }
+            }
+            return count;
+        },
+
+        neverObtainedBadgesCount() {
+            if (!this.badgesHistory || Object.keys(this.badgesHistory).length === 0) {
+                return this.allBadgesCount;
+            }
+
+            let count = 0;
+            const allBadges = [...this.voterBadges, ...this.photographerBadges, ...this.comboBadges];
+
+            for (const badge of allBadges) {
+                const badgeStatus = this.badgesHistory[badge.badge];
+                if (!badgeStatus || !badgeStatus.everObtained) {
+                    count++;
+                }
+            }
+            return count;
+        },
+
+        // Filtered badge lists based on selected filter
+        filteredVoterBadges() {
+            return this.filterBadgesByType(this.voterBadges);
+        },
+
+        filteredPhotographerBadges() {
+            return this.filterBadgesByType(this.photographerBadges);
+        },
+
+        filteredComboBadges() {
+            return this.filterBadgesByType(this.comboBadges);
         },
 
         // Options pour le select de filtrage par famille
@@ -723,6 +1253,18 @@ export default {
             }
 
             return result;
+        }
+    },
+    watch: {
+        selectedFamily() {
+            if (this.showFamilyGalleryDialog) {
+                this.loadFamilyMembers();
+            }
+        },
+        showFamilyGalleryDialog(newVal) {
+            if (newVal) {
+                this.loadFamilyMembers();
+            }
         }
     },
     mounted () {
@@ -1192,6 +1734,120 @@ export default {
             }
 
             this.mySlidingBadges = slidingBadges;
+        },
+
+        // Méthodes pour la galerie par famille
+        async loadFamilyMembers() {
+            this.loadingFamilyMembers = true;
+            try {
+                const response = await axios.get(`/api/agpa/family-badges/${this.selectedFamily}`);
+                if (response.data.success) {
+                    this.familyMembers = response.data.members || [];
+                } else {
+                    console.error('Erreur lors du chargement des membres:', response.data);
+                    this.familyMembers = [];
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des membres de la famille:', error);
+                this.familyMembers = [];
+            } finally {
+                this.loadingFamilyMembers = false;
+            }
+        },
+
+        showMemberDetails(member) {
+            this.selectedMember = member;
+            this.memberDetailsDialog = true;
+        },
+
+        onAvatarError(event) {
+            // Fallback to default avatar if image not found
+            event.target.src = '/files/avatars/default.png';
+        },
+
+        getBadgeTypeLabel(type) {
+            const labels = {
+                voter: 'Votant',
+                photographer: 'Photographe',
+                combo: 'Combo'
+            };
+            return labels[type] || type;
+        },
+
+        getBadgeTypeColor(type) {
+            const colors = {
+                voter: 'blue',
+                photographer: 'green',
+                combo: 'purple'
+            };
+            return colors[type] || 'grey';
+        },
+
+        getBadgeTypeIcon(type) {
+            const icons = {
+                voter: 'fas fa-vote-yea',
+                photographer: 'fas fa-camera',
+                combo: 'fas fa-star'
+            };
+            return icons[type] || 'fas fa-medal';
+        },
+
+        // Filter badges based on selected filter
+        filterBadgesByType(badgesList) {
+            if (!badgesList || badgesList.length === 0) {
+                return [];
+            }
+
+            if (this.badgeFilter === 'all') {
+                return badgesList;
+            }
+
+            return badgesList.filter(badge => {
+                const badgeStatus = this.badgesHistory[badge.badge];
+
+                switch (this.badgeFilter) {
+                    case 'obtained':
+                        // Badges obtenus au moins une fois
+                        return badgeStatus && badgeStatus.everObtained;
+
+                    case 'active':
+                        // Badges actifs (obtenus sur les 3 dernières éditions)
+                        return badgeStatus && badgeStatus.isActive;
+
+                    case 'almostCombo':
+                        // Only for combo badges: user has some (but not all) ACTIVE prerequisites
+                        if (badge.type !== 'combo') {
+                            return false;
+                        }
+                        if (badgeStatus && badgeStatus.isActive) {
+                            return false; // Already obtained
+                        }
+
+                        // Check if combo has prerequisites defined
+                        if (!badge.requires || badge.requires.length === 0) {
+                            return false;
+                        }
+
+                        // Count how many ACTIVE required badges the user has
+                        let activeCount = 0;
+                        for (const requiredBadge of badge.requires) {
+                            const requiredStatus = this.badgesHistory[requiredBadge];
+                            if (requiredStatus && requiredStatus.isActive) {
+                                activeCount++;
+                            }
+                        }
+
+                        // Return true if user has at least 1 active prerequisite but not all of them
+                        return activeCount > 0 && activeCount < badge.requires.length;
+
+                    case 'neverObtained':
+                        // Badges jamais obtenus
+                        return !badgeStatus || !badgeStatus.everObtained;
+
+                    default:
+                        return true;
+                }
+            });
         }
     }
 };
@@ -1200,4 +1856,13 @@ export default {
 
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
+
+.member-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.member-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
 </style>

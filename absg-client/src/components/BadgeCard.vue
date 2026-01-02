@@ -125,15 +125,6 @@
           {{ req }}
         </div>
       </div>
-
-      <!-- Indicateur semi-actif -->
-      <div
-        v-if="isSemiActive"
-        style="margin-top: 8px; padding: 6px 8px; background: #ff980020; border: 1px solid #ff9800; border-radius: 4px; font-size: 0.75em; color: #e65100;"
-      >
-        <i class="fas fa-star-half-alt" style="margin-right: 4px;"></i>
-        Semi-actif: {{ fulfilledRequirements }}/{{ badge.requires.length }} prérequis obtenus
-      </div>
     </div>
 
     <!-- Barre de progression pour badges progressifs -->
@@ -175,22 +166,6 @@ export default {
       default: null
     }
   },
-  computed: {
-    isSemiActive() {
-      if (!this.badge.requires || this.badge.requires.length === 0) {
-        return false;
-      }
-
-      const fulfilled = this.fulfilledRequirements;
-      return fulfilled > 0 && fulfilled < this.badge.requires.length;
-    },
-
-    fulfilledRequirements() {
-      if (!this.badge.requires) return 0;
-
-      return this.badge.requires.filter(req => this.getRequirementStatus(req)).length;
-    }
-  },
   methods: {
     getBorderColor() {
       if (this.badgeStatus && this.badgeStatus.isActive) {
@@ -213,7 +188,7 @@ export default {
     },
 
     getRequirementStatus(requirementName) {
-      // Vérifier si le badge prérequis a été obtenu récemment (3 dernières éditions)
+      // Vérifier si le badge prérequis est actif (obtenu sur les 3 dernières éditions)
       return this.allBadgesStatus[requirementName]?.isActive || false;
     }
   }
