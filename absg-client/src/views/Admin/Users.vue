@@ -177,7 +177,7 @@
             <v-col cols="4">
               <v-select
                 v-model="userEditor.person.motherId"
-                :items="usersListForRelations"
+                :items="mothersListForRelations"
                 label="Mère"
                 clearable
                 item-title="displayName"
@@ -206,7 +206,7 @@
             <v-col cols="4">
               <v-select
                 v-model="userEditor.person.fatherId"
-                :items="usersListForRelations"
+                :items="fathersListForRelations"
                 label="Père"
                 clearable
                 item-title="displayName"
@@ -235,7 +235,7 @@
             <v-col cols="4">
               <v-select
                 v-model="userEditor.person.spouseId"
-                :items="usersListForRelations"
+                :items="spousesListForRelations"
                 label="Conjoint(e)"
                 clearable
                 item-title="displayName"
@@ -415,7 +415,29 @@ export default {
                 displayName: u.person?.firstname && u.person?.lastname
                     ? `${u.person.firstname} ${u.person.lastname}`
                     : u.username
-            })).filter(u => u.personId !== null); // Exclure les utilisateurs sans person
+            }))
+            .filter(u => u.personId !== null) // Exclure les utilisateurs sans person
+            .sort((a, b) => a.displayName.localeCompare(b.displayName)); // Tri alphabétique
+        },
+
+        mothersListForRelations() {
+            // Filtrer uniquement les femmes pour la sélection de la mère
+            return this.usersListForRelations.filter(u => u.person?.sex === 'female');
+        },
+
+        fathersListForRelations() {
+            // Filtrer uniquement les hommes pour la sélection du père
+            return this.usersListForRelations.filter(u => u.person?.sex === 'male');
+        },
+
+        spousesListForRelations() {
+            // Filtrer par sexe opposé si le sexe de l'utilisateur édité est défini
+            if (!this.userEditor.person?.sex || this.userEditor.person.sex === 'undefined') {
+                return this.usersListForRelations; // Pas de filtre si sexe non défini
+            }
+
+            const oppositeSex = this.userEditor.person.sex === 'male' ? 'female' : 'male';
+            return this.usersListForRelations.filter(u => u.person?.sex === oppositeSex);
         }
     },
     mounted () {
