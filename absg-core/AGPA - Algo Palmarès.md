@@ -4,6 +4,8 @@
 
 Ce document liste l'ensemble des statistiques nécessaires pour déterminer l'attribution des **61 badges AGPA** (11 votant + 9 photographe + 14 combo directs + 27 combo progressifs).
 
+**Dernière mise à jour** : 2026-01-03
+
 ---
 
 ## I. STATISTIQUES DE VOTE (Badges Votant - 11 badges)
@@ -11,7 +13,9 @@ Ce document liste l'ensemble des statistiques nécessaires pour déterminer l'at
 ### A. Distribution des votes
 
 1. **Total de points distribués**
-   - Pour Le Radin (<30), Le Mécène (>100), Le Modéré (par défaut)
+   - Pour Le Radin (<30)
+   - Pour Le Mécène (distribution complète de tous les points disponibles)
+   - Pour Le Modéré (distribution moyenne par catégorie ±5 points)
 
 2. **Nombre de votes donnés**
    - Pour Le Revenant (<10)
@@ -29,11 +33,11 @@ Ce document liste l'ensemble des statistiques nécessaires pour déterminer l'at
 5. **Pourcentage de votes pour sa propre famille**
    - Pour Le Patriote (>70%), L'Anticonformiste (<30%)
 
-6. **Pourcentage de votes pour son/sa conjoint(e)**
-   - Pour L'Amoureux Transi (>50%)
+6. **Votes pour les photos du conjoint**
+   - Pour L'Amoureux Transi (2 points pour TOUTES les photos du conjoint)
 
-7. **Pourcentage de votes pour ses enfants**
-   - Pour Le Parent Fier (>50%)
+7. **Votes pour les photos des enfants**
+   - Pour Le Parent Fier (2 points pour TOUTES les photos des enfants)
 
 ### D. Analyse genre des votes donnés
 
@@ -78,8 +82,8 @@ Ce document liste l'ensemble des statistiques nécessaires pour déterminer l'at
 
 ### D. Analyse du conjoint
 
-17. **Pourcentage de points reçus du conjoint**
-    - Pour Le Couple Parfait (>40%)
+17. **Votes reçus du conjoint**
+    - Pour Le Chéri(e) de Mon Cœur (2 points du conjoint pour TOUTES les photos)
 
 ---
 
@@ -107,7 +111,7 @@ Ce document liste l'ensemble des statistiques nécessaires pour déterminer l'at
 - **Le Fan Club**: Badges "Le Sniper" + "Le Protégé"
 - **Le Politique**: Badges "Le Diplomate" + "L'Équilibré"
 - **Le Phénomène Total**: >100 pts donnés + Badge "Le Phénomène"
-- **Le Couple Parfait**: Badge "Amoureux Transi" + >40% pts reçus du conjoint
+- **Le Couple Parfait**: Badge "L'Amoureux Transi" + Badge "Le Chéri(e) de Mon Cœur"
 - **L'Incompris**: Badge "Le Philanthrope" + (Badge "L'Inconnu" ou <15 pts reçus)
 - **Girl Power**: Badges "Féministe Convaincu" + "Coqueluche des Dames"
 
@@ -260,6 +264,108 @@ Ces statistiques permettent de déterminer les **61 badges** au total:
 
 ---
 
+## 📝 Modifications Importantes du Système
+
+### 1. Relations Familiales (2025-12-31)
+
+**Objectif** : Activer les badges AGPA dépendant des relations familiales (conjoint/enfants).
+
+**Modifications** :
+- Ajout de 3 relations auto-référencées dans l'entité `Person` :
+  - `spouseId` : ID du conjoint
+  - `motherId` : ID de la mère
+  - `fatherId` : ID du père
+- Modification du service AGPA pour résoudre automatiquement les relations :
+  - Mapping `personId → userId` pour convertir les IDs
+  - Résolution du conjoint via `personToUser[spouseId]`
+  - Recherche des enfants via `motherId` ou `fatherId`
+
+**Badges impactés** :
+- **L'Amoureux Transi** 💕 : Vote 2 points pour TOUTES les photos du conjoint
+- **Le Parent Fier** 👨‍👧‍👦 : Vote 2 points pour TOUTES les photos des enfants (somme)
+- **Le Chéri(e) de Mon Cœur** 💝 : Le conjoint vote 2 points pour TOUTES les photos de l'utilisateur
+- **Le Couple Parfait** 💑 : Badge combo = "L'Amoureux Transi" + "Le Chéri(e) de Mon Cœur"
+
+**Référence** : `CHANGELOG_FAMILY_RELATIONS.md`
+
+### 2. Système de Badges Amoureux (2025-12-31)
+
+**Objectif** : Créer un système cohérent et symétrique de badges récompensant l'amour conjugal.
+
+**Modifications** :
+- **Badge Votant** : L'Amoureux Transi 💕
+  - Condition: 2 points pour TOUTES les photos du conjoint
+  - Description: "Mon amour mérite tous les trophées"
+
+- **Badge Photographe (NOUVEAU)** : Le Chéri(e) de Mon Cœur 💝
+  - Condition: Le conjoint vote 2 points pour TOUTES les photos de l'utilisateur
+  - Description: "Mon conjoint me soutient inconditionnellement"
+  - Priorité: 3ème badge photographe
+
+- **Badge Combo (MODIFIÉ)** : Le Couple Parfait 💑
+  - Ancienne condition: L'Amoureux Transi + vérification manuelle (>40%)
+  - Nouvelle condition: L'Amoureux Transi + Le Chéri(e) de Mon Cœur
+  - Description: "Amour inconditionnel et réciproque"
+
+**Impact** :
+- Badges photographe : 9 → 10 (ajout de "Le Chéri(e) de Mon Cœur")
+- Total badges : 61 → 62
+
+**Référence** : `CHANGELOG_LOVE_BADGES.md`
+
+### 3. Badge "Le Mécène" (2025-12-31)
+
+**Objectif** : Adapter le badge au système de votes AGPA où le nombre de points distribuables varie selon le nombre de photos.
+
+**Modifications** :
+- **Anciennes conditions** : >100 points distribués
+- **Nouvelles conditions** (TOUTES requises) :
+  1. Distribution complète: `totalPoints === maxPointsAvailable`
+  2. Maximum un vote à 2 points par catégorie
+  3. Seuil minimum: ≥80 points disponibles dans l'édition
+
+**Calcul de `maxPointsAvailable`** :
+- Pour chaque catégorie: `max = round(nbPhotos / 2)`
+- Total: `SUM(max)` pour toutes les catégories
+
+**Changements techniques** :
+- Ajout du champ `categoryId` dans l'interface `VoteData`
+- Ajout du paramètre `photoCountByCategory` dans les fonctions d'analyse
+- Nouvelle requête SQL pour obtenir le nombre de photos par catégorie
+
+**Référence** : `CHANGELOG_MECENE_BADGE.md`
+
+### 4. Badge "Le Modéré" + Suppression des Badges par Défaut (2025-12-31)
+
+**Objectif** : Transformer "Le Modéré" d'un badge par défaut en un badge méritoire récompensant un comportement équilibré.
+
+**Modifications** :
+- **Anciennes conditions** : Badge par défaut (attribution automatique)
+- **Nouvelles conditions** (TOUTES requises) :
+  1. Distribution moyenne par catégorie (±5 points de la moyenne)
+  2. Maximum 50% de votes à 2 points par catégorie
+  3. Minimum 3 catégories votées
+
+**Calcul de la moyenne par catégorie** :
+- `maxPoints = round(nbPhotos / 2)`
+- `minPoints = round(maxPoints / 2)`
+- `moyenne = (maxPoints + minPoints) / 2`
+- Plage acceptable: `[moyenne - 5, moyenne + 5]`
+
+**Suppression des badges par défaut** :
+- ❌ **L'Éclectique** (badge par défaut votant) - Supprimé
+- ❌ **Le Talent Émergent** (badge par défaut photographe) - Supprimé
+- Les fonctions retournent maintenant `null` si aucun badge ne correspond
+
+**Impact** :
+- Badges photographe : 10 → 9 (suppression de "Le Talent Émergent")
+- Total badges : 62 → 61
+- Philosophie: Les badges sont des récompenses méritées, pas des attributions automatiques
+
+**Référence** : `CHANGELOG_MODERE_BADGE.md`
+
+---
+
 ## 🔄 Algorithme de Calcul
 
 ### Étape 1: Collecte des données brutes
@@ -275,15 +381,15 @@ Pour chaque année, calculer les 32 statistiques listées ci-dessus.
 
 #### A. Badges Votant (année en cours)
 - Calculer les statistiques 1-10
-- Appliquer les règles de chaque badge
+- Appliquer les règles de chaque badge par ordre de priorité
 - Attribuer le badge correspondant (1 seul badge votant par an)
-- Badge par défaut: "Le Modéré"
+- Retourner `null` si aucun badge ne correspond (pas de badge par défaut)
 
 #### B. Badges Photographe (année en cours)
 - Calculer les statistiques 11-17
-- Appliquer les règles de chaque badge
+- Appliquer les règles de chaque badge par ordre de priorité
 - Attribuer le badge correspondant (1 seul badge photographe par an)
-- Badge par défaut: "Le Talent Émergent"
+- Retourner `null` si aucun badge ne correspond (pas de badge par défaut)
 
 #### C. Badges Combo Directs (année en cours)
 - Calculer les statistiques 18-20
