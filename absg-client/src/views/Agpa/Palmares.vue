@@ -66,12 +66,34 @@
               <!-- Total points cumulés -->
               <div style="margin-bottom: 25px;">
                 <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
-                  <span v-if="slidingYearFrom && slidingYearTo">
-                    {{ slidingYearFrom }} - {{ slidingYearTo }}
-                  </span>
-                  <span v-else>
-                    3 dernières éditions
-                  </span>
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="props"
+                        variant="text"
+                        size="small"
+                        style="text-transform: none; font-size: 0.85em;"
+                      >
+                        <span v-if="slidingYearFrom && slidingYearTo">
+                          {{ slidingYearFrom }} - {{ slidingYearTo }}
+                        </span>
+                        <span v-else>
+                          3 dernières éditions
+                        </span>
+                        <v-icon end size="small">fas fa-chevron-down</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-list density="compact">
+                      <v-list-item
+                        v-for="period in availableSlidingPeriods"
+                        :key="`${period.from}-${period.to}`"
+                        :active="slidingYearFrom === period.from && slidingYearTo === period.to"
+                        @click="changeSlidingPeriod(period.from, period.to)"
+                      >
+                        <v-list-item-title>{{ period.from }} - {{ period.to }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </div>
                 <template v-if="mySlidingAgpas > 0">
                   <div style="font-size: 3em; font-weight: bold; color: #667eea; margin-bottom: 5px;">
@@ -141,12 +163,34 @@
               <!-- Total badges actifs -->
               <div style="margin-bottom: 25px;">
                 <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
-                  <span v-if="slidingYearFrom && slidingYearTo">
-                    {{ slidingYearFrom }} - {{ slidingYearTo }}
-                  </span>
-                  <span v-else>
-                    3 dernières éditions
-                  </span>
+                  <v-menu>
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="props"
+                        variant="text"
+                        size="small"
+                        style="text-transform: none; font-size: 0.85em;"
+                      >
+                        <span v-if="slidingYearFrom && slidingYearTo">
+                          {{ slidingYearFrom }} - {{ slidingYearTo }}
+                        </span>
+                        <span v-else>
+                          3 dernières éditions
+                        </span>
+                        <v-icon end size="small">fas fa-chevron-down</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-list density="compact">
+                      <v-list-item
+                        v-for="period in availableSlidingPeriods"
+                        :key="`${period.from}-${period.to}`"
+                        :active="slidingYearFrom === period.from && slidingYearTo === period.to"
+                        @click="changeSlidingPeriod(period.from, period.to)"
+                      >
+                        <v-list-item-title>{{ period.from }} - {{ period.to }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </div>
                 <div style="font-size: 3em; font-weight: bold; color: #fa709a; margin-bottom: 5px;">
                   {{ totalActiveBadges }}
@@ -979,7 +1023,7 @@ export default {
         allUsers: [],
     }),
     computed: {
-        ...mapState(['user']),
+        ...mapState(['user', 'agpaMeta']),
         isAdmin() {
             return this.user?.roles?.includes('admin') || false;
         },
@@ -1253,6 +1297,26 @@ export default {
             }
 
             return result;
+        },
+
+        // Available sliding periods (3-year windows)
+        availableSlidingPeriods() {
+            const periods = [];
+
+            // Use AGPA metadata for min/max years, fallback to reasonable defaults
+            const minYear = this.agpaMeta?.minYear || 2006;
+            const maxYear = this.agpaMeta?.maxYear || new Date().getFullYear();
+
+            // Generate all possible 3-year sliding windows
+            // Start from the most recent period and go backwards
+            for (let yearTo = maxYear; yearTo >= minYear + 2; yearTo--) {
+                periods.push({
+                    from: yearTo - 2,
+                    to: yearTo
+                });
+            }
+
+            return periods;
         }
     },
     watch: {
@@ -1377,6 +1441,43 @@ export default {
                 };
                 // Récupérer la variation de rang depuis l'API
                 this.myRankChange = myEntry.rankChange !== undefined ? myEntry.rankChange : null;
+            }
+        },
+
+        async changeSlidingPeriod(yearFrom, yearTo) {
+            // Update the selected period
+            this.slidingYearFrom = yearFrom;
+            this.slidingYearTo = yearTo;
+
+            // Reload sliding palmares with the selected period
+            try {
+                const response = await axios.get(`/api/agpa/palmares/sliding?yearFrom=${yearFrom}&yearTo=${yearTo}`);
+                const data = parseAxiosResponse(response);
+
+                if (!data) {
+                    this.slidingPalmares = [];
+                } else if (Array.isArray(data)) {
+                    // Format ancien (fallback) - tableau direct
+                    this.slidingPalmares = data.map( e => ({
+                        ...e,
+                        ...getPeopleAvatar(e)
+                    }));
+                } else if (data?.palmares && Array.isArray(data.palmares)) {
+                    // Format avec années - objet avec propriété palmares
+                    this.slidingPalmares = data.palmares.map( e => ({
+                        ...e,
+                        ...getPeopleAvatar(e)
+                    }));
+                } else {
+                    this.slidingPalmares = [];
+                }
+
+                // Recalculer les stats et badges pour la nouvelle période
+                this.calculateMySlidingStats();
+                await this.calculateMySlidingBadges();
+            } catch (err) {
+                console.error('Erreur lors du chargement de la période glissante:', err);
+                this.slidingPalmares = [];
             }
         },
 
