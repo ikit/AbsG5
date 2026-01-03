@@ -426,30 +426,22 @@ export default {
             const currentUserBirthYear = this.userEditor.person?.birthdate
                 ? new Date(this.userEditor.person.birthdate).getFullYear()
                 : null;
+            const userFamily = this.userEditor.rootFamily;
 
             return this.usersListForRelations.filter(u => {
                 // Doit être une femme
                 if (u.person?.sex !== 'female') return false;
 
-                // Si on a les dates de naissance, la mère doit être plus âgée (au moins 15 ans)
+                // IMPORTANT: Empêcher de sélectionner quelqu'un né la même année ou après l'utilisateur
                 if (currentUserBirthYear && u.birthYear) {
-                    if (u.birthYear >= currentUserBirthYear - 15) return false;
+                    if (u.birthYear >= currentUserBirthYear) return false;
                 }
 
-                // Privilégier la même famille mère
-                // Mais ne pas exclure complètement les autres pour permettre plus de flexibilité
+                // Filtrer uniquement les utilisateurs de la même famille
+                if (userFamily && u.rootFamily !== userFamily) return false;
+
                 return true;
-            }).sort((a, b) => {
-                // Prioriser ceux de la même famille en les mettant en premier
-                const userFamily = this.userEditor.rootFamily;
-                const aIsFamily = a.rootFamily === userFamily;
-                const bIsFamily = b.rootFamily === userFamily;
-
-                if (aIsFamily && !bIsFamily) return -1;
-                if (!aIsFamily && bIsFamily) return 1;
-
-                return a.displayName.localeCompare(b.displayName);
-            });
+            }).sort((a, b) => a.displayName.localeCompare(b.displayName));
         },
 
         fathersListForRelations() {
@@ -457,29 +449,22 @@ export default {
             const currentUserBirthYear = this.userEditor.person?.birthdate
                 ? new Date(this.userEditor.person.birthdate).getFullYear()
                 : null;
+            const userFamily = this.userEditor.rootFamily;
 
             return this.usersListForRelations.filter(u => {
                 // Doit être un homme
                 if (u.person?.sex !== 'male') return false;
 
-                // Si on a les dates de naissance, le père doit être plus âgé (au moins 15 ans)
+                // IMPORTANT: Empêcher de sélectionner quelqu'un né la même année ou après l'utilisateur
                 if (currentUserBirthYear && u.birthYear) {
-                    if (u.birthYear >= currentUserBirthYear - 15) return false;
+                    if (u.birthYear >= currentUserBirthYear) return false;
                 }
 
-                // Privilégier la même famille mère
+                // Filtrer uniquement les utilisateurs de la même famille
+                if (userFamily && u.rootFamily !== userFamily) return false;
+
                 return true;
-            }).sort((a, b) => {
-                // Prioriser ceux de la même famille en les mettant en premier
-                const userFamily = this.userEditor.rootFamily;
-                const aIsFamily = a.rootFamily === userFamily;
-                const bIsFamily = b.rootFamily === userFamily;
-
-                if (aIsFamily && !bIsFamily) return -1;
-                if (!aIsFamily && bIsFamily) return 1;
-
-                return a.displayName.localeCompare(b.displayName);
-            });
+            }).sort((a, b) => a.displayName.localeCompare(b.displayName));
         },
 
         spousesListForRelations() {
