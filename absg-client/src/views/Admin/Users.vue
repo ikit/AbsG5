@@ -73,7 +73,7 @@
               class="mr-2"
               @click="editUser(item)"
             >
-              fa-pen
+              fas fa-pen
             </v-icon>
           </template>
         </v-data-table>
@@ -161,6 +161,104 @@
                 item-title="label"
                 item-value="id"
               />
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="12">
+              <h2>Relations familiales</h2>
+              <p style="opacity: 0.5">
+                Informations optionnelles pour les badges AGPA.
+              </p>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="4">
+              <v-select
+                v-model="userEditor.person.motherId"
+                :items="usersListForRelations"
+                label="Mère"
+                clearable
+                item-title="displayName"
+                item-value="personId"
+              >
+                <template #item="{ props, item }">
+                  <v-list-item v-bind="props">
+                    <template #prepend>
+                      <v-avatar size="32">
+                        <img :src="item.raw.url">
+                      </v-avatar>
+                    </template>
+                  </v-list-item>
+                </template>
+                <template #selection="{ item }">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <v-avatar size="24">
+                      <img :src="item.raw.url">
+                    </v-avatar>
+                    {{ item.raw.displayName }}
+                  </div>
+                </template>
+              </v-select>
+            </v-col>
+
+            <v-col cols="4">
+              <v-select
+                v-model="userEditor.person.fatherId"
+                :items="usersListForRelations"
+                label="Père"
+                clearable
+                item-title="displayName"
+                item-value="personId"
+              >
+                <template #item="{ props, item }">
+                  <v-list-item v-bind="props">
+                    <template #prepend>
+                      <v-avatar size="32">
+                        <img :src="item.raw.url">
+                      </v-avatar>
+                    </template>
+                  </v-list-item>
+                </template>
+                <template #selection="{ item }">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <v-avatar size="24">
+                      <img :src="item.raw.url">
+                    </v-avatar>
+                    {{ item.raw.displayName }}
+                  </div>
+                </template>
+              </v-select>
+            </v-col>
+
+            <v-col cols="4">
+              <v-select
+                v-model="userEditor.person.spouseId"
+                :items="usersListForRelations"
+                label="Conjoint(e)"
+                clearable
+                item-title="displayName"
+                item-value="personId"
+              >
+                <template #item="{ props, item }">
+                  <v-list-item v-bind="props">
+                    <template #prepend>
+                      <v-avatar size="32">
+                        <img :src="item.raw.url">
+                      </v-avatar>
+                    </template>
+                  </v-list-item>
+                </template>
+                <template #selection="{ item }">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <v-avatar size="24">
+                      <img :src="item.raw.url">
+                    </v-avatar>
+                    {{ item.raw.displayName }}
+                  </div>
+                </template>
+              </v-select>
             </v-col>
           </v-row>
         </v-container>
@@ -298,6 +396,9 @@ export default {
                 firstname: null,
                 sex: null,
                 email: null,
+                motherId: null,
+                fatherId: null,
+                spouseId: null,
             }
         },
         userActivity: {
@@ -305,6 +406,18 @@ export default {
             user: null, // l'utilisateur à supprimer
         }
     }),
+    computed: {
+        usersListForRelations() {
+            // Créer une liste des utilisateurs avec un displayName pour les selects de relations
+            return this.usersList.map(u => ({
+                ...u,
+                personId: u.person?.id || null,
+                displayName: u.person?.firstname && u.person?.lastname
+                    ? `${u.person.firstname} ${u.person.lastname}`
+                    : u.username
+            })).filter(u => u.personId !== null); // Exclure les utilisateurs sans person
+        }
+    },
     mounted () {
         this.isLoading = true;
         this.resetDialog();
@@ -334,6 +447,9 @@ export default {
                 firstname: "",
                 sex: "undefined",
                 email: "",
+                motherId: null,
+                fatherId: null,
+                spouseId: null,
             }
         },
         editUser(user) {
