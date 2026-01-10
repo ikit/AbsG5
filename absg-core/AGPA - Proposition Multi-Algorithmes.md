@@ -84,73 +84,75 @@ export class AgpaAward {
 
 ### 1.3 Modification de l'Entité AgpaPhoto (scores multi-versions)
 
-Plutôt que de créer une nouvelle entité, on ajoute un champ JSON `scores` dans `AgpaPhoto` pour stocker les scores de chaque algorithme :
+On ajoute des colonnes dédiées pour chaque version d'algorithme (accès direct) + un champ JSON pour les détails de calcul :
 
 ```typescript
 // absg-core/src/entities/AgpaPhoto.ts (modification)
 
+// Champs communs (indépendants de l'algorithme)
+@Column({ comment: "Nombre de votes reçu par la photo", nullable: true })
+votes: number;
+
+@Column({ comment: "Nombre de votes reçu par le titre de la photo", nullable: true })
+votesTitle: number;
+
+@Column({ comment: "Score brut obtenu (somme des points des votes)", nullable: true })
+score: number;
+
+// ========== Scores V2010 (algorithme historique) ==========
+@Column({ comment: "Score homogénéisé V2010 (Note G)", nullable: true })
+scoreV2010: number;
+
+@Column({ comment: "Classement V2010 (toutes catégories confondues)", nullable: true })
+rankingV2010: number;
+
+// ========== Scores V2026 (nouvel algorithme) ==========
+@Column({ comment: "Score homogénéisé V2026", nullable: true })
+scoreV2026: number;
+
+@Column({ comment: "Classement V2026 (toutes catégories confondues)", nullable: true })
+rankingV2026: number;
+
+// ========== Détails de calcul (pour transparence/debug) ==========
 @Column("json", {
-    comment: "Scores calculés par les différents algorithmes (v2010, v2026, ...)",
+    comment: "Détails des calculs par algorithme",
     nullable: true
 })
-scores: {
-    [version: string]: {
-        votes: number;
-        votesTitle: number;
-        score: number;
-        gscore: number;
-        ranking: number;
+scoreDetails: {
+    v2010?: {
+        scoreNote: number;      // Composante points du score
+        votesNote: number;      // Composante votes du score
+        catTotalPhotos: number; // Nb photos dans la catégorie
+        catScoresSum: number;   // Total points distribués dans la catégorie
+        catVotesSum: number;    // Total votes distribués dans la catégorie
         calculatedAt: string;
+    };
+    v2026?: {
+        // À définir selon le nouvel algorithme
+        calculatedAt: string;
+        [key: string]: any;
     };
 };
 ```
 
-**Exemple de données stockées :**
-```json
-{
-    "v2010": {
-        "votes": 15,
-        "votesTitle": 3,
-        "score": 28,
-        "gscore": 12500,
-        "ranking": 4,
-        "calculatedAt": "2026-01-10T15:30:00Z"
-    },
-    "v2026": {
-        "votes": 15,
-        "votesTitle": 3,
-        "score": 32,
-        "gscore": 14200,
-        "ranking": 2,
-        "calculatedAt": "2026-01-10T15:30:00Z"
-    }
-}
-```
-
 **Avantages de cette approche :**
-- Pas de nouvelle table à créer
-- Une seule requête pour récupérer tous les scores d'une photo
-- Facile à étendre pour de futures versions
-- Les champs existants (`votes`, `score`, `gscore`, `ranking`) restent pour la rétrocompatibilité (V2010)
+- Accès direct aux scores/rankings sans parser de JSON
+- Facilité de tri et filtrage SQL (`ORDER BY scoreV2010 DESC`)
+- Détails de calcul disponibles pour transparence
+- Les anciens champs `gscore` et `ranking` sont renommés en `scoreV2010` et `rankingV2010`
 
 **Migration SQL :**
 ```sql
-ALTER TABLE agpa_photo
-ADD COLUMN scores JSONB;
+-- Renommer les colonnes existantes
+ALTER TABLE agpa_photo RENAME COLUMN gscore TO "scoreV2010";
+ALTER TABLE agpa_photo RENAME COLUMN ranking TO "rankingV2010";
 
--- Optionnel: migrer les données existantes vers le format JSON
-UPDATE agpa_photo
-SET scores = jsonb_build_object(
-    'v2010', jsonb_build_object(
-        'votes', votes,
-        'votesTitle', "votesTitle",
-        'score', score,
-        'gscore', gscore,
-        'ranking', ranking,
-        'calculatedAt', NOW()
-    )
-)
-WHERE gscore IS NOT NULL;
+-- Ajouter les nouvelles colonnes V2026
+ALTER TABLE agpa_photo ADD COLUMN "scoreV2026" INTEGER;
+ALTER TABLE agpa_photo ADD COLUMN "rankingV2026" INTEGER;
+
+-- Ajouter le champ JSON pour les détails
+ALTER TABLE agpa_photo ADD COLUMN "scoreDetails" JSONB;
 ```
 
 ### 1.4 Nouvelle Entité : AgpaPalmaresEntry
@@ -235,23 +237,14 @@ DROP INDEX IF EXISTS "IDX_agpa_award_unique";
 CREATE UNIQUE INDEX "IDX_agpa_award_unique"
 ON agpa_award (year, "categoryId", "userId", award, "algorithmVersion");
 
--- 3. Ajouter la colonne scores (JSON) à agpa_photo
-ALTER TABLE agpa_photo
-ADD COLUMN scores JSONB;
+-- 3. Renommer les colonnes existantes de agpa_photo
+ALTER TABLE agpa_photo RENAME COLUMN gscore TO "scoreV2010";
+ALTER TABLE agpa_photo RENAME COLUMN ranking TO "rankingV2010";
 
--- 4. Migrer les scores existants vers le format JSON (V2010)
-UPDATE agpa_photo
-SET scores = jsonb_build_object(
-    'v2010', jsonb_build_object(
-        'votes', votes,
-        'votesTitle', "votesTitle",
-        'score', score,
-        'gscore', gscore,
-        'ranking', ranking,
-        'calculatedAt', NOW()
-    )
-)
-WHERE gscore IS NOT NULL;
+-- 4. Ajouter les nouvelles colonnes V2026 et scoreDetails
+ALTER TABLE agpa_photo ADD COLUMN "scoreV2026" INTEGER;
+ALTER TABLE agpa_photo ADD COLUMN "rankingV2026" INTEGER;
+ALTER TABLE agpa_photo ADD COLUMN "scoreDetails" JSONB;
 
 -- 5. Créer la table agpa_palmares_entry (optionnel, pour cache)
 CREATE TABLE agpa_palmares_entry (

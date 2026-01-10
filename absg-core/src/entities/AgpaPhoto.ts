@@ -25,39 +25,53 @@ export class AgpaPhoto {
     @Column({ comment: "Titre de la photo" })
     title: string;
 
-    @Column({ comment: "Classement de la photo", nullable: true })
-    ranking: number;
-
-    @Column({ comment: "Numéro de la photo", nullable: true })
+    @Column({ comment: "Numéro de la photo (ordre d'affichage lors du vote)", nullable: true })
     number: number;
 
     @Column({ comment: "Nombre de votes reçu par la photo", nullable: true })
     votes: number;
 
-    @Column({ comment: "Nombre de votes reçu par le titre la photo", nullable: true })
+    @Column({ comment: "Nombre de votes reçu par le titre de la photo", nullable: true })
     votesTitle: number;
 
-    @Column({ comment: "Score obtenu par la photo", nullable: true })
+    @Column({ comment: "Score brut obtenu (somme des points des votes)", nullable: true })
     score: number;
 
-    @Column({ comment: "Score homogonéisé obtenu par la photo (V2010)", nullable: true })
-    gscore: number;
+    // ========== Scores V2010 (algorithme historique) ==========
+    @Column({ comment: "Score homogénéisé V2010 (Note G)", nullable: true })
+    scoreV2010: number;
 
+    @Column({ comment: "Classement V2010 (toutes catégories confondues)", nullable: true })
+    rankingV2010: number;
+
+    // ========== Scores V2026 (nouvel algorithme) ==========
+    @Column({ comment: "Score homogénéisé V2026", nullable: true })
+    scoreV2026: number;
+
+    @Column({ comment: "Classement V2026 (toutes catégories confondues)", nullable: true })
+    rankingV2026: number;
+
+    // ========== Métadonnées ==========
     @Column("json", { comment: "Erreur disqualifiant la photo", nullable: true })
     error: any;
 
     @Column("json", {
-        comment: "Scores calculés par les différents algorithmes (v2010, v2026, ...)",
+        comment: "Détails des calculs par algorithme (pour transparence/debug)",
         nullable: true
     })
-    scores: {
-        [version: string]: {
-            votes: number;
-            votesTitle: number;
-            score: number;
-            gscore: number;
-            ranking: number;
+    scoreDetails: {
+        v2010?: {
+            scoreNote: number;      // Composante points du score
+            votesNote: number;      // Composante votes du score
+            catTotalPhotos: number; // Nb photos dans la catégorie
+            catScoresSum: number;   // Total points distribués dans la catégorie
+            catVotesSum: number;    // Total votes distribués dans la catégorie
             calculatedAt: string;
+        };
+        v2026?: {
+            // À définir selon le nouvel algorithme
+            calculatedAt: string;
+            [key: string]: any;
         };
     };
 
@@ -70,13 +84,18 @@ export class AgpaPhoto {
         this.year = json.year ? json.year : null;
         this.filename = json.filename ? json.filename : null;
         this.title = json.title ? json.title : null;
-        this.ranking = json.ranking ? json.ranking : null;
         this.number = json.number ? json.number : null;
         this.votes = json.votes ? json.votes : null;
         this.votesTitle = json.votesTitle ? json.votesTitle : null;
         this.score = json.score ? json.score : null;
-        this.gscore = json.gscore ? json.gscore : null;
+        // Scores V2010 (rétrocompatibilité avec ancien champ gscore/ranking)
+        this.scoreV2010 = json.scoreV2010 ?? json.gscore ?? null;
+        this.rankingV2010 = json.rankingV2010 ?? json.ranking ?? null;
+        // Scores V2026
+        this.scoreV2026 = json.scoreV2026 ?? null;
+        this.rankingV2026 = json.rankingV2026 ?? null;
         this.error = json.error ? json.error : null;
+        this.scoreDetails = json.scoreDetails ?? null;
 
         if (json.user) {
             const user = new User();
