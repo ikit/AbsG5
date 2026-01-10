@@ -1578,7 +1578,7 @@ class AgpaService {
         const usersQuery = `
             SELECT DISTINCT
                 u.id, u.username, u."rootFamily",
-                per."firstName", per."lastName", per.sex
+                per.firstname, per.lastname, per.sex
             FROM "user" u
             LEFT JOIN person per ON u."personId" = per.id
             WHERE u.id IN (
@@ -1658,7 +1658,7 @@ class AgpaService {
 
         return {
             photos: toCsv(photos, ["id", "year", "title", "filename", "votes", "votesTitle", "score", "scoreV2010", "scoreV2026", "rankingV2010", "rankingV2026", "categoryId", "userId", "authorUsername"]),
-            users: toCsv(users, ["id", "username", "rootFamily", "firstName", "lastName", "sex"]),
+            users: toCsv(users, ["id", "username", "rootFamily", "firstname", "lastname", "sex"]),
             votes: toCsv(votes, ["id", "year", "userId", "photoId", "categoryId", "score"]),
             categories: toCsv(categories, ["id", "title", "description", "order", "photoCount", "userCount"]),
             awards: toCsv(awards, ["id", "year", "categoryId", "userId", "photoId", "award", "algorithmVersion", "winnerUsername", "photoTitle"]),
