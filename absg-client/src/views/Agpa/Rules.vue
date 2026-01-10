@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <div class="version">
-      Règlement officiel des AGPA – Version du 28 décembre 2019
+      Règlement officiel des AGPA – Version du 5 janvier 2026
     </div>
 
     <v-expansion-panels style="padding: 10px; max-width: 800px; margin: auto">
@@ -89,6 +89,22 @@
                   Désormais les enfants et groupes d'enfants sont autorisés dans la catégorie Groupe et événements, et la catégorie Enfants concerne plutôt les portraits d'enfants de moins de 12 ans;
                 </li>
                 <li>Changement du barême d'attribution des points pour le palmarès (avec application rétroactive), afin de récompenser aussi les photos nominées (1 point). </li>
+              </ul>
+            </dd>
+            <dt>2026</dt>
+            <dd>
+              <ul>
+                <li>
+                  <strong>Nouvel algorithme de calcul des notes (V2026)</strong> : Le système de notation évolue pour prendre en compte l'équilibre entre les trois familles
+                  (Gueudelot, Guibert, Guyomard). Chaque photo est désormais classée indépendamment par chaque famille, et son score final est calculé
+                  à partir de la moyenne de ces trois classements;
+                </li>
+                <li>
+                  Ce nouvel algorithme vise à réduire l'impact du nombre de votants par famille et à favoriser les photos qui font consensus entre les trois branches de la famille;
+                </li>
+                <li>
+                  L'ancien algorithme (V2010) reste disponible à titre de comparaison historique.
+                </li>
               </ul>
             </dd>
           </dl>
@@ -285,13 +301,76 @@
         </v-expansion-panel-text>
       </v-expansion-panel>
 
-      <!-- II.5.a. Calcul des points -->
+      <!-- II.5.a. Calcul des points (V2026) -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.a.</i> Calcul des notes</span>
+          <span><i style="display: inline-block; width: 40px">II.5.a.</i> Calcul des notes (Algorithme V2026)</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
-          <p>Le calcul des notes pour les photographies et le suivant :</p>
+          <p>
+            <strong>Depuis l'édition 2026</strong>, un nouvel algorithme de calcul des notes est utilisé.
+            Cet algorithme prend en compte l'équilibre entre les trois familles (Gueudelot, Guibert, Guyomard)
+            afin de favoriser les photos qui font consensus.
+          </p>
+
+          <p><strong>Principe de calcul :</strong></p>
+          <ol>
+            <li>Pour chaque photo, les votes et points sont comptabilisés séparément pour chaque famille;</li>
+            <li>Dans chaque catégorie, un classement est établi pour chaque famille en fonction des points attribués par ses membres;</li>
+            <li>Le rang moyen des trois familles est calculé pour chaque photo;</li>
+            <li>Ce rang moyen est converti en score sur 100 (100 = meilleur, 0 = dernier).</li>
+          </ol>
+
+          <p><strong>Formule de conversion :</strong></p>
+          <v-card style="padding: 15px; margin: 15px 0; font-family: monospace; background: #f5f5f5;">
+            Score = 100 × (RangMax - RangMoyen) / (RangMax - RangMin)
+          </v-card>
+
+          <table style="width: 100%; text-align: left; margin: 15px 0">
+            <tr><td><i>RangMoyen</i></td><td>moyenne des rangs attribués par les trois familles</td></tr>
+            <tr><td><i>RangMin</i></td><td>meilleur rang moyen de la catégorie (généralement proche de 1)</td></tr>
+            <tr><td><i>RangMax</i></td><td>plus mauvais rang moyen de la catégorie</td></tr>
+          </table>
+
+          <p>
+            <strong>Règle de vote :</strong> Un participant ne peut pas voter pour ses propres photos.
+            En revanche, les membres d'une même famille peuvent voter les uns pour les autres.
+          </p>
+
+          <p>
+            <strong>Cas particulier :</strong> Si une famille n'a pas voté dans une catégorie (aucun membre de la famille n'a attribué de vote),
+            son classement n'est pas pris en compte dans le calcul du rang moyen pour cette catégorie.
+          </p>
+
+          <p>
+            En cas de scores équivalents, deux photos sont départagées par les critères suivants (par ordre d'application):<ul>
+              <li>Présence ou non de titre (avantage à la photo titrée);</li>
+              <li>Nombre total de photos de la catégorie (avantage à la photo provenant de la plus grande catégorie);</li>
+              <li>Nombre total de votes reçus (avantage à la photo ayant reçu le plus de votes);</li>
+              <li>Palmarès de l'auteur sur les 3 éditions précédentes (avantage au plus faible palmarès);</li>
+              <li>Tirage au sort.</li>
+            </ul>
+          </p>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+
+      <!-- II.5.a'. Ancien algorithme V2010 -->
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <span><i style="display: inline-block; width: 40px">II.5.a'</i> Ancien algorithme (V2010) - Historique</span>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <v-alert
+            type="info"
+            variant="tonal"
+            style="margin-bottom: 20px;"
+          >
+            <strong>Note :</strong> L'algorithme V2010, utilisé de 2008 à 2025, calculait une note unique
+            basée sur le nombre total de points et de votes, pondérée par le nombre de photos de la catégorie.
+            Il a été remplacé par l'algorithme V2026 qui prend en compte l'équilibre entre les trois familles.
+          </v-alert>
+
+          <p>Le calcul des notes pour les photographies était le suivant :</p>
           <img
             src="/img/agpa/f1.gif"
             alt="Note = NotePts + NoteVts"
@@ -316,22 +395,12 @@
 
           <p>
             Remarques :<ul>
-              <li>Les coefficients servent à départager les photos et rendre la note globale plus lisible qu’un chiffre à virgule;</li>
-              <li>La note des points (<i>NotePts</i>), affectée du plus fort coefficient, est la note déterminante, la note des votes (<i>NoteVts</i>) ne servant qu’à départager les photos à égalité avec le premier critère;</li>
-              <li>La fusion des deux notes <i>NotePts</i> et <i>NoteVts</i> en  une variable unique permet de simplifier les calculs et les comparaisons, sans remettre en cause des critères historiques de classement.</li>
-              <li>La note moyenne de chaque catégorie est de 10 000 points.</li>
+              <li>Les coefficients servaient à départager les photos et rendre la note globale plus lisible qu'un chiffre à virgule;</li>
+              <li>La note des points (<i>NotePts</i>), affectée du plus fort coefficient, était la note déterminante, la note des votes (<i>NoteVts</i>) ne servant qu'à départager les photos à égalité avec le premier critère;</li>
+              <li>La note moyenne de chaque catégorie était de 10 000 points.</li>
             </ul>
           </p>
 
-          <p>
-            En cas de notes équivalentes, deux photos sont départagées par les critères suivant (par ordre d’application):<ul>
-              <li>Présence ou non de titre (avantage à la photo titrée);</li>
-              <li>Nombre total de photos de la catégorie (avantage à la photo provenant de la plus grande catégorie);</li>
-              <li>Edition (pour les comparaisons entre éditions; avantage à la photo de l’édition la plus récente);</li>
-              <li>Palmarès des auteurs des photos avant l’édition en cours (avantage à la photo dont l’auteur présente le plus faible palmarès ; cf. paragraphe III.);</li>
-              <li>Tirage au sort.</li>
-            </ul>
-          </p>
         </v-expansion-panel-text>
       </v-expansion-panel>
 
@@ -428,20 +497,17 @@
           <p>
             Dans certains cas bien précis, les AGPA d’or peuvent se transformer en AGPA de diamant: <ul>
               <li>
-                AGPA de diamant de la meilleure photo de sa catégorie attribué à la première photo si: <ul>
-                  <li>Elle totalise 50 000 points ou plus;</li>
-                  <li><b>ET</b> la note de la photo est strictement supérieure au double de la note de la deuxième meilleure photo de la catégorie.</li>
-                </ul>
+                AGPA de diamant de la meilleure photo de sa catégorie attribué à la première photo si elle est classée rang 1 par les trois familles (Gueudelot, Guibert et Guyomard).
               </li>
-              <li>AGPA de diamant du meilleur titre est attribué si la photo récolte plus du double de plume par rapport au deuxième meilleur titre.</li>
+              <li>AGPA de diamant du meilleur titre est attribué si la photo a reçu le plus de plumes dans chacune des trois familles (Gueudelot, Guibert et Guyomard).</li>
               <li>
                 AGPA de diamant de la meilleure photo toutes catégories attribué à la meilleure photo si : <ul>
-                  <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés en age de voter moins un).</li>
+                  <li>La photo est AGPA de diamant de sa catégorie et a reçu le maximum de votes possible (= nombre de jurés en âge de voter moins un).</li>
                 </ul>
               </li>
               <li>
                 AGPA de diamant du meilleur photographe attribué au premier photographe si :<ul>
-                  <li>Il est l’auteur des trois meilleures photos et ses quatre meilleures photos totalisent 100 000 points ou plus ;</li>
+                  <li>Il est l’auteur des trois meilleures photos et la moyenne de ses quatre meilleures photos est de 80 ou plus ;</li>
                   <li><b>OU</b> il totalise 33 points ou plus au palmarès de l’édition actuelle (avant transformation de l’AGPA d’or du meilleur photographe en AGPA de diamant).</li>
                 </ul>
               </li>
@@ -553,18 +619,33 @@ dd {
     border-left: 3px solid #ddd;
     padding-left: 10px;
 
-
     ul {
       margin-left: 0;
+      padding-left: 15px;
     }
 
     li {
-        margin-left: -23px;
-        padding-left: 0;
+        margin-left: 0;
+        padding-left: 5px;
         list-style-image: url('/img/agpa/puce.png');
     }
 }
 
+ul, ol {
+    margin-left: 20px;
+    padding-left: 10px;
+}
+
+li {
+    margin-left: 0;
+    padding-left: 5px;
+    list-style-image: url('/img/agpa/puce.png');
+}
+
+ol li {
+    list-style-image: none;
+    list-style-type: decimal;
+}
 
 .categories {
     th {
@@ -578,11 +659,6 @@ dd {
         vertical-align: top;
         padding: 5px 16px;
     }
-}
-
-
-li {
-    list-style-image: url('/img/agpa/puce.png');
 }
 
 .version {
