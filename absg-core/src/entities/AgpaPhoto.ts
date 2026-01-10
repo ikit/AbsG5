@@ -69,9 +69,14 @@ export class AgpaPhoto {
             calculatedAt: string;
         };
         v2026?: {
-            // À définir selon le nouvel algorithme
+            gueudelot: { votes: number; points: number; rank: number };
+            guibert: { votes: number; points: number; rank: number };
+            guyomard: { votes: number; points: number; rank: number };
+            avgRank: number;        // Rang moyen des 3 familles
+            rankMin: number;        // Meilleur rang moyen de la catégorie
+            rankMax: number;        // Pire rang moyen de la catégorie
+            rankInCategory: number; // Classement dans la catégorie (1 = 1er)
             calculatedAt: string;
-            [key: string]: any;
         };
     };
 

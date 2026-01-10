@@ -9,6 +9,7 @@ import {
     p4DiamondAttribution,
     p4HonorAttribution
 } from "../middleware/agpaAlgorithmsHelper";
+import { computeScoresV2026, saveScoresV2026 } from "../middleware/agpaAlgorithmV2026";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { analyzeVoteProfiles, analyzeSlidingProfiles, UserData, YearData } from "../middleware/agpaVoteProfilesHelper";
@@ -328,8 +329,11 @@ class AgpaService {
         // Récupérer les votes et les vérifier
         context = await p4CheckVotes(context);
 
-        // Comptabiliser les votes correctes et calculer les notes pour chaque photo
+        // Comptabiliser les votes correctes et calculer les notes pour chaque photo (V2010)
         context = await p4ComputeNotes(context);
+
+        // Calcul des scores V2026 (algorithme basé sur les rangs par famille)
+        context = await computeScoresV2026(context);
 
         // Attributions AGPA et création d'un "premier" palmares
         context = await p4AgpaAttribution(context);
@@ -365,6 +369,8 @@ class AgpaService {
             context = await getMetaData(context.year, true);
             context = await p4CheckVotes(context);
             context = await p4ComputeNotes(context);
+            // Calcul des scores V2026
+            context = await computeScoresV2026(context);
             context = await p4AgpaAttribution(context);
             context = await p4DiamondAttribution(context);
             context = await p4HonorAttribution(context);
@@ -401,16 +407,20 @@ class AgpaService {
                 `INSERT INTO agpa_award (year, "categoryId", "userId", "photoId", award) VALUES ${sql.join(",")};`
             );
 
-            // On met à jours les résultats pour les photos de l'édition
+            // On met à jours les résultats pour les photos de l'édition (V2010 + V2026)
             sql = [];
             for (const pid in context.photos) {
                 const p = context.photos[pid];
-                sql.push(`UPDATE agpa_photo SET 
-                    ranking=${context.photosOrder.findIndex(e => e === p.id) + 0}, 
-                    votes=${p.votes}, 
-                    "votesTitle"=${p.votesTitle}, 
+                const scoreDetailsJson = p.scoreDetails ? `'${JSON.stringify(p.scoreDetails).replace(/'/g, "''")}'` : 'NULL';
+                sql.push(`UPDATE agpa_photo SET
+                    "rankingV2010"=${context.photosOrder.findIndex(e => e === p.id) + 1},
+                    votes=${p.votes},
+                    "votesTitle"=${p.votesTitle},
                     score=${p.score},
-                    gscore=${p.gscore}
+                    "scoreV2010"=${p.gscore},
+                    "scoreV2026"=${p.scoreV2026 ?? 'NULL'},
+                    "rankingV2026"=${p.rankingV2026 ?? 'NULL'},
+                    "scoreDetails"=${scoreDetailsJson}
                     WHERE id=${p.id}`);
             }
             this.catRepo.query(sql.join(";"));
