@@ -1,4 +1,5 @@
-import { AgpaPhoto, AgpaVote } from "../entities";
+import { AgpaPhoto, AgpaVote, AgpaAwardType } from "../entities";
+import { palmaresPoints } from "./agpaPalmaresHelper";
 import { getRepository } from "./database";
 
 /**
@@ -394,4 +395,478 @@ export async function saveScoresV2026(ctx: any): Promise<void> {
             );
         }
     }
+}
+
+// =============================================================================
+// ATTRIBUTION DES AGPA (V2026)
+// Ces méthodes utilisent scoreV2026 au lieu de gscore (V2010)
+// =============================================================================
+
+/**
+ * Attribution des AGPA (or, argent et bronze) pour une liste de photos donnée
+ * La liste des photos doit déjà être triée et ordonnée
+ * Cette première passe ne traite pas les AGPA de diamant
+ * @param pIds liste des photos
+ * @param catId la catégorie concernée
+ * @param ctx le context de donnée à mettre à jours
+ */
+function deliverAwardsPhotosV2026(pIds: number[], catId: number, ctx: any) {
+    // On vérifie si tout est correctement initialisé
+    for (let idx = 0; idx < 4; idx++) {
+        if (ctx.photos[pIds[idx]] && !ctx.photos[pIds[idx]].awards) {
+            ctx.photos[pIds[idx]].awards = [];
+        }
+    }
+
+    // On attribut simplement les agpa or, argent et bronze aux 1ere, deuxième et troisième photos
+    // Test du double agpa d'or : même auteur et même score
+    if (
+        ctx.photos[pIds[0]] && ctx.photos[pIds[1]] &&
+        ctx.photos[pIds[0]].userId === ctx.photos[pIds[1]].userId &&
+        ctx.photos[pIds[0]].scoreV2026 === ctx.photos[pIds[1]].scoreV2026
+    ) {
+        if (ctx.photos[pIds[0]]) ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        if (ctx.photos[pIds[1]]) ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        if (ctx.photos[pIds[2]]) ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
+        if (ctx.photos[pIds[3]]) ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
+    } else {
+        if (ctx.photos[pIds[0]]) ctx.photos[pIds[0]].awards.push({ award: AgpaAwardType.gold, categoryId: catId });
+        if (ctx.photos[pIds[1]]) ctx.photos[pIds[1]].awards.push({ award: AgpaAwardType.sylver, categoryId: catId });
+        if (ctx.photos[pIds[2]]) ctx.photos[pIds[2]].awards.push({ award: AgpaAwardType.bronze, categoryId: catId });
+        if (ctx.photos[pIds[3]]) ctx.photos[pIds[3]].awards.push({ award: AgpaAwardType.nominated, categoryId: catId });
+    }
+    // On met à jour le palmarès (de l'édition) des auteurs
+    for (let idx = 0; idx < 4; idx++) {
+        const p = ctx.photos[pIds[idx]];
+        if (p && ctx.users[p.userId]) {
+            const award = p.awards.find(a => a.categoryId === catId);
+            if (award) {
+                ctx.users[p.userId].palmares += palmaresPoints(award.award);
+            }
+        }
+    }
+}
+
+/**
+ * Attribution des AGPA (or, argent et bronze) pour une liste de photographes
+ * La liste des photographes doit déjà être triée et ordonnée
+ * @param pIds liste des photographes
+ * @param ctx le context de donnée à mettre à jours
+ */
+function deliverAwardsPhotographesV2026(pIds: number[], ctx: any) {
+    // On attribut simplement les agpa or, argent et bronze aux 1er, deuxième et troisième photographes
+    if (ctx.users[pIds[0]]) ctx.users[pIds[0]].award = AgpaAwardType.gold;
+    if (ctx.users[pIds[1]]) ctx.users[pIds[1]].award = AgpaAwardType.sylver;
+    if (ctx.users[pIds[2]]) ctx.users[pIds[2]].award = AgpaAwardType.bronze;
+    // On met à jour le palmarès (de l'édition) des auteurs
+    for (let idx = 0; idx < 3; idx++) {
+        if (ctx.users[pIds[idx]]) {
+            ctx.users[pIds[idx]].palmares += palmaresPoints(ctx.users[pIds[idx]].award);
+        }
+    }
+}
+
+/**
+ * Classe les photos pour toutes les catégories afin d'attribuer les AGPA et établie le palmares
+ * Version V2026 : utilise scoreV2026 au lieu de gscore
+ * @param ctx les données retournées lors du calcul des scores
+ *
+ * @return le contexte des agpa avec les awards obtenu pour chaque photos et utilisateurs
+ */
+export async function p4AgpaAttributionV2026(ctx: any) {
+    const repo = getRepository(AgpaPhoto);
+    const userData = {};
+    const catNumber = Object.values(ctx.categories).filter(c => (c as any).id > 0).length;
+
+    // Intialisation et calcul de différentes infos pour chaque participants de l'édition
+    // On trie d'abord les photos par scoreV2026 décroissant
+    const sortedPhotoIds = Object.keys(ctx.photos)
+        .filter(pId => ctx.photos[pId].categoryId > 0)
+        .sort((a, b) => (ctx.photos[b].scoreV2026 || 0) - (ctx.photos[a].scoreV2026 || 0));
+
+    for (const pId of sortedPhotoIds) {
+        const p = ctx.photos[pId];
+        if (!(p.userId in userData)) {
+            userData[p.userId] = {
+                id: p.userId,
+                username: p.username,
+                photos: [],
+                scoreOf8: 0,    // Score V2026 obtenu par les 8 meilleurs photos
+                scoreOf4: 0,    // Score V2026 obtenu par les 4 meilleurs photos
+                average: 0,     // Score moyen V2026
+                lower: Infinity, // Plus petit score V2026
+                formerPalmares: 0,
+                palmares: 0,
+                age: 0
+            };
+        }
+        if (userData[p.userId].photos.length < catNumber) {
+            userData[p.userId].photos.push(p);
+            userData[p.userId].scoreOf8 += p.scoreV2026 || 0;
+
+            if (userData[p.userId].photos.length <= 4) {
+                userData[p.userId].scoreOf4 += p.scoreV2026 || 0;
+            }
+        }
+    }
+
+    // Calcul des moyennes et scores minimaux
+    for (const uId in userData) {
+        const uPhotos = sortedPhotoIds
+            .map(pId => ctx.photos[pId])
+            .filter(p => +p.userId === +uId);
+        const count = uPhotos.length;
+        if (count > 0) {
+            userData[uId].lower = uPhotos[count - 1].scoreV2026 || 0;
+            userData[uId].average = uPhotos.reduce((sum, e) => (e.scoreV2026 || 0) + sum, 0) / count;
+        }
+    }
+
+    // On récupère l'age des utilisateurs qui ont participé à l'édition
+    let sql = `SELECT DISTINCT (p."userId"), a."dateOfBirth"
+        FROM agpa_photo p
+        INNER JOIN "user" u ON p."userId" = u.id
+        INNER JOIN person a ON u."personId" = a.id
+        WHERE p.year=${ctx.year}`;
+
+    let raw = await repo.query(sql);
+    for (const r of raw) {
+        if (userData[r.userId]) {
+            userData[r.userId].age = ctx.year - new Date(r.dateOfBirth).getFullYear();
+        }
+    }
+
+    ctx.users = userData;
+
+    // Calcul des palmares des editions précédentes
+    sql = `SELECT * FROM agpa_award WHERE year < ${ctx.year} ORDER BY "userId" ASC, year ASC`;
+    raw = await repo.query(sql);
+    for (const p of raw) {
+        if (p.userId in ctx.users) {
+            ctx.users[p.userId].formerPalmares += palmaresPoints(p.award);
+        }
+    }
+
+    // Définition des méthodes pour trier et départager les ex-aequos
+    // Version V2026 : utilise scoreV2026 et les règles de départage V2026
+    function sortPhotosV2026(aId, bId) {
+        const a = ctx.photos[aId];
+        const b = ctx.photos[bId];
+
+        // Tri par scoreV2026 décroissant
+        let res = (b.scoreV2026 || 0) - (a.scoreV2026 || 0);
+        if (res !== 0) return res;
+
+        // Règle 1 : Avantage à la photo qui a un titre
+        const hasValidTitleA = a.title && a.title.trim() !== "" && a.title !== "(sans titre)" ? 1 : 0;
+        const hasValidTitleB = b.title && b.title.trim() !== "" && b.title !== "(sans titre)" ? 1 : 0;
+        res = hasValidTitleB - hasValidTitleA;
+        if (res !== 0) return res;
+
+        // Règle 2 : Avantage à la photo de la catégorie avec le plus de photos
+        res = (ctx.categories[b.categoryId]?.totalPhotos || 0) - (ctx.categories[a.categoryId]?.totalPhotos || 0);
+        if (res !== 0) return res;
+
+        // Règle 3 : Avantage à la photo qui a reçu le plus de votes
+        res = (b.votes || 0) - (a.votes || 0);
+        if (res !== 0) return res;
+
+        // Règle 4 : Avantage au photographe ayant le moins bon palmarès sur les éditions précédentes
+        res = (ctx.users[a.userId]?.formerPalmares || 0) - (ctx.users[b.userId]?.formerPalmares || 0);
+        if (res !== 0) return res;
+
+        // Règle 5 : Tirage au sort
+        return Math.random() - 0.5;
+    }
+
+    function sortPhotographesV2026(a, b) {
+        // Tri par scoreOf8 décroissant (somme des 8 meilleures photos V2026)
+        let res = (b.scoreOf8 || 0) - (a.scoreOf8 || 0);
+        if (res !== 0) return res;
+
+        // Si exaequo, avantage à la meilleure moyenne V2026
+        res = (b.average || 0) - (a.average || 0);
+        if (res !== 0) return res;
+
+        // Si exaequo, avantage à celui dont la plus mauvaise photo a le meilleur score
+        res = (b.lower || 0) - (a.lower || 0);
+        if (res !== 0) return res;
+
+        // Si exaequo, avantage au meilleur palmarès de l'édition en cours
+        res = (ctx.users[b.id]?.palmares || 0) - (ctx.users[a.id]?.palmares || 0);
+        if (res !== 0) return res;
+
+        // Si exaequo, avantage au moins bon palmarès cumulé
+        res = (ctx.users[a.id]?.formerPalmares || 0) - (ctx.users[b.id]?.formerPalmares || 0);
+        if (res !== 0) return res;
+
+        // Tirage au sort
+        return Math.random() - 0.5;
+    }
+
+    function sortTitlesV2026(aId, bId) {
+        const a = ctx.photos[aId];
+        const b = ctx.photos[bId];
+
+        // Tri par nombre de votes titre décroissant
+        let res = (b.votesTitle || 0) - (a.votesTitle || 0);
+        if (res !== 0) return res;
+
+        // Si exaequo, avantage au plus petit score V2026 (pour diversifier les lauréats)
+        res = (b.scoreV2026 || 0) - (a.scoreV2026 || 0);
+        if (res !== 0) return res;
+
+        // Si exaequo, avantage au moins bon palmarès de l'édition
+        res = (ctx.users[a.userId]?.palmares || 0) - (ctx.users[b.userId]?.palmares || 0);
+        if (res !== 0) return res;
+
+        // Si exaequo, avantage au moins bon palmarès cumulé
+        res = (ctx.users[a.userId]?.formerPalmares || 0) - (ctx.users[b.userId]?.formerPalmares || 0);
+        if (res !== 0) return res;
+
+        // Tirage au sort
+        return Math.random() - 0.5;
+    }
+
+    // Ordre des photos par scoreV2026 décroissant
+    ctx.photosOrderV2026 = sortedPhotoIds.sort(sortPhotosV2026);
+
+    // Palmarès des catégories "simples"
+    for (const catId in ctx.categories) {
+        if (+catId < 0) continue;
+
+        ctx.categories[catId].photosV2026 = ctx.photosOrderV2026
+            .filter(pId => ctx.photos[pId].categoryId == catId)
+            .sort(sortPhotosV2026);
+        deliverAwardsPhotosV2026(ctx.categories[catId].photosV2026, +catId, ctx);
+    }
+
+    // Palmarès "Meilleur titre" (à partir de 2011)
+    if (ctx.categories[-3]) {
+        ctx.categories[-3].photosV2026 = ctx.photosOrderV2026
+            .filter(pId => ctx.photos[pId].votesTitle > 0)
+            .sort(sortTitlesV2026);
+        if (ctx.categories[-3].photosV2026.length > 0) {
+            deliverAwardsPhotosV2026(ctx.categories[-3].photosV2026, -3, ctx);
+        }
+    }
+
+    // Palmarès "Meilleure photographie"
+    ctx.photosOrderV2026.sort(sortPhotosV2026);
+    deliverAwardsPhotosV2026(ctx.photosOrderV2026, -2, ctx);
+
+    // Palmarès "Meilleur photographe"
+    ctx.usersOrderV2026 = Object.values(ctx.users)
+        .sort(sortPhotographesV2026)
+        .map(u => (u as any).id);
+    deliverAwardsPhotographesV2026(ctx.usersOrderV2026, ctx);
+
+    return ctx;
+}
+
+/**
+ * Modifie les AGPA d'or en AGPA de diamant si les conditions sont réunis.
+ * Version V2026 : utilise scoreV2026 avec seuils adaptés (score sur 100)
+ * @param ctx les données retournées lors de l'attribution
+ *
+ * @return le contexte mis à jour
+ */
+export async function p4DiamondAttributionV2026(ctx: any) {
+    // Pour chaque catégorie
+    if (!ctx.categories || !Array.isArray(ctx.categories)) {
+        // ctx.categories peut être un objet, on le convertit en array
+        const categoriesArray = Object.values(ctx.categories);
+        for (const cat of categoriesArray) {
+            await processCategoryDiamondV2026(cat as any, ctx);
+        }
+    } else {
+        for (const cat of ctx.categories) {
+            await processCategoryDiamondV2026(cat, ctx);
+        }
+    }
+
+    // Recompte des palmarès
+    for (const userId in ctx.users) {
+        ctx.users[userId].awards = [];
+        ctx.users[userId].palmares = 0;
+
+        if (ctx.users[userId].award) {
+            ctx.users[userId].awards.push({ categoryId: -1, award: ctx.users[userId].award });
+            ctx.users[userId].palmares += palmaresPoints(ctx.users[userId].award);
+        }
+    }
+
+    for (const pId in ctx.photos) {
+        const photo = ctx.photos[pId];
+        if (Array.isArray(photo.awards)) {
+            for (const a of photo.awards) {
+                ctx.users[photo.userId].awards.push(a);
+                ctx.users[photo.userId].palmares += palmaresPoints(a.award);
+            }
+        }
+    }
+
+    return ctx;
+}
+
+async function processCategoryDiamondV2026(cat: any, ctx: any) {
+    const photosKey = cat.photosV2026 ? "photosV2026" : "photos";
+    if (!cat[photosKey] || cat[photosKey].length <= 2) return;
+
+    const p1 = ctx.photos[cat[photosKey][0]];
+    const p2 = ctx.photos[cat[photosKey][1]];
+
+    if (!p1 || !p2) return;
+
+    if (cat.id > 0) {
+        // Catégorie "simple"
+        // Pour V2026: Diamant si la photo a obtenu le rang 1 chez les 3 familles
+        const details = p1.scoreDetails?.v2026;
+        if (details) {
+            const hasRank1AllFamilies =
+                details.gueudelot?.rank === 1 &&
+                details.guibert?.rank === 1 &&
+                details.guyomard?.rank === 1;
+
+            if (hasRank1AllFamilies) {
+                const idxAward = p1.awards?.findIndex(a => a.categoryId === cat.id);
+                if (idxAward !== undefined && idxAward >= 0) {
+                    p1.awards[idxAward].award = AgpaAwardType.diamond;
+                }
+            }
+        }
+    } else if (cat.id === -3) {
+        // Catégorie "Meilleur titre"
+        if ((p1.votesTitle || 0) > 2 * (p2.votesTitle || 1)) {
+            const idxAward = p1.awards?.findIndex(a => a.categoryId === cat.id);
+            if (idxAward !== undefined && idxAward >= 0) {
+                p1.awards[idxAward].award = AgpaAwardType.diamond;
+            }
+        }
+    } else if (cat.id === -2) {
+        // Catégorie "Meilleure photo"
+        let isDiamond = p1.awards?.find(a => a.categoryId > 0);
+        isDiamond = isDiamond ? isDiamond.award === AgpaAwardType.diamond : false;
+
+        const maxJudgesNumber = ctx.categories[p1.categoryId]?.votes?.filter(j => j.age >= 12).length || 0;
+        if (isDiamond && (p1.votes || 0) >= maxJudgesNumber - 1) {
+            const idxAward = p1.awards?.findIndex(a => a.categoryId === cat.id);
+            if (idxAward !== undefined && idxAward >= 0) {
+                p1.awards[idxAward].award = AgpaAwardType.diamond;
+            }
+        }
+    } else if (cat.id === -1) {
+        // Catégorie "Meilleur photographe"
+        const cat2Photos = ctx.categories[-2]?.photosV2026 || ctx.categories[-2]?.photos || [];
+        if (cat2Photos.length >= 3) {
+            const p3 = ctx.photos[cat2Photos[2]];
+            if (p3) {
+                const author = p1.userId === p2.userId && p2.userId === p3.userId;
+                // Pour V2026: score sur 100, donc total >= 240 (équiv 100000 pour V2010)
+                const total = (p1.scoreV2026 || 0) + (p2.scoreV2026 || 0) + (p3.scoreV2026 || 0);
+                const usersOrder = ctx.usersOrderV2026 || ctx.usersOrder || [];
+                if (author && p1.userId === usersOrder[0] && total >= 240) {
+                    ctx.users[p1.userId].award = AgpaAwardType.diamond;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Attribue les agpa d'honneur aux enfants de moins de 12 ans qui ont participés.
+ * @param ctx les données retournées lors de l'attribution des diamants
+ */
+export async function p4HonorAttributionV2026(ctx: any) {
+    if (!ctx.users) {
+        return ctx;
+    }
+    for (const uid in ctx.users) {
+        const u = ctx.users[uid];
+        if (u.age < 12 && (!Array.isArray(u.awards) || u.awards.length === 0)) {
+            u.awards = [
+                {
+                    categoryId: u.photos[0]?.categoryId,
+                    userId: u.id,
+                    photoId: u.photos[0]?.id,
+                    award: AgpaAwardType.honor
+                }
+            ];
+        }
+    }
+    return ctx;
+}
+
+/**
+ * Calcul les statistiques affichées dans la section "monitoring" de l'édition des agpa
+ * Version V2026 (identique à V2010 car ne dépend pas du score)
+ * @param ctx les données "contexte" de l'édition des AGPA
+ */
+export async function monitoringStatsV2026(ctx: any) {
+    const repo = getRepository(AgpaPhoto);
+
+    // On rajoute la notion de famille aux utilisateurs
+    const users = await repo.query('SELECT * from "user"');
+    for (const u of users) {
+        if (!ctx.users[u.id]) {
+            continue;
+        }
+        ctx.users[u.id].rootFamily = u.rootFamily;
+    }
+
+    // Répartitions des photos
+    const total = {
+        catId: 0,
+        name: "Total",
+        total: 0,
+        totalByAge: {
+            adults: 0,
+            childdren: 0
+        },
+        totalByFamilies: {
+            gueudelot: 0,
+            guibert: 0,
+            guyomard: 0
+        }
+    };
+    ctx.photosStats = ctx.categoriesOrders.map(e => ({
+        catId: e,
+        name: ctx.categories[e].title,
+        total: 0,
+        totalByAge: {
+            adults: 0,
+            childdren: 0
+        },
+        totalByFamilies: {
+            gueudelot: 0,
+            guibert: 0,
+            guyomard: 0
+        }
+    }));
+    for (const pId of Object.keys(ctx.photos)) {
+        const p = ctx.photos[pId];
+        const cat = ctx.photosStats.find(c => c.catId === p.categoryId);
+        if (!cat) continue;
+        cat.total += 1;
+        total.total += 1;
+        cat.totalByAge[ctx.users[p.userId]?.age < 12 ? "childdren" : "adults"] += 1;
+        total.totalByAge[ctx.users[p.userId]?.age < 12 ? "childdren" : "adults"] += 1;
+        cat.totalByFamilies[ctx.users[p.userId]?.rootFamily] += 1;
+        total.totalByFamilies[ctx.users[p.userId]?.rootFamily] += 1;
+    }
+    ctx.photosStats.push(total);
+
+    // Répartition des votes (qui vote pour qui)
+    const sql = `SELECT u1.username as "from", u2.username as "to", SUM(v.score)
+        FROM public.agpa_vote v
+        INNER JOIN "user" u1 ON v."userId" = u1.id
+        INNER JOIN "agpa_photo" p ON p.id = v."photoId"
+        INNER JOIN "user" u2 ON p."userId" = u2.id
+        WHERE v.year = ${ctx.year} AND v.score > 0
+        GROUP BY "from", "to"`;
+
+    ctx.votesStats = await repo.query(sql);
+    ctx.votesStats = ctx.votesStats.map(r => [r.from, r.to, +r.sum]);
+
+    return ctx;
 }

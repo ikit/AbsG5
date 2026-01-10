@@ -10,7 +10,7 @@ import {
     Req
 } from "routing-controllers";
 import { AgpaPhoto, User } from "../entities";
-import { agpaService } from "../services/AgpaService";
+import { agpaService, AgpaAlgorithmVersion } from "../services/AgpaService";
 import { agpaBadgeService } from "../services/AgpaBadgeService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
 import { AppDataSource } from "../data-source";
@@ -191,15 +191,57 @@ export class AgpaController {
 
     /**
      * Effectue le dépouillement des votes
+     * @param year l'année de l'édition
+     * @param algorithm l'algorithme à utiliser (V2010 ou V2026, défaut: V2026)
      * @param user l'utilisateur qui effectue la demande
      */
     @Get("/monitoring/:year([0-9]+)")
     monitoring(@Param("year") year: number, @CurrentUser() user: User) {
         if (user.is("admin")) {
-            return agpaService.monitoring(year, user);
+            return agpaService.monitoring(year, user, "V2026");
         } else {
             return null;
         }
+    }
+
+    /**
+     * Effectue le dépouillement des votes avec choix de l'algorithme
+     * @param year l'année de l'édition
+     * @param algorithm l'algorithme à utiliser (V2010 ou V2026)
+     * @param user l'utilisateur qui effectue la demande
+     */
+    @Get("/monitoring/:year([0-9]+)/:algorithm")
+    monitoringWithAlgorithm(
+        @Param("year") year: number,
+        @Param("algorithm") algorithm: string,
+        @CurrentUser() user: User
+    ) {
+        if (user.is("admin")) {
+            const algo: AgpaAlgorithmVersion = algorithm === "V2010" ? "V2010" : "V2026";
+            return agpaService.monitoring(year, user, algo);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Recalcule les scores V2026 pour toutes les éditions (admin only)
+     * Cette route ne modifie PAS les awards existants, uniquement les scores V2026
+     * @param fromYear année de début (défaut: 2006)
+     * @param toYear année de fin (défaut: 2025)
+     * @param user l'utilisateur qui effectue la demande
+     */
+    @Post("/recalculate-v2026")
+    async recalculateV2026(
+        @Body() body: { fromYear?: number; toYear?: number },
+        @CurrentUser() user: User
+    ) {
+        if (!user.is("admin")) {
+            throw new Error("Accès refusé - Admin uniquement");
+        }
+        const fromYear = body?.fromYear ?? 2006;
+        const toYear = body?.toYear ?? 2025;
+        return agpaService.recalculateAllEditionsV2026(fromYear, toYear);
     }
 
     /**

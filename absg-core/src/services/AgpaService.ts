@@ -8,8 +8,15 @@ import {
     p4ComputeNotes,
     p4DiamondAttribution,
     p4HonorAttribution
-} from "../middleware/agpaAlgorithmsHelper";
-import { computeScoresV2026, saveScoresV2026 } from "../middleware/agpaAlgorithmV2026";
+} from "../middleware/agpaAlgorithmV2010";
+import {
+    computeScoresV2026,
+    saveScoresV2026,
+    p4AgpaAttributionV2026,
+    p4DiamondAttributionV2026,
+    p4HonorAttributionV2026,
+    monitoringStatsV2026
+} from "../middleware/agpaAlgorithmV2026";
 import { palmaresData } from "../middleware/agpaPalmaresHelper";
 import { ceremonyData } from "../middleware/agpaCeremonyHelper";
 import { analyzeVoteProfiles, analyzeSlidingProfiles, UserData, YearData } from "../middleware/agpaVoteProfilesHelper";
@@ -20,6 +27,14 @@ import { saveImage, shuffleArray } from "../middleware/commonHelper";
 import * as path from "path";
 import * as fs from "fs";
 import { websocketService, WSMessageType } from "./WebsocketService";
+import { agpaBadgeService } from "./AgpaBadgeService";
+
+/**
+ * Type d'algorithme de calcul des scores AGPA
+ * - V2010: Algorithme historique basé sur la "Note G" (gscore)
+ * - V2026: Nouvel algorithme basé sur la moyenne des rangs par famille
+ */
+export type AgpaAlgorithmVersion = "V2010" | "V2026";
 
 class AgpaService {
     photoRepo = null;
@@ -319,33 +334,43 @@ class AgpaService {
      * de chaques de photos et leur attribuer les récompenses en départageant les exaequos
      * Cete méthode permet aussi bien le calcul des résultats d'une édition que sa supervision
      * en controlant que tout se passe bien.
+     * @param year l'année de l'édition
      * @param user l'utilisateur qui en fait la demande
+     * @param algorithm l'algorithme à utiliser pour le calcul des scores (V2010 ou V2026, défaut: V2026)
      */
-    async monitoring(year: number, user: User) {
+    async monitoring(year: number, user: User, algorithm: AgpaAlgorithmVersion = "V2026") {
         let context = null;
         // On récupère le contexte
         context = await getMetaData(year, true);
 
-        // Récupérer les votes et les vérifier
+        // Récupérer les votes et les vérifier (commun aux deux algorithmes)
         context = await p4CheckVotes(context);
 
         // Comptabiliser les votes correctes et calculer les notes pour chaque photo (V2010)
+        // Note: p4ComputeNotes est toujours appelé car il initialise ctx.photos et calcule votes/score brut
         context = await p4ComputeNotes(context);
 
         // Calcul des scores V2026 (algorithme basé sur les rangs par famille)
+        // Note: On calcule toujours les scores V2026 pour les avoir dans scoreDetails
         context = await computeScoresV2026(context);
 
-        // Attributions AGPA et création d'un "premier" palmares
-        context = await p4AgpaAttribution(context);
+        // Attributions AGPA selon l'algorithme choisi
+        if (algorithm === "V2026") {
+            // Utilise scoreV2026 pour l'attribution des AGPA
+            context = await p4AgpaAttributionV2026(context);
+            context = await p4DiamondAttributionV2026(context);
+            context = await p4HonorAttributionV2026(context);
+            context = await monitoringStatsV2026(context);
+        } else {
+            // Utilise gscore (V2010) pour l'attribution des AGPA
+            context = await p4AgpaAttribution(context);
+            context = await p4DiamondAttribution(context);
+            context = await p4HonorAttribution(context);
+            context = await monitoringStats(context);
+        }
 
-        // Attribution des AGPA de diamant
-        context = await p4DiamondAttribution(context);
-
-        // Attribution des AGPA d'honneur
-        context = await p4HonorAttribution(context);
-
-        // Stats
-        context = await monitoringStats(context);
+        // Ajouter l'info de l'algorithme utilisé au contexte
+        context.algorithmUsed = algorithm;
 
         // On ajoute aux photos les vignettes et url
         for (const pId of Object.keys(context.photos)) {
@@ -358,8 +383,9 @@ class AgpaService {
 
     /**
      * Clos l'édition en cours si nécessaire
+     * @param algorithm l'algorithme à utiliser pour le calcul final des scores (V2010 ou V2026, défaut: V2026)
      */
-    async closeEdition() {
+    async closeEdition(algorithm: AgpaAlgorithmVersion = "V2026") {
         const currentYear = getCurrentEdition();
         // On récupère le contexte
         let context = await getMetaData(currentYear, true);
@@ -369,11 +395,19 @@ class AgpaService {
             context = await getMetaData(context.year, true);
             context = await p4CheckVotes(context);
             context = await p4ComputeNotes(context);
-            // Calcul des scores V2026
+            // Calcul des scores V2026 (toujours calculé pour avoir les détails)
             context = await computeScoresV2026(context);
-            context = await p4AgpaAttribution(context);
-            context = await p4DiamondAttribution(context);
-            context = await p4HonorAttribution(context);
+
+            // Attributions AGPA selon l'algorithme choisi
+            if (algorithm === "V2026") {
+                context = await p4AgpaAttributionV2026(context);
+                context = await p4DiamondAttributionV2026(context);
+                context = await p4HonorAttributionV2026(context);
+            } else {
+                context = await p4AgpaAttribution(context);
+                context = await p4DiamondAttribution(context);
+                context = await p4HonorAttribution(context);
+            }
             // On récpère des agpas des catégories normales et meilleurs titre
             for (const pid in context.photos) {
                 const p = context.photos[pid];
@@ -1299,6 +1333,141 @@ class AgpaService {
                 members: []
             };
         }
+    }
+
+    /**
+     * Recalcule les scores V2026 pour toutes les éditions existantes (2006 à 2025)
+     * Cette méthode ne modifie PAS les awards existants, elle met seulement à jour :
+     * - scoreV2026
+     * - rankingV2026
+     * - scoreDetails (avec les détails V2026)
+     * - badges de l'année (recalculés après les scores)
+     *
+     * @param fromYear année de début (défaut: 2006)
+     * @param toYear année de fin (défaut: 2025)
+     * @returns un résumé du recalcul pour chaque année
+     */
+    async recalculateAllEditionsV2026(fromYear: number = 2006, toYear: number = 2025) {
+        const results: Array<{
+            year: number;
+            success: boolean;
+            photosUpdated: number;
+            badgesCreated?: number;
+            badgeError?: string;
+            error?: string;
+        }> = [];
+
+        logger.info(`Début du recalcul V2026 pour les éditions ${fromYear} à ${toYear}`);
+
+        for (let year = fromYear; year <= toYear; year++) {
+            try {
+                logger.info(`Recalcul V2026 pour l'année ${year}...`);
+
+                // Récupérer le contexte de l'année
+                let context = await getMetaData(year, true);
+
+                // Vérifier qu'il y a des photos pour cette année
+                if (!context.categories || Object.keys(context.categories).length === 0) {
+                    results.push({
+                        year,
+                        success: false,
+                        photosUpdated: 0,
+                        error: "Pas de catégories pour cette année"
+                    });
+                    continue;
+                }
+
+                // Vérifier les votes
+                context = await p4CheckVotes(context);
+
+                // Calculer les scores V2010 (nécessaire pour initialiser ctx.photos)
+                context = await p4ComputeNotes(context);
+
+                // Calculer les scores V2026
+                context = await computeScoresV2026(context);
+
+                // Sauvegarder les scores V2026 en base
+                let photosUpdated = 0;
+                const updateQueries: string[] = [];
+
+                for (const photoId in context.photos) {
+                    const photo = context.photos[photoId];
+
+                    if (photo.scoreV2026 !== undefined) {
+                        const scoreDetailsJson = photo.scoreDetails
+                            ? `'${JSON.stringify(photo.scoreDetails).replace(/'/g, "''")}'`
+                            : 'NULL';
+
+                        updateQueries.push(`
+                            UPDATE agpa_photo SET
+                                "scoreV2026" = ${photo.scoreV2026 ?? 'NULL'},
+                                "rankingV2026" = ${photo.rankingV2026 ?? 'NULL'},
+                                "scoreDetails" = ${scoreDetailsJson}
+                            WHERE id = ${photo.id}
+                        `);
+                        photosUpdated++;
+                    }
+                }
+
+                // Exécuter les mises à jour par batch
+                if (updateQueries.length > 0) {
+                    await this.photoRepo.query(updateQueries.join(";"));
+                }
+
+                // Recalculer les badges pour cette année
+                let badgesCreated = 0;
+                let badgeError: string | undefined;
+                try {
+                    logger.info(`Recalcul des badges pour l'année ${year}...`);
+                    const badgeResult = await agpaBadgeService.computeBadgesForYear(year);
+                    badgesCreated = badgeResult.createdCount;
+                    if (!badgeResult.success) {
+                        badgeError = badgeResult.message;
+                    }
+                    logger.info(`Année ${year}: ${badgesCreated} badges créés`);
+                } catch (badgeErr) {
+                    badgeError = badgeErr.message || String(badgeErr);
+                    logger.error(`Erreur lors du calcul des badges pour l'année ${year}:`, badgeErr);
+                }
+
+                results.push({
+                    year,
+                    success: true,
+                    photosUpdated,
+                    badgesCreated,
+                    badgeError
+                });
+
+                logger.info(`Année ${year}: ${photosUpdated} photos mises à jour, ${badgesCreated} badges créés`);
+
+            } catch (error) {
+                logger.error(`Erreur lors du recalcul V2026 pour l'année ${year}:`, error);
+                results.push({
+                    year,
+                    success: false,
+                    photosUpdated: 0,
+                    error: error.message || String(error)
+                });
+            }
+        }
+
+        // Résumé
+        const successCount = results.filter(r => r.success).length;
+        const totalPhotos = results.reduce((sum, r) => sum + r.photosUpdated, 0);
+        const totalBadges = results.reduce((sum, r) => sum + (r.badgesCreated || 0), 0);
+
+        logger.info(`Recalcul V2026 terminé: ${successCount}/${results.length} années, ${totalPhotos} photos mises à jour, ${totalBadges} badges créés`);
+
+        return {
+            summary: {
+                yearsProcessed: results.length,
+                yearsSuccess: successCount,
+                yearsFailed: results.length - successCount,
+                totalPhotosUpdated: totalPhotos,
+                totalBadgesCreated: totalBadges
+            },
+            details: results
+        };
     }
 }
 
