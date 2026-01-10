@@ -661,6 +661,10 @@ export async function p4AgpaAttributionV2026(ctx: any) {
         .map(u => (u as any).id);
     deliverAwardsPhotographesV2026(ctx.usersOrderV2026, ctx);
 
+    // Alias pour compatibilité avec le frontend (qui attend photosOrder et usersOrder)
+    ctx.photosOrder = ctx.photosOrderV2026;
+    ctx.usersOrder = ctx.usersOrderV2026;
+
     return ctx;
 }
 

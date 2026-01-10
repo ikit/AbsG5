@@ -319,6 +319,20 @@
               flex: $vuetify.display.mobile ? '0 0 auto' : '1 1 auto',
               marginBottom: $vuetify.display.mobile ? '10px' : '0'
             }">Calcul des notes</h2>
+            <v-select
+              v-model="selectedAlgorithm"
+              :items="algorithmOptions"
+              label="Algorithme"
+              item-title="title"
+              item-value="value"
+              density="compact"
+              hide-details
+              :style="{
+                flex: $vuetify.display.mobile ? '1 1 auto' : '0 0 180px',
+                minWidth: $vuetify.display.mobile ? '100%' : '150px'
+              }"
+              @update:model-value="onAlgorithmChange"
+            />
             <v-text-field
               v-model="notesFilter.quickFilter"
               prepend-icon="fas fa-search"
@@ -364,7 +378,12 @@
             </template>
 
             <template #[`item.photo`]="{ item }">
-              {{ item.title }} <br />({{ item.id }})
+              <div
+                style="text-align: left; cursor: pointer;"
+                @click="photosGalleryDisplay(item)"
+              >
+                <span style="opacity: 0.6;">({{ item.id }})</span> {{ item.title }}
+              </div>
             </template>
 
             <template #[`item.votes`]="{ item }">
@@ -378,8 +397,61 @@
             </template>
 
             <template #[`item.score`]="{ item }">
-              {{ item.gscore }}<br>
-              <span style="color: red;">{{ item.formerStats.gscore }}</span>
+              <template v-if="selectedAlgorithm === 'V2026'">
+                <strong>{{ item.scoreV2026 != null ? item.scoreV2026.toFixed(2) : '-' }}</strong>
+              </template>
+              <template v-else>
+                {{ item.gscore }}<br>
+                <span style="color: #888; font-size: 0.85em;">ancien: {{ item.formerStats?.gscore }}</span>
+              </template>
+            </template>
+
+            <template #[`item.familyRanks`]="{ item }">
+              <div v-if="item.scoreDetails?.v2026" style="display: flex; gap: 8px; font-size: 0.9em;">
+                <v-tooltip bottom>
+                  <template #activator="{ props }">
+                    <span v-bind="props" :style="{
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: item.scoreDetails.v2026.gueudelot?.rank === 1 ? '#7cb5ec' : '#f0f0f0',
+                      color: item.scoreDetails.v2026.gueudelot?.rank === 1 ? 'white' : 'inherit',
+                      fontWeight: item.scoreDetails.v2026.gueudelot?.rank === 1 ? 'bold' : 'normal'
+                    }">
+                      G: {{ item.scoreDetails.v2026.gueudelot?.rank || '-' }}
+                    </span>
+                  </template>
+                  <span>Gueudelot: Rang {{ item.scoreDetails.v2026.gueudelot?.rank || '-' }} ({{ item.scoreDetails.v2026.gueudelot?.points?.toFixed(1) || 0 }} pts)</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template #activator="{ props }">
+                    <span v-bind="props" :style="{
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: item.scoreDetails.v2026.guibert?.rank === 1 ? '#434348' : '#f0f0f0',
+                      color: item.scoreDetails.v2026.guibert?.rank === 1 ? 'white' : 'inherit',
+                      fontWeight: item.scoreDetails.v2026.guibert?.rank === 1 ? 'bold' : 'normal'
+                    }">
+                      B: {{ item.scoreDetails.v2026.guibert?.rank || '-' }}
+                    </span>
+                  </template>
+                  <span>Guibert: Rang {{ item.scoreDetails.v2026.guibert?.rank || '-' }} ({{ item.scoreDetails.v2026.guibert?.points?.toFixed(1) || 0 }} pts)</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template #activator="{ props }">
+                    <span v-bind="props" :style="{
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: item.scoreDetails.v2026.guyomard?.rank === 1 ? '#90ed7d' : '#f0f0f0',
+                      color: item.scoreDetails.v2026.guyomard?.rank === 1 ? '#333' : 'inherit',
+                      fontWeight: item.scoreDetails.v2026.guyomard?.rank === 1 ? 'bold' : 'normal'
+                    }">
+                      Y: {{ item.scoreDetails.v2026.guyomard?.rank || '-' }}
+                    </span>
+                  </template>
+                  <span>Guyomard: Rang {{ item.scoreDetails.v2026.guyomard?.rank || '-' }} ({{ item.scoreDetails.v2026.guyomard?.points?.toFixed(1) || 0 }} pts)</span>
+                </v-tooltip>
+              </div>
+              <span v-else style="color: #999;">-</span>
             </template>
 
             <template #[`item.awards`]="{ item }">
@@ -433,7 +505,33 @@
 
         <!-- Palmarès -->
         <v-window-item>
-          <h2>Etablissement du palmarès</h2>
+          <div :style="{
+            display: 'flex',
+            flexDirection: $vuetify.display.mobile ? 'column' : 'row',
+            alignItems: $vuetify.display.mobile ? 'stretch' : 'center',
+            gap: '15px',
+            margin: '10px',
+            marginBottom: '20px'
+          }">
+            <h2 :style="{
+              flex: $vuetify.display.mobile ? '0 0 auto' : '1 1 auto',
+              marginBottom: $vuetify.display.mobile ? '10px' : '0'
+            }">Etablissement du palmarès</h2>
+            <v-select
+              v-model="selectedAlgorithm"
+              :items="algorithmOptions"
+              label="Algorithme"
+              item-title="title"
+              item-value="value"
+              density="compact"
+              hide-details
+              :style="{
+                flex: $vuetify.display.mobile ? '1 1 auto' : '0 0 180px',
+                minWidth: $vuetify.display.mobile ? '100%' : '150px'
+              }"
+              @update:model-value="onAlgorithmChange"
+            />
+          </div>
           <v-data-table
             :headers="palmaresHeaders"
             :items="palmares"
@@ -1146,32 +1244,47 @@ export default {
             vote: null
         },
 
-        notesHeaders: [
-            { text: 'Catégorie', value: 'category' },
-            { text: 'Auteur', value: 'author' },
-            { text: 'Photo', value: 'photo' },
-            { text: 'Votes', value: 'votes' },
-            { text: 'Titre', value: 'title' },
-            { text: 'Score Global', value: 'score' },
-            { text: 'AGPA', value: 'awards' }
+        notesHeadersV2010: [
+            { title: 'Catégorie', key: 'category' },
+            { title: 'Auteur', key: 'author' },
+            { title: 'Photo', key: 'photo' },
+            { title: 'Votes', key: 'votes' },
+            { title: 'Titre', key: 'title' },
+            { title: 'Score (V2010)', key: 'score' },
+            { title: 'AGPA', key: 'awards' }
+        ],
+        notesHeadersV2026: [
+            { title: 'Catégorie', key: 'category' },
+            { title: 'Auteur', key: 'author' },
+            { title: 'Photo', key: 'photo' },
+            { title: 'Votes', key: 'votes' },
+            { title: 'Titre', key: 'title' },
+            { title: 'Score (V2026)', key: 'score' },
+            { title: 'Rangs Familles', key: 'familyRanks' },
+            { title: 'AGPA', key: 'awards' }
         ],
         notesFilter: {
             quickfilter: null, // un filtre par recherche de mot clés multichamps: cf construction du champs quickfilter dans mounted()
             categoryId: null, // si on filtre une catégorie en particulier
         },
+        selectedAlgorithm: 'V2026', // Algorithme sélectionné (V2010 ou V2026)
+        algorithmOptions: [
+            { title: 'V2026 (Familles)', value: 'V2026' },
+            { title: 'V2010 (Classique)', value: 'V2010' }
+        ],
         notesCategories: [{ label: "Toutes", id: null }],
         notes: [],
         notesAll: [],
 
         palmaresHeaders: [
-            { text: 'Photographe', value: 'photographe' },
-            { text: 'Récompenses', value: 'awards' },
-            { text: '8 meilleurs photos', value: 'scoreOf8' },
-            { text: 'Moyenne des photos', value: 'average' },
-            { text: 'Moins bonne photo', value: 'lower' },
-            { text: 'Score', value: 'score' },
-            { text: 'Palmarès précédant', value: 'formerPalmares' },
-            { text: 'Nouveau Palmarès', value: 'newPalmares' },
+            { title: 'Photographe', key: 'photographe' },
+            { title: 'Récompenses', key: 'awards' },
+            { title: '8 meilleurs photos', key: 'scoreOf8' },
+            { title: 'Moyenne', key: 'average' },
+            { title: 'Plus basse', key: 'lower' },
+            { title: 'Score édition', key: 'score' },
+            { title: 'Palmarès ancien', key: 'formerPalmares' },
+            { title: 'Nouveau Palmarès', key: 'newPalmares' },
         ],
         palmaresFilter: {
             quickfilter: null, // un filtre par recherche de mot clés multichamps: cf construction du champs quickfilter dans mounted()
@@ -1206,6 +1319,9 @@ export default {
             'agpaMeta',
             'user'
         ]),
+        notesHeaders() {
+            return this.selectedAlgorithm === 'V2026' ? this.notesHeadersV2026 : this.notesHeadersV2010;
+        },
         categoriesOptions() {
             if (!this.data || !this.data.categories) return [];
             return this.data.categoriesOrders
@@ -1567,7 +1683,7 @@ export default {
             // Fin de la phase 4
             this.end = format(new Date(this.agpaMeta.boudaries[3].endDate), "dd MMM 'à' HH'h'mm", {locale: fr});
 
-            axios.get(`/api/agpa/monitoring/${this.agpaMeta.year}`).then(response => {
+            axios.get(`/api/agpa/monitoring/${this.agpaMeta.year}/${this.selectedAlgorithm}`).then(response => {
                 this.data = parseAxiosResponse(response);
                 
                 // Vérifier que les données sont valides
@@ -1884,6 +2000,11 @@ export default {
                 // Fallback - afficher toutes les notes
                 this.notes = this.notesAll;
             }
+        },
+
+        onAlgorithmChange() {
+            // Recharger les données avec le nouvel algorithme
+            this.refresh();
         },
 
         notesSearchFilter(value, search, item) {
