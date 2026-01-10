@@ -225,23 +225,24 @@ export class AgpaController {
     }
 
     /**
-     * Recalcule les scores V2026 pour toutes les éditions (admin only)
-     * Cette route ne modifie PAS les awards existants, uniquement les scores V2026
+     * Recalcule les scores, awards et badges pour toutes les éditions (admin only)
      * @param fromYear année de début (défaut: 2006)
-     * @param toYear année de fin (défaut: 2025)
+     * @param toYear année de fin (défaut: année courante)
+     * @param algorithm l'algorithme à utiliser (V2010 ou V2026, défaut: V2026)
      * @param user l'utilisateur qui effectue la demande
      */
-    @Post("/recalculate-v2026")
-    async recalculateV2026(
-        @Body() body: { fromYear?: number; toYear?: number },
+    @Post("/recalculate")
+    async recalculate(
+        @Body() body: { fromYear?: number; toYear?: number; algorithm?: string },
         @CurrentUser() user: User
     ) {
         if (!user.is("admin")) {
             throw new Error("Accès refusé - Admin uniquement");
         }
         const fromYear = body?.fromYear ?? 2006;
-        const toYear = body?.toYear ?? 2025;
-        return agpaService.recalculateAllEditionsV2026(fromYear, toYear);
+        const toYear = body?.toYear ?? new Date().getFullYear();
+        const algo: AgpaAlgorithmVersion = body?.algorithm === "V2010" ? "V2010" : "V2026";
+        return agpaService.recalculateAllEditions(fromYear, toYear, algo);
     }
 
     /**

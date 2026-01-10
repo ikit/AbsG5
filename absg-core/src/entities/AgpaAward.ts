@@ -12,6 +12,11 @@ export enum AgpaAwardType {
     diamond = "diamond"
 }
 
+export enum AgpaAlgorithmVersion {
+    V2010 = "V2010",
+    V2026 = "V2026"
+}
+
 @Entity()
 @Index(["year", "category", "user", "award"], { unique: true })
 export class AgpaAward {
@@ -38,4 +43,11 @@ export class AgpaAward {
     @ManyToOne(() => AgpaPhoto)
     @JoinColumn()
     photo: AgpaPhoto;
+
+    @Column("enum", {
+        enum: ["V2010", "V2026"],
+        default: "V2010",
+        comment: "Version de l'algorithme utilisé pour l'attribution de l'award"
+    })
+    algorithmVersion: AgpaAlgorithmVersion;
 }

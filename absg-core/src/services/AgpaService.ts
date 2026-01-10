@@ -432,13 +432,13 @@ class AgpaService {
             let sql = [];
             for (const a of awards) {
                 if (a.categoryId === -1) {
-                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, NULL, '${a.award}')`);
+                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, NULL, '${a.award}', '${algorithm}')`);
                 } else {
-                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, ${a.photoId}, '${a.award}')`);
+                    sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, ${a.photoId}, '${a.award}', '${algorithm}')`);
                 }
             }
             this.catRepo.query(
-                `INSERT INTO agpa_award (year, "categoryId", "userId", "photoId", award) VALUES ${sql.join(",")};`
+                `INSERT INTO agpa_award (year, "categoryId", "userId", "photoId", award, "algorithmVersion") VALUES ${sql.join(",")};`
             );
 
             // On met à jours les résultats pour les photos de l'édition (V2010 + V2026)
@@ -1336,32 +1336,38 @@ class AgpaService {
     }
 
     /**
-     * Recalcule les scores V2026 pour toutes les éditions existantes (2006 à 2025)
-     * Cette méthode ne modifie PAS les awards existants, elle met seulement à jour :
-     * - scoreV2026
-     * - rankingV2026
-     * - scoreDetails (avec les détails V2026)
-     * - badges de l'année (recalculés après les scores)
+     * Recalcule les scores, les awards et les badges pour toutes les éditions existantes
+     * Cette méthode SUPPRIME et RECALCULE :
+     * - Les scores (V2010 et V2026)
+     * - Les awards de l'année (supprimés puis recréés avec l'algo choisi)
+     * - Les badges de l'année (supprimés puis recréés)
      *
      * @param fromYear année de début (défaut: 2006)
-     * @param toYear année de fin (défaut: 2025)
+     * @param toYear année de fin (défaut: année courante)
+     * @param algorithm l'algorithme à utiliser pour les awards (V2010 ou V2026, défaut: V2026)
      * @returns un résumé du recalcul pour chaque année
      */
-    async recalculateAllEditionsV2026(fromYear: number = 2006, toYear: number = 2025) {
+    async recalculateAllEditions(
+        fromYear: number = 2006,
+        toYear: number = new Date().getFullYear(),
+        algorithm: AgpaAlgorithmVersion = "V2026"
+    ) {
         const results: Array<{
             year: number;
             success: boolean;
             photosUpdated: number;
+            awardsDeleted?: number;
+            awardsCreated?: number;
             badgesCreated?: number;
             badgeError?: string;
             error?: string;
         }> = [];
 
-        logger.info(`Début du recalcul V2026 pour les éditions ${fromYear} à ${toYear}`);
+        logger.info(`Début du recalcul ${algorithm} pour les éditions ${fromYear} à ${toYear}`);
 
         for (let year = fromYear; year <= toYear; year++) {
             try {
-                logger.info(`Recalcul V2026 pour l'année ${year}...`);
+                logger.info(`Recalcul ${algorithm} pour l'année ${year}...`);
 
                 // Récupérer le contexte de l'année
                 let context = await getMetaData(year, true);
@@ -1383,30 +1389,94 @@ class AgpaService {
                 // Calculer les scores V2010 (nécessaire pour initialiser ctx.photos)
                 context = await p4ComputeNotes(context);
 
-                // Calculer les scores V2026
+                // Calculer les scores V2026 (toujours calculé pour avoir les détails)
                 context = await computeScoresV2026(context);
 
-                // Sauvegarder les scores V2026 en base
+                // Attribution des AGPA selon l'algorithme choisi
+                if (algorithm === "V2026") {
+                    context = await p4AgpaAttributionV2026(context);
+                    context = await p4DiamondAttributionV2026(context);
+                    context = await p4HonorAttributionV2026(context);
+                } else {
+                    context = await p4AgpaAttribution(context);
+                    context = await p4DiamondAttribution(context);
+                    context = await p4HonorAttribution(context);
+                }
+
+                // Supprimer les awards existants pour cette année
+                logger.info(`Suppression des awards existants pour ${year}...`);
+                const deleteResult = await this.catRepo.query(`DELETE FROM agpa_award WHERE year = ${year}`);
+                const awardsDeleted = deleteResult?.rowCount || 0;
+                logger.info(`${awardsDeleted} awards supprimés pour ${year}`);
+
+                // Collecter les nouveaux awards
+                let awards = [];
+
+                // Awards des photos (catégories normales et meilleur titre)
+                for (const pid in context.photos) {
+                    const p = context.photos[pid];
+                    let a = Array.isArray(p.awards) ? p.awards : [];
+                    a = a.map(e => ({ ...e, photoId: +pid, userId: p.userId }));
+                    awards = awards.concat(a);
+                }
+
+                // Awards des photographes (meilleur photographe et honneur)
+                for (const uid in context.users) {
+                    const u = context.users[uid];
+                    let a = Array.isArray(u.awards) ? u.awards : [];
+                    a = a.filter(e => e.categoryId === -1 || e.award === AgpaAwardType.honor);
+                    a = a.map(e => ({ ...e, userId: u.id }));
+                    awards = awards.concat(a);
+                }
+
+                awards.sort((a, b) => a.categoryId - b.categoryId);
+
+                // Sauvegarder les nouveaux awards
+                let awardsCreated = 0;
+                if (awards.length > 0) {
+                    const sqlValues = [];
+                    for (const a of awards) {
+                        if (a.categoryId === -1) {
+                            sqlValues.push(`(${year}, ${a.categoryId}, ${a.userId}, NULL, '${a.award}', '${algorithm}')`);
+                        } else {
+                            sqlValues.push(`(${year}, ${a.categoryId}, ${a.userId}, ${a.photoId}, '${a.award}', '${algorithm}')`);
+                        }
+                    }
+                    await this.catRepo.query(
+                        `INSERT INTO agpa_award (year, "categoryId", "userId", "photoId", award, "algorithmVersion") VALUES ${sqlValues.join(",")};`
+                    );
+                    awardsCreated = awards.length;
+                    logger.info(`${awardsCreated} awards créés pour ${year} (algo ${algorithm})`);
+                }
+
+                // Sauvegarder les scores en base (V2010 et V2026)
                 let photosUpdated = 0;
                 const updateQueries: string[] = [];
 
                 for (const photoId in context.photos) {
                     const photo = context.photos[photoId];
+                    const scoreDetailsJson = photo.scoreDetails
+                        ? `'${JSON.stringify(photo.scoreDetails).replace(/'/g, "''")}'`
+                        : 'NULL';
 
-                    if (photo.scoreV2026 !== undefined) {
-                        const scoreDetailsJson = photo.scoreDetails
-                            ? `'${JSON.stringify(photo.scoreDetails).replace(/'/g, "''")}'`
-                            : 'NULL';
+                    // Calcul du ranking V2010
+                    const rankingV2010 = context.photosOrder
+                        ? context.photosOrder.findIndex(e => e === photo.id) + 1
+                        : null;
 
-                        updateQueries.push(`
-                            UPDATE agpa_photo SET
-                                "scoreV2026" = ${photo.scoreV2026 ?? 'NULL'},
-                                "rankingV2026" = ${photo.rankingV2026 ?? 'NULL'},
-                                "scoreDetails" = ${scoreDetailsJson}
-                            WHERE id = ${photo.id}
-                        `);
-                        photosUpdated++;
-                    }
+                    updateQueries.push(`
+                        UPDATE agpa_photo SET
+                            "rankingV2010" = ${rankingV2010 ?? 'NULL'},
+                            votes = ${photo.votes ?? 'NULL'},
+                            "votesTitle" = ${photo.votesTitle ?? 'NULL'},
+                            score = ${photo.score ?? 'NULL'},
+                            "scoreV2010" = ${photo.gscore ?? 'NULL'},
+                            "scoreV2026" = ${photo.scoreV2026 ?? 'NULL'},
+                            "rankingV2026" = ${photo.rankingV2026 ?? 'NULL'},
+                            "scoreDetails" = ${scoreDetailsJson}
+                        WHERE id = ${photo.id}
+                    `);
+                    photosUpdated++;
                 }
 
                 // Exécuter les mises à jour par batch
@@ -1434,14 +1504,16 @@ class AgpaService {
                     year,
                     success: true,
                     photosUpdated,
+                    awardsDeleted,
+                    awardsCreated,
                     badgesCreated,
                     badgeError
                 });
 
-                logger.info(`Année ${year}: ${photosUpdated} photos mises à jour, ${badgesCreated} badges créés`);
+                logger.info(`Année ${year}: ${photosUpdated} photos, ${awardsCreated} awards, ${badgesCreated} badges`);
 
             } catch (error) {
-                logger.error(`Erreur lors du recalcul V2026 pour l'année ${year}:`, error);
+                logger.error(`Erreur lors du recalcul ${algorithm} pour l'année ${year}:`, error);
                 results.push({
                     year,
                     success: false,
@@ -1454,16 +1526,21 @@ class AgpaService {
         // Résumé
         const successCount = results.filter(r => r.success).length;
         const totalPhotos = results.reduce((sum, r) => sum + r.photosUpdated, 0);
+        const totalAwardsDeleted = results.reduce((sum, r) => sum + (r.awardsDeleted || 0), 0);
+        const totalAwardsCreated = results.reduce((sum, r) => sum + (r.awardsCreated || 0), 0);
         const totalBadges = results.reduce((sum, r) => sum + (r.badgesCreated || 0), 0);
 
-        logger.info(`Recalcul V2026 terminé: ${successCount}/${results.length} années, ${totalPhotos} photos mises à jour, ${totalBadges} badges créés`);
+        logger.info(`Recalcul ${algorithm} terminé: ${successCount}/${results.length} années, ${totalPhotos} photos, ${totalAwardsCreated} awards, ${totalBadges} badges`);
 
         return {
             summary: {
+                algorithm,
                 yearsProcessed: results.length,
                 yearsSuccess: successCount,
                 yearsFailed: results.length - successCount,
                 totalPhotosUpdated: totalPhotos,
+                totalAwardsDeleted,
+                totalAwardsCreated,
                 totalBadgesCreated: totalBadges
             },
             details: results
