@@ -40,11 +40,26 @@ export class AgpaPhoto {
     @Column({ comment: "Score obtenu par la photo", nullable: true })
     score: number;
 
-    @Column({ comment: "Score homogonéisé obtenu par la photo", nullable: true })
+    @Column({ comment: "Score homogonéisé obtenu par la photo (V2010)", nullable: true })
     gscore: number;
 
     @Column("json", { comment: "Erreur disqualifiant la photo", nullable: true })
     error: any;
+
+    @Column("json", {
+        comment: "Scores calculés par les différents algorithmes (v2010, v2026, ...)",
+        nullable: true
+    })
+    scores: {
+        [version: string]: {
+            votes: number;
+            votesTitle: number;
+            score: number;
+            gscore: number;
+            ranking: number;
+            calculatedAt: string;
+        };
+    };
 
     // Transient properties
     awards: Map<number, string> = null; // catId => award

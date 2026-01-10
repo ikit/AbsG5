@@ -82,57 +82,75 @@ export class AgpaAward {
 }
 ```
 
-### 1.3 Nouvelle Entité : AgpaPhotoScore
+### 1.3 Modification de l'Entité AgpaPhoto (scores multi-versions)
 
-Stocker les scores calculés par chaque algorithme séparément :
+Plutôt que de créer une nouvelle entité, on ajoute un champ JSON `scores` dans `AgpaPhoto` pour stocker les scores de chaque algorithme :
 
 ```typescript
-// absg-core/src/entities/AgpaPhotoScore.ts
+// absg-core/src/entities/AgpaPhoto.ts (modification)
 
-import { Entity, Column, JoinColumn, Index, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { AgpaPhoto } from "./AgpaPhoto";
-import { AgpaAlgorithmVersion } from "./AgpaAlgorithmVersion";
+@Column("json", {
+    comment: "Scores calculés par les différents algorithmes (v2010, v2026, ...)",
+    nullable: true
+})
+scores: {
+    [version: string]: {
+        votes: number;
+        votesTitle: number;
+        score: number;
+        gscore: number;
+        ranking: number;
+        calculatedAt: string;
+    };
+};
+```
 
-@Entity()
-@Index(["photo", "algorithmVersion"], { unique: true })
-export class AgpaPhotoScore {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @ManyToOne(() => AgpaPhoto)
-    @JoinColumn()
-    photo: AgpaPhoto;
-
-    @Column("enum", {
-        enum: AgpaAlgorithmVersion,
-        comment: "Version de l'algorithme de calcul"
-    })
-    algorithmVersion: AgpaAlgorithmVersion;
-
-    @Column({ comment: "Nombre de votes reçu par la photo", nullable: true })
-    votes: number;
-
-    @Column({ comment: "Nombre de votes reçu par le titre", nullable: true })
-    votesTitle: number;
-
-    @Column({ comment: "Score brut obtenu par la photo", nullable: true })
-    score: number;
-
-    @Column({ comment: "Score homogénéisé (Note G)", nullable: true })
-    gscore: number;
-
-    @Column({ comment: "Classement de la photo", nullable: true })
-    ranking: number;
-
-    @Column("json", {
-        comment: "Détails du calcul (pour debug/transparence)",
-        nullable: true
-    })
-    calculationDetails: any;
-
-    @Column({ comment: "Date du calcul" })
-    calculatedAt: Date;
+**Exemple de données stockées :**
+```json
+{
+    "v2010": {
+        "votes": 15,
+        "votesTitle": 3,
+        "score": 28,
+        "gscore": 12500,
+        "ranking": 4,
+        "calculatedAt": "2026-01-10T15:30:00Z"
+    },
+    "v2026": {
+        "votes": 15,
+        "votesTitle": 3,
+        "score": 32,
+        "gscore": 14200,
+        "ranking": 2,
+        "calculatedAt": "2026-01-10T15:30:00Z"
+    }
 }
+```
+
+**Avantages de cette approche :**
+- Pas de nouvelle table à créer
+- Une seule requête pour récupérer tous les scores d'une photo
+- Facile à étendre pour de futures versions
+- Les champs existants (`votes`, `score`, `gscore`, `ranking`) restent pour la rétrocompatibilité (V2010)
+
+**Migration SQL :**
+```sql
+ALTER TABLE agpa_photo
+ADD COLUMN scores JSONB;
+
+-- Optionnel: migrer les données existantes vers le format JSON
+UPDATE agpa_photo
+SET scores = jsonb_build_object(
+    'v2010', jsonb_build_object(
+        'votes', votes,
+        'votesTitle', "votesTitle",
+        'score', score,
+        'gscore', gscore,
+        'ranking', ranking,
+        'calculatedAt', NOW()
+    )
+)
+WHERE gscore IS NOT NULL;
 ```
 
 ### 1.4 Nouvelle Entité : AgpaPalmaresEntry
@@ -217,22 +235,25 @@ DROP INDEX IF EXISTS "IDX_agpa_award_unique";
 CREATE UNIQUE INDEX "IDX_agpa_award_unique"
 ON agpa_award (year, "categoryId", "userId", award, "algorithmVersion");
 
--- 3. Créer la table agpa_photo_score
-CREATE TABLE agpa_photo_score (
-    id SERIAL PRIMARY KEY,
-    "photoId" INTEGER REFERENCES agpa_photo(id),
-    "algorithmVersion" VARCHAR(10) NOT NULL,
-    votes INTEGER,
-    "votesTitle" INTEGER,
-    score INTEGER,
-    gscore INTEGER,
-    ranking INTEGER,
-    "calculationDetails" JSONB,
-    "calculatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
-    UNIQUE ("photoId", "algorithmVersion")
-);
+-- 3. Ajouter la colonne scores (JSON) à agpa_photo
+ALTER TABLE agpa_photo
+ADD COLUMN scores JSONB;
 
--- 4. Créer la table agpa_palmares_entry
+-- 4. Migrer les scores existants vers le format JSON (V2010)
+UPDATE agpa_photo
+SET scores = jsonb_build_object(
+    'v2010', jsonb_build_object(
+        'votes', votes,
+        'votesTitle', "votesTitle",
+        'score', score,
+        'gscore', gscore,
+        'ranking', ranking,
+        'calculatedAt', NOW()
+    )
+)
+WHERE gscore IS NOT NULL;
+
+-- 5. Créer la table agpa_palmares_entry (optionnel, pour cache)
 CREATE TABLE agpa_palmares_entry (
     id SERIAL PRIMARY KEY,
     "userId" INTEGER REFERENCES "user"(id),
@@ -249,7 +270,7 @@ CREATE TABLE agpa_palmares_entry (
     UNIQUE ("userId", "yearFrom", "yearTo", "algorithmVersion")
 );
 
--- 5. Migrer les données existantes vers V2010
+-- 6. Migrer les awards existants vers V2010
 UPDATE agpa_award SET "algorithmVersion" = 'v2010' WHERE "algorithmVersion" IS NULL;
 ```
 
