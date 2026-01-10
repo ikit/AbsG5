@@ -81,7 +81,7 @@ export class AgpaContext {
                 INNER JOIN "user" u ON U.id = p."userId" 
                 LEFT JOIN agpa_award a ON a."photoId" = p.id 
             WHERE p.year=${this.editionYear}
-            ORDER BY p."categoryId" ASC, p.gscore DESC, p.number ASC`;
+            ORDER BY p."categoryId" ASC, p."scoreV2010" DESC, p.number ASC`;
 
         // On récupère les données
         result = await repo.query(sql);

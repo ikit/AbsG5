@@ -336,6 +336,25 @@
           </div>
         </div>
       </div>
+
+      <!-- Bouton de téléchargement des données -->
+      <div style="text-align: center; margin: 60px 20px 40px; padding-top: 40px; border-top: 1px solid #ddd;">
+        <v-tooltip bottom>
+          <template #activator="{ props }">
+            <v-btn
+              color="primary"
+              variant="outlined"
+              v-bind="props"
+              :loading="isDownloading"
+              @click="downloadData"
+            >
+              <v-icon start>fas fa-download</v-icon>
+              Télécharger les données
+            </v-btn>
+          </template>
+          <span>Télécharger les données de l'édition {{ year }} (photos, votes, awards, badges) au format CSV</span>
+        </v-tooltip>
+      </div>
     </div>
   </section>
 </template>
@@ -351,6 +370,7 @@ import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 export default {
     data: () => ({
         isLoading: true,
+        isDownloading: false,
         current: null,
         error: null,
         year: 0,
@@ -419,6 +439,27 @@ export default {
             nextYear = nextYear > this.agpaMeta.maxYear ? this.agpaMeta.minYear : nextYear;
             nextYear = nextYear < this.agpaMeta.minYear ? this.agpaMeta.maxYear : nextYear;
             this.$router.replace({path: `/agpa/archives/${nextYear}`});
+        },
+        async downloadData() {
+            this.isDownloading = true;
+            try {
+                const response = await axios.get(`/api/agpa/archives/${this.year}/files`, {
+                    responseType: 'blob'
+                });
+                // Créer un lien de téléchargement
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `AGPA-${this.year}.zip`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading data:', error);
+            } finally {
+                this.isDownloading = false;
+            }
         },
     }
 

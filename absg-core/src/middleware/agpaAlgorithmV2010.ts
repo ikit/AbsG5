@@ -216,7 +216,7 @@ export async function p4ComputeNotes(ctx) {
             votes: p.votes,
             votesTitle: p.votesTitle,
             score: p.score,
-            gscore: p.gscore
+            gscore: p.scoreV2010
         };
         // On réinitialise les scores
         p.votes = 0; // Le nombre de vote "étoile" d'utilisateurs différents obtenu

@@ -23,7 +23,7 @@ export async function archiveSummary(user: User): Promise<any> {
     let sql = `SELECT p.*, a.award, a."categoryId" as "awardCategory", a."userId" from agpa_photo p
         INNER JOIN agpa_award a ON p.id = a."photoId"
         WHERE a."categoryId" = -2 AND p.year <= ${maxYear}
-        ORDER BY p.year DESC, p.gscore DESC`;
+        ORDER BY p.year DESC, p."scoreV2010" DESC`;
     // On récupère les données
     let result = await repo.query(sql);
     for (const row of result) {
@@ -99,7 +99,7 @@ export async function archiveEdition(year: number, user: User): Promise<any> {
         INNER JOIN "user" u ON u.id = p."userId" 
         LEFT JOIN agpa_award a ON p.id = a."photoId"
         WHERE p.year=${year} AND p."categoryId" > 0 AND a.award != 'honor' AND (a.award IS NOT NULL OR p."userId" = ${user.id})
-        ORDER BY p.gscore DESC`;
+        ORDER BY p."scoreV2010" DESC`;
     let result = await repo.query(sql);
     for (const row of result) {
         const p = new AgpaPhoto();
@@ -171,7 +171,7 @@ export async function archiveCategory(year: number, catId: number, user: User) {
         LEFT JOIN agpa_award a ON p.id = a."photoId"
         INNER JOIN "user" u ON u.id = p."userId" 
         WHERE p.year=${year} AND p."categoryId"=${catId}
-        ORDER BY p.gscore DESC`;
+        ORDER BY p."scoreV2010" DESC`;
     // On récupère les données
     const result = await repo.query(sql);
     for (const row of result) {

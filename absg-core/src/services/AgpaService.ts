@@ -1546,6 +1546,125 @@ class AgpaService {
             details: results
         };
     }
+
+    /**
+     * Génère les données d'export CSV pour une édition AGPA
+     * @param year l'année de l'édition à exporter
+     * @returns un objet contenant les données CSV pour photos, users, votes, categories, awards et badges
+     */
+    async getExportData(year: number): Promise<{
+        photos: string;
+        users: string;
+        votes: string;
+        categories: string;
+        awards: string;
+        badges: string;
+    }> {
+        // Photos de l'édition
+        const photosQuery = `
+            SELECT
+                p.id, p.year, p.title, p.filename, p.votes, p."votesTitle",
+                p.score, p."scoreV2010", p."scoreV2026", p."rankingV2010", p."rankingV2026",
+                p."categoryId", p."userId",
+                u.username as "authorUsername"
+            FROM agpa_photo p
+            LEFT JOIN "user" u ON p."userId" = u.id
+            WHERE p.year = $1
+            ORDER BY p."categoryId", p."rankingV2026" NULLS LAST
+        `;
+        const photos = await this.catRepo.query(photosQuery, [year]);
+
+        // Utilisateurs ayant participé
+        const usersQuery = `
+            SELECT DISTINCT
+                u.id, u.username, u."rootFamily",
+                per."firstName", per."lastName", per.sex
+            FROM "user" u
+            LEFT JOIN person per ON u."personId" = per.id
+            WHERE u.id IN (
+                SELECT DISTINCT "userId" FROM agpa_photo WHERE year = $1
+                UNION
+                SELECT DISTINCT "userId" FROM agpa_vote WHERE year = $1
+            )
+            ORDER BY u.username
+        `;
+        const users = await this.catRepo.query(usersQuery, [year]);
+
+        // Votes de l'édition
+        const votesQuery = `
+            SELECT
+                v.id, v.year, v."userId", v."photoId", v."categoryId", v.score
+            FROM agpa_vote v
+            WHERE v.year = $1
+            ORDER BY v."userId", v."categoryId", v."photoId"
+        `;
+        const votes = await this.catRepo.query(votesQuery, [year]);
+
+        // Catégories de l'édition
+        const categoriesQuery = `
+            SELECT DISTINCT
+                c.id, c.title, c.description, c."order",
+                (SELECT COUNT(*) FROM agpa_photo p WHERE p."categoryId" = c.id AND p.year = $1) as "photoCount",
+                (SELECT COUNT(DISTINCT "userId") FROM agpa_photo p WHERE p."categoryId" = c.id AND p.year = $1) as "userCount"
+            FROM agpa_category c
+            WHERE c.id IN (SELECT DISTINCT "categoryId" FROM agpa_photo WHERE year = $1)
+               OR c.id < 0
+            ORDER BY c."order"
+        `;
+        const categories = await this.catRepo.query(categoriesQuery, [year]);
+
+        // Awards de l'édition
+        const awardsQuery = `
+            SELECT
+                a.id, a.year, a."categoryId", a."userId", a."photoId", a.award, a."algorithmVersion",
+                u.username as "winnerUsername",
+                p.title as "photoTitle"
+            FROM agpa_award a
+            LEFT JOIN "user" u ON a."userId" = u.id
+            LEFT JOIN agpa_photo p ON a."photoId" = p.id
+            WHERE a.year = $1
+            ORDER BY a."categoryId", a.award
+        `;
+        const awards = await this.catRepo.query(awardsQuery, [year]);
+
+        // Badges de l'édition
+        const badgesQuery = `
+            SELECT
+                b.id, b.year, b."userId", b."badgeName", b."badgeType", b."badgeTiming", b."isActive",
+                u.username
+            FROM agpa_user_badge b
+            LEFT JOIN "user" u ON b."userId" = u.id
+            WHERE b.year = $1
+            ORDER BY u.username, b."badgeType"
+        `;
+        const badges = await this.catRepo.query(badgesQuery, [year]);
+
+        // Convertir en CSV
+        const toCsv = (data: any[], columns: string[]): string => {
+            if (data.length === 0) return columns.join(";") + "\n";
+            const header = columns.join(";");
+            const rows = data.map(row =>
+                columns.map(col => {
+                    const val = row[col];
+                    if (val === null || val === undefined) return "";
+                    if (typeof val === "string" && (val.includes(";") || val.includes('"') || val.includes("\n"))) {
+                        return `"${val.replace(/"/g, '""')}"`;
+                    }
+                    return String(val);
+                }).join(";")
+            );
+            return [header, ...rows].join("\n");
+        };
+
+        return {
+            photos: toCsv(photos, ["id", "year", "title", "filename", "votes", "votesTitle", "score", "scoreV2010", "scoreV2026", "rankingV2010", "rankingV2026", "categoryId", "userId", "authorUsername"]),
+            users: toCsv(users, ["id", "username", "rootFamily", "firstName", "lastName", "sex"]),
+            votes: toCsv(votes, ["id", "year", "userId", "photoId", "categoryId", "score"]),
+            categories: toCsv(categories, ["id", "title", "description", "order", "photoCount", "userCount"]),
+            awards: toCsv(awards, ["id", "year", "categoryId", "userId", "photoId", "award", "algorithmVersion", "winnerUsername", "photoTitle"]),
+            badges: toCsv(badges, ["id", "year", "userId", "badgeName", "badgeType", "badgeTiming", "isActive", "username"])
+        };
+    }
 }
 
 export const agpaService = new AgpaService();

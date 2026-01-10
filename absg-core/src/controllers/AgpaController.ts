@@ -7,13 +7,16 @@ import {
     CurrentUser,
     Post,
     Body,
-    Req
+    Req,
+    Res
 } from "routing-controllers";
 import { AgpaPhoto, User } from "../entities";
 import { agpaService, AgpaAlgorithmVersion } from "../services/AgpaService";
 import { agpaBadgeService } from "../services/AgpaBadgeService";
 import { getMetaData } from "../middleware/agpaCommonHelpers";
 import { AppDataSource } from "../data-source";
+import archiver from "archiver";
+import { Response } from "express";
 
 @Authorized()
 @JsonController("/agpa")
@@ -62,13 +65,37 @@ export class AgpaController {
     }
 
     /**
-     * Permet de télécharger au format CSV les données des AGPA
-     * @param year
+     * Permet de télécharger au format ZIP les données CSV des AGPA d'une édition
+     * Contient: photos.csv, users.csv, votes.csv, categories.csv, awards.csv, badges.csv
+     * @param year l'année de l'édition
+     * @param response la réponse Express
      */
     @Get("/archives/:year([0-9]{4})/files")
-    getArchivesFile(@Param("year") year: number) {
-        // TODO
-        return `Zip AGPA-${year}.zip created`;
+    async getArchivesFile(@Param("year") year: number, @Res() response: Response) {
+        const exportData = await agpaService.getExportData(year);
+
+        // Configurer les headers pour le téléchargement ZIP
+        response.setHeader("Content-Type", "application/zip");
+        response.setHeader("Content-Disposition", `attachment; filename=AGPA-${year}.zip`);
+
+        // Créer l'archive ZIP
+        const archive = archiver("zip", { zlib: { level: 9 } });
+
+        // Pipe l'archive vers la réponse
+        archive.pipe(response);
+
+        // Ajouter les fichiers CSV à l'archive
+        archive.append(exportData.photos, { name: `AGPA-${year}/photos.csv` });
+        archive.append(exportData.users, { name: `AGPA-${year}/users.csv` });
+        archive.append(exportData.votes, { name: `AGPA-${year}/votes.csv` });
+        archive.append(exportData.categories, { name: `AGPA-${year}/categories.csv` });
+        archive.append(exportData.awards, { name: `AGPA-${year}/awards.csv` });
+        archive.append(exportData.badges, { name: `AGPA-${year}/badges.csv` });
+
+        // Finaliser l'archive
+        await archive.finalize();
+
+        return response;
     }
 
     @Get("/ceremony/:year([0-9]{4})")
