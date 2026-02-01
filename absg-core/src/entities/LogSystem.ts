@@ -18,7 +18,8 @@ export enum LogModule {
     event = "event",
     agpa = "agpa",
     forum = "forum",
-    gtheque = "gtheque"
+    gtheque = "gtheque",
+    users = "users"
 }
 
 @Entity()

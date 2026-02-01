@@ -40,10 +40,6 @@ export const router = createRouter({
                     }
                 },
                 {
-                    path: "profile",
-                    component: () => import("./views/Admin/Profile.vue"),
-                },
-                {
                     path: "resetpwd",
                     component: () => import("./views/Admin/NewPassword.vue"),
                 },
@@ -166,7 +162,11 @@ export const router = createRouter({
                 },
                 {
                     path: "admin",
-                    component: () => import("./views/Agpa/Monitoring.vue"),
+                    component: () => import("./views/Agpa/Monitoring/MonitoringMain.vue"),
+                },
+                {
+                    path: "admin/:year",
+                    component: () => import("./views/Agpa/Monitoring/MonitoringMain.vue"),
                 },
                 {
                     path: "rules",
@@ -226,6 +226,10 @@ export const router = createRouter({
             ]
         },
         // Pages uniques
+        {
+            path: "/profile",
+            component: () => import("./views/User/Profile.vue"),
+        },
         {
             path: "/login",
             component: Login,

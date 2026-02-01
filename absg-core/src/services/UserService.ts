@@ -1,11 +1,12 @@
 import { Equal } from "typeorm";
 import { getRepository } from "../middleware/database";
-import { User, LogPassag, Person } from "../entities";
+import { User, LogPassag, Person, LogModule } from "../entities";
 import { format, differenceInDays } from "date-fns";
-import { cleanString, sendEmail } from "../middleware/commonHelper";
+import { cleanString, sendEmail, saveImage } from "../middleware/commonHelper";
 import { logger } from "../middleware/logger";
 import { hashPassword, createToken } from "../middleware";
 import { BadRequestError } from "routing-controllers";
+import * as path from "path";
 
 class UserService {
     private usersRepo = null;
@@ -244,21 +245,221 @@ L'équipe système`,
     }
 
     /**
-     * Met à jour la position GPS d'un utilisateur
-     * @param userId
-     * @param gpsLocation
+     * Récupère le profil complet d'un utilisateur avec ses photos de trombinoscope
+     * @param userId ID de l'utilisateur
      */
-    async updateGPS(userId: number, gpsLocation: any) {
-        // on récupère l'utilisateur
+    async getUserProfile(userId: number) {
         const user = await this.usersRepo
             .createQueryBuilder("u")
             .leftJoinAndSelect("u.person", "person")
-            .where("u.id = " + userId)
+            .where("u.id = :userId", { userId })
             .getOne();
 
-        user.person.lastLocation = gpsLocation;
+        if (!user) {
+            throw new BadRequestError("Utilisateur non trouvé");
+        }
+
+        // Récupérer la liste des personnes pour les relations familiales
+        const persons = await this.personsRepo
+            .createQueryBuilder("p")
+            .select(["p.id", "p.firstname", "p.lastname", "p.sex", "p.trombis", "p.dateOfBirth"])
+            .getMany();
+
+        const personsWithThumb = persons.map((p: Person) => {
+            const photo = p.trombis && p.trombis.length > 0 ? p.trombis[p.trombis.length - 1] : null;
+            return {
+                id: p.id,
+                firstname: p.firstname,
+                lastname: p.lastname,
+                sex: p.sex,
+                dateOfBirth: p.dateOfBirth,
+                thumb: photo ? `/files/trombi/mini/${p.id}_${photo.year}.jpg` : null
+            };
+        });
+
+        const maxDate = user.person?.dateOfDeath ? new Date(user.person.dateOfDeath) : new Date();
+        const minYear = user.person?.dateOfBirth ? new Date(user.person.dateOfBirth).getFullYear() : 1900;
+        const maxYear = maxDate.getFullYear();
+
+        return {
+            profile: {
+                id: user.id,
+                personId: user.person?.id || null,
+                username: user.username,
+                rootFamily: user.rootFamily,
+                roles: user.roles || [],
+                email: user.person?.email || null,
+                firstname: user.person?.firstname || null,
+                lastname: user.person?.lastname || null,
+                sex: user.person?.sex || 'undefined',
+                dateOfBirth: user.person?.dateOfBirth || null,
+                motherId: user.person?.motherId || null,
+                fatherId: user.person?.fatherId || null,
+                spouseId: user.person?.spouseId || null,
+                trombis: (user.person?.trombis || []).map(t => ({
+                    ...t,
+                    url: `/files/trombi/${user.person.id}_${t.year}.jpg`,
+                    thumb: `/files/trombi/mini/${user.person.id}_${t.year}.jpg`
+                })),
+                trombiYearRange: { min: minYear, max: maxYear }
+            },
+            persons: personsWithThumb
+        };
+    }
+
+    /**
+     * Met à jour l'email de l'utilisateur
+     * @param userId ID de l'utilisateur
+     * @param email Nouvel email
+     */
+    async updateEmail(userId: number, email: string) {
+        const user = await this.usersRepo
+            .createQueryBuilder("u")
+            .leftJoinAndSelect("u.person", "person")
+            .where("u.id = :userId", { userId })
+            .getOne();
+
+        if (!user) {
+            throw new BadRequestError("Utilisateur non trouvé");
+        }
+
+        if (!user.person) {
+            throw new BadRequestError("Profil utilisateur incomplet");
+        }
+
+        user.person.email = email;
         await this.personsRepo.save(user.person);
-        return user;
+
+        return { success: true, email };
+    }
+
+    /**
+     * Met à jour les informations personnelles de l'utilisateur
+     * @param userId ID de l'utilisateur
+     * @param profileData Données du profil à mettre à jour
+     */
+    async updateUserProfile(userId: number, profileData: {
+        email?: string;
+        firstname?: string;
+        lastname?: string;
+        sex?: string;
+        motherId?: number;
+        fatherId?: number;
+        spouseId?: number;
+    }) {
+        const user = await this.usersRepo
+            .createQueryBuilder("u")
+            .leftJoinAndSelect("u.person", "person")
+            .where("u.id = :userId", { userId })
+            .getOne();
+
+        if (!user) {
+            throw new BadRequestError("Utilisateur non trouvé");
+        }
+
+        if (!user.person) {
+            throw new BadRequestError("Profil utilisateur incomplet");
+        }
+
+        // Mettre à jour les champs modifiables
+        if (profileData.email !== undefined) {
+            user.person.email = profileData.email;
+        }
+        if (profileData.firstname !== undefined) {
+            user.person.firstname = profileData.firstname;
+        }
+        if (profileData.lastname !== undefined) {
+            user.person.lastname = profileData.lastname;
+        }
+        if (profileData.sex !== undefined) {
+            user.person.sex = profileData.sex as any;
+        }
+        if (profileData.motherId !== undefined) {
+            user.person.motherId = profileData.motherId;
+        }
+        if (profileData.fatherId !== undefined) {
+            user.person.fatherId = profileData.fatherId;
+        }
+        if (profileData.spouseId !== undefined) {
+            user.person.spouseId = profileData.spouseId;
+        }
+
+        await this.personsRepo.save(user.person);
+
+        logger.info(`Profil utilisateur ${user.username} mis à jour`, {
+            userId: user.id,
+            module: LogModule.users
+        });
+
+        return { success: true };
+    }
+
+    /**
+     * Ajoute ou remplace une photo du trombinoscope pour l'utilisateur
+     * @param userId ID de l'utilisateur
+     * @param year Année de la photo
+     * @param image Image uploadée
+     */
+    async saveUserTrombi(userId: number, year: number, image: any) {
+        const user = await this.usersRepo
+            .createQueryBuilder("u")
+            .leftJoinAndSelect("u.person", "person")
+            .where("u.id = :userId", { userId })
+            .getOne();
+
+        if (!user) {
+            throw new BadRequestError("Utilisateur non trouvé");
+        }
+
+        if (!user.person) {
+            throw new BadRequestError("Profil utilisateur incomplet");
+        }
+
+        const p = user.person;
+        const filename = `${p.id}_${year}.jpg`;
+        const title = `${p.getFullname()} - ${year} - ${p.getAge(year)}`;
+
+        // Sauvegarder l'image
+        const thumbPath = path.join(process.env.PATH_FILES, `trombi/mini/${filename}`);
+        const urlPath = path.join(process.env.PATH_FILES, `trombi/${filename}`);
+        await saveImage(image.buffer, thumbPath, urlPath, null);
+
+        // Mettre à jour la base de données
+        const data = {
+            year: Number(year),
+            title,
+            thumb: `${process.env.URL_FILES}trombi/mini/${filename}`,
+            url: `${process.env.URL_FILES}trombi/${filename}`
+        };
+
+        // Initialiser trombis si null
+        if (!p.trombis) {
+            p.trombis = [];
+        }
+
+        // Vérifier si l'année existe déjà
+        const existingIndex = p.trombis.findIndex(e => e.year === Number(year));
+        if (existingIndex > -1) {
+            // Remplacer la photo existante
+            p.trombis[existingIndex] = data;
+        } else {
+            // Ajouter la nouvelle photo
+            p.trombis.push(data);
+            p.trombis.sort((a, b) => a.year - b.year);
+        }
+
+        await this.personsRepo.save(p);
+
+        logger.notice(`Photo trombinoscope "${title}" ${existingIndex > -1 ? 'remplacée' : 'ajoutée'} par ${user.username}`, {
+            userId: user.id,
+            module: LogModule.agenda
+        });
+
+        return {
+            success: true,
+            replaced: existingIndex > -1,
+            trombi: data
+        };
     }
 }
 

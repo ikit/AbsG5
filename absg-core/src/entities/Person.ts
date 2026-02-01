@@ -33,14 +33,8 @@ export class Person {
     @Column({ nullable: true, comment: "Date du décé au format YYYY.MM.DD" })
     dateOfDeath: string;
 
-    @Column({ nullable: true, comment: "Dernière adresse connue de la personne" })
-    address: string;
-
     @Column({ nullable: true, comment: "Le dernier emplois exercé par cette personne" })
     job: string;
-
-    @Column({ nullable: true, comment: "Numéro de téléphone personnel" })
-    phone: string;
 
     @Column({ nullable: true, comment: "Email" })
     email: string;

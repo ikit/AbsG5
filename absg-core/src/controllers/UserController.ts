@@ -1,4 +1,4 @@
-import { JsonController, Post, Body, BadRequestError, Get, Authorized, CurrentUser, Param } from "routing-controllers";
+import { JsonController, Post, Body, BadRequestError, Get, Authorized, CurrentUser, UploadedFile } from "routing-controllers";
 import { User } from "../entities";
 import { userService } from "../services";
 
@@ -25,11 +25,44 @@ export class UserController {
         return userService.changePassword(user, body.pwd);
     }
 
-    @Post("/:id([0-9]+)/updateGPS")
-    updateGPS(@Param("id") id: number, @Body() body: any, @CurrentUser() user: User) {
-        if (user && user.id === id) {
-            return userService.updateGPS(id, body);
+    /**
+     * Récupère le profil de l'utilisateur connecté avec ses photos de trombinoscope
+     */
+    @Get("/profile")
+    getProfile(@CurrentUser() user: User) {
+        return userService.getUserProfile(user.id);
+    }
+
+    /**
+     * Met à jour l'email de l'utilisateur connecté
+     */
+    @Post("/profile/email")
+    updateEmail(@Body() body: any, @CurrentUser() user: User) {
+        if (!body.email) {
+            throw new BadRequestError("Email requis");
         }
-        throw new BadRequestError("Impossible de mettre à jour les données l'utilisateur");
+        return userService.updateEmail(user.id, body.email);
+    }
+
+    /**
+     * Ajoute ou remplace une photo du trombinoscope pour l'utilisateur connecté
+     */
+    @Post("/profile/trombi")
+    saveTrombi(@UploadedFile("image") image: any, @Body() body: any, @CurrentUser() user: User) {
+        if (!image) {
+            throw new BadRequestError("Image requise");
+        }
+        if (!body.year) {
+            throw new BadRequestError("Année requise");
+        }
+        return userService.saveUserTrombi(user.id, body.year, image);
+    }
+
+    /**
+     * Met à jour les informations personnelles de l'utilisateur connecté
+     */
+    @Post("/profile/info")
+    updateProfile(@Body() body: any, @CurrentUser() user: User) {
+        return userService.updateUserProfile(user.id, body);
     }
 }

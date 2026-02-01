@@ -95,9 +95,6 @@
           </template>
 
           <template #[`item.contact`]="{ item }">
-            <div v-if="item.phone">
-              {{ item.phone }}
-            </div>
             <div v-if="item.email">
               {{ item.email }}
             </div>
@@ -105,14 +102,6 @@
 
 
           <template #[`item.actions`]="{ item }">
-            <v-icon
-              v-if="item.address"
-              small
-              class="mr-2"
-              @click="openMap(item)"
-            >
-              fas fa-map-marker-alt
-            </v-icon>
             <v-icon
               small
               class="mr-2"
@@ -204,18 +193,6 @@
                 />
 
                 <v-text-field
-                  v-model="personEditor.address"
-                  label="Adresse"
-                  prepend-icon="fas fa-map-marker-alt"
-                />
-
-                <v-text-field
-                  v-model="personEditor.phone"
-                  label="Téléphone"
-                  prepend-icon="fas fa-phone"
-                />
-
-                <v-text-field
                   v-model="personEditor.email"
                   label="Email"
                   prepend-icon="fas fa-at"
@@ -270,7 +247,6 @@ export default  {
             { text: '', value: 'photo' },
             { text: 'Nom', value: 'name' },
             { text: 'Age', value: 'age' },
-            { text: 'Adresse', value: 'address' },
             { text: 'Contact', value: 'contact' },
             { text: 'Emploi', value: 'job' },
             { text: '', value: 'actions' },
@@ -298,9 +274,7 @@ export default  {
             sex: null,
             dateOfBirth: null,
             dateOfDeath: null,
-            address: null,
             job: null,
-            phone: null,
             email: null,
             rootFamily: null,
 
@@ -344,14 +318,6 @@ export default  {
             return { age, birth, death };
         },
 
-        openMap(person) {
-            if (person && person.address) {
-                const url = `https://www.google.com/maps/place/${encodeURI(person.address)}`;
-                const win = window.open(url, '_blank');
-                win.focus();
-            }
-        },
-
         photosGalleryDisplay(index) {
             store.commit('photosGallerySetIndex', index);
             store.commit('photosGalleryDisplay');
@@ -369,9 +335,7 @@ export default  {
             this.personEditor.rootFamily = null;
             this.personEditor.dateOfBirth = null;
             this.personEditor.dateOfDeath = null;
-            this.personEditor.address = null;
             this.personEditor.job = null;
-            this.personEditor.phone = null;
             this.personEditor.email = null;
             this.personEditor.complete = 0;
         },
@@ -388,9 +352,7 @@ export default  {
             this.personEditor.rootFamily = person.rootFamily;
             this.personEditor.dateOfBirth = person.dateOfBirth;
             this.personEditor.dateOfDeath = person.dateOfDeath;
-            this.personEditor.address = person.address;
             this.personEditor.job = person.job;
-            this.personEditor.phone = person.phone;
             this.personEditor.email = person.email
             this.personEditor.complete = 0;
         },
