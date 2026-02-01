@@ -22,14 +22,16 @@
               class="categories"
               style="width: 100%; text-align: left;"
             >
-              <tr><th>Portrait</th><td>Photos mettant en évidence un personnage unique de plus de douze ans (âge pris lors de l'année en cours)</td></tr>
-              <tr><th>Groupe et événement</th><td>Photos de groupes avec au minimum deux individus sur la photo. Peut importe l'âge, il peut s'agir aussi bien d'enfants que d'adultes</td></tr>
-              <tr><th>Enfant</th><td>Portraits ou photos de groupe d'enfants de douze ans ou moins (âge pris lors de l'année en cours)</td></tr>
-              <tr><th>Nature</th><td>Photos mettant l'accent sur un sujet ou phénomène naturel (végétal, animal, minéral, météorologique, ...). Les paysages naturels sont aussi acceptés</td></tr>
-              <tr><th>Grand angle</th><td>Tous types de paysages et panoramas</td></tr>
-              <tr><th>Manus Hominum</th><td>Photos dont le sujet principal est marqués par l'emprunte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme, ...)</td></tr>
-              <tr><th>Spéciale</th><td>Chaque année, un thème particulier est choisi</td></tr>
-              <tr><th>Autre regard</th><td>Photos humoristiques, artistiques, décalées ou retouchées, ainsi que toutes celles n'ayant pas trouvées leurs places dans les autres catégories</td></tr>
+              <tbody>
+                <tr><th>Portrait</th><td>Photos mettant en évidence un personnage unique de plus de douze ans (âge pris lors de l'année en cours)</td></tr>
+                <tr><th>Groupe et événement</th><td>Photos de groupes avec au minimum deux individus sur la photo. Peut importe l'âge, il peut s'agir aussi bien d'enfants que d'adultes</td></tr>
+                <tr><th>Enfant</th><td>Portraits ou photos de groupe d'enfants de douze ans ou moins (âge pris lors de l'année en cours)</td></tr>
+                <tr><th>Nature</th><td>Photos mettant l'accent sur un sujet ou phénomène naturel (végétal, animal, minéral, météorologique, ...). Les paysages naturels sont aussi acceptés</td></tr>
+                <tr><th>Grand angle</th><td>Tous types de paysages et panoramas</td></tr>
+                <tr><th>Manus Hominum</th><td>Photos dont le sujet principal est marqués par l'emprunte de l'Homme (villes, monuments, ouvrage d'art, machinerie, objets confectionnés par l'homme, ...)</td></tr>
+                <tr><th>Spéciale</th><td>Chaque année, un thème particulier est choisi</td></tr>
+                <tr><th>Autre regard</th><td>Photos humoristiques, artistiques, décalées ou retouchées, ainsi que toutes celles n'ayant pas trouvées leurs places dans les autres catégories</td></tr>
+              </tbody>
             </v-table>
           </v-card>
         </v-expansion-panel-text>
@@ -125,11 +127,13 @@
 
           <v-card style="width: 100%; padding: 15px">
             <table style="width: 100%; text-align: left;">
-              <tr><td>Phase n°1</td><td>1er oct. à 00h00</td><td>Enregistrement des photos</td></tr>
-              <tr><td>Phase n°2</td><td>19 déc. à 00h00</td><td>Validation des photos</td></tr>
-              <tr><td>Phase n°3</td><td>20 déc. à 00h00</td><td>Votes</td></tr>
-              <tr><td>Phase n°4</td><td>24 déc. à 00h00</td><td>Dépouillement</td></tr>
-              <tr><td>Phase n°5</td><td>25 déc. à 20h30</td><td>Cérémonie des AGPA</td></tr>
+              <tbody>
+                <tr><td>Phase n°1</td><td>1er oct. à 00h00</td><td>Enregistrement des photos</td></tr>
+                <tr><td>Phase n°2</td><td>19 déc. à 00h00</td><td>Validation des photos</td></tr>
+                <tr><td>Phase n°3</td><td>20 déc. à 00h00</td><td>Votes</td></tr>
+                <tr><td>Phase n°4</td><td>24 déc. à 00h00</td><td>Dépouillement</td></tr>
+                <tr><td>Phase n°5</td><td>25 déc. à 20h30</td><td>Cérémonie des AGPA</td></tr>
+              </tbody>
             </table>
           </v-card>
         </v-expansion-panel-text>
@@ -327,9 +331,11 @@
           </v-card>
 
           <table style="width: 100%; text-align: left; margin: 15px 0">
-            <tr><td><i>RangMoyen</i></td><td>moyenne des rangs attribués par les trois familles</td></tr>
-            <tr><td><i>RangMin</i></td><td>meilleur rang moyen de la catégorie (généralement proche de 1)</td></tr>
-            <tr><td><i>RangMax</i></td><td>plus mauvais rang moyen de la catégorie</td></tr>
+            <tbody>
+              <tr><td><i>RangMoyen</i></td><td>moyenne des rangs attribués par les trois familles</td></tr>
+              <tr><td><i>RangMin</i></td><td>meilleur rang moyen de la catégorie (généralement proche de 1)</td></tr>
+              <tr><td><i>RangMax</i></td><td>plus mauvais rang moyen de la catégorie</td></tr>
+            </tbody>
           </table>
 
           <p>
@@ -385,11 +391,13 @@
           ><br>
 
           <table style="width: 100%; text-align: left; margin: 15px 0">
-            <tr><td><i>PtsPhoto</i></td><td>nombre total de points recueillis par la photo</td></tr>
-            <tr><td><i>PtsCatégorie</i></td><td>nombre total de points recueillis par l’ensemble des photos de la catégorie</td></tr>
-            <tr><td><i>VtsPhotos</i></td><td>nombre total de votes recueillis par la photo</td></tr>
-            <tr><td><i>PtsCatégorie</i></td><td>nombre total de votes recueillis par l’ensemble des photos de la catégorie</td></tr>
-            <tr><td><i>Nbphotos</i></td><td>nombre de photos de la catégorie</td></tr>
+            <tbody>
+              <tr><td><i>PtsPhoto</i></td><td>nombre total de points recueillis par la photo</td></tr>
+              <tr><td><i>PtsCatégorie</i></td><td>nombre total de points recueillis par l'ensemble des photos de la catégorie</td></tr>
+              <tr><td><i>VtsPhotos</i></td><td>nombre total de votes recueillis par la photo</td></tr>
+              <tr><td><i>PtsCatégorie</i></td><td>nombre total de votes recueillis par l'ensemble des photos de la catégorie</td></tr>
+              <tr><td><i>Nbphotos</i></td><td>nombre de photos de la catégorie</td></tr>
+            </tbody>
           </table>
 
 
@@ -572,8 +580,12 @@
           </p>
           <v-card style="width: 100%;">
             <table style="width: 100%; text-align: center;">
-              <tr><th>AGPA de diamant</th><th>AGPA d’or</th><th>AGPA d’argent</th><th>AGPA de bronze</th><th>Nominé</th></tr>
-              <tr><td>6</td><td>4</td><td>3</td><td>2</td><td>1</td></tr>
+              <thead>
+                <tr><th>AGPA de diamant</th><th>AGPA d'or</th><th>AGPA d'argent</th><th>AGPA de bronze</th><th>Nominé</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>6</td><td>4</td><td>3</td><td>2</td><td>1</td></tr>
+              </tbody>
             </table>
           </v-card>
         </v-expansion-panel-text>

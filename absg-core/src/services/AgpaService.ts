@@ -437,7 +437,7 @@ class AgpaService {
                     sql.push(`(${currentYear}, ${a.categoryId}, ${a.userId}, ${a.photoId}, '${a.award}', '${algorithm}')`);
                 }
             }
-            this.catRepo.query(
+            await this.catRepo.query(
                 `INSERT INTO agpa_award (year, "categoryId", "userId", "photoId", award, "algorithmVersion") VALUES ${sql.join(",")};`
             );
 
@@ -457,7 +457,7 @@ class AgpaService {
                     "scoreDetails"=${scoreDetailsJson}
                     WHERE id=${p.id}`);
             }
-            this.catRepo.query(sql.join(";"));
+            await this.catRepo.query(sql.join(";"));
         }
 
         return awards;

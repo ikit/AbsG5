@@ -1,7 +1,7 @@
 <template>
   <section id="content">
     <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
-      <v-row style="padding: 15px">
+      <v-row style="padding: 15px; align-items: center;">
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
@@ -23,30 +23,30 @@
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
-              icon
-              small
+              size="small"
+              variant="text"
               :disabled="isLoading"
               v-bind="props"
               @click="gotoNextYear(-1)"
             >
-              <v-icon>fa-chevron-left</v-icon>
+              <v-icon>fas fa-chevron-left</v-icon>
             </v-btn>
           </template>
           <span>Edition précédente</span>
         </v-tooltip>
-        <span class="text-grey">
+        <span class="text-grey" style="line-height: 28px;">
           {{ year }}
         </span>
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
-              icon
-              small
+              size="small"
+              variant="text"
               :disabled="isLoading"
               v-bind="props"
               @click="gotoNextYear(1)"
             >
-              <v-icon>fa-chevron-right</v-icon>
+              <v-icon>fas fa-chevron-right</v-icon>
             </v-btn>
           </template>
           <span>Edition suivante</span>
@@ -57,8 +57,8 @@
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
-              icon
-              small
+              size="small"
+              variant="text"
               :disabled="isLoading"
               v-bind="props"
               @click="gotoNextCat(-1)"
@@ -68,14 +68,14 @@
           </template>
           <span>Catégorie précédente</span>
         </v-tooltip>
-        <span class="text-grey">
-          {{ agpaMeta ? agpaMeta.categories[category].title : '...' }}
+        <span class="text-grey" style="line-height: 28px;">
+          {{ agpaMeta?.categories?.[category]?.title ?? '...' }}
         </span>
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
-              icon
-              small
+              size="small"
+              variant="text"
               :disabled="isLoading"
               v-bind="props"
               @click="gotoNextCat(1)"
@@ -147,7 +147,7 @@
 
 <script>
 import axios from 'axios';
-import { mapState } from '../../stores/helpers';
+import store, { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 
@@ -186,17 +186,17 @@ export default {
                     for (let photo of this.current.photos) {
                         this.photosGalery.push(agpaPhotoToGalleryPhoto(photo));
                     }
-                    this.photosGallery.reset(this.photosGalery);
+                    store.commit('photosGalleryReset', this.photosGalery);
                 }
                 this.isLoading = false;
             });
         },
         photosGalleryDisplay(index) {
-            this.photosGallery.setIndex(index);
-            this.photosGallery.display();
+            store.commit('photosGallerySetIndex', index);
+            store.commit('photosGalleryDisplay');
         },
         photosGalleryHide() {
-            this.photosGallery.hide();
+            store.commit('photosGalleryHide');
         },
         gotoNextYear(step) {
             let nextYear = this.year + step;

@@ -24,7 +24,10 @@
           fas fa-scroll
         </v-icon> Réglement
       </v-tab>
-      <v-tab :to="{path:'/agpa/archives'}">
+      <v-tab
+        :to="{path:'/agpa/archives'}"
+        :active="$route.path.startsWith('/agpa/archives')"
+      >
         <v-icon start>
           fas fa-archive
         </v-icon> Archives
@@ -34,7 +37,10 @@
           fas fa-trophy
         </v-icon> Palmarès
       </v-tab>
-      <v-tab :to="{path:'/agpa/ceremony'}">
+      <v-tab
+        :to="{path:'/agpa/ceremony'}"
+        :active="$route.path.startsWith('/agpa/ceremony')"
+      >
         <v-icon start>
           fas fa-tv
         </v-icon> Cérémonies
