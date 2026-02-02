@@ -102,7 +102,7 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="bg-grey-lighten-4">
+        <v-card-title class="dialog-header bg-primary">
           {{ citationEditor.id ? "Editer la citation" : "Nouvelle citation" }}
         </v-card-title>
         <v-container
@@ -116,46 +116,53 @@
             <v-col cols="12">
               <v-autocomplete
                 v-model="citationEditor.author"
-                prepend-icon="fas fa-user"
-                label="Autheur de la citation"
+                prepend-inner-icon="fas fa-user"
+                label="Auteur de la citation"
                 :items="persons"
                 item-title="fullname"
                 item-value="id"
+                variant="outlined"
+                density="compact"
+                hide-details
               />
             </v-col>
             <v-col cols="12">
-              <v-text-field
+              <v-textarea
                 v-model="citationEditor.citation"
-                prepend-icon="fas fa-quote-left"
+                prepend-inner-icon="fas fa-quote-left"
                 label="La citation"
+                variant="outlined"
+                density="compact"
+                hide-details
+                rows="3"
               />
             </v-col>
             <v-col cols="12">
               <v-text-field
                 v-model="citationEditor.year"
-                prepend-icon="fas fa-calendar-alt"
+                prepend-inner-icon="fas fa-calendar-alt"
                 label="Année de référence (où la citation a été dite)"
+                variant="outlined"
+                density="compact"
+                hide-details
               />
             </v-col>
             <v-col cols="12">
-              <v-card>
-                <div style="position: relative;">
-                  <v-icon style="position: absolute; top: 18px; left: 22px;">
-                    fas fa-info
-                  </v-icon>
-                  <p style="margin-left: 50px; padding: 10px; font-style: italic">
-                    Merci de les mettre la citation entre double quotes, et les précisions entre parenthèses: "La citation" (ma précision).
-                  </p>
-                </div>
-              </v-card>
+              <v-alert
+                type="info"
+                variant="tonal"
+                density="compact"
+                class="info-alert"
+              >
+                Merci de mettre la citation entre double quotes, et les précisions entre parenthèses : "La citation" (ma précision).
+              </v-alert>
             </v-col>
           </v-row>
         </v-container>
-        <v-card-actions>
+        <v-card-actions class="dialog-actions">
           <v-spacer />
           <v-btn
             variant="text"
-            color="primary"
             @click="resetDialog()"
           >
             Annuler
@@ -175,17 +182,16 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="bg-grey-lighten-4">
+        <v-card-title class="dialog-header bg-primary">
           Supprimer la citation
         </v-card-title>
-        <p style="margin: 0 24px;">
+        <v-card-text>
           Êtes vous sûr de vouloir supprimer cette citation ?
-        </p>
-        <v-card-actions>
+        </v-card-text>
+        <v-card-actions class="dialog-actions">
           <v-spacer />
           <v-btn
             variant="text"
-            color="primary"
             @click="citationDeletion.open = false"
           >
             Annuler
@@ -344,6 +350,15 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+.dialog-header {
+  color: white;
+}
+
+.dialog-actions {
+  background: rgba(var(--v-theme-surface-variant), 0.5);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 .search-field {
   max-width: 300px;
 }
@@ -377,6 +392,17 @@ export default {
 .year {
   opacity: 0.5;
   margin: 0;
+}
+
+.info-alert {
+  font-size: 0.9em;
+  font-style: italic;
+  background: rgba(var(--v-theme-info), 0.25) !important;
+  color: rgba(var(--v-theme-on-surface), 0.85) !important;
+
+  :deep(.v-icon) {
+    color: rgb(var(--v-theme-info)) !important;
+  }
 }
 
 .citation-avatar {
