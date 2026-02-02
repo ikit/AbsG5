@@ -102,7 +102,7 @@
             color="primary"
             v-bind="props"
             data-cy="user"
-            style="margin-right: 0"
+            style="margin-right: 12px"
           >
             <img
               :src="user.avatarUrl"
@@ -601,7 +601,7 @@ export default {
         text-align: center;
         bottom: -7px;
         color: rgba(255,255,255, 0.2);
-        background: rgb(var(--v-theme-primary));
+        background: #1E3A5F;
         font-variant: all-small-caps;
         font-size: 11px;
     }
@@ -621,7 +621,7 @@ export default {
     bottom: 0;
     left: 0;
     width: 85px;
-    background: rgb(var(--v-theme-primary));
+    background: #1E3A5F;
     padding-top: 8px;
 
     a {
@@ -630,7 +630,7 @@ export default {
         vertical-align: middle;
         width: 85px;
         height: 75px;
-        color: rgba(var(--v-theme-on-primary), 0.9);
+        color: rgba(255, 255, 255, 0.9);
         text-decoration: none;
         cursor: pointer;
         border-right: 1px solid rgba(0, 0, 0, 0.2);

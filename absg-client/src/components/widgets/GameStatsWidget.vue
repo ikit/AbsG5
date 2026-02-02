@@ -91,7 +91,7 @@ export default {
       externalGames: [
         {
           name: "Cemantix",
-          url: "https://cemantix.certideal.com/",
+          url: "https://cemantix.certitudes.org/",
           icon: "fas fa-brain",
           color: "purple"
         },
