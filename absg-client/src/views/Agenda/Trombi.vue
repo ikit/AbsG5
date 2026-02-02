@@ -1,63 +1,65 @@
 <template>
   <div>
-    <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
-      <v-row
-        style="margin: 0"
-        align="center"
-        justify="center"
-      >
-        <v-text-field
-          v-model="filter.search"
-          prepend-icon="fa-search"
-          placeholder="Rechercher"
-          style="max-width: 300px;"
-          @change="applyFilter()"
-        />
+    <v-container class="sticky-header-container">
+      <v-card class="sticky-card">
+        <v-card-title class="card-header">
+          <v-text-field
+            v-model="filter.search"
+            prepend-inner-icon="fas fa-search"
+            label="Rechercher"
+            single-line
+            hide-details
+            density="compact"
+            variant="outlined"
+            class="search-field"
+            @change="applyFilter()"
+          />
 
-        <v-spacer />
+          <v-spacer />
 
-        <v-btn-toggle :disabled="isLoading">
-          <v-tooltip bottom v-if="isAdmin">
-            <template #activator="{ props }">
-              <v-btn @click.stop="rebuildTrombis()" v-bind="props">
-                <v-icon>fas fa-redo</v-icon>
-              </v-btn>
-            </template>
-            <span>Reconstruire la liste des trombi</span>
-          </v-tooltip>
+          <v-btn-toggle :disabled="isLoading">
+            <v-tooltip bottom v-if="isAdmin">
+              <template #activator="{ props }">
+                <v-btn @click.stop="rebuildTrombis()" v-bind="props">
+                  <v-icon>fas fa-redo</v-icon>
+                </v-btn>
+              </template>
+              <span>Reconstruire la liste des trombi</span>
+            </v-tooltip>
 
-          <v-tooltip bottom>
-            <template #activator="{ props }">
-              <v-btn @click.stop="switchHidden()" v-bind="props">
-                <v-icon v-if="filter.hideEmpty">fas fa-portrait</v-icon>
-                <v-icon v-else>fas fa-user-friends</v-icon>
-              </v-btn>
-            </template>
-            <span>Afficher/Masquer les personnes sans trombi</span>
-          </v-tooltip>
-          
-          <v-tooltip bottom>
-            <template #activator="{ props }">
-              <v-btn @click.stop="displayStats()" v-bind="props">
-                <v-icon>fas fa-chart-pie</v-icon>
-              </v-btn>
-            </template>
-            <span>Voir les statistiques</span>
-          </v-tooltip>
+            <v-tooltip bottom>
+              <template #activator="{ props }">
+                <v-btn @click.stop="switchHidden()" v-bind="props">
+                  <v-icon v-if="filter.hideEmpty">fas fa-portrait</v-icon>
+                  <v-icon v-else>fas fa-user-friends</v-icon>
+                </v-btn>
+              </template>
+              <span>Afficher/Masquer les personnes sans trombi</span>
+            </v-tooltip>
 
-          <v-tooltip bottom>
-            <template #activator="{ props }">
-              <v-btn @click.stop="resetDialog(true)" v-bind="props">
-                <v-icon>fas fa-plus</v-icon>
-              </v-btn>
-            </template>
-            <span>Enregistrer une nouvelle photo</span>
-          </v-tooltip>
-        </v-btn-toggle>
-      </v-row>
-    </div>
+            <v-tooltip bottom>
+              <template #activator="{ props }">
+                <v-btn @click.stop="displayStats()" v-bind="props">
+                  <v-icon>fas fa-chart-pie</v-icon>
+                </v-btn>
+              </template>
+              <span>Voir les statistiques</span>
+            </v-tooltip>
 
-    <v-container>
+            <v-tooltip bottom>
+              <template #activator="{ props }">
+                <v-btn @click.stop="resetDialog(true)" v-bind="props">
+                  <v-icon>fas fa-plus</v-icon>
+                </v-btn>
+              </template>
+              <span>Enregistrer une nouvelle photo</span>
+            </v-tooltip>
+          </v-btn-toggle>
+        </v-card-title>
+      </v-card>
+    </v-container>
+
+    <v-container style="padding-top: 0;">
       <v-expansion-panels
         v-model="panel"
         multiple
@@ -100,7 +102,7 @@
       width="400px"
     >
       <v-card>
-        <v-card-title class="bg-grey-lighten-4 py-4 title">
+        <v-card-title class="dialog-header bg-primary">
           Nouvelle trombinette
         </v-card-title>
         <v-container
@@ -112,17 +114,24 @@
             :items="persons"
             :rules="editorRules.person"
             label="Qui"
-            prepend-icon="fas fa-user"
+            prepend-inner-icon="fas fa-user"
             item-title="fullname"
+            variant="outlined"
+            density="compact"
+            hide-details
           />
-          
+
           <v-text-field
             v-model="trombiEditor.date"
             :rules="editorRules.date"
             label="Quand"
             placeholder="Année de la photo"
             validate-on-blur
-            prepend-icon="far fa-calendar-alt"
+            prepend-inner-icon="fas fa-calendar-alt"
+            variant="outlined"
+            density="compact"
+            hide-details
+            class="mt-4"
           />
 
           <ImageEditor
@@ -130,16 +139,16 @@
             icon="fas fa-camera"
             style="height: 300px;"
             mode="square"
+            class="mt-4"
           />
           <div v-if="trombiEditor.isLoading">
             Enregistrement en cours : {{ trombiEditor.complete }}%
           </div>
         </v-container>
-        <v-card-actions>
+        <v-card-actions class="dialog-actions">
           <v-spacer />
           <v-btn
             variant="text"
-            color="primary"
             :disabled="trombiEditor.isLoading"
             @click="resetDialog()"
           >
@@ -160,7 +169,7 @@
       v-model="stats.open"
     >
       <v-card>
-        <v-card-title class="bg-grey-lighten-4 py-4 title">
+        <v-card-title class="dialog-header bg-primary">
           Statistiques
         </v-card-title>
         <div style="display: flex;">
@@ -196,12 +205,11 @@
             />
           </div>
         </div>
-          
-        <v-card-actions class="bg-grey-lighten-4 py-4 title">
+
+        <v-card-actions class="dialog-actions">
           <v-spacer />
           <v-btn
             variant="text"
-            color="primary"
             :disabled="trombiEditor.isLoading"
             @click="stats.open = false"
           >
@@ -541,9 +549,36 @@ export default {
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
 
-// Override sticky header pour cette page sans onglets
-.stickyHeader {
-    top: 64px !important;
+.sticky-header-container {
+  position: sticky;
+  top: 48px;
+  z-index: 10;
+  padding-bottom: 0;
+}
+
+.sticky-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(var(--v-theme-surface-variant), 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dialog-header {
+  color: white;
+}
+
+.dialog-actions {
+  background: rgba(var(--v-theme-surface-variant), 0.5);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.search-field {
+  max-width: 300px;
 }
 
 .thumb {
@@ -592,6 +627,18 @@ export default {
       text-align: right;
       font-weight: bold
     }
+  }
+}
+
+@media (max-width: 600px) {
+  .card-header {
+    flex-wrap: wrap;
+  }
+
+  .search-field {
+    flex: 1;
+    min-width: 150px;
+    max-width: unset;
   }
 }
 </style>

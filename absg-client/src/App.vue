@@ -744,3 +744,11 @@ export default {
 
 }
 </style>
+
+<style lang="scss">
+// Styles globaux (non scoped) pour les overlays comme les tooltips
+.v-tooltip > .v-overlay__content {
+    background: rgb(var(--v-theme-on-surface)) !important;
+    color: rgb(var(--v-theme-surface)) !important;
+}
+</style>
