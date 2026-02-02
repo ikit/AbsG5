@@ -60,18 +60,7 @@
           Absolument <span>G</span>
         </router-link>
       </v-toolbar-title>
-      <v-spacer>
-        <div
-          v-if="citation && $vuetify.display.lgAndUp"
-          data-cy="citation"
-          style="text-align:center; margin: 0 100px; color: #fff"
-        >
-          <b>{{ citation.author }} - </b> <span
-            style="font-style: italic; font-weight: 200; opacity: 0.7; color: #fff"
-            v-html="citation.citation"
-          />
-        </div>
-      </v-spacer>
+      <v-spacer />
 
       <div
         v-if="usersOnline.length > 0"
@@ -423,7 +412,6 @@ export default {
     }),
     computed: {
         ...mapState([
-            "citation",
             "wsOnline",
             "wsMessage",
             "error",

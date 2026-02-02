@@ -26,10 +26,8 @@
         >
           <v-icon color="white" size="small">fas fa-user</v-icon>
         </v-avatar>
-        <div class="author-info">
-          <span class="author-name">{{ citation.author?.fullname || 'Anonyme' }}</span>
-          <span v-if="citation.year" class="citation-year">{{ citation.year }}</span>
-        </div>
+        <span class="author-name">{{ citation.author?.fullname || 'Anonyme' }}</span>
+        <span v-if="citation.year" class="citation-year">{{ citation.year }}</span>
       </div>
     </v-card-text>
     <v-card-text v-else class="no-citation text-center pa-6">
@@ -142,19 +140,16 @@ export default {
   }
 }
 
-.author-info {
-  display: flex;
-  flex-direction: column;
-}
-
 .author-name {
   font-weight: 600;
   color: rgb(var(--v-theme-primary));
+  flex: 1;
 }
 
 .citation-year {
   font-size: 0.85em;
   opacity: 0.6;
+  font-style: italic;
 }
 
 .citation-actions {

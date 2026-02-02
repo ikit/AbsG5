@@ -1,7 +1,7 @@
 <template>
   <v-card class="widget-card">
     <v-card-title class="widget-title">
-      <v-icon start color="accent">fas fa-calendar-star</v-icon>
+      <v-icon start color="accent">fas fa-calendar-alt</v-icon>
       Événements à venir
     </v-card-title>
     <v-card-text class="pa-0">
