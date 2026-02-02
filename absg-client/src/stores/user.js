@@ -29,6 +29,11 @@ export const useUserStore = defineStore('user', {
      */
     setCurrentUser(user) {
       if (user) {
+        // Add avatarUrl if user has an id
+        if (user.id) {
+          const idAsStr = `${user.id}`
+          user.avatarUrl = `/files/avatars/${idAsStr.padStart(3, '0')}.png`
+        }
         this.user = user
         this.isAuthenticated = true
       } else {
@@ -44,6 +49,11 @@ export const useUserStore = defineStore('user', {
     updateUser(userData) {
       if (this.user) {
         this.user = { ...this.user, ...userData }
+        // Ensure avatarUrl is present
+        if (this.user.id && !this.user.avatarUrl) {
+          const idAsStr = `${this.user.id}`
+          this.user.avatarUrl = `/files/avatars/${idAsStr.padStart(3, '0')}.png`
+        }
       }
     },
 

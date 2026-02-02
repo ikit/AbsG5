@@ -66,7 +66,11 @@ export const useMainStore = defineStore('main', {
     setCurrentUser(user) {
       const userStore = useUserStore()
       userStore.setCurrentUser(user)
-      // Keep in sync for backward compatibility
+      // Keep in sync for backward compatibility, add avatarUrl
+      if (user && user.id) {
+        const idAsStr = `${user.id}`
+        user.avatarUrl = `/files/avatars/${idAsStr.padStart(3, '0')}.png`
+      }
       this.user = user
     },
 
@@ -74,7 +78,11 @@ export const useMainStore = defineStore('main', {
     updateUser(user) {
       const userStore = useUserStore()
       userStore.updateUser(user)
-      // Keep in sync for backward compatibility
+      // Keep in sync for backward compatibility, add avatarUrl
+      if (user && user.id) {
+        const idAsStr = `${user.id}`
+        user.avatarUrl = `/files/avatars/${idAsStr.padStart(3, '0')}.png`
+      }
       this.user = user
     },
 

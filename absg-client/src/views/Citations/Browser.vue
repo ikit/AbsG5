@@ -2,13 +2,14 @@
   <div>
     <v-container>
       <v-card>
-        <v-card-title>
+        <v-card-title style="display: flex; align-items: center;">
           <v-text-field
             v-model="filter.search"
             prepend-icon="fas fa-search"
             label="Rechercher"
             single-line
             hide-details
+            style="max-width: 300px"
           />
           <v-spacer />
           <v-btn
@@ -45,10 +46,12 @@
                 v-if="$vuetify.display.lgAndUp"
                 size="36px"
                 style="flex: 0 1 1"
+                class="citation-avatar"
               >
                 <img
                   alt="photo"
                   :src="item.author.thumb"
+                  class="citation-avatar-img"
                 >
               </v-avatar>
               <div
@@ -358,5 +361,16 @@ export default {
 .year {
     opacity: 0.5;
     margin: 0;
+}
+
+.citation-avatar {
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.citation-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 </style>

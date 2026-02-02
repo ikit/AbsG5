@@ -311,7 +311,7 @@ h2 {
     margin-inline-start: 0px;
     margin-inline-end: 0px;
     text-align: center;
-    color: $primary;
+    color: rgb(var(--v-theme-primary));
     text-shadow: 0 -1px #000;
     text-shadow: 0 1px #aaa;
     font-size: 1.5em;

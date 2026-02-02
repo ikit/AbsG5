@@ -154,7 +154,7 @@ h2 {
 }
 h3 {
     font-family: 'Tangerine', serif;
-    color: $accent;
+    color: rgb(var(--v-theme-accent));
     font-size: 2.5em;
 }
 

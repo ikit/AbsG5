@@ -716,7 +716,7 @@ export default {
 h2 {
   font-family: "Comfortaa", sans-serif;
   font-size: 1.5em;
-  color: $primary;
+  color: rgb(var(--v-theme-primary));
 }
 
 .profile-avatar {
@@ -742,7 +742,7 @@ h2 {
 
 .info-icon {
   width: 20px;
-  color: $primary;
+  color: rgb(var(--v-theme-primary));
   opacity: 0.7;
 }
 
@@ -754,7 +754,7 @@ h2 {
 
 .info-value {
   font-weight: 600;
-  color: $primary;
+  color: rgb(var(--v-theme-primary));
 }
 
 .trombi-container {

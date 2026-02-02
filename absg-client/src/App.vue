@@ -41,7 +41,7 @@
       v-if="user && user.id > 0"
       app
       fixed
-      style="z-index: 2000; background: #37474f"
+      :style="{ zIndex: 2000, background: themeColors.primary }"
     >
       <v-app-bar-nav-icon
         v-if="!$vuetify.display.lgAndUp"
@@ -123,24 +123,18 @@
           </v-btn>
         </template>
         <v-list nav>
-          <!-- <v-list-item :to="{ path: '/admin/profile'}">
-                    <v-list-item-title :key="1"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-info-circle</v-icon>Mes informations</v-list-item-title>
-                </v-list-item> -->
-          <v-list-item @click="setGPSPosition()">
-            <v-list-item-title :key="2">
+          <v-list-item :to="{ path: '/profile'}">
+            <v-list-item-title :key="1">
               <v-icon style="width: 38px; margin-right: 8px; text-align: center;">
-                fas fa-crosshairs
-              </v-icon>Ma position
+                fas fa-user
+              </v-icon>Mon profil
             </v-list-item-title>
           </v-list-item>
-          <!-- <v-list-item @click="toggleDarkMode()">
-                    <v-list-item-title :key="5"><v-icon style="width: 38px; margin-right: 8px; text-align: center;">fas fa-adjust</v-icon>Mode {{ $vuetify.theme.dark ? "sombre" : "clair" }}</v-list-item-title>
-                </v-list-item> -->
-          <v-list-item :to="{ path: '/admin/resetpwd'}">
-            <v-list-item-title :key="3">
+          <v-list-item @click="toggleDarkMode()">
+            <v-list-item-title :key="2">
               <v-icon style="width: 38px; margin-right: 8px; text-align: center;">
-                fas fa-lock
-              </v-icon>Changer mot de passe
+                {{ isDarkMode ? 'fas fa-sun' : 'fas fa-moon' }}
+              </v-icon>{{ isDarkMode ? 'Mode clair' : 'Mode sombre' }}
             </v-list-item-title>
           </v-list-item>
           <v-list-item @click="logout()">
@@ -181,7 +175,7 @@
           class="menuItem"
           style="position: absolute; bottom: 0; border-top: 1px solid rgba(0, 0, 0, 0.2)"
         >
-          <router-link to="/changelog">
+          <router-link>
             <v-icon color="inherit">
               far fa-question-circle
             </v-icon><br>
@@ -463,6 +457,32 @@ export default {
         // Editeur photos
         photosEditorDisplayed() {
             return this.$store.state.photosEditorDisplayed;
+        },
+        // Thème
+        isDarkMode() {
+            return this.$vuetify.theme.global.name === 'dark';
+        },
+        themeColors() {
+            // Accède aux couleurs du thème actuel via Vuetify
+            // Vérification null pour éviter l'erreur lors de l'initialisation
+            const theme = this.$vuetify.theme.current?.value;
+            if (!theme?.colors) {
+                // Valeurs par défaut (thème light Ocean)
+                return {
+                    primary: '#1E3A5F',
+                    secondary: '#152A45',
+                    accent: '#FF6B6B',
+                    background: '#E8EDF2',
+                    surface: '#F5F7FA',
+                };
+            }
+            return {
+                primary: theme.colors.primary,
+                secondary: theme.colors.secondary,
+                accent: theme.colors.accent,
+                background: theme.colors.background,
+                surface: theme.colors.surface,
+            };
         }
     },
     watch: {
@@ -510,34 +530,6 @@ export default {
             logoutUser(store);
             this.$router.push("/login");
         },
-        setGPSPosition() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        // On met à jour les infos de l'utilisateur,
-                        axios.post(`/api/users/${this.user.id}/updateGPS`, [position.coords.latitude, position.coords.longitude]).then(
-                            savedUser => {
-                                store.commit("onNotif", [
-                                    "Localisation mise à jours",
-                                    `Votre position a été mise à jours avec les coordonnées GPS suivantes : <code>[${position.coords.latitude}, ${position.coords.longitude}]</code>`]);
-                                },
-                            err => {
-                                store.commit('onError', err);
-                            }
-                        );
-                    },
-                    () => {
-                        store.commit("onWarning", `
-                            La récupération automatique de votre position est bloquée par votre navigateur.<br/>
-                            Vous pouvez modifier manuellement votre position dans la section '<a href="/admin/profile">Mes informations</a>' du site.`);
-                    }
-                );
-            } else {
-                store.commit("onWarning", `
-                    La récupération automatique de votre position est bloquée par votre navigateur.<br/>
-                    Vous pouvez modifier manuellement votre position dans la section '<a href="/admin/profile">Mes informations</a>' du site.`);
-            }
-        },
 
         copyError() {
             navigator.clipboard.writeText(`Erreur Absolument G\nDate: ${this.error.log}\nRequête: ${this.error.query}\nStatus: ${this.error.htmlError}\nError: ${this.error.msg}`);;
@@ -584,7 +576,6 @@ export default {
 
 
 <style lang="scss" scoped>
-@use './themes/global.scss' as *;
 #title {
     font-size: 1.5em;
     line-height: 1.5em;
@@ -592,7 +583,7 @@ export default {
     color: white;
     text-decoration: none;
     span {
-        color: $accent;
+        color: rgb(var(--v-theme-accent));
     }
 }
 
@@ -617,7 +608,7 @@ export default {
         text-align: center;
         bottom: -7px;
         color: rgba(255,255,255, 0.2);
-        background: #37474f;
+        background: rgb(var(--v-theme-primary));
         font-variant: all-small-caps;
         font-size: 11px;
     }
@@ -627,12 +618,7 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background: rgba(200, 200, 200, 0.1)
-    // background-image: url("/img/background/r00.png");
-    // background-position: center;
-    // background-size: cover;
-    // background-attachment: fixed;
-    // position: relative;
+    background: rgb(var(--v-theme-background));
 }
 
 #menu {
@@ -642,7 +628,7 @@ export default {
     bottom: 0;
     left: 0;
     width: 85px;
-    background: $primary;
+    background: rgb(var(--v-theme-primary));
     padding-top: 8px;
 
     a {
@@ -651,10 +637,10 @@ export default {
         vertical-align: middle;
         width: 85px;
         height: 75px;
-        color: rgba(0,0,0, 0.9);
+        color: rgba(var(--v-theme-on-primary), 0.9);
         text-decoration: none;
         cursor: pointer;
-        border-right: 1px solid #000;
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
 
         span {
             font-size: 0.8em
@@ -662,25 +648,26 @@ export default {
     }
 
     .router-link-active {
-        background: $accent;
-        color: white!important;
+        background: rgb(var(--v-theme-accent));
+        color: white !important;
 
-        .theme--light.v-icon {
+        .v-icon {
             color: white;
         }
     }
 }
+
 .menuItem {
-    border-bottom: 1px solid rgba(0,0,0, 0.2);
-}
-.menuItem:hover {
-    background: rgba(255,255,255, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+.menuItem:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
 
 .unreadNotification {
     font-weight: bold;
-    color: $accent;
+    color: rgb(var(--v-theme-accent));
     cursor: pointer;
 }
 

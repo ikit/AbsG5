@@ -615,7 +615,7 @@ h1 {
     margin-inline-end: 0px;
     font-weight: bold;
     text-align: center;
-    color: $primary;
+    color: rgb(var(--v-theme-primary));
     text-shadow: 0 -1px #000;
     text-shadow: 0 1px #aaa;
     font-size: 40px;

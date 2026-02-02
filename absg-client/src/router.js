@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router"
 // These components are now loaded on-demand when their route is accessed
 const Home = () => import("./views/Home.vue")
 const E404 = () => import("./views/E404.vue")
-const Changelog = () => import("./views/Changelog.vue")
+// const Changelog = () => import("./views/Changelog.vue")
 const Login = () => import("./views/User/Login.vue")
 import axios from "axios"
 import store from "./store"
@@ -247,10 +247,10 @@ export const router = createRouter({
         //     path: "/voyag",
         //     component: () => import("./views/VoyaG.vue"),
         // },
-        {
-            path: "/changelog",
-            component: Changelog
-        },
+        // {
+        //     path: "/changelog",
+        //     component: Changelog
+        // },
 
         // Error management
         {

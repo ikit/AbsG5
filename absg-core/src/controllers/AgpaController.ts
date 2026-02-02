@@ -34,6 +34,54 @@ export class AgpaController {
     }
 
     /**
+     * Récupère la liste de toutes les éditions disponibles avec leurs statistiques
+     * Utilisé par le module de supervision pour permettre la sélection d'une édition
+     */
+    @Get("/editions")
+    getEditionsList(@CurrentUser() user: User) {
+        if (user.is("admin")) {
+            return agpaService.getEditionsList();
+        }
+        return null;
+    }
+
+    /**
+     * Récupère les étapes de calcul V2026 pour une édition
+     * Permet de visualiser le processus de calcul étape par étape
+     * @param year l'année de l'édition
+     */
+    @Get("/monitoring/:year([0-9]{4})/v2026-steps")
+    getV2026Steps(@Param("year") year: number, @CurrentUser() user: User) {
+        if (user.is("admin")) {
+            return agpaService.getV2026CalculationSteps(year);
+        }
+        return null;
+    }
+
+    /**
+     * Récupère les votes organisés par votant pour une édition
+     * @param year l'année de l'édition
+     */
+    @Get("/monitoring/:year([0-9]{4})/votes-by-voter")
+    getVotesByVoter(@Param("year") year: number, @CurrentUser() user: User) {
+        if (user.is("admin")) {
+            return agpaService.getVotesByVoter(year);
+        }
+        return null;
+    }
+
+    /**
+     * Récupère l'évolution du palmarès glissant sur toutes les fenêtres de 3 ans
+     */
+    @Get("/palmares/sliding-evolution")
+    getSlidingPalmaresEvolution(@CurrentUser() user: User) {
+        if (user.is("admin")) {
+            return agpaService.getSlidingPalmaresEvolution();
+        }
+        return null;
+    }
+
+    /**
      * Récupère les données globale sur l'ensemble des éditions permettant de faire
      * le résumé des archives
      * @param session l'utilisateur qui fait la demande

@@ -278,7 +278,7 @@ button {
     }
 
     &:hover {
-        background-color: $accent;
+        background-color: rgb(var(--v-theme-accent));
         color: #fff;
     }
 }

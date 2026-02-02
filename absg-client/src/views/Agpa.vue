@@ -11,14 +11,6 @@
           fas fa-star
         </v-icon> Edition {{ agpaMeta ? agpaMeta.year : "" }}
       </v-tab>
-      <v-tab
-        v-if="isAdmin"
-        :to="{path:'/agpa/admin'}"
-      >
-        <v-icon start>
-          fas fa-tachometer-alt
-        </v-icon> Supervision
-      </v-tab>
       <v-tab :to="{path:'/agpa/rules'}">
         <v-icon start>
           fas fa-scroll
@@ -44,6 +36,14 @@
         <v-icon start>
           fas fa-tv
         </v-icon> Cérémonies
+      </v-tab>
+      <v-tab
+        v-if="isAdmin"
+        :to="{path:'/agpa/admin'}"
+      >
+        <v-icon start>
+          fas fa-tachometer-alt
+        </v-icon> Supervision
       </v-tab>
     </v-tabs>
     <router-view />

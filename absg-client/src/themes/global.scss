@@ -1,45 +1,41 @@
-$primary: #37474f;
-$secondary: #263238;
-$accent: #26a69a;
-$info: #4fc3f7;
-$success: #2e7d32;
-$warning: #ff8f00;
-$error: #d32f2f;
-$group1: #0a0a0a; // Gueudelot
-$group2: #4caf50; // Guibert
-$group3: #ff7043; // Guyomard
-
+/**
+ * AbsG5 - Global Styles
+ *
+ * Les couleurs sont définies dans vuetify.js et accessibles via les CSS variables Vuetify:
+ * - rgb(var(--v-theme-primary))
+ * - rgb(var(--v-theme-background))
+ * - rgb(var(--v-theme-surface))
+ * - rgb(var(--v-theme-surface-variant))
+ * - rgb(var(--v-theme-accent))
+ * - rgb(var(--v-theme-error))
+ * - rgb(var(--v-theme-warning))
+ * - rgb(var(--v-theme-success))
+ * - rgb(var(--v-theme-info))
+ * - rgb(var(--v-theme-group1))
+ * - rgb(var(--v-theme-group2))
+ * - rgb(var(--v-theme-group3))
+ */
 
 @import url("https://fonts.googleapis.com/css?family=Comfortaa|Tangerine");
 
+// ============================================
+// Classes utilitaires pour les couleurs de groupe (famille)
+// ============================================
 .group1-fg {
-    color: $group1;
+    color: rgb(var(--v-theme-group1));
 }
 .group2-fg {
-    color: $group2;
+    color: rgb(var(--v-theme-group2));
 }
 .group3-fg {
-    color: $group3;
+    color: rgb(var(--v-theme-group3));
 }
 
-// h1 {
-    // display: block;
-    // font-size: 2em;
-    // margin-block-start: 0.67em;
-    // margin-block-end: 0.67em;
-    // margin-inline-start: 0px;
-    // margin-inline-end: 0px;
-    // font-weight: bold;
-    // text-align: center;
-    // color: $primary;
-    // text-shadow: 0 -1px #000;
-    // text-shadow: 0 1px #aaa;
-    // font-size: 40px;
-    // font-family: "Comfortaa", sans-serif;
-    // margin: 30px 0 60px 0;
-// }
+// ============================================
+// Styles globaux
+// ============================================
 body {
-    background-color: #f1f1f1;
+    background-color: rgb(var(--v-theme-background));
 }
 
 h1 {
@@ -65,54 +61,66 @@ h1 {
     src: url(https://cdn.glitch.com/61908de1-dd0a-4359-a54b-6cb6d41bb5fd%2FNotoColorEmoji.ttf?1513108808150) format("truetype");
 }
 
+// ============================================
+// Composants UI
+// ============================================
 .v-tabs {
-    border-bottom: 1px solid #ddd;
-    //margin-bottom: 10px;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
 }
-
 
 .stickyHeaderSmall {
     position: sticky;
     top: 56px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 2px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 4px;
     margin: 0px;
     padding: 0px 20px;
     z-index: 100;
-    background: #eee;  //  rgba(150,150,150, 0.1);
+    background: rgb(var(--v-theme-surface-variant));
 }
+
 .stickyHeader {
     position: sticky;
     top: 113px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 2px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 4px;
     margin: 0px;
     padding: 0px 20px;
     z-index: 100;
-    background: #eee;  //  rgba(150,150,150, 0.1);
+    background: rgb(var(--v-theme-surface-variant));
 }
+
 .fixed-tabs-bar {
     position: sticky;
     top: 64px;
     z-index: 100;
 }
 
+// ============================================
+// Boîtes de dialogue
+// ============================================
 .msgDiallog {
     min-width: 300px;
     max-width: 1200px;
     width: auto;
 }
+
 .annonce {
     color: white;
-    background-color: $info;
-}
-.warning {
-    color: white;
-    background-color: $warning;
-}
-.error {
-    color: white;
-    background-color: $error;
+    background-color: rgb(var(--v-theme-info));
 }
 
+.warning {
+    color: white;
+    background-color: rgb(var(--v-theme-warning));
+}
+
+.error {
+    color: white;
+    background-color: rgb(var(--v-theme-error));
+}
+
+// ============================================
+// Layout helpers
+// ============================================
 .row {
     display: flex;
     margin: 0;

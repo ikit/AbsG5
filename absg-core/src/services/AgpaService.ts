@@ -49,6 +49,377 @@ class AgpaService {
     }
 
     /**
+     * Retourne la liste des éditions disponibles avec leur statut
+     * @returns Liste des éditions avec année, phase, et statistiques de base
+     */
+    async getEditionsList(): Promise<{
+        editions: Array<{
+            year: number;
+            phase: number | null;
+            totalPhotos: number;
+            totalVotes: number;
+            totalParticipants: number;
+            hasAwards: boolean;
+        }>;
+        currentYear: number;
+        maxArchiveYear: number;
+    }> {
+        const currentYear = getCurrentEdition();
+        const maxArchiveYear = getMaxArchiveEdition();
+
+        // Récupérer les statistiques pour chaque année depuis 2006
+        const sql = `
+            SELECT
+                p.year,
+                COUNT(DISTINCT p.id) as "totalPhotos",
+                COUNT(DISTINCT p."userId") as "totalParticipants",
+                COALESCE((SELECT COUNT(*) FROM agpa_vote v WHERE v.year = p.year), 0) as "totalVotes",
+                EXISTS(SELECT 1 FROM agpa_award a WHERE a.year = p.year) as "hasAwards"
+            FROM agpa_photo p
+            WHERE p.year >= 2006
+            GROUP BY p.year
+            ORDER BY p.year DESC
+        `;
+
+        const rawEditions = await this.catRepo.query(sql);
+
+        // Pour l'année courante, calculer la phase
+        const currentPhaseData = await getMetaData(currentYear, true);
+
+        const editions = rawEditions.map((e: any) => ({
+            year: e.year,
+            phase: e.year === currentYear ? currentPhaseData.phase : (e.year <= maxArchiveYear ? 5 : null),
+            totalPhotos: parseInt(e.totalPhotos),
+            totalVotes: parseInt(e.totalVotes),
+            totalParticipants: parseInt(e.totalParticipants),
+            hasAwards: e.hasAwards
+        }));
+
+        return {
+            editions,
+            currentYear,
+            maxArchiveYear
+        };
+    }
+
+    /**
+     * Retourne les étapes de calcul V2026 pour une édition donnée
+     * Permet de visualiser le processus de calcul étape par étape
+     * @param year l'année de l'édition
+     */
+    async getV2026CalculationSteps(year: number): Promise<{
+        year: number;
+        categories: Record<number, {
+            categoryId: number;
+            categoryName: string;
+            totalPhotos: number;
+            photos: Array<{
+                photoId: number;
+                title: string;
+                authorId: number;
+                authorName: string;
+                authorFamily: string;
+                families: {
+                    gueudelot: { votes: number; points: number; rank: number };
+                    guibert: { votes: number; points: number; rank: number };
+                    guyomard: { votes: number; points: number; rank: number };
+                };
+                avgRank: number;
+                scoreV2026: number;
+                rankInCategory: number;
+                award: string | null;
+            }>;
+        }>;
+        globalRanking: Array<{
+            rank: number;
+            photoId: number;
+            title: string;
+            categoryId: number;
+            categoryName: string;
+            authorId: number;
+            authorName: string;
+            scoreV2026: number;
+            avgRank: number;
+            award: string | null;
+        }>;
+    }> {
+        // Récupérer les données des photos avec leurs scoreDetails V2026
+        const sql = `
+            SELECT
+                p.id as "photoId",
+                p.title,
+                p."categoryId",
+                p."userId" as "authorId",
+                p."scoreV2026",
+                p."scoreDetails",
+                p."rankingV2026",
+                u.username as "authorName",
+                u."rootFamily" as "authorFamily",
+                c.title as "categoryName",
+                a.award
+            FROM agpa_photo p
+            INNER JOIN "user" u ON u.id = p."userId"
+            INNER JOIN agpa_category c ON c.id = p."categoryId"
+            LEFT JOIN agpa_award a ON a."photoId" = p.id AND a.year = p.year AND a."categoryId" = p."categoryId"
+            WHERE p.year = $1 AND p."categoryId" > 0 AND p.error IS NULL
+            ORDER BY p."categoryId", COALESCE((p."scoreDetails"->'v2026'->>'rankInCategory')::int, 999)
+        `;
+
+        const photos = await this.catRepo.query(sql, [year]);
+
+        // Récupérer les catégories
+        const categoriesQuery = `
+            SELECT c.id, c.title
+            FROM agpa_category c
+            WHERE c.id > 0 AND (c.to IS NULL OR c.to >= $1) AND c.from <= $1
+            ORDER BY c."order"
+        `;
+        const categories = await this.catRepo.query(categoriesQuery, [year]);
+
+        // Construire la structure par catégorie
+        const categoriesData: Record<number, any> = {};
+
+        for (const cat of categories) {
+            categoriesData[cat.id] = {
+                categoryId: cat.id,
+                categoryName: cat.title,
+                totalPhotos: 0,
+                photos: []
+            };
+        }
+
+        // Remplir les photos par catégorie
+        for (const photo of photos) {
+            if (!categoriesData[photo.categoryId]) continue;
+
+            const v2026Details = photo.scoreDetails?.v2026 || {
+                gueudelot: { votes: 0, points: 0, rank: 0 },
+                guibert: { votes: 0, points: 0, rank: 0 },
+                guyomard: { votes: 0, points: 0, rank: 0 },
+                avgRank: 0,
+                rankInCategory: null
+            };
+
+            categoriesData[photo.categoryId].photos.push({
+                photoId: photo.photoId,
+                title: photo.title || "(sans titre)",
+                authorId: photo.authorId,
+                authorName: photo.authorName,
+                authorFamily: photo.authorFamily || "autre",
+                families: {
+                    gueudelot: v2026Details.gueudelot || { votes: 0, points: 0, rank: 0 },
+                    guibert: v2026Details.guibert || { votes: 0, points: 0, rank: 0 },
+                    guyomard: v2026Details.guyomard || { votes: 0, points: 0, rank: 0 }
+                },
+                avgRank: v2026Details.avgRank || 0,
+                scoreV2026: photo.scoreV2026 || 0,
+                rankInCategory: v2026Details.rankInCategory || null,
+                award: photo.award || null
+            });
+
+            categoriesData[photo.categoryId].totalPhotos++;
+        }
+
+        // Construire le classement global
+        const globalRanking = photos
+            .filter(p => p.scoreV2026 !== null)
+            .sort((a, b) => (a.rankingV2026 || 999) - (b.rankingV2026 || 999))
+            .map((photo, index) => ({
+                rank: photo.rankingV2026 || index + 1,
+                photoId: photo.photoId,
+                title: photo.title || "(sans titre)",
+                categoryId: photo.categoryId,
+                categoryName: photo.categoryName,
+                authorId: photo.authorId,
+                authorName: photo.authorName,
+                scoreV2026: photo.scoreV2026 || 0,
+                avgRank: photo.scoreDetails?.v2026?.avgRank || 0,
+                award: photo.award || null
+            }));
+
+        return {
+            year,
+            categories: categoriesData,
+            globalRanking
+        };
+    }
+
+    /**
+     * Retourne les votes organisés par votant pour une édition
+     * @param year l'année de l'édition
+     */
+    async getVotesByVoter(year: number): Promise<{
+        year: number;
+        voters: Array<{
+            voterId: number;
+            voterName: string;
+            voterFamily: string;
+            totalVotes: number;
+            totalPoints: number;
+            votesByCategory: Record<number, Array<{
+                photoId: number;
+                photoTitle: string;
+                authorId: number;
+                authorName: string;
+                authorFamily: string;
+                score: number;
+            }>>;
+            votesForFamily: {
+                gueudelot: { votes: number; points: number };
+                guibert: { votes: number; points: number };
+                guyomard: { votes: number; points: number };
+            };
+        }>;
+    }> {
+        const sql = `
+            SELECT
+                v.id as "voteId",
+                v."userId" as "voterId",
+                v."photoId",
+                v."categoryId",
+                v.score,
+                voter.username as "voterName",
+                voter."rootFamily" as "voterFamily",
+                p.title as "photoTitle",
+                p."userId" as "authorId",
+                author.username as "authorName",
+                author."rootFamily" as "authorFamily"
+            FROM agpa_vote v
+            INNER JOIN "user" voter ON voter.id = v."userId"
+            INNER JOIN agpa_photo p ON p.id = v."photoId"
+            INNER JOIN "user" author ON author.id = p."userId"
+            WHERE v.year = $1 AND v.score > 0
+            ORDER BY v."userId", v."categoryId", v.score DESC
+        `;
+
+        const votes = await this.catRepo.query(sql, [year]);
+
+        // Grouper par votant
+        const votersMap: Map<number, any> = new Map();
+
+        for (const vote of votes) {
+            if (!votersMap.has(vote.voterId)) {
+                votersMap.set(vote.voterId, {
+                    voterId: vote.voterId,
+                    voterName: vote.voterName,
+                    voterFamily: vote.voterFamily || "autre",
+                    totalVotes: 0,
+                    totalPoints: 0,
+                    votesByCategory: {},
+                    votesForFamily: {
+                        gueudelot: { votes: 0, points: 0 },
+                        guibert: { votes: 0, points: 0 },
+                        guyomard: { votes: 0, points: 0 }
+                    }
+                });
+            }
+
+            const voter = votersMap.get(vote.voterId);
+            voter.totalVotes++;
+            voter.totalPoints += vote.score;
+
+            // Ajouter au vote par catégorie
+            if (!voter.votesByCategory[vote.categoryId]) {
+                voter.votesByCategory[vote.categoryId] = [];
+            }
+            voter.votesByCategory[vote.categoryId].push({
+                photoId: vote.photoId,
+                photoTitle: vote.photoTitle || "(sans titre)",
+                authorId: vote.authorId,
+                authorName: vote.authorName,
+                authorFamily: vote.authorFamily || "autre",
+                score: vote.score
+            });
+
+            // Compter les votes par famille d'auteur
+            const authorFamily = (vote.authorFamily || "").toLowerCase();
+            if (authorFamily === "gueudelot" || authorFamily === "guibert" || authorFamily === "guyomard") {
+                voter.votesForFamily[authorFamily].votes++;
+                voter.votesForFamily[authorFamily].points += vote.score;
+            }
+        }
+
+        return {
+            year,
+            voters: Array.from(votersMap.values())
+        };
+    }
+
+    /**
+     * Retourne l'évolution du palmarès glissant sur toutes les fenêtres 3 ans
+     */
+    async getSlidingPalmaresEvolution(): Promise<{
+        windows: Array<{
+            windowStart: number;
+            windowEnd: number;
+            rankings: Array<{
+                rank: number;
+                userId: number;
+                username: string;
+                rootFamily: string;
+                totalPoints: number;
+                golds: number;
+                sylvers: number;
+                bronzes: number;
+                diamonds: number;
+                previousRank: number | null;
+                rankChange: number | null;
+            }>;
+        }>;
+    }> {
+        const maxYear = getMaxArchiveEdition();
+        const windows: Array<any> = [];
+
+        // Pour chaque fenêtre de 3 ans (à partir de 2008 = première fenêtre complète 2006-2008)
+        for (let endYear = 2008; endYear <= maxYear; endYear++) {
+            const startYear = endYear - 2;
+
+            // Récupérer le palmarès de cette fenêtre
+            const palmares = await palmaresData(startYear, endYear);
+
+            // Construire le classement avec changement de rang par rapport à la fenêtre précédente
+            const previousWindow = windows.length > 0 ? windows[windows.length - 1] : null;
+            const previousRankMap = new Map<number, number>();
+            if (previousWindow) {
+                previousWindow.rankings.forEach((r: any) => {
+                    previousRankMap.set(r.userId, r.rank);
+                });
+            }
+
+            const rankings = palmares.map((entry: any, index: number) => {
+                const currentRank = index + 1;
+                const previousRank = previousRankMap.get(entry.userId) || null;
+                let rankChange: number | null = null;
+                if (previousRank !== null) {
+                    rankChange = previousRank - currentRank; // positif = montée
+                }
+
+                return {
+                    rank: currentRank,
+                    userId: entry.userId,
+                    username: entry.username,
+                    rootFamily: entry.rootFamily || "autre",
+                    totalPoints: entry.total || 0,
+                    golds: entry.gold || 0,
+                    sylvers: entry.sylver || 0,
+                    bronzes: entry.bronze || 0,
+                    diamonds: entry.diamond || 0,
+                    previousRank,
+                    rankChange
+                };
+            });
+
+            windows.push({
+                windowStart: startYear,
+                windowEnd: endYear,
+                rankings
+            });
+        }
+
+        return { windows };
+    }
+
+    /**
      * Retourne les informations sur les anciennes éditions
      * @param user l'utilisateur qui demande les informations
      */

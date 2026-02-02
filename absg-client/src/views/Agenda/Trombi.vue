@@ -541,6 +541,10 @@ export default {
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
 
+// Override sticky header pour cette page sans onglets
+.stickyHeader {
+    top: 64px !important;
+}
 
 .thumb {
     margin: auto;
