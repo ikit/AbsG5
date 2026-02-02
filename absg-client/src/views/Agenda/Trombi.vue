@@ -29,12 +29,11 @@
 
             <v-tooltip bottom>
               <template #activator="{ props }">
-                <v-btn @click.stop="switchHidden()" v-bind="props">
-                  <v-icon v-if="filter.hideEmpty">fas fa-portrait</v-icon>
-                  <v-icon v-else>fas fa-user-friends</v-icon>
+                <v-btn @click.stop="startMemoryGame()" v-bind="props">
+                  <v-icon>fas fa-th</v-icon>
                 </v-btn>
               </template>
-              <span>Afficher/Masquer les personnes sans trombi</span>
+              <span>Jouer au Memory</span>
             </v-tooltip>
 
             <v-tooltip bottom>
@@ -167,52 +166,153 @@
 
     <v-dialog
       v-model="stats.open"
+      max-width="900px"
     >
       <v-card>
         <v-card-title class="dialog-header bg-primary">
-          Statistiques
+          <v-icon start>fas fa-chart-pie</v-icon>
+          Statistiques des trombinoscopes
         </v-card-title>
-        <div style="display: flex;">
-          <div style="flex: 1 0 0;">
-            <table class="stats-table">
-              <tr>
-                <td>&nbsp;</td>
-                <td>0%</td>
-                <td>&lt; 50%</td>
-                <td>&gt; 50%</td>
-                <td>100%</td>
-                <td>Total</td>
-              </tr>
-              <tr
-                v-for="row in stats.overview"
-                :key="row.title"
-              >
-                <td>
-                  {{ row.title }}
-                </td>
-                <td>{{ row.col0 }}</td>
-                <td>{{ row.col1 }}</td>
-                <td>{{ row.col50 }}</td>
-                <td>{{ row.col100 }}</td>
-                <td>{{ row.total }}</td>
-              </tr>
-            </table>
+        <v-card-text class="stats-content">
+          <div class="stats-layout">
+            <div class="stats-table-container">
+              <table class="stats-table">
+                <thead>
+                  <tr>
+                    <th>Famille</th>
+                    <th class="col0-header">0%</th>
+                    <th class="col1-header">&lt; 50%</th>
+                    <th class="col50-header">&gt; 50%</th>
+                    <th class="col100-header">100%</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="row in stats.overview"
+                    :key="row.title"
+                    :class="{ 'total-row': row.title === 'Total' }"
+                  >
+                    <td class="family-cell">{{ row.title }}</td>
+                    <td>{{ row.col0 }}</td>
+                    <td>{{ row.col1 }}</td>
+                    <td>{{ row.col50 }}</td>
+                    <td>{{ row.col100 }}</td>
+                    <td class="total-cell">{{ row.total }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="stats-chart-container">
+              <highcharts
+                v-if="stats.overviewGraph"
+                :options="stats.overviewGraph"
+              />
+            </div>
           </div>
-          <div style="flex: 0 1 0;">
-            <highcharts
-            v-if="stats.overviewGraph"
-              :options="stats.overviewGraph"
-            />
-          </div>
-        </div>
-
+        </v-card-text>
         <v-card-actions class="dialog-actions">
           <v-spacer />
           <v-btn
             variant="text"
-            :disabled="trombiEditor.isLoading"
             @click="stats.open = false"
           >
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Memory Game Dialog -->
+    <v-dialog
+      v-model="memory.open"
+      :max-width="memory.gridCols >= 10 ? '900px' : memory.gridCols >= 8 ? '800px' : '700px'"
+      persistent
+    >
+      <v-card class="memory-card">
+        <v-card-title class="dialog-header bg-primary">
+          <v-icon start>fas fa-th</v-icon>
+          Memory Trombinoscope
+          <v-spacer />
+          <div class="memory-timer" :class="{ 'timer-warning': memory.timeLeft <= 30 }">
+            <v-icon size="small" class="mr-1">fas fa-clock</v-icon>
+            {{ formatTime(memory.timeLeft) }}
+          </div>
+        </v-card-title>
+
+        <v-card-text class="memory-content">
+          <!-- État initial: pas encore commencé -->
+          <div v-if="memory.status === 'ready'" class="memory-intro">
+            <v-icon size="64" color="primary" class="mb-4">fas fa-brain</v-icon>
+            <h3>Niveau {{ memory.level }}</h3>
+            <p>Retrouvez les {{ memory.pairsCount }} paires de photos en moins de 3 minutes !</p>
+            <v-btn color="accent" size="large" @click="launchMemoryGame()">
+              <v-icon start>fas fa-play</v-icon>
+              Commencer
+            </v-btn>
+          </div>
+
+          <!-- Grille de jeu -->
+          <div v-else-if="memory.status === 'playing'" class="memory-grid" :style="{ gridTemplateColumns: `repeat(${memory.gridCols}, 1fr)` }">
+            <div
+              v-for="(card, index) in memory.cards"
+              :key="index"
+              class="memory-cell"
+              :class="{
+                'flipped': card.flipped || card.matched,
+                'matched': card.matched
+              }"
+              @click="flipCard(index)"
+            >
+              <div class="memory-cell-inner">
+                <div class="memory-cell-front">
+                  <v-icon size="32" color="primary">fas fa-question</v-icon>
+                </div>
+                <div class="memory-cell-back">
+                  <img :src="card.thumb" :alt="card.name" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Victoire -->
+          <div v-else-if="memory.status === 'won'" class="memory-result memory-won">
+            <v-icon size="64" color="success" class="mb-4">fas fa-trophy</v-icon>
+            <h3>Niveau {{ memory.level }} réussi !</h3>
+            <p>Vous avez trouvé les {{ memory.pairsCount }} paires en {{ formatTime(180 - memory.timeLeft) }} !</p>
+            <p class="memory-stats">{{ memory.moves }} coups joués</p>
+            <v-btn color="accent" class="mt-2" @click="nextMemoryLevel()">
+              <v-icon start>fas fa-arrow-right</v-icon>
+              Niveau {{ memory.level + 1 }} ({{ getNextPairsCount() }} paires)
+            </v-btn>
+            <v-btn variant="text" class="mt-2 ml-2" @click="resetMemoryToLevel1()">
+              Recommencer au niveau 1
+            </v-btn>
+          </div>
+
+          <!-- Défaite -->
+          <div v-else-if="memory.status === 'lost'" class="memory-result memory-lost">
+            <v-icon size="64" color="error" class="mb-4">fas fa-clock</v-icon>
+            <h3>Temps écoulé !</h3>
+            <p>Niveau {{ memory.level }} : vous avez trouvé {{ memory.matchedPairs }}/{{ memory.pairsCount }} paires.</p>
+            <v-btn color="accent" @click="retryMemoryLevel()">
+              <v-icon start>fas fa-redo</v-icon>
+              Réessayer ce niveau
+            </v-btn>
+            <v-btn variant="text" class="ml-2" @click="resetMemoryToLevel1()">
+              Recommencer au niveau 1
+            </v-btn>
+          </div>
+        </v-card-text>
+
+        <v-card-actions class="dialog-actions">
+          <div v-if="memory.status === 'playing'" class="memory-info">
+            <span class="memory-level-badge">Niv. {{ memory.level }}</span>
+            <span class="ml-3"><v-icon size="small" class="mr-1">fas fa-mouse-pointer</v-icon> {{ memory.moves }} coups</span>
+            <span class="ml-3"><v-icon size="small" class="mr-1">fas fa-check-double</v-icon> {{ memory.matchedPairs }}/{{ memory.pairsCount }}</span>
+          </div>
+          <v-spacer />
+          <v-btn variant="text" @click="closeMemoryGame()">
             Fermer
           </v-btn>
         </v-card-actions>
@@ -249,7 +349,7 @@ export default {
         layoutMode: "GRID",
         sortMode: "ASC",
         filter: {
-            hideEmpty: true,
+            hideEmpty: false,
             search: null,
         },
         trombiEditor: {
@@ -278,12 +378,26 @@ export default {
           headers: [
             "Famille",
             "Complet à 100%",
-            "Complet à > 50%", 
+            "Complet à > 50%",
             "Complet à < 50%",
             "Sans photo"
           ],
           overview: [],
           overviewGraph: null,
+        },
+        memory: {
+          open: false,
+          status: 'ready', // ready, playing, won, lost
+          cards: [],
+          flippedCards: [],
+          matchedPairs: 0,
+          moves: 0,
+          timeLeft: 180, // 3 minutes en secondes
+          timer: null,
+          isProcessing: false,
+          level: 1,
+          pairsCount: 12, // Commence avec 12 paires (6x4)
+          gridCols: 6,
         }
     }),
 
@@ -312,6 +426,13 @@ export default {
 
         this.isLoading = false;
       });
+    },
+
+    beforeUnmount() {
+      // Nettoyer le timer du Memory si actif
+      if (this.memory.timer) {
+        clearInterval(this.memory.timer);
+      }
     },
 
     methods: {
@@ -485,11 +606,6 @@ export default {
         store.commit('photosGalleryDisplay');
       },
 
-      switchHidden() {
-        this.filter.hideEmpty = !this.filter.hideEmpty;
-        this.applyFilter();
-      },
-
       applyFilter() {
         this.displayedPersons = this.filter.hideEmpty ? this.persons.filter(p => p.trombis.length > 0) : this.persons;
         const tokens = this.filter.search ? this.filter.search.split(" ") : [];
@@ -540,6 +656,196 @@ export default {
 
           this.isLoading = false;
         });
+      },
+
+      // Memory Game Methods
+      startMemoryGame() {
+        this.memory.open = true;
+        this.memory.status = 'ready';
+        this.memory.cards = [];
+        this.memory.flippedCards = [];
+        this.memory.matchedPairs = 0;
+        this.memory.moves = 0;
+        this.memory.timeLeft = 180;
+        // Garder le niveau actuel
+        if (this.memory.timer) {
+          clearInterval(this.memory.timer);
+          this.memory.timer = null;
+        }
+      },
+
+      resetMemoryToLevel1() {
+        this.memory.level = 1;
+        this.memory.pairsCount = 12;
+        this.memory.gridCols = 6;
+        this.memory.status = 'ready';
+        this.memory.cards = [];
+        this.memory.flippedCards = [];
+        this.memory.matchedPairs = 0;
+        this.memory.moves = 0;
+        this.memory.timeLeft = 180;
+        if (this.memory.timer) {
+          clearInterval(this.memory.timer);
+          this.memory.timer = null;
+        }
+      },
+
+      nextMemoryLevel() {
+        this.memory.level++;
+        // Progression: 12 -> 15 -> 18 -> 20 -> 24 -> 28 -> 30
+        const levelConfig = this.getLevelConfig(this.memory.level);
+        this.memory.pairsCount = levelConfig.pairs;
+        this.memory.gridCols = levelConfig.cols;
+        this.memory.status = 'ready';
+        this.memory.cards = [];
+        this.memory.flippedCards = [];
+        this.memory.matchedPairs = 0;
+        this.memory.moves = 0;
+        this.memory.timeLeft = 180;
+      },
+
+      retryMemoryLevel() {
+        this.memory.status = 'ready';
+        this.memory.cards = [];
+        this.memory.flippedCards = [];
+        this.memory.matchedPairs = 0;
+        this.memory.moves = 0;
+        this.memory.timeLeft = 180;
+      },
+
+      getLevelConfig(level) {
+        // Configuration des niveaux: { pairs, cols }
+        const configs = [
+          { pairs: 12, cols: 6 },  // Niveau 1: 6x4 = 24 cartes
+          { pairs: 15, cols: 6 },  // Niveau 2: 6x5 = 30 cartes
+          { pairs: 18, cols: 6 },  // Niveau 3: 6x6 = 36 cartes
+          { pairs: 20, cols: 8 },  // Niveau 4: 8x5 = 40 cartes
+          { pairs: 24, cols: 8 },  // Niveau 5: 8x6 = 48 cartes
+          { pairs: 28, cols: 8 },  // Niveau 6: 8x7 = 56 cartes
+          { pairs: 30, cols: 10 }, // Niveau 7+: 10x6 = 60 cartes
+        ];
+        const index = Math.min(level - 1, configs.length - 1);
+        return configs[index];
+      },
+
+      getNextPairsCount() {
+        return this.getLevelConfig(this.memory.level + 1).pairs;
+      },
+
+      launchMemoryGame() {
+        // Collecter toutes les photos disponibles
+        const allTrombis = [];
+        for (const person of this.persons) {
+          for (const trombi of person.trombis) {
+            allTrombis.push({
+              thumb: trombi.thumb,
+              name: person.fullname
+            });
+          }
+        }
+
+        const requiredPairs = this.memory.pairsCount;
+
+        // Vérifier qu'on a assez de photos
+        if (allTrombis.length < requiredPairs) {
+          store.commit('onError', { message: `Pas assez de photos pour ce niveau (${requiredPairs} requises, ${allTrombis.length} disponibles)` });
+          return;
+        }
+
+        // Mélanger et prendre le nombre de photos requis
+        const shuffled = allTrombis.sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, requiredPairs);
+
+        // Créer les paires
+        const cards = [];
+        selected.forEach((photo, pairId) => {
+          cards.push({ ...photo, pairId, flipped: false, matched: false });
+          cards.push({ ...photo, pairId, flipped: false, matched: false });
+        });
+
+        // Mélanger les cartes
+        this.memory.cards = cards.sort(() => Math.random() - 0.5);
+        this.memory.status = 'playing';
+        this.memory.flippedCards = [];
+        this.memory.matchedPairs = 0;
+        this.memory.moves = 0;
+        this.memory.timeLeft = 180;
+        this.memory.isProcessing = false;
+
+        // Démarrer le timer
+        this.memory.timer = setInterval(() => {
+          this.memory.timeLeft--;
+          if (this.memory.timeLeft <= 0) {
+            this.endMemoryGame(false);
+          }
+        }, 1000);
+      },
+
+      flipCard(index) {
+        const card = this.memory.cards[index];
+
+        // Ignorer si on traite déjà une paire, si la carte est déjà retournée ou déjà trouvée
+        if (this.memory.isProcessing || card.flipped || card.matched) {
+          return;
+        }
+
+        // Retourner la carte
+        card.flipped = true;
+        this.memory.flippedCards.push(index);
+
+        // Si on a retourné 2 cartes
+        if (this.memory.flippedCards.length === 2) {
+          this.memory.moves++;
+          this.memory.isProcessing = true;
+
+          const [firstIndex, secondIndex] = this.memory.flippedCards;
+          const firstCard = this.memory.cards[firstIndex];
+          const secondCard = this.memory.cards[secondIndex];
+
+          if (firstCard.pairId === secondCard.pairId) {
+            // Paire trouvée !
+            firstCard.matched = true;
+            secondCard.matched = true;
+            this.memory.matchedPairs++;
+            this.memory.flippedCards = [];
+            this.memory.isProcessing = false;
+
+            // Vérifier si toutes les paires sont trouvées
+            if (this.memory.matchedPairs === this.memory.pairsCount) {
+              this.endMemoryGame(true);
+            }
+          } else {
+            // Pas une paire, retourner les cartes après un délai
+            setTimeout(() => {
+              firstCard.flipped = false;
+              secondCard.flipped = false;
+              this.memory.flippedCards = [];
+              this.memory.isProcessing = false;
+            }, 1000);
+          }
+        }
+      },
+
+      endMemoryGame(won) {
+        if (this.memory.timer) {
+          clearInterval(this.memory.timer);
+          this.memory.timer = null;
+        }
+        this.memory.status = won ? 'won' : 'lost';
+      },
+
+      closeMemoryGame() {
+        if (this.memory.timer) {
+          clearInterval(this.memory.timer);
+          this.memory.timer = null;
+        }
+        this.memory.open = false;
+      },
+
+      formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
       }
     }
 }
@@ -606,28 +912,208 @@ export default {
   color: #9E9E9E;
 }
 
+.stats-content {
+  padding: 16px 24px;
+}
+
+.stats-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.stats-table-container {
+  flex: 1;
+  min-width: 300px;
+}
+
+.stats-chart-container {
+  flex: 1;
+  min-width: 300px;
+}
+
 .stats-table {
-  border: 1px solid #ddd;
-  width: 90%;
-  margin: 10px;
-  text-align: center;
-  border-spacing: 0;
-  td {
-    padding: 2px 5px;
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  th, td {
+    padding: 10px 12px;
+    text-align: center;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
   }
-  tr:first-child {
-    background: #eee;
-    font-weight: bold;
+
+  thead tr {
+    background: rgba(var(--v-theme-surface-variant), 0.7);
+
+    th {
+      font-weight: 600;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  tbody tr:hover {
+    background: rgba(var(--v-theme-surface-variant), 0.3);
+  }
+
+  .family-cell {
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .total-cell {
+    font-weight: 600;
+  }
+
+  .total-row {
+    background: rgba(var(--v-theme-surface-variant), 0.5);
+    font-weight: 600;
+
     td {
-      border-bottom: 1px solid #ddd;
+      border-top: 2px solid rgba(var(--v-theme-on-surface), 0.15);
     }
   }
-  tr {
-    td:first-child {
-      text-align: right;
-      font-weight: bold
-    }
+
+  .col0-header { color: #9E9E9E; }
+  .col1-header { color: #E00A16; }
+  .col50-header { color: #FFA500; }
+  .col100-header { color: #06A300; }
+}
+
+// Memory Game Styles
+.memory-card {
+  overflow: hidden;
+}
+
+.memory-timer {
+  font-family: monospace;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.timer-warning {
+  background: rgba(255, 0, 0, 0.3);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.memory-content {
+  padding: 24px;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memory-intro,
+.memory-result {
+  text-align: center;
+  padding: 32px;
+
+  h3 {
+    font-size: 1.5em;
+    margin-bottom: 8px;
   }
+
+  p {
+    opacity: 0.8;
+    margin-bottom: 16px;
+  }
+}
+
+.memory-stats {
+  font-size: 0.9em;
+  opacity: 0.6;
+}
+
+.memory-grid {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.memory-cell {
+  aspect-ratio: 1;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.memory-cell-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.memory-cell.flipped .memory-cell-inner {
+  transform: rotateY(180deg);
+}
+
+.memory-cell-front,
+.memory-cell-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.memory-cell-front {
+  background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
+}
+
+.memory-cell-back {
+  transform: rotateY(180deg);
+  background: white;
+  padding: 2px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+}
+
+.memory-cell.matched .memory-cell-back {
+  box-shadow: 0 0 0 3px rgb(var(--v-theme-success));
+}
+
+.memory-cell.matched {
+  cursor: default;
+}
+
+.memory-info {
+  font-size: 0.9em;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+}
+
+.memory-level-badge {
+  background: rgb(var(--v-theme-primary));
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85em;
 }
 
 @media (max-width: 600px) {
@@ -639,6 +1125,28 @@ export default {
     flex: 1;
     min-width: 150px;
     max-width: unset;
+  }
+
+  .stats-layout {
+    flex-direction: column;
+  }
+
+  .stats-table-container,
+  .stats-chart-container {
+    min-width: 100%;
+  }
+
+  .memory-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 4px;
+  }
+
+  .memory-content {
+    padding: 12px;
+  }
+
+  .memory-cell {
+    min-width: 50px;
   }
 }
 </style>
