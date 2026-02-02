@@ -1,5 +1,5 @@
 import { JsonController, Post, Body, Get, Authorized, CurrentUser, Param } from "routing-controllers";
-import { citationService, immtService, userService, eventService } from "../services";
+import { citationService, dailyGamesService, homepageService, immtService, userService, eventService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
 import { getCurrentEdition } from "../middleware/agpaCommonHelpers";
@@ -33,16 +33,24 @@ export class UserController {
      * Récupère l'ensemble des éléments nécessaire pour construire la page d'accueil
      *  - La dernière image du moment
      *  - L'historique des passages de la journée
+     *  - Les widgets (événements à venir, citation, "ce jour dans l'histoire")
      */
     @Authorized()
     @Get("/homepage")
     async home() {
-        const result = {
-            immt: await immtService.last(),
-            passag: await userService.getPassag(subDays(addHours(new Date(), 1), 1)),
-            events: await eventService.getNextEvents()
+        const [immt, passag, events, widgets] = await Promise.all([
+            immtService.last(),
+            userService.getPassag(subDays(addHours(new Date(), 1), 1)),
+            eventService.getNextEvents(),
+            homepageService.getHomepageWidgets()
+        ]);
+
+        return {
+            immt,
+            passag,
+            events,
+            ...widgets
         };
-        return result;
     }
 
     /**
@@ -143,5 +151,40 @@ export class UserController {
     markAsRead(@Param("notifId") notifId: number, @CurrentUser() user: User) {
         userService.markAsRead(notifId, user);
         return true;
+    }
+
+    /**
+     * Récupère les jeux quotidiens (Sudoku + Mot mystère Wikipedia)
+     */
+    @Authorized()
+    @Get("/daily-games")
+    async getDailyGames() {
+        const [sudoku, wikiMystery] = await Promise.all([
+            dailyGamesService.getDailySudoku(),
+            dailyGamesService.getDailyWikiMystery()
+        ]);
+
+        return {
+            sudoku,
+            wikiMystery
+        };
+    }
+
+    /**
+     * Récupère un nouveau mot mystère Wikipedia (pour le bouton renew)
+     */
+    @Authorized()
+    @Get("/daily-games/wiki-mystery")
+    async getWikiMystery() {
+        return dailyGamesService.getDailyWikiMystery();
+    }
+
+    /**
+     * Vérifie une réponse pour le mot mystère Wikipedia
+     */
+    @Authorized()
+    @Post("/daily-games/wiki-mystery/check")
+    checkWikiMysteryAnswer(@Body() body: { guess: string; answer: string }) {
+        return dailyGamesService.checkWikiMysteryAnswer(body.guess, body.answer);
     }
 }

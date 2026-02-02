@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import {
     agpaService,
     citationService,
+    homepageService,
     immtService,
     agendaService,
     voyagService,
@@ -33,6 +34,7 @@ AppDataSource.initialize()
         citationService.initService();
         eventService.initService();
         forumService.initService();
+        homepageService.initService();
         immtService.initService();
         voyagService.initService();
         userService.initService();

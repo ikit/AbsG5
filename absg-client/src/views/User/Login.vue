@@ -115,16 +115,14 @@ export default {
 
 
 <style lang="scss" scoped>
-@use '../../themes/global.scss' as *;
-
 .errorMsg {
     position: absolute;
     font-size: 1em;
-    color: $error;
+    color: rgb(var(--v-theme-error));
     bottom: 10px;
     margin: 0;
     left: 0;
     right: 0;
-    text-align: center
+    text-align: center;
 }
 </style>

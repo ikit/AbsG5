@@ -304,19 +304,26 @@ axios.interceptors.response.use(
         return response
     },
     error => {
+        // Si pas de réponse (erreur réseau), on rejette simplement
+        if (!error.response) {
+            return Promise.reject(error)
+        }
+
+        const status = error.response.status
+
         // Session invalide, on force la déconnection/reconnection de l"utilisateur
-        if (error.response.status === 401) {
+        if (status === 401) {
             logoutUser(store);
             return router.push("/login");
         }
         // Accès refusé, on redirige vers l"accueil
-        if (error.response.status === 403) {
+        if (status === 403) {
             return router.push("/");
         }
         // Erreur du serveur
-        if (error.response.status === 400 || error.response.status === 500) {
+        if (status === 400 || status === 500) {
             // Cas spéciale de l'erreur mot de passe à réinitialiser
-            if (error.response && error.response.data && error.response.data.message === "Réinitialisation du mot de passe requis.") {
+            if (error.response.data && error.response.data.message === "Réinitialisation du mot de passe requis.") {
                 return error;
             }
 
@@ -325,7 +332,7 @@ axios.interceptors.response.use(
         }
 
         // Si il s"agit d"une route IHM inconnu on redirige vers 404
-        if (!error.config.url.startsWith("/api/")) {
+        if (error.config && !error.config.url.startsWith("/api/")) {
             router.push("/404");
         }
         // Si il s"agit d"une route interne (appel au serveur) on reste sur la même page
