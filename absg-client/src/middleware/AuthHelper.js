@@ -43,5 +43,7 @@ export function logoutUser(store) {
     store.commit('setCurrentUser', null);
     // On supprime les infos de session dans le navigateur
     localStorage.removeItem('user');
+    // On supprime le header d'autorisation d'axios
+    delete axios.defaults.headers.common['Authorization'];
     return null;
 }

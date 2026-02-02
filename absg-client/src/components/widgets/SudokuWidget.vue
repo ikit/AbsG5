@@ -78,11 +78,13 @@ export default {
       default: null
     }
   },
+  emits: ["completed"],
   data() {
     return {
       userGrid: [],
       selectedCell: null,
-      errors: new Set()
+      errors: new Set(),
+      completionEmitted: false
     };
   },
   computed: {
@@ -105,7 +107,14 @@ export default {
       handler(newPuzzle) {
         if (newPuzzle) {
           this.loadOrInitGrid();
+          this.completionEmitted = false;
         }
+      }
+    },
+    isCompleted(newVal) {
+      if (newVal && !this.completionEmitted) {
+        this.completionEmitted = true;
+        this.$emit("completed");
       }
     }
   },

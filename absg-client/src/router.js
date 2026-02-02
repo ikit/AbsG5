@@ -313,8 +313,14 @@ axios.interceptors.response.use(
 
         // Session invalide, on force la déconnection/reconnection de l"utilisateur
         if (status === 401) {
+            // Déconnecter l'utilisateur (efface le store et localStorage)
             logoutUser(store);
-            return router.push("/login");
+            // Si pas déjà sur la page de login, rediriger
+            if (router.currentRoute.value.path !== "/login") {
+                router.push("/login");
+            }
+            // Rejeter l'erreur pour que l'appelant sache que la requête a échoué
+            return Promise.reject(error);
         }
         // Accès refusé, on redirige vers l"accueil
         if (status === 403) {

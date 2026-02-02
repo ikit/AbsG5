@@ -5,6 +5,7 @@ export * from "./AgpaPhoto";
 export * from "./AgpaUserBadge";
 export * from "./AgpaVote";
 export * from "./Citation";
+export * from "./DailyGameScore";
 export * from "./ForumTopic";
 export * from "./EventG";
 export * from "./Forum";

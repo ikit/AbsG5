@@ -39,17 +39,33 @@
         <!-- Sudoku du jour -->
         <v-col
           cols="12"
-          md="6"
+          md="4"
         >
-          <SudokuWidget :puzzle="sudoku" />
+          <SudokuWidget
+            ref="sudokuWidget"
+            :puzzle="sudoku"
+            @completed="onSudokuCompleted"
+          />
         </v-col>
 
         <!-- Mot mystère Wikipedia -->
         <v-col
           cols="12"
-          md="6"
+          md="4"
         >
-          <WikiMysteryWidget :game="wikiMystery" @renew="renewWikiMystery" />
+          <WikiMysteryWidget
+            :game="wikiMystery"
+            @renew="renewWikiMystery"
+            @completed="onWikiMysteryCompleted"
+          />
+        </v-col>
+
+        <!-- Stats et jeux externes -->
+        <v-col
+          cols="12"
+          md="4"
+        >
+          <GameStatsWidget ref="gameStatsWidget" />
         </v-col>
       </v-row>
     </v-container>
@@ -65,6 +81,7 @@ import CitationWidget from '../components/widgets/CitationWidget.vue';
 import OnThisDayWidget from '../components/widgets/OnThisDayWidget.vue';
 import SudokuWidget from '../components/widgets/SudokuWidget.vue';
 import WikiMysteryWidget from '../components/widgets/WikiMysteryWidget.vue';
+import GameStatsWidget from '../components/widgets/GameStatsWidget.vue';
 
 export default {
     components: {
@@ -72,14 +89,16 @@ export default {
         CitationWidget,
         OnThisDayWidget,
         SudokuWidget,
-        WikiMysteryWidget
+        WikiMysteryWidget,
+        GameStatsWidget
     },
     data: () => ({
         upcomingEvents: [],
         citation: null,
         onThisDay: [],
         sudoku: null,
-        wikiMystery: null
+        wikiMystery: null,
+        wikiMysteryOffset: 0
     }),
     mounted() {
         this.getHomeData();
@@ -117,12 +136,34 @@ export default {
         },
         renewWikiMystery() {
             this.wikiMystery = null;
-            axios.get(`/api/daily-games/wiki-mystery`).then(response => {
+            this.wikiMysteryOffset++;
+            axios.get(`/api/daily-games/wiki-mystery?offset=${this.wikiMysteryOffset}`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.wikiMystery = data;
                 }
             });
+        },
+        onSudokuCompleted() {
+            axios.post(`/api/daily-games/complete`, {
+                gameType: 'sudoku'
+            }).then(() => {
+                this.refreshGameStats();
+            });
+        },
+        onWikiMysteryCompleted(attempts, hintsUsed) {
+            axios.post(`/api/daily-games/complete`, {
+                gameType: 'wiki_mystery',
+                attempts: attempts || 1,
+                hintsUsed: hintsUsed || 0
+            }).then(() => {
+                this.refreshGameStats();
+            });
+        },
+        refreshGameStats() {
+            if (this.$refs.gameStatsWidget) {
+                this.$refs.gameStatsWidget.refresh();
+            }
         }
     }
 };

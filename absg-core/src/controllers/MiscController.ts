@@ -1,4 +1,4 @@
-import { JsonController, Post, Body, Get, Authorized, CurrentUser, Param } from "routing-controllers";
+import { JsonController, Post, Body, Get, Authorized, CurrentUser, Param, QueryParam } from "routing-controllers";
 import { citationService, dailyGamesService, homepageService, immtService, userService, eventService } from "../services";
 import { subDays, addHours } from "date-fns";
 import { Parameter, User } from "../entities";
@@ -172,11 +172,12 @@ export class UserController {
 
     /**
      * Récupère un nouveau mot mystère Wikipedia (pour le bouton renew)
+     * @param offset - Décalage pour obtenir un article différent (pour le bouton refresh)
      */
     @Authorized()
     @Get("/daily-games/wiki-mystery")
-    async getWikiMystery() {
-        return dailyGamesService.getDailyWikiMystery();
+    async getWikiMystery(@QueryParam("offset") offset?: number) {
+        return dailyGamesService.getDailyWikiMystery(offset || 0);
     }
 
     /**
@@ -186,5 +187,31 @@ export class UserController {
     @Post("/daily-games/wiki-mystery/check")
     checkWikiMysteryAnswer(@Body() body: { guess: string; answer: string }) {
         return dailyGamesService.checkWikiMysteryAnswer(body.guess, body.answer);
+    }
+
+    /**
+     * Enregistre la complétion d'un jeu (Sudoku ou Wiki Mystery)
+     */
+    @Authorized()
+    @Post("/daily-games/complete")
+    async recordGameCompletion(
+        @Body() body: { gameType: "sudoku" | "wiki_mystery"; attempts?: number; hintsUsed?: number },
+        @CurrentUser() user: User
+    ) {
+        return dailyGamesService.recordGameCompletion(
+            user.id,
+            body.gameType,
+            body.attempts || 1,
+            body.hintsUsed || 0
+        );
+    }
+
+    /**
+     * Récupère les stats des jeux quotidiens pour un utilisateur
+     */
+    @Authorized()
+    @Get("/daily-games/stats")
+    async getGameStats(@CurrentUser() user: User) {
+        return dailyGamesService.getGameStats(user.id);
     }
 }

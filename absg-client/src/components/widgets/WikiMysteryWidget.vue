@@ -134,7 +134,7 @@ export default {
       default: null
     }
   },
-  emits: ["renew"],
+  emits: ["renew", "completed"],
   data() {
     return {
       currentGuess: "",
@@ -194,6 +194,7 @@ export default {
         if (result.correct) {
           this.gameState = "won";
           this.lastFeedback = null;
+          this.$emit("completed", this.attempts, this.revealedHints.length);
         } else {
           if (this.attempts >= 6) {
             this.gameState = "lost";
@@ -214,6 +215,7 @@ export default {
         const correct = this.currentGuess.toLowerCase().trim() === this.game.answer.toLowerCase().trim();
         if (correct) {
           this.gameState = "won";
+          this.$emit("completed", this.attempts, this.revealedHints.length);
         } else if (this.attempts >= 6) {
           this.gameState = "lost";
         } else {

@@ -398,6 +398,7 @@
 import store from "./store";
 import axios from "axios";
 import { mapState } from "./stores/helpers";
+import { useUserStore } from "./stores/user";
 import { MODULES, parseAxiosResponse } from  "./middleware/CommonHelper";
 import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
 import PhotoMetadataEditor from "./components/PhotoMetadataEditor.vue";
@@ -423,7 +424,6 @@ export default {
     computed: {
         ...mapState([
             "citation",
-            "user",
             "wsOnline",
             "wsMessage",
             "error",
@@ -431,6 +431,11 @@ export default {
             "notif",
             "snack"
         ]),
+        // Utiliser directement le store Pinia pour une meilleure réactivité
+        user() {
+            const userStore = useUserStore();
+            return userStore.currentUser;
+        },
         // WebSocket
         ws() {
             return this.$socket || null;

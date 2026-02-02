@@ -4,6 +4,9 @@
  * - Mot mystère Wikipedia
  */
 
+import { AppDataSource } from "../data-source";
+import { DailyGameScore } from "../entities";
+
 export interface SudokuPuzzle {
     grid: number[][];
     solution: number[][];
@@ -152,31 +155,12 @@ class DailyGamesService {
 
     /**
      * Récupère un article Wikipedia aléatoire pour le mot mystère
+     * @param offset - Décalage pour obtenir un article différent (bouton renew)
      */
-    public async getDailyWikiMystery(): Promise<WikiMysteryGame | null> {
-        const seed = this.getDailySeed();
-        const random = this.seededRandom(seed);
+    public async getDailyWikiMystery(offset: number = 0): Promise<WikiMysteryGame | null> {
         const today = new Date().toISOString().split("T")[0];
 
         try {
-            // Liste de catégories intéressantes pour le jeu
-            const categories = [
-                "Personnalité_française",
-                "Monument_historique_en_France",
-                "Invention",
-                "Ville_de_France",
-                "Animal",
-                "Plante",
-                "Événement_historique",
-                "Sport",
-                "Instrument_de_musique",
-                "Aliment"
-            ];
-
-            // Sélectionner une catégorie basée sur le jour
-            const categoryIndex = Math.floor(random() * categories.length);
-            const selectedCategory = categories[categoryIndex];
-
             // Récupérer un article aléatoire de Wikipedia
             const searchUrl = `https://fr.wikipedia.org/api/rest_v1/page/random/summary`;
             const response = await fetch(searchUrl, {
@@ -200,7 +184,16 @@ class DailyGamesService {
             const extract = data.extract;
 
             // Masquer le titre dans l'extrait
-            const maskedText = this.maskWordInText(extract, title);
+            const maskResult = this.maskWordInText(extract, title);
+
+            // Vérifier que le masquage a fonctionné
+            if (!maskResult.success) {
+                console.warn(`Wiki Mystery: Could not mask "${title}" in extract, using fallback`);
+                return this.getFallbackWikiMystery(today);
+            }
+
+            // Extraire le titre principal (sans parenthèses) pour les indices
+            const mainTitle = title.replace(/\s*\([^)]*\)\s*/g, "").trim();
 
             // Déterminer la catégorie simplifiée
             const category = this.guessCategory(data.description || "", title);
@@ -209,13 +202,13 @@ class DailyGamesService {
             const hints = this.generateHints(title, data.description || "", extract);
 
             return {
-                id: `wiki-${today}`,
+                id: `wiki-${today}-${offset}`,
                 date: today,
-                maskedText,
+                maskedText: maskResult.text,
                 category,
-                answer: title,
-                answerLength: title.length,
-                firstLetter: title.charAt(0).toUpperCase(),
+                answer: mainTitle,
+                answerLength: mainTitle.length,
+                firstLetter: mainTitle.charAt(0).toUpperCase(),
                 hints,
                 url: data.content_urls?.desktop?.page || `https://fr.wikipedia.org/wiki/${encodeURIComponent(title)}`
             };
@@ -227,12 +220,54 @@ class DailyGamesService {
 
     /**
      * Masque un mot dans un texte
+     * Gère les titres avec parenthèses: "Paris (Texas)" -> masque "Paris"
      */
-    private maskWordInText(text: string, word: string): string {
-        // Créer une regex pour trouver le mot (insensible à la casse)
-        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(escapedWord, "gi");
-        return text.replace(regex, "???");
+    private maskWordInText(text: string, word: string): { text: string; success: boolean } {
+        let maskedText = text;
+        let replacements = 0;
+
+        // Extraire le titre principal (avant les parenthèses)
+        const mainTitle = word.replace(/\s*\([^)]*\)\s*/g, "").trim();
+
+        // Liste des variantes à masquer (du plus spécifique au plus général)
+        const variants: string[] = [];
+
+        // 1. Le titre complet
+        variants.push(word);
+
+        // 2. Le titre principal sans parenthèses (si différent)
+        if (mainTitle && mainTitle !== word) {
+            variants.push(mainTitle);
+        }
+
+        // 3. Pour les noms composés avec tiret, essayer aussi les parties
+        // Ex: "Mont-Saint-Michel" -> on garde tel quel, c'est un nom propre
+
+        // 4. Pour les titres avec articles "Le", "La", "Les", "L'"
+        const withoutArticle = word.replace(/^(Le |La |Les |L')/i, "").trim();
+        if (withoutArticle && withoutArticle !== word) {
+            variants.push(withoutArticle);
+        }
+
+        // Masquer chaque variante
+        for (const variant of variants) {
+            if (!variant || variant.length < 2) continue;
+
+            const escapedWord = variant.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const regex = new RegExp(escapedWord, "gi");
+
+            const newText = maskedText.replace(regex, (match) => {
+                replacements++;
+                return "???";
+            });
+            maskedText = newText;
+        }
+
+        // Vérifier qu'au moins un remplacement a été fait
+        return {
+            text: maskedText,
+            success: replacements > 0
+        };
     }
 
     /**
@@ -270,21 +305,24 @@ class DailyGamesService {
     private generateHints(title: string, description: string, extract: string): string[] {
         const hints: string[] = [];
 
-        // Indice 1: Catégorie (déjà fournie séparément)
-        hints.push(`Première lettre : ${title.charAt(0).toUpperCase()}`);
+        // Utiliser le titre principal sans parenthèses pour les indices
+        const mainTitle = title.replace(/\s*\([^)]*\)\s*/g, "").trim();
+
+        // Indice 1: Première lettre
+        hints.push(`Première lettre : ${mainTitle.charAt(0).toUpperCase()}`);
 
         // Indice 2: Nombre de mots
-        const wordCount = title.split(/\s+/).length;
+        const wordCount = mainTitle.split(/\s+/).length;
         hints.push(wordCount > 1 ? `Le nom contient ${wordCount} mots` : "C'est un seul mot");
 
         // Indice 3: Dernière lettre
-        hints.push(`Dernière lettre : ${title.charAt(title.length - 1).toUpperCase()}`);
+        hints.push(`Dernière lettre : ${mainTitle.charAt(mainTitle.length - 1).toUpperCase()}`);
 
         // Indice 4: Description courte si disponible
         if (description && description.length > 5) {
             hints.push(description.charAt(0).toUpperCase() + description.slice(1));
         } else {
-            hints.push(`${title.length} caractères au total`);
+            hints.push(`${mainTitle.length} caractères au total`);
         }
 
         return hints;
@@ -324,6 +362,48 @@ class DailyGamesService {
                 extract: "Le ??? est un instrument de musique polyphonique, à clavier, de la famille des cordes frappées.",
                 category: "Concept",
                 description: "Instrument de musique à clavier"
+            },
+            {
+                title: "Napoléon Ier",
+                extract: "???, né le 15 août 1769 à Ajaccio et mort le 5 mai 1821 sur l'île de Sainte-Hélène, est un militaire et homme d'État français, premier empereur des Français.",
+                category: "Personnalité",
+                description: "Empereur des Français"
+            },
+            {
+                title: "Lion",
+                extract: "Le ??? est une espèce de mammifère carnivore de la famille des Félidés. C'est le plus grand félin d'Afrique.",
+                category: "Animal",
+                description: "Grand félin d'Afrique"
+            },
+            {
+                title: "Château de Versailles",
+                extract: "Le ??? est un château et un monument historique français situé à Versailles, dans les Yvelines. Il fut la résidence des rois de France Louis XIV, Louis XV et Louis XVI.",
+                category: "Monument",
+                description: "Ancienne résidence royale française"
+            },
+            {
+                title: "Football",
+                extract: "Le ??? est un sport collectif qui se joue avec un ballon sphérique entre deux équipes de onze joueurs.",
+                category: "Concept",
+                description: "Sport collectif populaire"
+            },
+            {
+                title: "Dauphin",
+                extract: "Le ??? est un mammifère marin appartenant à l'ordre des cétacés. Il est connu pour son intelligence et sa sociabilité.",
+                category: "Animal",
+                description: "Mammifère marin intelligent"
+            },
+            {
+                title: "Marie Curie",
+                extract: "??? est une physicienne et chimiste polonaise, naturalisée française. Elle est la première femme à avoir reçu le prix Nobel.",
+                category: "Personnalité",
+                description: "Physicienne franco-polonaise"
+            },
+            {
+                title: "Baguette",
+                extract: "La ??? est un pain allongé d'origine française. Elle est caractérisée par sa forme longue et sa croûte croustillante.",
+                category: "Aliment",
+                description: "Pain traditionnel français"
             }
         ];
 
@@ -397,6 +477,160 @@ class DailyGamesService {
             if (i > 0) costs[s2.length] = lastValue;
         }
         return costs[s2.length];
+    }
+
+    /**
+     * Repository pour les scores
+     */
+    private get scoreRepo() {
+        return AppDataSource.getRepository(DailyGameScore);
+    }
+
+    /**
+     * Enregistre la complétion d'un jeu
+     */
+    public async recordGameCompletion(
+        userId: number,
+        gameType: "sudoku" | "wiki_mystery",
+        attempts: number = 1,
+        hintsUsed: number = 0
+    ): Promise<DailyGameScore> {
+        const today = new Date().toISOString().split("T")[0];
+
+        // Vérifier si un score existe déjà pour ce jour
+        let score = await this.scoreRepo.findOne({
+            where: { userId, gameType, date: today }
+        });
+
+        if (score) {
+            // Mettre à jour si pas encore complété
+            if (!score.completed) {
+                score.completed = true;
+                score.attempts = attempts;
+                score.hintsUsed = hintsUsed;
+                score.completedAt = new Date();
+                await this.scoreRepo.save(score);
+            }
+        } else {
+            // Créer un nouveau score
+            score = new DailyGameScore();
+            score.userId = userId;
+            score.gameType = gameType;
+            score.date = today;
+            score.completed = true;
+            score.attempts = attempts;
+            score.hintsUsed = hintsUsed;
+            score.completedAt = new Date();
+            await this.scoreRepo.save(score);
+        }
+
+        return score;
+    }
+
+    /**
+     * Récupère les stats d'un utilisateur
+     */
+    public async getUserStats(userId: number): Promise<{
+        sudoku: { total: number; thisWeek: number; thisMonth: number };
+        wikiMystery: { total: number; thisWeek: number; thisMonth: number };
+    }> {
+        const now = new Date();
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
+        const scores = await this.scoreRepo.find({
+            where: { userId, completed: true }
+        });
+
+        const sudokuScores = scores.filter(s => s.gameType === "sudoku");
+        const wikiScores = scores.filter(s => s.gameType === "wiki_mystery");
+
+        return {
+            sudoku: {
+                total: sudokuScores.length,
+                thisWeek: sudokuScores.filter(s => s.date >= weekAgo).length,
+                thisMonth: sudokuScores.filter(s => s.date >= monthAgo).length
+            },
+            wikiMystery: {
+                total: wikiScores.length,
+                thisWeek: wikiScores.filter(s => s.date >= weekAgo).length,
+                thisMonth: wikiScores.filter(s => s.date >= monthAgo).length
+            }
+        };
+    }
+
+    /**
+     * Récupère le classement familial
+     */
+    public async getFamilyRanking(): Promise<{
+        ranking: Array<{
+            rank: number;
+            userId: number;
+            username: string;
+            rootFamily: string;
+            sudokuCount: number;
+            wikiMysteryCount: number;
+            totalScore: number;
+        }>;
+    }> {
+        // Requête SQL pour obtenir le classement avec les infos utilisateur
+        const result = await this.scoreRepo.query(`
+            SELECT
+                u.id as "userId",
+                u.username,
+                u."rootFamily" as "rootFamily",
+                COALESCE(SUM(CASE WHEN dgs.game_type = 'sudoku' AND dgs.completed = true THEN 1 ELSE 0 END), 0) as "sudokuCount",
+                COALESCE(SUM(CASE WHEN dgs.game_type = 'wiki_mystery' AND dgs.completed = true THEN 1 ELSE 0 END), 0) as "wikiMysteryCount",
+                COALESCE(SUM(CASE WHEN dgs.completed = true THEN 1 ELSE 0 END), 0) as "totalScore"
+            FROM "user" u
+            LEFT JOIN daily_game_score dgs ON dgs.user_id = u.id
+            WHERE u."isActive" = true
+            GROUP BY u.id, u.username, u."rootFamily"
+            HAVING COALESCE(SUM(CASE WHEN dgs.completed = true THEN 1 ELSE 0 END), 0) > 0
+            ORDER BY "totalScore" DESC, "sudokuCount" DESC, "wikiMysteryCount" DESC
+            LIMIT 10
+        `);
+
+        return {
+            ranking: result.map((row: any, index: number) => ({
+                rank: index + 1,
+                userId: row.userId,
+                username: row.username,
+                rootFamily: row.rootFamily || "Inconnu",
+                sudokuCount: parseInt(row.sudokuCount) || 0,
+                wikiMysteryCount: parseInt(row.wikiMysteryCount) || 0,
+                totalScore: parseInt(row.totalScore) || 0
+            }))
+        };
+    }
+
+    /**
+     * Récupère les stats et classement pour le widget
+     */
+    public async getGameStats(userId: number): Promise<{
+        userStats: {
+            sudoku: { total: number; thisWeek: number; thisMonth: number };
+            wikiMystery: { total: number; thisWeek: number; thisMonth: number };
+        };
+        ranking: Array<{
+            rank: number;
+            userId: number;
+            username: string;
+            rootFamily: string;
+            sudokuCount: number;
+            wikiMysteryCount: number;
+            totalScore: number;
+        }>;
+    }> {
+        const [userStats, familyRanking] = await Promise.all([
+            this.getUserStats(userId),
+            this.getFamilyRanking()
+        ]);
+
+        return {
+            userStats,
+            ranking: familyRanking.ranking
+        };
     }
 }
 
