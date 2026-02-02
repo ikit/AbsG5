@@ -171,13 +171,15 @@ class DailyGamesService {
             });
 
             if (!response.ok) {
-                return this.getFallbackWikiMystery(today);
+                console.error("Wiki Mystery: Wikipedia API returned error", response.status);
+                return null;
             }
 
             const data: any = await response.json();
 
             if (!data.title || !data.extract) {
-                return this.getFallbackWikiMystery(today);
+                console.error("Wiki Mystery: Invalid data from Wikipedia API");
+                return null;
             }
 
             const title = data.title;
@@ -186,10 +188,10 @@ class DailyGamesService {
             // Masquer le titre dans l'extrait
             const maskResult = this.maskWordInText(extract, title);
 
-            // Vérifier que le masquage a fonctionné
+            // Vérifier que le masquage a fonctionné - si non, réessayer avec un autre article
             if (!maskResult.success) {
-                console.warn(`Wiki Mystery: Could not mask "${title}" in extract, using fallback`);
-                return this.getFallbackWikiMystery(today);
+                console.warn(`Wiki Mystery: Could not mask "${title}" in extract, retrying...`);
+                return null;
             }
 
             // Extraire le titre principal (sans parenthèses) pour les indices
@@ -214,7 +216,7 @@ class DailyGamesService {
             };
         } catch (error) {
             console.error("Error fetching Wiki Mystery:", error);
-            return this.getFallbackWikiMystery(today);
+            return null;
         }
     }
 
@@ -326,103 +328,6 @@ class DailyGamesService {
         }
 
         return hints;
-    }
-
-    /**
-     * Données de secours pour le mot mystère
-     */
-    private getFallbackWikiMystery(date: string): WikiMysteryGame {
-        const fallbackArticles = [
-            {
-                title: "Tour Eiffel",
-                extract: "La ??? est une tour de fer puddlé de 330 mètres de hauteur située à Paris, construite par Gustave Eiffel pour l'Exposition universelle de 1889.",
-                category: "Monument",
-                description: "Monument parisien emblématique"
-            },
-            {
-                title: "Croissant",
-                extract: "Le ??? est une viennoiserie à base de pâte feuilletée levée, caractérisée par sa forme de lune en croissant.",
-                category: "Aliment",
-                description: "Viennoiserie française"
-            },
-            {
-                title: "Victor Hugo",
-                extract: "??? est un poète, dramaturge, écrivain et homme politique français du XIXe siècle, auteur des Misérables et de Notre-Dame de Paris.",
-                category: "Personnalité",
-                description: "Écrivain français du XIXe siècle"
-            },
-            {
-                title: "Marseille",
-                extract: "??? est une ville du sud-est de la France, chef-lieu de la région Provence-Alpes-Côte d'Azur et préfecture du département des Bouches-du-Rhône.",
-                category: "Lieu",
-                description: "Grande ville du sud de la France"
-            },
-            {
-                title: "Piano",
-                extract: "Le ??? est un instrument de musique polyphonique, à clavier, de la famille des cordes frappées.",
-                category: "Concept",
-                description: "Instrument de musique à clavier"
-            },
-            {
-                title: "Napoléon Ier",
-                extract: "???, né le 15 août 1769 à Ajaccio et mort le 5 mai 1821 sur l'île de Sainte-Hélène, est un militaire et homme d'État français, premier empereur des Français.",
-                category: "Personnalité",
-                description: "Empereur des Français"
-            },
-            {
-                title: "Lion",
-                extract: "Le ??? est une espèce de mammifère carnivore de la famille des Félidés. C'est le plus grand félin d'Afrique.",
-                category: "Animal",
-                description: "Grand félin d'Afrique"
-            },
-            {
-                title: "Château de Versailles",
-                extract: "Le ??? est un château et un monument historique français situé à Versailles, dans les Yvelines. Il fut la résidence des rois de France Louis XIV, Louis XV et Louis XVI.",
-                category: "Monument",
-                description: "Ancienne résidence royale française"
-            },
-            {
-                title: "Football",
-                extract: "Le ??? est un sport collectif qui se joue avec un ballon sphérique entre deux équipes de onze joueurs.",
-                category: "Concept",
-                description: "Sport collectif populaire"
-            },
-            {
-                title: "Dauphin",
-                extract: "Le ??? est un mammifère marin appartenant à l'ordre des cétacés. Il est connu pour son intelligence et sa sociabilité.",
-                category: "Animal",
-                description: "Mammifère marin intelligent"
-            },
-            {
-                title: "Marie Curie",
-                extract: "??? est une physicienne et chimiste polonaise, naturalisée française. Elle est la première femme à avoir reçu le prix Nobel.",
-                category: "Personnalité",
-                description: "Physicienne franco-polonaise"
-            },
-            {
-                title: "Baguette",
-                extract: "La ??? est un pain allongé d'origine française. Elle est caractérisée par sa forme longue et sa croûte croustillante.",
-                category: "Aliment",
-                description: "Pain traditionnel français"
-            }
-        ];
-
-        // Sélectionner basé sur la date
-        const seed = parseInt(date.replace(/-/g, ""));
-        const index = seed % fallbackArticles.length;
-        const article = fallbackArticles[index];
-
-        return {
-            id: `wiki-${date}`,
-            date,
-            maskedText: article.extract,
-            category: article.category,
-            answer: article.title,
-            answerLength: article.title.length,
-            firstLetter: article.title.charAt(0).toUpperCase(),
-            hints: this.generateHints(article.title, article.description, article.extract),
-            url: `https://fr.wikipedia.org/wiki/${encodeURIComponent(article.title)}`
-        };
     }
 
     /**

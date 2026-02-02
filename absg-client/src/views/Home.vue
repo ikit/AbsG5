@@ -55,6 +55,7 @@
         >
           <WikiMysteryWidget
             :game="wikiMystery"
+            :error="wikiMysteryError"
             @renew="renewWikiMystery"
             @completed="onWikiMysteryCompleted"
           />
@@ -98,6 +99,7 @@ export default {
         onThisDay: [],
         sudoku: null,
         wikiMystery: null,
+        wikiMysteryError: false,
         wikiMysteryOffset: 0
     }),
     mounted() {
@@ -130,17 +132,24 @@ export default {
                     }
                     if (data.wikiMystery) {
                         this.wikiMystery = data.wikiMystery;
+                        this.wikiMysteryError = false;
+                    } else {
+                        this.wikiMysteryError = true;
                     }
                 }
             });
         },
         renewWikiMystery() {
             this.wikiMystery = null;
+            this.wikiMysteryError = false;
             this.wikiMysteryOffset++;
             axios.get(`/api/daily-games/wiki-mystery?offset=${this.wikiMysteryOffset}`).then(response => {
                 const data = parseAxiosResponse(response);
                 if (data) {
                     this.wikiMystery = data;
+                    this.wikiMysteryError = false;
+                } else {
+                    this.wikiMysteryError = true;
                 }
             });
         },

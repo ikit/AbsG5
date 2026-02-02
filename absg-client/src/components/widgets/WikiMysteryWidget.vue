@@ -117,6 +117,22 @@
         </div>
       </div>
     </v-card-text>
+    <!-- État: Erreur -->
+    <v-card-text v-else-if="error" class="error-state">
+      <v-icon color="warning" size="48">fas fa-exclamation-triangle</v-icon>
+      <p class="error-text">Un problème technique empêche de charger le jeu.</p>
+      <v-btn
+        size="small"
+        variant="tonal"
+        color="accent"
+        @click="renewGame"
+      >
+        <v-icon start size="small">fas fa-sync-alt</v-icon>
+        Réessayer
+      </v-btn>
+    </v-card-text>
+
+    <!-- État: Chargement -->
     <v-card-text v-else class="loading-state">
       <v-progress-circular indeterminate color="accent" size="32" />
     </v-card-text>
@@ -132,6 +148,10 @@ export default {
     game: {
       type: Object,
       default: null
+    },
+    error: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ["renew", "completed"],
@@ -349,5 +369,21 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 200px;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-height: 200px;
+  text-align: center;
+
+  .error-text {
+    margin: 0;
+    opacity: 0.7;
+    font-size: 0.9em;
+  }
 }
 </style>
