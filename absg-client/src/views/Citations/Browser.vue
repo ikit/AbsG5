@@ -2,18 +2,22 @@
   <div>
     <v-container>
       <v-card>
-        <v-card-title style="display: flex; align-items: center;">
+        <!-- Header avec recherche et bouton -->
+        <v-card-title class="card-header">
           <v-text-field
             v-model="filter.search"
-            prepend-icon="fas fa-search"
+            prepend-inner-icon="fas fa-search"
             label="Rechercher"
             single-line
             hide-details
-            style="max-width: 300px"
+            density="compact"
+            variant="outlined"
+            class="search-field"
           />
           <v-spacer />
           <v-btn
             v-if="$vuetify.display.mdAndUp"
+            color="accent"
             @click.stop="resetDialog(true)"
           >
             <v-icon start>
@@ -23,14 +27,15 @@
           </v-btn>
           <v-btn
             v-else
-            fab
-            small
+            icon
+            color="accent"
             @click.stop="resetDialog(true)"
           >
             <v-icon>fas fa-plus</v-icon>
           </v-btn>
         </v-card-title>
 
+        <!-- Contenu principal -->
         <v-data-table
           :headers="headers"
           :items="citations"
@@ -331,46 +336,69 @@ export default {
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
 
-
-
-.citation :deep(.note)  {
-    color: #999!important;
-    flex: 1 0 1;
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(var(--v-theme-surface-variant), 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-// .citationRow {
-//     border-bottom: 1px solid #ddd;
-// }
+.search-field {
+  max-width: 300px;
+}
+
+.citation :deep(.note) {
+  color: #999 !important;
+  flex: 1 0 1;
+}
+
 .citationRow:hover {
-    background: rgba(15, 15, 30, 0.05);
-    .deleteAction, .editAction {
-        display: block;
-    }
+  background: rgba(15, 15, 30, 0.05);
+  .deleteAction, .editAction {
+    display: block;
+  }
 }
+
 .deleteAction, .editAction {
-    position: absolute;
-    text-align: center;
-    display: none;
+  position: absolute;
+  text-align: center;
+  display: none;
 }
+
 .deleteAction {
-    right: 15px;
+  right: 15px;
 }
+
 .editAction {
-    right: 50px;
+  right: 50px;
 }
+
 .year {
-    opacity: 0.5;
-    margin: 0;
+  opacity: 0.5;
+  margin: 0;
 }
 
 .citation-avatar {
-    overflow: hidden;
-    border: 1px solid #ddd;
+  overflow: hidden;
+  border: 1px solid #ddd;
 }
 
 .citation-avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 600px) {
+  .card-header {
+    flex-wrap: wrap;
+  }
+
+  .search-field {
+    flex: 1;
+    min-width: 150px;
+    max-width: unset;
+  }
 }
 </style>
