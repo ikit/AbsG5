@@ -1,6 +1,7 @@
 import {
     JsonController,
     Param,
+    QueryParam,
     Get,
     Delete,
     Authorized,
@@ -146,6 +147,32 @@ export class AgpaController {
         return response;
     }
 
+    /**
+     * Télécharge toutes les données AGPA au format ZIP avec CSVs
+     * Contient: photos.csv, users.csv, votes.csv, categories.csv, awards.csv, badges.csv
+     */
+    @Get("/data/export-all")
+    async getFullExport(@Res() response: Response) {
+        const exportData = await agpaService.getAllExportData();
+
+        response.setHeader("Content-Type", "application/zip");
+        response.setHeader("Content-Disposition", "attachment; filename=AGPA-Export.zip");
+
+        const archive = archiver("zip", { zlib: { level: 9 } });
+        archive.pipe(response);
+
+        archive.append(exportData.photos, { name: "AGPA-Export/photos.csv" });
+        archive.append(exportData.users, { name: "AGPA-Export/users.csv" });
+        archive.append(exportData.votes, { name: "AGPA-Export/votes.csv" });
+        archive.append(exportData.categories, { name: "AGPA-Export/categories.csv" });
+        archive.append(exportData.awards, { name: "AGPA-Export/awards.csv" });
+        archive.append(exportData.badges, { name: "AGPA-Export/badges.csv" });
+
+        await archive.finalize();
+
+        return response;
+    }
+
     @Get("/ceremony/:year([0-9]{4})")
     getCeremony(@Param("year") year: number) {
         return agpaService.getCeremonyData(year);
@@ -162,16 +189,20 @@ export class AgpaController {
     }
 
     @Get("/palmares")
-    getPalmares() {
-        return agpaService.getPalmaresData();
+    getPalmares(@QueryParam("algorithm") algorithm?: string) {
+        return agpaService.getPalmaresData(algorithm);
     }
 
     /**
-     * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
+     * Récupère les statistiques "palmarès glissant" pour une période donnée
      */
     @Get("/palmares/sliding")
-    getSlidingPalmares() {
-        return agpaService.getSlidingPalmaresData();
+    getSlidingPalmares(
+        @QueryParam("yearFrom") yearFrom?: number,
+        @QueryParam("yearTo") yearTo?: number,
+        @QueryParam("algorithm") algorithm?: string
+    ) {
+        return agpaService.getSlidingPalmaresData(yearFrom, yearTo, algorithm);
     }
 
     /**

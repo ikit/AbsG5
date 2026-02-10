@@ -49,9 +49,112 @@
         </v-card-text>
       </v-card>
 
-      <!-- Première ligne: Mes AGPA et Mes Succès côte à côte -->
+      <!-- Barre de contrôles -->
+      <div class="palmares-toolbar bg-surface-variant">
+        <div class="palmares-toolbar-inner">
+          <v-icon size="small" class="palmares-toolbar-icon">fas fa-sliders-h</v-icon>
+
+          <!-- Sélecteur de période -->
+          <v-menu
+            v-model="showPeriodSlider"
+            :close-on-content-click="false"
+            location="bottom"
+          >
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                size="small"
+                variant="flat"
+                color="primary"
+                :disabled="palmaresMode !== 'sliding'"
+                class="palmares-period-btn"
+              >
+                <v-icon start size="small">fas fa-calendar-alt</v-icon>
+                <template v-if="selectedSlidingPeriod">
+                  {{ selectedSlidingPeriod.from }} - {{ selectedSlidingPeriod.to }}
+                </template>
+                <template v-else>
+                  Période
+                </template>
+                <v-icon end size="x-small">fas fa-caret-down</v-icon>
+              </v-btn>
+            </template>
+            <v-card class="palmares-period-card">
+              <div class="palmares-period-label">Période glissante (3 ans)</div>
+              <v-slider
+                v-model="sliderYearTo"
+                :min="sliderMin"
+                :max="sliderMax"
+                :step="1"
+                show-ticks="always"
+                thumb-label="always"
+                color="primary"
+                hide-details
+                @end="onSliderEnd"
+              >
+                <template #thumb-label="{ modelValue }">
+                  {{ modelValue - 2 }}-{{ modelValue }}
+                </template>
+              </v-slider>
+              <div class="palmares-period-range">
+                <span>{{ sliderMin - 2 }}</span>
+                <span>{{ sliderMax }}</span>
+              </div>
+            </v-card>
+          </v-menu>
+
+          <div class="palmares-toolbar-separator" />
+
+          <!-- Toggle algorithme -->
+          <v-btn-toggle
+            v-model="selectedAlgorithm"
+            mandatory
+            density="comfortable"
+            class="palmares-toolbar-toggle"
+          >
+            <v-btn value="V2010" size="small">v2010</v-btn>
+            <v-btn value="V2026" size="small">v2026</v-btn>
+          </v-btn-toggle>
+
+          <div class="palmares-toolbar-separator" />
+
+          <!-- Toggle mode -->
+          <v-btn-toggle
+            v-model="palmaresMode"
+            mandatory
+            density="comfortable"
+            class="palmares-toolbar-toggle"
+          >
+            <v-btn value="global" size="small">
+              <v-icon start size="small">fas fa-globe</v-icon>
+              Global
+            </v-btn>
+            <v-btn value="sliding" size="small">
+              <v-icon start size="small">fas fa-chart-line</v-icon>
+              Glissant
+            </v-btn>
+          </v-btn-toggle>
+
+          <v-spacer />
+
+          <!-- Export ZIP -->
+          <v-btn
+            size="small"
+            variant="tonal"
+            color="primary"
+            :loading="isDownloadingData"
+            class="palmares-period-btn"
+            @click="downloadAllData"
+          >
+            <v-icon start size="small">fas fa-download</v-icon>
+            Data
+          </v-btn>
+        </div>
+      </div>
+
+      <!-- Palmarès et Badges côte à côte -->
       <v-row style="margin-bottom: 20px;">
-        <!-- Mes AGPA -->
+        <!-- Palmarès AGPA -->
         <v-col cols="12" md="6">
           <v-card
             style="cursor: pointer; transition: transform 0.2s; height: 100%;"
@@ -60,47 +163,27 @@
           >
             <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
               <v-icon start color="white">fas fa-trophy</v-icon>
-              Mes AGPA
+              Palmarès AGPA
             </v-card-title>
             <v-card-text style="padding: 30px; text-align: center;">
+              <!-- Label mode/période -->
+              <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
+                <span v-if="palmaresMode === 'sliding' && slidingYearFrom && slidingYearTo">
+                  {{ slidingYearFrom }} - {{ slidingYearTo }}
+                </span>
+                <span v-else>
+                  Classement global
+                </span>
+              </div>
+
               <!-- Total points cumulés -->
               <div style="margin-bottom: 25px;">
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
-                  <v-menu>
-                    <template #activator="{ props }">
-                      <v-btn
-                        v-bind="props"
-                        variant="text"
-                        size="small"
-                        style="text-transform: none; font-size: 0.85em;"
-                      >
-                        <span v-if="slidingYearFrom && slidingYearTo">
-                          {{ slidingYearFrom }} - {{ slidingYearTo }}
-                        </span>
-                        <span v-else>
-                          3 dernières éditions
-                        </span>
-                        <v-icon end size="small">fas fa-chevron-down</v-icon>
-                      </v-btn>
-                    </template>
-                    <v-list density="compact">
-                      <v-list-item
-                        v-for="period in availableSlidingPeriods"
-                        :key="`${period.from}-${period.to}`"
-                        :active="slidingYearFrom === period.from && slidingYearTo === period.to"
-                        @click="changeSlidingPeriod(period.from, period.to)"
-                      >
-                        <v-list-item-title>{{ period.from }} - {{ period.to }}</v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </div>
-                <template v-if="mySlidingAgpas > 0">
+                <template v-if="currentPoints > 0">
                   <div style="font-size: 3em; font-weight: bold; color: #667eea; margin-bottom: 5px;">
-                    {{ mySlidingAgpas }}
+                    {{ currentPoints }}
                   </div>
                   <div style="font-size: 0.9em; color: #666;">
-                    point{{ mySlidingAgpas > 1 ? 's' : '' }} cumulé{{ mySlidingAgpas > 1 ? 's' : '' }}
+                    point{{ currentPoints > 1 ? 's' : '' }} cumulé{{ currentPoints > 1 ? 's' : '' }}
                   </div>
                 </template>
                 <template v-else>
@@ -118,25 +201,25 @@
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="fas fa-circle" style="color: #c68b00; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #c68b00;">{{ mySlidingAwards.gold }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #c68b00;">{{ currentAwards.gold }}</span>
                   </div>
                 </div>
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #9b9b9b;">{{ mySlidingAwards.sylver }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #9b9b9b;">{{ currentAwards.sylver }}</span>
                   </div>
                 </div>
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #cd7f32;">{{ mySlidingAwards.bronze }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #cd7f32;">{{ currentAwards.bronze }}</span>
                   </div>
                 </div>
                 <div style="text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <i class="far fa-circle" style="color: #764ba2; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #764ba2;">{{ mySlidingAwards.nominated }}</span>
+                    <span style="font-size: 1.6em; font-weight: bold; color: #764ba2;">{{ currentAwards.nominated }}</span>
                   </div>
                 </div>
               </div>
@@ -163,34 +246,12 @@
               <!-- Total badges actifs -->
               <div style="margin-bottom: 25px;">
                 <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
-                  <v-menu>
-                    <template #activator="{ props }">
-                      <v-btn
-                        v-bind="props"
-                        variant="text"
-                        size="small"
-                        style="text-transform: none; font-size: 0.85em;"
-                      >
-                        <span v-if="slidingYearFrom && slidingYearTo">
-                          {{ slidingYearFrom }} - {{ slidingYearTo }}
-                        </span>
-                        <span v-else>
-                          3 dernières éditions
-                        </span>
-                        <v-icon end size="small">fas fa-chevron-down</v-icon>
-                      </v-btn>
-                    </template>
-                    <v-list density="compact">
-                      <v-list-item
-                        v-for="period in availableSlidingPeriods"
-                        :key="`${period.from}-${period.to}`"
-                        :active="slidingYearFrom === period.from && slidingYearTo === period.to"
-                        @click="changeSlidingPeriod(period.from, period.to)"
-                      >
-                        <v-list-item-title>{{ period.from }} - {{ period.to }}</v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
+                  <span v-if="palmaresMode === 'sliding' && slidingYearFrom && slidingYearTo">
+                    {{ slidingYearFrom }} - {{ slidingYearTo }}
+                  </span>
+                  <span v-else>
+                    Tous les badges
+                  </span>
                 </div>
                 <div style="font-size: 3em; font-weight: bold; color: #fa709a; margin-bottom: 5px;">
                   {{ totalActiveBadges }}
@@ -272,164 +333,6 @@
         </v-col>
       </v-row>
 
-      <!-- Deuxième ligne: Mes Statistiques sur toute la largeur -->
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-title style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
-              <v-icon start color="white">fas fa-chart-line</v-icon>
-              Mes Statistiques
-            </v-card-title>
-            <v-card-text style="padding: 20px;">
-              <!-- Stats générales en grille -->
-              <v-row style="margin-bottom: 20px;">
-                <!-- Meilleure catégorie -->
-                <v-col cols="12" sm="6" md="3">
-                  <div style="padding: 12px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800; height: 100%;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                      <i class="fas fa-crown" style="color: #ff9800; font-size: 1.2em;"></i>
-                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Catégorie favorite</div>
-                    </div>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">Animaux</div>
-                    <div style="font-size: 0.75em; color: #666;">
-                      3 <i class="fas fa-circle" style="color: #c68b00; font-size: 0.7em;"></i> ·
-                      2 <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.7em;"></i> ·
-                      1 <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.7em;"></i>
-                    </div>
-                  </div>
-                </v-col>
-
-                <!-- Meilleure année -->
-                <v-col cols="12" sm="6" md="3">
-                  <div style="padding: 12px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50; height: 100%;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                      <i class="fas fa-calendar-star" style="color: #4caf50; font-size: 1.2em;"></i>
-                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Meilleure année</div>
-                    </div>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">2023</div>
-                    <div style="font-size: 0.75em; color: #666;">
-                      5 récompenses · 42 points
-                    </div>
-                  </div>
-                </v-col>
-
-                <!-- Éditions participées -->
-                <v-col cols="12" sm="6" md="3">
-                  <div style="padding: 12px; background: #fce4ec; border-radius: 8px; border-left: 4px solid #e91e63; height: 100%;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                      <i class="fas fa-calendar-check" style="color: #e91e63; font-size: 1.2em;"></i>
-                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Éditions</div>
-                    </div>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">18</div>
-                    <div style="font-size: 0.75em; color: #666;">
-                      Participation totale
-                    </div>
-                  </div>
-                </v-col>
-
-                <!-- Photos soumises -->
-                <v-col cols="12" sm="6" md="3">
-                  <div style="padding: 12px; background: #e1f5fe; border-radius: 8px; border-left: 4px solid #03a9f4; height: 100%;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                      <i class="fas fa-images" style="color: #03a9f4; font-size: 1.2em;"></i>
-                      <div style="font-size: 0.8em; font-weight: 600; color: #666;">Photos soumises</div>
-                    </div>
-                    <div style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">156</div>
-                    <div style="font-size: 0.75em; color: #666;">
-                      Au total
-                    </div>
-                  </div>
-                </v-col>
-              </v-row>
-
-              <!-- Séparateur -->
-              <v-divider style="margin: 20px 0;" />
-
-              <!-- Stats familiales -->
-              <div style="margin-bottom: 20px;">
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 12px; font-weight: 600;">
-                  <i class="fas fa-users" style="margin-right: 5px;"></i>
-                  Ma famille
-                </div>
-
-                <div style="padding: 12px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
-                  <div style="font-size: 0.8em; color: #666; margin-bottom: 5px;">Classement famille Gueudelot</div>
-                  <div style="font-size: 1.1em; font-weight: bold; color: #9c27b0;">3ème position</div>
-                </div>
-              </div>
-
-              <!-- Séparateur -->
-              <v-divider style="margin: 20px 0;" />
-
-              <!-- Fun Facts -->
-              <div>
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 12px; font-weight: 600;">
-                  <i class="fas fa-lightbulb" style="margin-right: 5px;"></i>
-                  Fun Facts
-                </div>
-
-                <v-row>
-                  <!-- Fact 1 -->
-                  <v-col cols="12" sm="6">
-                    <div style="padding: 10px; background: #fff9e6; border-radius: 8px; height: 100%;">
-                      <div style="display: flex; align-items: flex-start; gap: 8px;">
-                        <i class="fas fa-vote-yea" style="color: #ffc107; font-size: 1.1em; margin-top: 2px;"></i>
-                        <div style="flex: 1;">
-                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                            Vous avez voté pour <strong>127 photos</strong> différentes lors de l'édition 2024
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </v-col>
-
-                  <!-- Fact 2 -->
-                  <v-col cols="12" sm="6">
-                    <div style="padding: 10px; background: #f3e5f5; border-radius: 8px; height: 100%;">
-                      <div style="display: flex; align-items: flex-start; gap: 8px;">
-                        <i class="fas fa-fire" style="color: #9c27b0; font-size: 1.1em; margin-top: 2px;"></i>
-                        <div style="flex: 1;">
-                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                            Votre série la plus longue: <strong>12 éditions</strong> consécutives
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </v-col>
-
-                  <!-- Fact 3 -->
-                  <v-col cols="12" sm="6">
-                    <div style="padding: 10px; background: #e3f2fd; border-radius: 8px; height: 100%;">
-                      <div style="display: flex; align-items: flex-start; gap: 8px;">
-                        <i class="fas fa-trophy" style="color: #2196f3; font-size: 1.1em; margin-top: 2px;"></i>
-                        <div style="flex: 1;">
-                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                            Premier podium en <strong>2015</strong> dans la catégorie "Nature"
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </v-col>
-
-                  <!-- Fact 4 -->
-                  <v-col cols="12" sm="6">
-                    <div style="padding: 10px; background: #e8f5e9; border-radius: 8px; height: 100%;">
-                      <div style="display: flex; align-items: flex-start; gap: 8px;">
-                        <i class="fas fa-heart" style="color: #e91e63; font-size: 1.1em; margin-top: 2px;"></i>
-                        <div style="flex: 1;">
-                          <div style="font-size: 0.8em; color: #666; line-height: 1.4;">
-                            Photographe préféré: <strong>Jean-Michel</strong> (23 votes donnés)
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </v-col>
-                </v-row>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
     </v-container>
 
     <!-- Dialog Palmarès Unifié -->
@@ -440,6 +343,7 @@
       :sliding-year-from="slidingYearFrom"
       :sliding-year-to="slidingYearTo"
       :loading="isLoading"
+      :initial-mode="palmaresMode"
     />
 
     <!-- Dialog Détails Palmarès Utilisateur -->
@@ -1016,6 +920,14 @@ export default {
         loadingFamilyMembers: false,
         memberDetailsDialog: false,
         selectedMember: null,
+        // Barre de contrôles
+        selectedAlgorithm: 'V2026',
+        palmaresMode: 'sliding',
+        selectedSlidingPeriod: null,
+        showPeriodSlider: false,
+        sliderYearTo: null,
+        initialized: false,
+        isDownloadingData: false,
         // Mode debug admin
         debugModeEnabled: false,
         debugUserId: null,
@@ -1029,6 +941,14 @@ export default {
         },
         showDebugPanel() {
             return this.isAdmin && this.debugModeEnabled;
+        },
+
+        // Points et awards adaptés au mode (global ou sliding)
+        currentPoints() {
+            return this.palmaresMode === 'sliding' ? this.mySlidingAgpas : this.myGlobalAgpas;
+        },
+        currentAwards() {
+            return this.palmaresMode === 'sliding' ? this.mySlidingAwards : this.myGlobalAwards;
         },
 
         // Badges arrays from metadata
@@ -1317,6 +1237,12 @@ export default {
             }
 
             return periods;
+        },
+        sliderMin() {
+            return (this.agpaMeta?.minYear || 2006) + 2;
+        },
+        sliderMax() {
+            return this.agpaMeta?.maxYear || new Date().getFullYear();
         }
     },
     watch: {
@@ -1329,11 +1255,27 @@ export default {
             if (newVal) {
                 this.loadFamilyMembers();
             }
+        },
+        selectedAlgorithm() {
+            if (this.initialized) this.reloadPalmaresData();
+        },
+        palmaresMode() {
+            if (this.initialized) this.reloadPalmaresData();
+        },
+        selectedSlidingPeriod(newVal) {
+            if (this.initialized && newVal && this.palmaresMode === 'sliding') {
+                this.reloadPalmaresData();
+            }
         }
     },
     mounted () {
+        // Initialiser la période glissante par défaut
+        if (this.availableSlidingPeriods.length > 0) {
+            this.selectedSlidingPeriod = this.availableSlidingPeriods[0];
+            this.sliderYearTo = this.selectedSlidingPeriod.to;
+        }
         this.initView();
-        this.loadAllUsers(); // Charger la liste des utilisateurs pour le mode debug admin
+        this.loadAllUsers();
         this.checkDebugMode();
         this.setupKeyboardShortcut();
     },
@@ -1341,12 +1283,38 @@ export default {
         this.removeKeyboardShortcut();
     },
     methods: {
+        onSliderEnd(value) {
+            this.selectedSlidingPeriod = { from: value - 2, to: value };
+        },
+
+        async downloadAllData() {
+            this.isDownloadingData = true;
+            try {
+                const response = await axios.get('/api/agpa/data/export-all', {
+                    responseType: 'blob'
+                });
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'AGPA-Export.zip');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading AGPA data:', error);
+            } finally {
+                this.isDownloadingData = false;
+            }
+        },
+
         async initView() {
             this.isLoading = true;
+            const algo = this.selectedAlgorithm;
 
             // Charger le palmarès global
             try {
-                const response = await axios.get(`/api/agpa/palmares`);
+                const response = await axios.get(`/api/agpa/palmares?algorithm=${algo}`);
                 const palmaresData = parseAxiosResponse(response);
 
                 if (palmaresData && Array.isArray(palmaresData)) {
@@ -1358,9 +1326,7 @@ export default {
                     this.palmares = [];
                 }
 
-                // Calculer ma position et mes AGPA dans le palmarès global
                 this.calculateMyGlobalStats();
-
                 this.isLoading = false;
             } catch (err) {
                 console.error(err);
@@ -1368,21 +1334,23 @@ export default {
                 this.isLoading = false;
             }
 
-            // Charger le palmarès glissant (3 dernières éditions)
+            // Charger le palmarès glissant
             try {
-                const response = await axios.get(`/api/agpa/palmares/sliding`);
+                let slidingUrl = `/api/agpa/palmares/sliding?algorithm=${algo}`;
+                if (this.selectedSlidingPeriod) {
+                    slidingUrl += `&yearFrom=${this.selectedSlidingPeriod.from}&yearTo=${this.selectedSlidingPeriod.to}`;
+                }
+                const response = await axios.get(slidingUrl);
                 const data = parseAxiosResponse(response);
 
                 if (!data) {
                     this.slidingPalmares = [];
                 } else if (Array.isArray(data)) {
-                    // Format ancien (fallback) - tableau direct
                     this.slidingPalmares = data.map( e => ({
                         ...e,
                         ...getPeopleAvatar(e)
                     }));
                 } else if (data?.palmares && Array.isArray(data.palmares)) {
-                    // Format avec années - objet avec propriété palmares
                     this.slidingPalmares = data.palmares.map( e => ({
                         ...e,
                         ...getPeopleAvatar(e)
@@ -1393,11 +1361,9 @@ export default {
                     this.slidingPalmares = [];
                 }
 
-                // Calculer ma position et mes AGPA dans le palmarès glissant
                 this.calculateMySlidingStats();
             } catch (err) {
                 console.error('Palmarès glissant non disponible:', err);
-                // Pour l'instant, utiliser le palmarès global comme fallback
                 this.slidingPalmares = this.palmares || [];
                 this.calculateMySlidingStats();
             }
@@ -1405,9 +1371,50 @@ export default {
             // Charger les badges
             await this.calculateMyGlobalBadges();
             await this.calculateMySlidingBadges();
-
-            // Charger l'historique des badges
             await this.loadBadgeHistory();
+
+            this.initialized = true;
+        },
+
+        async reloadPalmaresData() {
+            this.isLoading = true;
+            const algo = this.selectedAlgorithm;
+
+            try {
+                // Recharger le palmarès global
+                const globalResponse = await axios.get(`/api/agpa/palmares?algorithm=${algo}`);
+                const globalData = parseAxiosResponse(globalResponse);
+                this.palmares = (globalData && Array.isArray(globalData))
+                    ? globalData.map(e => ({ ...e, ...getPeopleAvatar(e) }))
+                    : [];
+                this.calculateMyGlobalStats();
+
+                // Recharger le palmarès glissant
+                let slidingUrl = `/api/agpa/palmares/sliding?algorithm=${algo}`;
+                if (this.selectedSlidingPeriod) {
+                    slidingUrl += `&yearFrom=${this.selectedSlidingPeriod.from}&yearTo=${this.selectedSlidingPeriod.to}`;
+                }
+                const slidingResponse = await axios.get(slidingUrl);
+                const slidingData = parseAxiosResponse(slidingResponse);
+
+                if (!slidingData) {
+                    this.slidingPalmares = [];
+                } else if (Array.isArray(slidingData)) {
+                    this.slidingPalmares = slidingData.map(e => ({ ...e, ...getPeopleAvatar(e) }));
+                } else if (slidingData?.palmares && Array.isArray(slidingData.palmares)) {
+                    this.slidingPalmares = slidingData.palmares.map(e => ({ ...e, ...getPeopleAvatar(e) }));
+                    this.slidingYearFrom = slidingData.yearFrom;
+                    this.slidingYearTo = slidingData.yearTo;
+                } else {
+                    this.slidingPalmares = [];
+                }
+
+                this.calculateMySlidingStats();
+            } catch (err) {
+                console.error('Erreur lors du rechargement:', err);
+            }
+
+            this.isLoading = false;
         },
 
         calculateMyGlobalStats() {
@@ -1451,7 +1458,7 @@ export default {
 
             // Reload sliding palmares with the selected period
             try {
-                const response = await axios.get(`/api/agpa/palmares/sliding?yearFrom=${yearFrom}&yearTo=${yearTo}`);
+                const response = await axios.get(`/api/agpa/palmares/sliding?yearFrom=${yearFrom}&yearTo=${yearTo}&algorithm=${this.selectedAlgorithm}`);
                 const data = parseAxiosResponse(response);
 
                 if (!data) {
@@ -1739,10 +1746,11 @@ export default {
 
         async loadPalmaresData(userId) {
             this.isLoading = true;
+            const algo = this.selectedAlgorithm;
 
             try {
                 // Charger le palmarès global
-                const globalResponse = await axios.get('/api/agpa/palmares');
+                const globalResponse = await axios.get(`/api/agpa/palmares?algorithm=${algo}`);
                 const globalData = parseAxiosResponse(globalResponse);
                 if (globalData) {
                     this.palmares = globalData;
@@ -1750,7 +1758,7 @@ export default {
                 }
 
                 // Charger le palmarès glissant
-                const slidingResponse = await axios.get('/api/agpa/palmares/sliding');
+                const slidingResponse = await axios.get(`/api/agpa/palmares/sliding?algorithm=${algo}`);
                 const slidingData = parseAxiosResponse(slidingResponse);
                 if (slidingData) {
                     this.slidingPalmares = slidingData.palmares || [];
@@ -1957,6 +1965,82 @@ export default {
 
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
+
+.palmares-toolbar {
+  border-radius: 12px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.palmares-toolbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.palmares-toolbar-icon {
+  color: rgb(var(--v-theme-on-surface));
+  opacity: 0.5;
+}
+
+.palmares-period-btn {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.palmares-period-card {
+  min-width: 320px;
+  padding: 16px 24px 8px;
+
+  :deep(.v-slider-thumb__label) {
+    color: white !important;
+  }
+}
+
+.palmares-period-label {
+  font-size: 0.85em;
+  opacity: 0.6;
+  margin-bottom: 4px;
+}
+
+.palmares-period-range {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75em;
+  opacity: 0.4;
+  margin-top: -4px;
+  padding: 0 2px;
+}
+
+.palmares-toolbar-separator {
+  width: 1px;
+  height: 28px;
+  background: rgba(var(--v-theme-on-surface), 0.12);
+  flex-shrink: 0;
+}
+
+.palmares-toolbar-toggle {
+  :deep(.v-btn-group) {
+    background: transparent;
+  }
+
+  :deep(.v-btn) {
+    text-transform: none;
+    font-weight: 500;
+    letter-spacing: 0;
+    background: rgba(var(--v-theme-on-surface), 0.08) !important;
+    color: rgba(var(--v-theme-on-surface), 0.6) !important;
+  }
+
+  :deep(.v-btn--active) {
+    color: white !important;
+    background: rgb(var(--v-theme-primary)) !important;
+    font-weight: 700;
+  }
+}
 
 .member-card {
   transition: transform 0.2s, box-shadow 0.2s;

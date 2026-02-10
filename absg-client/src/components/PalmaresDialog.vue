@@ -259,6 +259,10 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    initialMode: {
+      type: String,
+      default: 'sliding'
     }
   },
   data() {
@@ -315,6 +319,13 @@ export default {
       }
 
       return result;
+    }
+  },
+  watch: {
+    modelValue(newVal) {
+      if (newVal) {
+        this.mode = this.initialMode;
+      }
     }
   },
   methods: {

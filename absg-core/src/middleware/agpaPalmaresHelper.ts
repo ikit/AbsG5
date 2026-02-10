@@ -92,18 +92,23 @@ export function palmaresPoints(award: AgpaAwardType) {
  * @param from  première année prise en compte (par défaut 2006)
  * @param to  dernière année à prendre en compte (par défaut l'année de la dernière édition terminée)
  */
-export async function palmaresData(from: number = null, to: number = null) {
+export async function palmaresData(from: number = null, to: number = null, algorithm?: string) {
     from = checkValidYear(from, 2006);
     to = checkValidYear(to, getMaxArchiveEdition());
     // On récupère le contexte sql
     const repo = getRepository(AgpaPhoto);
+    // Filtre optionnel par version d'algorithme
+    const whereClause = (algorithm === "V2010" || algorithm === "V2026")
+        ? `WHERE a."algorithmVersion" = '${algorithm}'`
+        : "";
     // On récupère les données
     let sql = `SELECT a.year, a.award, a."photoId", a."categoryId", c.title as "catTitle", c.order, c.color, p.title, p.filename, a."userId", u.username, u."rootFamily"
         FROM agpa_award a
         INNER JOIN agpa_category c ON a."categoryId" = c.id
         INNER JOIN public."user" u ON a."userId" = u.id
         INNER JOIN person up ON u."personId" = up.id
-        LEFT JOIN agpa_photo p ON a."photoId" = p.id 
+        LEFT JOIN agpa_photo p ON a."photoId" = p.id
+        ${whereClause}
         ORDER BY a."categoryId" ASC, a.year ASC`;
     let result = await repo.query(sql);
 

@@ -455,25 +455,25 @@ class AgpaService {
     /**
      * Récupère toutes les statistiques "palmarès" de l'ensemble des éditions
      */
-    getPalmaresData() {
-        return palmaresData(null, null);
+    getPalmaresData(algorithm?: string) {
+        return palmaresData(null, null, algorithm);
     }
 
     /**
      * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
      * avec calcul de la variation du rang par rapport à la période précédente
      */
-    async getSlidingPalmaresData() {
-        const maxYear = getMaxArchiveEdition();
-        const fromYear = Math.max(2006, maxYear - 2); // 3 dernières années
+    async getSlidingPalmaresData(yearFrom?: number, yearTo?: number, algorithm?: string) {
+        const maxYear = yearTo || getMaxArchiveEdition();
+        const fromYear = yearFrom || Math.max(2006, maxYear - 2); // 3 dernières années
 
-        // Palmarès de la période actuelle (3 dernières éditions)
-        const currentPalmares = await palmaresData(fromYear, maxYear);
+        // Palmarès de la période actuelle
+        const currentPalmares = await palmaresData(fromYear, maxYear, algorithm);
 
         // Palmarès de la période précédente (3 éditions d'avant)
         const prevFromYear = Math.max(2006, fromYear - 3);
         const prevToYear = Math.max(2006, maxYear - 3);
-        const previousPalmares = prevToYear >= 2006 ? await palmaresData(prevFromYear, prevToYear) : [];
+        const previousPalmares = prevToYear >= 2006 ? await palmaresData(prevFromYear, prevToYear, algorithm) : [];
 
         // Créer un mapping userId -> rang pour la période précédente
         const previousRankMap = new Map();
@@ -2032,6 +2032,94 @@ class AgpaService {
             users: toCsv(users, ["id", "username", "rootFamily", "firstname", "lastname", "sex"]),
             votes: toCsv(votes, ["id", "year", "userId", "photoId", "categoryId", "score"]),
             categories: toCsv(categories, ["id", "title", "description", "order", "photoCount", "userCount"]),
+            awards: toCsv(awards, ["id", "year", "categoryId", "userId", "photoId", "award", "algorithmVersion", "winnerUsername", "photoTitle"]),
+            badges: toCsv(badges, ["id", "year", "userId", "badgeName", "badgeType", "badgeTiming", "isActive", "username"])
+        };
+    }
+
+    /**
+     * Génère les données d'export CSV pour toutes les éditions AGPA
+     * @returns un objet contenant les données CSV pour photos, users, votes, categories, awards et badges
+     */
+    async getAllExportData(): Promise<{
+        photos: string;
+        users: string;
+        votes: string;
+        categories: string;
+        awards: string;
+        badges: string;
+    }> {
+        const photos = await this.catRepo.query(`
+            SELECT p.id, p.year, p.title, p.filename, p.votes, p."votesTitle",
+                   p.score, p."scoreV2010", p."scoreV2026", p."rankingV2010", p."rankingV2026",
+                   p."categoryId", p."userId", u.username as "authorUsername"
+            FROM agpa_photo p
+            LEFT JOIN "user" u ON p."userId" = u.id
+            ORDER BY p.year DESC, p."categoryId", p."rankingV2026" NULLS LAST
+        `);
+
+        const users = await this.catRepo.query(`
+            SELECT DISTINCT u.id, u.username, u."rootFamily", per.firstname, per.lastname, per.sex
+            FROM "user" u
+            LEFT JOIN person per ON u."personId" = per.id
+            WHERE u.id IN (
+                SELECT DISTINCT "userId" FROM agpa_photo
+                UNION
+                SELECT DISTINCT "userId" FROM agpa_vote
+            )
+            ORDER BY u.username
+        `);
+
+        const votes = await this.catRepo.query(`
+            SELECT v.id, v.year, v."userId", v."photoId", v."categoryId", v.score
+            FROM agpa_vote v
+            ORDER BY v.year DESC, v."userId", v."categoryId", v."photoId"
+        `);
+
+        const categories = await this.catRepo.query(`
+            SELECT c.id, c.title, c.description, c."order", c.color, c."from", c."to"
+            FROM agpa_category c
+            ORDER BY c."order"
+        `);
+
+        const awards = await this.catRepo.query(`
+            SELECT a.id, a.year, a."categoryId", a."userId", a."photoId", a.award, a."algorithmVersion",
+                   u.username as "winnerUsername", p.title as "photoTitle"
+            FROM agpa_award a
+            LEFT JOIN "user" u ON a."userId" = u.id
+            LEFT JOIN agpa_photo p ON a."photoId" = p.id
+            ORDER BY a.year DESC, a."categoryId", a.award
+        `);
+
+        const badges = await this.catRepo.query(`
+            SELECT b.id, b.year, b."userId", b."badgeName", b."badgeType", b."badgeTiming", b."isActive",
+                   u.username
+            FROM agpa_user_badge b
+            LEFT JOIN "user" u ON b."userId" = u.id
+            ORDER BY b.year DESC, u.username, b."badgeType"
+        `);
+
+        const toCsv = (data: any[], columns: string[]): string => {
+            if (data.length === 0) return columns.join(";") + "\n";
+            const header = columns.join(";");
+            const rows = data.map(row =>
+                columns.map(col => {
+                    const val = row[col];
+                    if (val === null || val === undefined) return "";
+                    if (typeof val === "string" && (val.includes(";") || val.includes('"') || val.includes("\n"))) {
+                        return `"${val.replace(/"/g, '""')}"`;
+                    }
+                    return String(val);
+                }).join(";")
+            );
+            return [header, ...rows].join("\n");
+        };
+
+        return {
+            photos: toCsv(photos, ["id", "year", "title", "filename", "votes", "votesTitle", "score", "scoreV2010", "scoreV2026", "rankingV2010", "rankingV2026", "categoryId", "userId", "authorUsername"]),
+            users: toCsv(users, ["id", "username", "rootFamily", "firstname", "lastname", "sex"]),
+            votes: toCsv(votes, ["id", "year", "userId", "photoId", "categoryId", "score"]),
+            categories: toCsv(categories, ["id", "title", "description", "order", "color", "from", "to"]),
             awards: toCsv(awards, ["id", "year", "categoryId", "userId", "photoId", "award", "algorithmVersion", "winnerUsername", "photoTitle"]),
             badges: toCsv(badges, ["id", "year", "userId", "badgeName", "badgeType", "badgeTiming", "isActive", "username"])
         };
