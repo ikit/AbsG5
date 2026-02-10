@@ -64,7 +64,7 @@
               style="margin: 30px 0;"
             >
               <v-icon start size="small">fas fa-trophy</v-icon>
-              Les informations ci-dessous sont utilisees pour le calcul des badges AGPA.
+              Les informations ci-dessous sont utilisees pour les différents jeux et le calcul des badges AGPA.
             </v-alert>
 
             <!-- Informations personnelles modifiables -->

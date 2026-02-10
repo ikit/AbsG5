@@ -226,7 +226,7 @@
     <!-- Memory Game Dialog -->
     <v-dialog
       v-model="memory.open"
-      :max-width="memory.gridCols >= 10 ? '900px' : memory.gridCols >= 8 ? '800px' : '700px'"
+      :max-width="memory.gridCols >= 12 ? '1100px' : memory.gridCols >= 10 ? '950px' : '800px'"
       persistent
     >
       <v-card class="memory-card">
@@ -245,7 +245,7 @@
           <div v-if="memory.status === 'ready'" class="memory-intro">
             <v-icon size="64" color="primary" class="mb-4">fas fa-brain</v-icon>
             <h3>Niveau {{ memory.level }}</h3>
-            <p>Retrouvez les {{ memory.pairsCount }} paires de photos en moins de 3 minutes !</p>
+            <p>Retrouvez les {{ memory.pairsCount }} paires de photos en moins de {{ formatTime(memory.totalTime) }} !</p>
             <v-btn color="accent" size="large" @click="launchMemoryGame()">
               <v-icon start>fas fa-play</v-icon>
               Commencer
@@ -279,7 +279,7 @@
           <div v-else-if="memory.status === 'won'" class="memory-result memory-won">
             <v-icon size="64" color="success" class="mb-4">fas fa-trophy</v-icon>
             <h3>Niveau {{ memory.level }} réussi !</h3>
-            <p>Vous avez trouvé les {{ memory.pairsCount }} paires en {{ formatTime(180 - memory.timeLeft) }} !</p>
+            <p>Vous avez trouvé les {{ memory.pairsCount }} paires en {{ formatTime(memory.totalTime - memory.timeLeft) }} !</p>
             <p class="memory-stats">{{ memory.moves }} coups joués</p>
             <v-btn color="accent" class="mt-2" @click="nextMemoryLevel()">
               <v-icon start>fas fa-arrow-right</v-icon>
@@ -392,12 +392,13 @@ export default {
           flippedCards: [],
           matchedPairs: 0,
           moves: 0,
-          timeLeft: 180, // 3 minutes en secondes
+          timeLeft: 180,
+          totalTime: 180,
           timer: null,
           isProcessing: false,
           level: 1,
-          pairsCount: 12, // Commence avec 12 paires (6x4)
-          gridCols: 6,
+          pairsCount: 12,
+          gridCols: 8,
         }
     }),
 
@@ -660,14 +661,17 @@ export default {
 
       // Memory Game Methods
       startMemoryGame() {
+        const config = this.getLevelConfig(this.memory.level);
         this.memory.open = true;
         this.memory.status = 'ready';
         this.memory.cards = [];
         this.memory.flippedCards = [];
         this.memory.matchedPairs = 0;
         this.memory.moves = 0;
-        this.memory.timeLeft = 180;
-        // Garder le niveau actuel
+        this.memory.pairsCount = config.pairs;
+        this.memory.gridCols = config.cols;
+        this.memory.totalTime = config.time;
+        this.memory.timeLeft = config.time;
         if (this.memory.timer) {
           clearInterval(this.memory.timer);
           this.memory.timer = null;
@@ -676,14 +680,16 @@ export default {
 
       resetMemoryToLevel1() {
         this.memory.level = 1;
-        this.memory.pairsCount = 12;
-        this.memory.gridCols = 6;
+        const config = this.getLevelConfig(1);
+        this.memory.pairsCount = config.pairs;
+        this.memory.gridCols = config.cols;
+        this.memory.totalTime = config.time;
+        this.memory.timeLeft = config.time;
         this.memory.status = 'ready';
         this.memory.cards = [];
         this.memory.flippedCards = [];
         this.memory.matchedPairs = 0;
         this.memory.moves = 0;
-        this.memory.timeLeft = 180;
         if (this.memory.timer) {
           clearInterval(this.memory.timer);
           this.memory.timer = null;
@@ -692,37 +698,40 @@ export default {
 
       nextMemoryLevel() {
         this.memory.level++;
-        // Progression: 12 -> 15 -> 18 -> 20 -> 24 -> 28 -> 30
-        const levelConfig = this.getLevelConfig(this.memory.level);
-        this.memory.pairsCount = levelConfig.pairs;
-        this.memory.gridCols = levelConfig.cols;
+        const config = this.getLevelConfig(this.memory.level);
+        this.memory.pairsCount = config.pairs;
+        this.memory.gridCols = config.cols;
+        this.memory.totalTime = config.time;
+        this.memory.timeLeft = config.time;
         this.memory.status = 'ready';
         this.memory.cards = [];
         this.memory.flippedCards = [];
         this.memory.matchedPairs = 0;
         this.memory.moves = 0;
-        this.memory.timeLeft = 180;
       },
 
       retryMemoryLevel() {
+        const config = this.getLevelConfig(this.memory.level);
+        this.memory.totalTime = config.time;
+        this.memory.timeLeft = config.time;
         this.memory.status = 'ready';
         this.memory.cards = [];
         this.memory.flippedCards = [];
         this.memory.matchedPairs = 0;
         this.memory.moves = 0;
-        this.memory.timeLeft = 180;
       },
 
       getLevelConfig(level) {
-        // Configuration des niveaux: { pairs, cols }
+        // Configuration des niveaux: { pairs, cols, time }
+        // Grilles horizontales et -30s par niveau
         const configs = [
-          { pairs: 12, cols: 6 },  // Niveau 1: 6x4 = 24 cartes
-          { pairs: 15, cols: 6 },  // Niveau 2: 6x5 = 30 cartes
-          { pairs: 18, cols: 6 },  // Niveau 3: 6x6 = 36 cartes
-          { pairs: 20, cols: 8 },  // Niveau 4: 8x5 = 40 cartes
-          { pairs: 24, cols: 8 },  // Niveau 5: 8x6 = 48 cartes
-          { pairs: 28, cols: 8 },  // Niveau 6: 8x7 = 56 cartes
-          { pairs: 30, cols: 10 }, // Niveau 7+: 10x6 = 60 cartes
+          { pairs: 12, cols: 8,  time: 180 }, // Niveau 1: 8x3  = 24 cartes
+          { pairs: 15, cols: 10, time: 150 }, // Niveau 2: 10x3 = 30 cartes
+          { pairs: 18, cols: 9,  time: 140 }, // Niveau 3: 9x4  = 36 cartes
+          { pairs: 20, cols: 10, time: 130 }, // Niveau 4: 10x4 = 40 cartes
+          { pairs: 24, cols: 12, time: 120 }, // Niveau 5: 12x4 = 48 cartes
+          { pairs: 28, cols: 14, time: 120 }, // Niveau 6: 14x4 = 56 cartes
+          { pairs: 30, cols: 12, time: 120 }, // Niveau 7+: 12x5 = 60 cartes
         ];
         const index = Math.min(level - 1, configs.length - 1);
         return configs[index];
@@ -769,7 +778,7 @@ export default {
         this.memory.flippedCards = [];
         this.memory.matchedPairs = 0;
         this.memory.moves = 0;
-        this.memory.timeLeft = 180;
+        this.memory.timeLeft = this.memory.totalTime;
         this.memory.isProcessing = false;
 
         // Démarrer le timer
