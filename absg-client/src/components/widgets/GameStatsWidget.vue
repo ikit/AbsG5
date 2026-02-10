@@ -48,7 +48,7 @@
 
       <!-- Jeux externes -->
       <div class="external-games-section">
-        <div class="section-title">Autres jeux</div>
+        <div class="section-title">Autres jeux sympas</div>
         <div class="external-games-grid">
           <a
             v-for="game in externalGames"

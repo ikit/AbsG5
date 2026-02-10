@@ -17,6 +17,28 @@
 
           <v-spacer />
 
+          <v-tooltip bottom>
+            <template #activator="{ props }">
+              <v-btn color="accent" class="mr-2" @click.stop="startMemoryGame()" v-bind="props">
+                <v-icon start>fas fa-th</v-icon>
+                Memory
+              </v-btn>
+            </template>
+            <span>Jouer au Memory</span>
+          </v-tooltip>
+
+          <v-tooltip bottom>
+            <template #activator="{ props }">
+              <v-btn color="accent" class="mr-4" @click.stop="startChronoGame()" v-bind="props">
+                <v-icon start>fas fa-sort-numeric-down</v-icon>
+                Chrono
+              </v-btn>
+            </template>
+            <span>Jouer au Chrono Trombi</span>
+          </v-tooltip>
+
+          <v-spacer />
+
           <v-btn-toggle :disabled="isLoading">
             <v-tooltip bottom v-if="isAdmin">
               <template #activator="{ props }">
@@ -25,15 +47,6 @@
                 </v-btn>
               </template>
               <span>Reconstruire la liste des trombi</span>
-            </v-tooltip>
-
-            <v-tooltip bottom>
-              <template #activator="{ props }">
-                <v-btn @click.stop="startMemoryGame()" v-bind="props">
-                  <v-icon>fas fa-th</v-icon>
-                </v-btn>
-              </template>
-              <span>Jouer au Memory</span>
             </v-tooltip>
 
             <v-tooltip bottom>
@@ -235,7 +248,7 @@
           Memory Trombinoscope
           <v-spacer />
           <div class="memory-timer" :class="{ 'timer-warning': memory.timeLeft <= 30 }">
-            <v-icon size="small" class="mr-1">fas fa-clock</v-icon>
+            <v-icon size="small" class="mr-1" style="vertical-align: text-bottom">fas fa-clock</v-icon>
             {{ formatTime(memory.timeLeft) }}
           </div>
         </v-card-title>
@@ -318,6 +331,128 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Chrono Trombi Game Dialog -->
+    <v-dialog
+      v-model="chrono.open"
+      max-width="1000px"
+      persistent
+    >
+      <v-card>
+        <v-card-title class="dialog-header bg-primary">
+          <v-icon start>fas fa-sort-numeric-down</v-icon>
+          Chrono Trombi
+          <v-spacer />
+          <div class="memory-timer" :class="{ 'timer-warning': chrono.timeLeft <= 30 }">
+            <v-icon size="small" class="mr-1" style="vertical-align: text-bottom">fas fa-clock</v-icon>
+            {{ formatTime(chrono.timeLeft) }}
+          </div>
+        </v-card-title>
+
+        <v-card-text class="chrono-content">
+          <!-- État ready -->
+          <div v-if="chrono.status === 'ready'" class="memory-intro">
+            <v-icon size="64" color="primary" class="mb-4">
+              {{ chrono.mode === 'chrono' ? 'fas fa-calendar-alt' : 'fas fa-child' }}
+            </v-icon>
+            <h3>Niveau {{ chrono.level }}</h3>
+            <div class="chrono-mode-badge mb-3">
+              {{ chrono.mode === 'chrono' ? 'Mode Chronologique' : 'Mode Âge' }}
+            </div>
+            <p v-if="chrono.mode === 'chrono'">
+              Remettez {{ chrono.photosCount }} photos de {{ chrono.peopleCount }} personnes
+              dans l'ordre chronologique en moins de {{ formatTime(chrono.totalTime) }} !
+            </p>
+            <p v-else>
+              Classez {{ chrono.photosCount }} photos de {{ chrono.peopleCount }} personnes
+              par âge croissant en moins de {{ formatTime(chrono.totalTime) }} !
+            </p>
+            <p style="font-size: 0.85em; opacity: 0.6;">Cliquez sur deux photos pour les échanger de place.</p>
+            <v-btn color="accent" size="large" @click="launchChronoGame()">
+              <v-icon start>fas fa-play</v-icon>
+              Commencer
+            </v-btn>
+          </div>
+
+          <!-- Grille de jeu -->
+          <div v-else-if="chrono.status === 'playing' || chrono.status === 'won' || chrono.status === 'lost'">
+            <div class="chrono-grid">
+              <div
+                v-for="(card, index) in chrono.cards"
+                :key="card.thumb"
+                class="chrono-card"
+                :class="{
+                  'selected': chrono.selectedIndex === index && chrono.status === 'playing',
+                  'correct': chrono.validated && card.sortKey === chrono.correctOrder[index],
+                  'wrong': chrono.validated && card.sortKey !== chrono.correctOrder[index],
+                  'disabled': chrono.status !== 'playing'
+                }"
+                @click="selectChronoCard(index)"
+              >
+                <div class="chrono-card-position">{{ index + 1 }}</div>
+                <img :src="card.thumb" :alt="card.name" />
+                <div class="chrono-card-name">{{ card.name }}</div>
+                <div v-if="chrono.validated && chrono.status !== 'playing'" class="chrono-card-year">
+                  {{ chrono.mode === 'chrono' ? card.year : card.age + ' ans' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Bouton valider (pendant le jeu) -->
+            <div v-if="chrono.status === 'playing'" class="chrono-validate">
+              <v-btn
+                color="accent"
+                size="large"
+                @click="validateChronoOrder()"
+              >
+                <v-icon start>fas fa-check</v-icon>
+                Valider l'ordre
+              </v-btn>
+            </div>
+
+            <!-- Victoire -->
+            <div v-if="chrono.status === 'won'" class="memory-result memory-won" style="padding-top: 16px;">
+              <v-icon size="48" color="success" class="mb-2">fas fa-trophy</v-icon>
+              <h3>Niveau {{ chrono.level }} réussi !</h3>
+              <p>{{ chrono.moves }} échanges en {{ formatTime(chrono.totalTime - chrono.timeLeft) }}</p>
+              <v-btn color="accent" class="mt-2" @click="nextChronoLevel()">
+                <v-icon start>fas fa-arrow-right</v-icon>
+                Niveau {{ chrono.level + 1 }}
+              </v-btn>
+              <v-btn variant="text" class="mt-2 ml-2" @click="resetChronoToLevel1()">
+                Niveau 1
+              </v-btn>
+            </div>
+
+            <!-- Défaite -->
+            <div v-if="chrono.status === 'lost'" class="memory-result memory-lost" style="padding-top: 16px;">
+              <v-icon size="48" color="error" class="mb-2">fas fa-clock</v-icon>
+              <h3>Temps écoulé !</h3>
+              <v-btn color="accent" class="mt-2" @click="retryChronoLevel()">
+                <v-icon start>fas fa-redo</v-icon>
+                Réessayer
+              </v-btn>
+              <v-btn variant="text" class="mt-2 ml-2" @click="resetChronoToLevel1()">
+                Niveau 1
+              </v-btn>
+            </div>
+          </div>
+        </v-card-text>
+
+        <v-card-actions class="dialog-actions">
+          <div v-if="chrono.status === 'playing'" class="memory-info">
+            <span class="memory-level-badge">Niv. {{ chrono.level }}</span>
+            <span class="chrono-mode-tag ml-2">{{ chrono.mode === 'chrono' ? 'Chrono' : 'Âge' }}</span>
+            <span class="ml-3"><v-icon size="small" class="mr-1">fas fa-exchange-alt</v-icon> {{ chrono.moves }} échanges</span>
+          </div>
+          <v-spacer />
+          <v-btn variant="text" @click="closeChronoGame()">
+            Fermer
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </div>
 </template>
 
@@ -399,7 +534,23 @@ export default {
           level: 1,
           pairsCount: 12,
           gridCols: 8,
-        }
+        },
+        chrono: {
+          open: false,
+          status: 'ready', // ready, playing, won, lost
+          mode: 'chrono', // 'chrono' (par année) ou 'age' (par âge)
+          cards: [],
+          correctOrder: [],
+          selectedIndex: null,
+          moves: 0,
+          timeLeft: 180,
+          totalTime: 180,
+          timer: null,
+          level: 1,
+          photosCount: 10,
+          peopleCount: 2,
+          validated: false,
+        },
     }),
 
     computed: {
@@ -430,9 +581,11 @@ export default {
     },
 
     beforeUnmount() {
-      // Nettoyer le timer du Memory si actif
       if (this.memory.timer) {
         clearInterval(this.memory.timer);
+      }
+      if (this.chrono.timer) {
+        clearInterval(this.chrono.timer);
       }
     },
 
@@ -855,7 +1008,199 @@ export default {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs.toString().padStart(2, '0')}`;
-      }
+      },
+
+      // Chrono Trombi Game Methods
+      getChronoLevelConfig(level) {
+        const configs = [
+          { photos: 10, people: 2, time: 180, minYearGap: 3 }, // Niv 1
+          { photos: 12, people: 3, time: 160, minYearGap: 3 }, // Niv 2
+          { photos: 14, people: 4, time: 140, minYearGap: 2 }, // Niv 3
+          { photos: 16, people: 5, time: 120, minYearGap: 2 }, // Niv 4
+          { photos: 18, people: 6, time: 120, minYearGap: 1 }, // Niv 5
+          { photos: 20, people: 7, time: 120, minYearGap: 1 }, // Niv 6
+          { photos: 24, people: 8, time: 120, minYearGap: 1 }, // Niv 7
+        ];
+        const index = Math.min(level - 1, configs.length - 1);
+        return configs[index];
+      },
+
+      startChronoGame() {
+        const config = this.getChronoLevelConfig(this.chrono.level);
+        this.chrono.open = true;
+        this.chrono.status = 'ready';
+        this.chrono.mode = Math.random() < 0.5 ? 'chrono' : 'age';
+        this.chrono.cards = [];
+        this.chrono.correctOrder = [];
+        this.chrono.selectedIndex = null;
+        this.chrono.moves = 0;
+        this.chrono.photosCount = config.photos;
+        this.chrono.peopleCount = config.people;
+        this.chrono.totalTime = config.time;
+        this.chrono.timeLeft = config.time;
+        this.chrono.validated = false;
+        if (this.chrono.timer) {
+          clearInterval(this.chrono.timer);
+          this.chrono.timer = null;
+        }
+      },
+
+      parseAge(title) {
+        // Titre format: "Fullname - year - 35 ans"
+        const match = title.match(/(\d+)\s*ans\s*$/);
+        return match ? parseInt(match[1]) : null;
+      },
+
+      selectChronoPhotos(config) {
+        const isAgeMode = this.chrono.mode === 'age';
+
+        // 1. Filtrer les personnes ayant au moins 3 trombis
+        const eligiblePersons = this.persons.filter(p => p.trombis.length >= 3);
+        if (eligiblePersons.length < config.people) return null;
+
+        // 2. Choisir N personnes au hasard
+        const shuffledPersons = [...eligiblePersons].sort(() => Math.random() - 0.5);
+        const selectedPersons = shuffledPersons.slice(0, config.people);
+
+        // 3. Collecter les photos avec clé unique (année ou âge)
+        const photosMap = new Map();
+        for (const person of selectedPersons) {
+          for (const trombi of person.trombis) {
+            const age = this.parseAge(trombi.title);
+            if (age === null) continue;
+            const key = isAgeMode ? age : trombi.year;
+
+            if (!photosMap.has(key)) {
+              photosMap.set(key, {
+                year: trombi.year,
+                age,
+                thumb: trombi.thumb,
+                name: person.fullname,
+                sortKey: key,
+              });
+            }
+          }
+        }
+
+        let pool = Array.from(photosMap.values());
+
+        // 4. Appliquer le filtre minGap si > 1
+        if (config.minYearGap > 1 && pool.length > config.photos) {
+          pool.sort((a, b) => a.sortKey - b.sortKey);
+          const spaced = [pool[0]];
+          for (let i = 1; i < pool.length; i++) {
+            if (pool[i].sortKey - spaced[spaced.length - 1].sortKey >= config.minYearGap) {
+              spaced.push(pool[i]);
+            }
+          }
+          if (spaced.length >= config.photos) {
+            pool = spaced;
+          }
+        }
+
+        if (pool.length < config.photos) return null;
+
+        // 5. Prendre le nombre requis au hasard
+        const shuffled = pool.sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, config.photos);
+      },
+
+      launchChronoGame() {
+        const config = this.getChronoLevelConfig(this.chrono.level);
+        const photos = this.selectChronoPhotos(config);
+
+        if (!photos) {
+          store.commit('onError', { message: `Pas assez de photos/personnes pour ce niveau` });
+          return;
+        }
+
+        // Ordre correct = trié par sortKey (année ou âge)
+        const sorted = [...photos].sort((a, b) => a.sortKey - b.sortKey);
+        this.chrono.correctOrder = sorted.map(p => p.sortKey);
+
+        // Mélanger les cartes pour le joueur
+        this.chrono.cards = [...photos].sort(() => Math.random() - 0.5);
+        this.chrono.status = 'playing';
+        this.chrono.selectedIndex = null;
+        this.chrono.moves = 0;
+        this.chrono.validated = false;
+        this.chrono.timeLeft = config.time;
+
+        // Timer
+        this.chrono.timer = setInterval(() => {
+          this.chrono.timeLeft--;
+          if (this.chrono.timeLeft <= 0) {
+            this.endChronoGame(false);
+          }
+        }, 1000);
+      },
+
+      selectChronoCard(index) {
+        if (this.chrono.status !== 'playing') return;
+
+        // Réinitialiser la validation visuelle quand on bouge des cartes
+        this.chrono.validated = false;
+
+        if (this.chrono.selectedIndex === null) {
+          // Premier clic : sélectionner
+          this.chrono.selectedIndex = index;
+        } else if (this.chrono.selectedIndex === index) {
+          // Clic sur la même : désélectionner
+          this.chrono.selectedIndex = null;
+        } else {
+          // Deuxième clic : échanger les deux cartes
+          const temp = this.chrono.cards[this.chrono.selectedIndex];
+          this.chrono.cards.splice(this.chrono.selectedIndex, 1, this.chrono.cards[index]);
+          this.chrono.cards.splice(index, 1, temp);
+          this.chrono.selectedIndex = null;
+          this.chrono.moves++;
+        }
+      },
+
+      validateChronoOrder() {
+        this.chrono.validated = true;
+
+        // Vérifier si toutes les positions sont correctes
+        const allCorrect = this.chrono.cards.every(
+          (card, i) => card.sortKey === this.chrono.correctOrder[i]
+        );
+
+        if (allCorrect) {
+          this.endChronoGame(true);
+        }
+      },
+
+      endChronoGame(won) {
+        if (this.chrono.timer) {
+          clearInterval(this.chrono.timer);
+          this.chrono.timer = null;
+        }
+        this.chrono.validated = true;
+        this.chrono.status = won ? 'won' : 'lost';
+      },
+
+      closeChronoGame() {
+        if (this.chrono.timer) {
+          clearInterval(this.chrono.timer);
+          this.chrono.timer = null;
+        }
+        this.chrono.open = false;
+      },
+
+      nextChronoLevel() {
+        this.chrono.level++;
+        this.startChronoGame();
+      },
+
+      retryChronoLevel() {
+        this.startChronoGame();
+      },
+
+      resetChronoToLevel1() {
+        this.chrono.level = 1;
+        this.startChronoGame();
+      },
+
     }
 }
 </script>
@@ -885,6 +1230,9 @@ export default {
 
 .dialog-header {
   color: white;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .dialog-actions {
@@ -1125,6 +1473,127 @@ export default {
   font-size: 0.85em;
 }
 
+// Chrono Trombi Game Styles
+.chrono-content {
+  padding: 24px;
+  min-height: 300px;
+}
+
+.chrono-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.chrono-card {
+  width: 90px;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  background: rgb(var(--v-theme-surface));
+  transition: box-shadow 0.15s;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  }
+
+  img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+}
+
+.chrono-card-position {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 0.7em;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.chrono-card-name {
+  font-size: 0.7em;
+  text-align: center;
+  padding: 4px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.chrono-card-year {
+  font-size: 0.75em;
+  text-align: center;
+  font-weight: bold;
+  padding: 2px;
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.1);
+  pointer-events: none;
+}
+
+.chrono-card.selected {
+  box-shadow: 0 0 0 3px rgb(var(--v-theme-primary));
+}
+
+.chrono-card.correct {
+  box-shadow: 0 0 0 3px rgb(var(--v-theme-success));
+}
+
+.chrono-card.wrong {
+  box-shadow: 0 0 0 3px rgb(var(--v-theme-error));
+}
+
+.chrono-card.disabled {
+  cursor: default;
+
+  &:hover {
+    transform: none;
+  }
+}
+
+.chrono-validate {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.chrono-mode-badge {
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 20px;
+  background: rgba(var(--v-theme-primary), 0.15);
+  color: rgb(var(--v-theme-primary));
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+.chrono-mode-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  background: rgba(var(--v-theme-secondary), 0.2);
+  color: rgb(var(--v-theme-secondary));
+}
+
+
 @media (max-width: 600px) {
   .card-header {
     flex-wrap: wrap;
@@ -1157,5 +1626,23 @@ export default {
   .memory-cell {
     min-width: 50px;
   }
+
+  .chrono-card {
+    width: 70px;
+
+    img {
+      width: 70px;
+      height: 70px;
+    }
+  }
+
+  .chrono-grid {
+    gap: 6px;
+  }
+
+  .chrono-content {
+    padding: 12px;
+  }
+
 }
 </style>

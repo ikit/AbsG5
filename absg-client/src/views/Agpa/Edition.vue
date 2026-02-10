@@ -56,12 +56,7 @@
         <v-icon style="width: 50px">
           fas fa-info
         </v-icon>
-        N'hésitez pas à discuter de l'organisation sur <router-link
-          :to="{ path: '/forum/' }"
-          tag="a"
-        >
-          le forum
-        </router-link>.
+        N'hésitez pas à discuter de l'organisation sur WhatApps.
       </v-card>
     </v-card>
     <!-- Affichage de l'édition en cours -->
