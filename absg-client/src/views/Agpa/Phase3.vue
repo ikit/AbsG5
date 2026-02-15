@@ -2,18 +2,17 @@
   <section id="content">
     <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
       <!-- Desktop Layout -->
-      <v-row v-if="!$vuetify.display.mobile" style="padding: 15px">
+      <v-row v-if="!$vuetify.display.mobile" class="phase3-header-row">
         <v-tooltip bottom>
           <template #activator="{ props }">
             <div
-              class="phase-left-header"
+              class="phase-left-header d-flex align-start"
               v-bind="props"
               @click="help.displayed = true; help.page = 3"
-              style="display: flex; align-items: flex-start;"
             >
               <v-icon
                 start
-                style="margin-top:-10px; font-size: 30px; margin-right: 10px;"
+                class="phase3-help-icon"
               >
                 far fa-question-circle
               </v-icon>
@@ -34,7 +33,7 @@
               icon
               size="small"
               :disabled="isLoading"
-              style="margin-top: 3px;"
+              class="phase3-nav-btn"
               v-bind="props"
               @click="gotoNextCat(-1)"
             >
@@ -73,7 +72,7 @@
               icon
               size="small"
               :disabled="isLoading"
-              style="margin-top: 3px;"
+              class="phase3-nav-btn"
               v-bind="props"
               @click="gotoNextCat(1)"
             >
@@ -111,14 +110,14 @@
       </v-row>
 
       <!-- Mobile Layout -->
-      <div v-else style="padding: 10px;">
+      <div v-else class="phase3-mobile-layout">
         <!-- Header avec aide et votes -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+        <div class="phase3-mobile-header">
           <div
             class="phase-left-header-mobile"
             @click="help.displayed = true; help.page = 3"
           >
-            <v-icon size="small" style="margin-right: 5px;">far fa-question-circle</v-icon>
+            <v-icon size="small" class="mr-1">far fa-question-circle</v-icon>
             <div>
               <h2>Phase 3 : Votes</h2>
               <p>Phase 4 - dès le {{ end }}</p>
@@ -132,18 +131,18 @@
             <h2>Vos votes</h2>
             <p v-if="category && category.categoryId > 0">
               <span :style="{ color: totalVotes >= category.maxVotes / 2.0 && totalVotes <= category.maxVotes ? 'green' : 'red'}">
-                {{ totalVotes }}/{{ category.maxVotes }} <i class="fas fa-star" style="font-size: 0.8em;" />
+                {{ totalVotes }}/{{ category.maxVotes }} <i class="fas fa-star phase3-icon-sm" />
               </span>
               &nbsp;
               <span :style="{ color: totalTitleVotes >= 5 && totalTitleVotes <= 10 ? 'green' : 'red' }">
-                {{ totalTitleVotes }}/10 <i class="fas fa-feather-alt" style="font-size: 0.8em;" />
+                {{ totalTitleVotes }}/10 <i class="fas fa-feather-alt phase3-icon-sm" />
               </span>
             </p>
           </div>
         </div>
 
         <!-- Navigation catégories -->
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="phase3-mobile-nav">
           <v-btn
             icon
             size="small"
@@ -159,7 +158,7 @@
                 v-bind="props"
                 variant="outlined"
                 size="small"
-                style="flex: 1; text-transform: none;"
+                class="phase3-mobile-cat-btn"
               >
                 {{ category.title }}
               </v-btn>
@@ -190,7 +189,7 @@
         v-if="isLoading"
         color="accent"
         indeterminate
-        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
+        class="phase3-progress-bar"
       />
     </div>
 
@@ -207,7 +206,7 @@
         disable-sort
         hide-default-footer
         loading-text="Mise à jours des données"
-        style="margin: 25px"
+        class="phase3-resume-table"
         @click:row="gotoCat($event.categoryId)"
       >
         <template #[`item.votes`]="{ item }">
@@ -649,8 +648,8 @@ export default {
 h2.section {
     text-align: left;
     font-weight: bold;
-    color: #37474f;
-    text-shadow: 0 1px #aaa;
+    color: rgba(var(--v-theme-on-surface), 0.75);
+    text-shadow: 0 1px rgba(var(--v-theme-on-surface), 0.3);
     font-size: 25px;
     font-family: "Comfortaa", sans-serif;
     margin: 30px 0 -20px 25px;
@@ -799,7 +798,59 @@ h2.section {
 
 .vote-btn {
     opacity: 1 !important;
-    background: #fff !important;
+    background: rgb(var(--v-theme-surface)) !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.phase3-header-row {
+    padding: 15px;
+}
+
+.phase3-help-icon {
+    margin-top: -10px;
+    font-size: 30px;
+    margin-right: 10px;
+}
+
+.phase3-nav-btn {
+    margin-top: 3px;
+}
+
+.phase3-mobile-layout {
+    padding: 10px;
+}
+
+.phase3-mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.phase3-icon-sm {
+    font-size: 0.8em;
+}
+
+.phase3-mobile-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.phase3-mobile-cat-btn {
+    flex: 1;
+    text-transform: none;
+}
+
+.phase3-progress-bar {
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    right: 0;
+    height: 5px;
+}
+
+.phase3-resume-table {
+    margin: 25px;
 }
 </style>
