@@ -11,7 +11,7 @@
             <v-table density="compact" style="font-size: 0.85em;">
               <thead>
                 <tr>
-                  <th style="text-align: right;">Catégorie</th>
+                  <th class="text-right">Catégorie</th>
                   <th style="text-align: center;">Gueudelot</th>
                   <th style="text-align: center;">Guibert</th>
                   <th style="text-align: center;">Guyomard</th>
@@ -92,12 +92,12 @@
           <v-col cols="12" md="6">
             <v-card variant="outlined">
               <v-card-text>
-                <div class="font-weight-bold mb-2 text-center" style="background: #f5f5f5; padding: 4px;">
+                <div class="font-weight-bold mb-2 text-center monitoring-stats__section-header">
                   Points donnés
                 </div>
 
                 <!-- Par famille -->
-                <div class="mb-3 pa-2" style="background: #fafafa;">
+                <div class="mb-3 pa-2 monitoring-stats__family-bg">
                   <div class="text-body-2 mb-1">Total: {{ userStats.given.total }} pts</div>
                   <div v-for="fam in userStats.given.byFamily" :key="'g-'+fam.family" class="text-caption text-grey pl-2">
                     {{ fam.family }}: {{ fam.points }} pts ({{ Math.round(fam.points / userStats.given.total * 100) || 0 }}%)
@@ -105,17 +105,17 @@
                 </div>
 
                 <!-- Par personne -->
-                <v-table density="compact" style="font-size: 0.8em;">
+                <v-table density="compact" class="monitoring-stats__v-table">
                   <thead>
                     <tr>
-                      <th style="text-align: left;">Personne</th>
-                      <th style="text-align: right;">Points (%)</th>
+                      <th class="text-left">Personne</th>
+                      <th class="text-right">Points (%)</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="person in userStats.given.byPerson" :key="'gp-'+person.username">
-                      <td style="text-align: left;">{{ person.username }}</td>
-                      <td style="text-align: right;">
+                      <td class="text-left">{{ person.username }}</td>
+                      <td class="text-right">
                         {{ person.points }} ({{ Math.round(person.points / userStats.given.total * 100) || 0 }}%)
                       </td>
                     </tr>
@@ -128,12 +128,12 @@
           <v-col cols="12" md="6">
             <v-card variant="outlined">
               <v-card-text>
-                <div class="font-weight-bold mb-2 text-center" style="background: #f5f5f5; padding: 4px;">
+                <div class="font-weight-bold mb-2 text-center monitoring-stats__section-header">
                   Points reçus
                 </div>
 
                 <!-- Par famille -->
-                <div class="mb-3 pa-2" style="background: #fafafa;">
+                <div class="mb-3 pa-2 monitoring-stats__family-bg">
                   <div class="text-body-2 mb-1">Total: {{ userStats.received.total }} pts</div>
                   <div v-for="fam in userStats.received.byFamily" :key="'r-'+fam.family" class="text-caption text-grey pl-2">
                     {{ fam.family }}: {{ fam.points }} pts ({{ Math.round(fam.points / userStats.received.total * 100) || 0 }}%)
@@ -141,17 +141,17 @@
                 </div>
 
                 <!-- Par personne -->
-                <v-table density="compact" style="font-size: 0.8em;">
+                <v-table density="compact" class="monitoring-stats__v-table">
                   <thead>
                     <tr>
-                      <th style="text-align: left;">Personne</th>
-                      <th style="text-align: right;">Points (%)</th>
+                      <th class="text-left">Personne</th>
+                      <th class="text-right">Points (%)</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="person in userStats.received.byPerson" :key="'rp-'+person.username">
-                      <td style="text-align: left;">{{ person.username }}</td>
-                      <td style="text-align: right;">
+                      <td class="text-left">{{ person.username }}</td>
+                      <td class="text-right">
                         {{ person.points }} ({{ Math.round(person.points / userStats.received.total * 100) || 0 }}%)
                       </td>
                     </tr>
@@ -314,3 +314,18 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.monitoring-stats__section-header {
+  background: rgba(var(--v-theme-on-surface), 0.05);
+  padding: 4px;
+}
+
+.monitoring-stats__family-bg {
+  background: rgba(var(--v-theme-on-surface), 0.03);
+}
+
+.monitoring-stats__v-table {
+  font-size: 0.8em;
+}
+</style>

@@ -451,7 +451,7 @@
                   <span>Guyomard: Rang {{ item.scoreDetails.v2026.guyomard?.rank || '-' }} ({{ item.scoreDetails.v2026.guyomard?.points?.toFixed(1) || 0 }} pts)</span>
                 </v-tooltip>
               </div>
-              <span v-else style="color: #999;">-</span>
+              <span v-else class="monitoring-empty-value">-</span>
             </template>
 
             <template #[`item.awards`]="{ item }">
@@ -692,35 +692,35 @@
 
                         <!-- Colonne Points Donnés -->
                         <div>
-                          <div style="font-weight: bold; margin-bottom: 8px; text-align: center; background: #f5f5f5; padding: 4px;">
+                          <div class="monitoring-stats__section-header">
                             Points donnés
                           </div>
 
                           <!-- Stats par famille -->
-                          <div style="margin-bottom: 8px; padding: 4px; background: #fafafa;">
-                            <div style="font-size: 0.9em; margin-bottom: 4px;">
+                          <div class="monitoring-stats__family-section">
+                            <div class="monitoring-stats__total">
                               Total: {{ votesUserStats.given.total }} pts
                             </div>
-                            <div v-for="item in votesUserStats.given.byFamily" :key="'given-fam-'+item.family" style="font-size: 0.85em; color: #666; padding-left: 8px;">
+                            <div v-for="item in votesUserStats.given.byFamily" :key="'given-fam-'+item.family" class="monitoring-stats__family-detail">
                               {{ item.family }}: {{ item.points }} pts ({{ Math.round(item.points / votesUserStats.given.total * 100) }}%)
                             </div>
                           </div>
 
                           <!-- Tableau détaillé par personne -->
-                          <table style="width: 100%; border-collapse: collapse;">
+                          <table class="monitoring-stats__table">
                             <thead>
-                              <tr style="border-bottom: 1px solid #ddd;">
-                                <th style="text-align: left; padding: 2px; font-size: 0.85em;">Personne</th>
-                                <th style="text-align: right; padding: 2px; font-size: 0.85em;">Points (%)</th>
+                              <tr class="monitoring-stats__table-header-row">
+                                <th class="monitoring-stats__table-cell--left">Personne</th>
+                                <th class="monitoring-stats__table-cell--right">Points (%)</th>
                               </tr>
                             </thead>
                             <tbody>
-                              <tr v-for="person in votesUserStats.given.byPerson" :key="'given-'+person.username" style="border-bottom: 1px solid #eee;">
+                              <tr v-for="person in votesUserStats.given.byPerson" :key="'given-'+person.username" class="monitoring-stats__table-row">
                                 <td style="padding: 2px; font-size: 0.85em; text-align: left;">
                                   <span :style="{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: getUserColor(person.username), marginRight: '6px' }"></span>
                                   {{ person.username }}
                                 </td>
-                                <td style="text-align: right; padding: 2px; font-size: 0.85em;">{{ person.points }} ({{ Math.round(person.points / votesUserStats.given.total * 100) }}%)</td>
+                                <td class="monitoring-stats__table-cell--right">{{ person.points }} ({{ Math.round(person.points / votesUserStats.given.total * 100) }}%)</td>
                               </tr>
                             </tbody>
                           </table>
@@ -728,35 +728,35 @@
 
                         <!-- Colonne Points Reçus -->
                         <div>
-                          <div style="font-weight: bold; margin-bottom: 8px; text-align: center; background: #f5f5f5; padding: 4px;">
+                          <div class="monitoring-stats__section-header">
                             Points reçus
                           </div>
 
                           <!-- Stats par famille -->
-                          <div style="margin-bottom: 8px; padding: 4px; background: #fafafa;">
-                            <div style="font-size: 0.9em; margin-bottom: 4px;">
+                          <div class="monitoring-stats__family-section">
+                            <div class="monitoring-stats__total">
                               Total: {{ votesUserStats.received.total }} pts
                             </div>
-                            <div v-for="item in votesUserStats.received.byFamily" :key="'received-fam-'+item.family" style="font-size: 0.85em; color: #666; padding-left: 8px;">
+                            <div v-for="item in votesUserStats.received.byFamily" :key="'received-fam-'+item.family" class="monitoring-stats__family-detail">
                               {{ item.family }}: {{ item.points }} pts ({{ Math.round(item.points / votesUserStats.received.total * 100) }}%)
                             </div>
                           </div>
 
                           <!-- Tableau détaillé par personne -->
-                          <table style="width: 100%; border-collapse: collapse;">
+                          <table class="monitoring-stats__table">
                             <thead>
-                              <tr style="border-bottom: 1px solid #ddd;">
-                                <th style="text-align: left; padding: 2px; font-size: 0.85em;">Personne</th>
-                                <th style="text-align: right; padding: 2px; font-size: 0.85em;">Points (%)</th>
+                              <tr class="monitoring-stats__table-header-row">
+                                <th class="monitoring-stats__table-cell--left">Personne</th>
+                                <th class="monitoring-stats__table-cell--right">Points (%)</th>
                               </tr>
                             </thead>
                             <tbody>
-                              <tr v-for="person in votesUserStats.received.byPerson" :key="'received-'+person.username" style="border-bottom: 1px solid #eee;">
+                              <tr v-for="person in votesUserStats.received.byPerson" :key="'received-'+person.username" class="monitoring-stats__table-row">
                                 <td style="padding: 2px; font-size: 0.85em; text-align: left;">
                                   <span :style="{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: getUserColor(person.username), marginRight: '6px' }"></span>
                                   {{ person.username }}
                                 </td>
-                                <td style="text-align: right; padding: 2px; font-size: 0.85em;">{{ person.points }} ({{ Math.round(person.points / votesUserStats.received.total * 100) }}%)</td>
+                                <td class="monitoring-stats__table-cell--right">{{ person.points }} ({{ Math.round(person.points / votesUserStats.received.total * 100) }}%)</td>
                               </tr>
                             </tbody>
                           </table>
@@ -2188,9 +2188,66 @@ h2, .h2 {
 }
 
 .thumb {
-    background: white;
+    background: rgb(var(--v-theme-surface));
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
     cursor: pointer;
+}
+
+// ============================================
+// Monitoring stats (votes analysis)
+// ============================================
+.monitoring-empty-value {
+    color: rgba(var(--v-theme-on-surface), 0.45);
+}
+
+.monitoring-stats__section-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+    background: rgba(var(--v-theme-on-surface), 0.05);
+    padding: 4px;
+}
+
+.monitoring-stats__family-section {
+    margin-bottom: 8px;
+    padding: 4px;
+    background: rgba(var(--v-theme-on-surface), 0.03);
+}
+
+.monitoring-stats__total {
+    font-size: 0.9em;
+    margin-bottom: 4px;
+}
+
+.monitoring-stats__family-detail {
+    font-size: 0.85em;
+    color: rgba(var(--v-theme-on-surface), 0.6);
+    padding-left: 8px;
+}
+
+.monitoring-stats__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.monitoring-stats__table-header-row {
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.15);
+}
+
+.monitoring-stats__table-cell--left {
+    text-align: left;
+    padding: 2px;
+    font-size: 0.85em;
+}
+
+.monitoring-stats__table-cell--right {
+    text-align: right;
+    padding: 2px;
+    font-size: 0.85em;
+}
+
+.monitoring-stats__table-row {
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 </style>

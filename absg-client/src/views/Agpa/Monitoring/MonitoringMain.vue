@@ -368,7 +368,7 @@ export default {
 
 <style lang="scss" scoped>
 .monitoring-header {
-  background: #fafafa;
-  border-bottom: 1px solid #e0e0e0;
+  background: rgba(var(--v-theme-on-surface), 0.03);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
 }
 </style>
