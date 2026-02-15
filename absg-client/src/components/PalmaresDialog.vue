@@ -435,9 +435,6 @@ export default {
   }
 }
 
-// Couleurs des récompenses AGPA
-.award-diamond { color: #c3f1ff; }
-.award-gold { color: #c68b00; }
-.award-silver { color: #9b9b9b; }
-.award-bronze { color: #964c31; }
+// Couleurs des récompenses AGPA : définies globalement dans themes/global.scss
+// Classes: .award-diamond, .award-gold, .award-silver, .award-bronze
 </style>

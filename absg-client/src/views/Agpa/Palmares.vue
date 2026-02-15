@@ -1917,16 +1917,12 @@ export default {
 
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
+@use '../../themes/agpa-tokens' as *;
 
 // ============================================
-// Couleurs AGPA récompenses
+// Gradients de page
 // ============================================
-$award-gold: #c68b00;
-$award-silver: #9b9b9b;
-$award-bronze: #cd7f32;
-$award-nominated: #764ba2;
 $gradient-palmares: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
-$gradient-badges: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 
 // ============================================
 // Toolbar (existant)

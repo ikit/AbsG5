@@ -1,0 +1,14 @@
+// ============================================
+// Tokens AGPA — Couleurs des récompenses
+// ============================================
+// Utilisé via @use '../../themes/agpa-tokens' as *;
+// dans les composants Vue qui ont besoin des variables SCSS.
+
+$award-diamond: #c3f1ff;
+$award-gold: #c68b00;
+$award-silver: #9b9b9b;
+$award-bronze: #cd7f32;
+$award-nominated: #764ba2;
+
+// Gradients réutilisables
+$gradient-badges: linear-gradient(135deg, #fa709a 0%, #fee140 100%);

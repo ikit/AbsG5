@@ -60,28 +60,16 @@
                     v-bind="props"
                   >
                     <template v-if="edition.palmares.diamond">
-                      <i
-                        class="fas fa-circle"
-                        style="color: #c3f1ff"
-                      /> {{ edition.palmares.diamond }}
+                      <i class="fas fa-circle award-diamond" /> {{ edition.palmares.diamond }}
                     </template>
                     <template v-if="edition.palmares.gold">
-                      <i
-                        class="fas fa-circle"
-                        style="color: #c68b00"
-                      /> {{ edition.palmares.gold }}
+                      <i class="fas fa-circle award-gold" /> {{ edition.palmares.gold }}
                     </template>
                     <template v-if="edition.palmares.sylver">
-                      <i
-                        class="fas fa-circle"
-                        style="color: #9b9b9b"
-                      /> {{ edition.palmares.sylver }}
+                      <i class="fas fa-circle award-silver" /> {{ edition.palmares.sylver }}
                     </template>
                     <template v-if="edition.palmares.bronze">
-                      <i
-                        class="fas fa-circle"
-                        style="color: #964c31"
-                      /> {{ edition.palmares.bronze }}
+                      <i class="fas fa-circle award-bronze" /> {{ edition.palmares.bronze }}
                     </template>
                     <template v-if="edition.palmares.nominated">
                       <i class="far fa-circle" /> {{ edition.palmares.nominated }}

@@ -463,26 +463,22 @@
                   <template #activator="{ props }">
                     <i
                       v-if="a.award === 'diamond'"
-                      class="fas fa-circle"
-                      style="color: #c3f1ff"
+                      class="fas fa-circle award-diamond"
                       v-bind="props"
                     />
                     <i
                       v-if="a.award === 'gold'"
-                      class="fas fa-circle"
-                      style="color: #c68b00"
+                      class="fas fa-circle award-gold"
                       v-bind="props"
                     />
                     <i
                       v-if="a.award === 'sylver'"
-                      class="fas fa-circle"
-                      style="color: #9b9b9b"
+                      class="fas fa-circle award-silver"
                       v-bind="props"
                     />
                     <i
                       v-if="a.award === 'bronze'"
-                      class="fas fa-circle"
-                      style="color: #964c31"
+                      class="fas fa-circle award-bronze"
                       v-bind="props"
                     />
                     <i
@@ -551,28 +547,16 @@
 
             <template #[`item.awards`]="{ item }">
               <template v-if="item.rewards.diamond">
-                <i
-                  class="fas fa-circle"
-                  style="color: #c3f1ff"
-                /> {{ item.rewards.diamond }}
+                <i class="fas fa-circle award-diamond" /> {{ item.rewards.diamond }}
               </template>
               <template v-if="item.rewards.gold">
-                <i
-                  class="fas fa-circle"
-                  style="color: #c68b00"
-                /> {{ item.rewards.gold }}
+                <i class="fas fa-circle award-gold" /> {{ item.rewards.gold }}
               </template>
               <template v-if="item.rewards.sylver">
-                <i
-                  class="fas fa-circle"
-                  style="color: #9b9b9b"
-                /> {{ item.rewards.sylver }}
+                <i class="fas fa-circle award-silver" /> {{ item.rewards.sylver }}
               </template>
               <template v-if="item.rewards.bronze">
-                <i
-                  class="fas fa-circle"
-                  style="color: #964c31"
-                /> {{ item.rewards.bronze }}
+                <i class="fas fa-circle award-bronze" /> {{ item.rewards.bronze }}
               </template>
               <template v-if="item.rewards.nominated">
                 <i class="far fa-circle" /> {{ item.rewards.nominated }}

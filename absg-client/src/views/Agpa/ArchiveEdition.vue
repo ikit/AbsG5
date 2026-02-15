@@ -156,23 +156,19 @@
                     >
                       <i
                         v-if="a == 'diamond'"
-                        class="fas fa-circle"
-                        style="color: #c3f1ff"
+                        class="fas fa-circle award-diamond"
                       />
                       <i
                         v-if="a == 'gold'"
-                        class="fas fa-circle"
-                        style="color: #c68b00"
+                        class="fas fa-circle award-gold"
                       />
                       <i
                         v-if="a == 'sylver'"
-                        class="fas fa-circle"
-                        style="color: #9b9b9b"
+                        class="fas fa-circle award-silver"
                       />
                       <i
                         v-if="a == 'bronze'"
-                        class="fas fa-circle"
-                        style="color: #964c31"
+                        class="fas fa-circle award-bronze"
                       />
                       <i
                         v-if="a == 'nominated'"
