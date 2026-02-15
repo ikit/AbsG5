@@ -347,7 +347,7 @@ export default {
   align-items: center;
   gap: 12px;
   background: rgba(var(--v-theme-surface-variant), 0.5);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .dialog-header {
@@ -356,7 +356,7 @@ export default {
 
 .dialog-actions {
   background: rgba(var(--v-theme-surface-variant), 0.5);
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .search-field {
@@ -364,12 +364,12 @@ export default {
 }
 
 .citation :deep(.note) {
-  color: #999 !important;
+  color: rgba(var(--v-theme-on-surface), 0.45) !important;
   flex: 1 0 1;
 }
 
 .citationRow:hover {
-  background: rgba(15, 15, 30, 0.05);
+  background: rgba(var(--v-theme-on-surface), 0.05);
   .deleteAction, .editAction {
     display: block;
   }
@@ -407,7 +407,7 @@ export default {
 
 .citation-avatar {
   overflow: hidden;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.15);
 }
 
 .citation-avatar-img {

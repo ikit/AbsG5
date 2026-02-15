@@ -76,7 +76,7 @@ export default {
   font-family: "Comfortaa", sans-serif;
   font-size: 1.1em;
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .citation-content {
@@ -130,7 +130,7 @@ export default {
 }
 
 .author-avatar {
-  border: 2px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(var(--v-theme-on-surface), 0.1);
   flex-shrink: 0;
 
   img {
@@ -153,7 +153,7 @@ export default {
 }
 
 .citation-actions {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
   justify-content: center;
 }
 
