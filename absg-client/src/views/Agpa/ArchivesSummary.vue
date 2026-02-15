@@ -59,24 +59,7 @@
                     class="palmares-badges"
                     v-bind="props"
                   >
-                    <template v-if="edition.palmares.diamond">
-                      <i class="fas fa-circle award-diamond" /> {{ edition.palmares.diamond }}
-                    </template>
-                    <template v-if="edition.palmares.gold">
-                      <i class="fas fa-circle award-gold" /> {{ edition.palmares.gold }}
-                    </template>
-                    <template v-if="edition.palmares.sylver">
-                      <i class="fas fa-circle award-silver" /> {{ edition.palmares.sylver }}
-                    </template>
-                    <template v-if="edition.palmares.bronze">
-                      <i class="fas fa-circle award-bronze" /> {{ edition.palmares.bronze }}
-                    </template>
-                    <template v-if="edition.palmares.nominated">
-                      <i class="far fa-circle" /> {{ edition.palmares.nominated }}
-                    </template>
-                    <template v-if="edition.palmares.honor">
-                      <i class="far fa-smile" /> {{ edition.palmares.honor }}
-                    </template>
+                    <AwardBadges :awards="edition.palmares" />
                   </div>
                 </template>
                 <span>Mon palmarès {{ edition.year }}</span>
@@ -94,9 +77,11 @@
 import axios from 'axios';
 import { mapState } from '../../stores/helpers';
 import { getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
+import AwardBadges from '../../components/AwardBadges.vue';
 
 export default {
     name: 'ArchivesSummary',
+    components: { AwardBadges },
     data: () => ({
         summary: []
     }),

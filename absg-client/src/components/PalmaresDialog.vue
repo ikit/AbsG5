@@ -120,24 +120,7 @@
             </template>
 
             <template #[`item.awards`]="{ item }">
-              <template v-if="item.awards.diamond">
-                <i class="fas fa-circle award-diamond" /> {{ item.awards.diamond }}
-              </template>
-              <template v-if="item.awards.gold">
-                <i class="fas fa-circle award-gold" /> {{ item.awards.gold }}
-              </template>
-              <template v-if="item.awards.sylver">
-                <i class="fas fa-circle award-silver" /> {{ item.awards.sylver }}
-              </template>
-              <template v-if="item.awards.bronze">
-                <i class="fas fa-circle award-bronze" /> {{ item.awards.bronze }}
-              </template>
-              <template v-if="item.awards.nominated">
-                <i class="far fa-circle" /> {{ item.awards.nominated }}
-              </template>
-              <template v-if="item.awards.honor">
-                <i class="far fa-smile" /> {{ item.awards.honor }}
-              </template>
+              <AwardBadges :awards="item.awards" />
             </template>
 
             <template #[`item.score`]="{ item }">
@@ -230,8 +213,11 @@
 </template>
 
 <script>
+import AwardBadges from './AwardBadges.vue';
+
 export default {
   name: 'PalmaresDialog',
+  components: { AwardBadges },
   props: {
     modelValue: {
       type: Boolean,

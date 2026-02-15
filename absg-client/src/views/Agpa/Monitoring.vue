@@ -546,24 +546,7 @@
             </template>
 
             <template #[`item.awards`]="{ item }">
-              <template v-if="item.rewards.diamond">
-                <i class="fas fa-circle award-diamond" /> {{ item.rewards.diamond }}
-              </template>
-              <template v-if="item.rewards.gold">
-                <i class="fas fa-circle award-gold" /> {{ item.rewards.gold }}
-              </template>
-              <template v-if="item.rewards.sylver">
-                <i class="fas fa-circle award-silver" /> {{ item.rewards.sylver }}
-              </template>
-              <template v-if="item.rewards.bronze">
-                <i class="fas fa-circle award-bronze" /> {{ item.rewards.bronze }}
-              </template>
-              <template v-if="item.rewards.nominated">
-                <i class="far fa-circle" /> {{ item.rewards.nominated }}
-              </template>
-              <template v-if="item.rewards.honor">
-                <i class="far fa-smile" /> {{ item.rewards.honor }}
-              </template>
+              <AwardBadges :awards="item.rewards" />
             </template>
 
             <template #[`item.scoreOf8`]="{ item }">
@@ -1189,12 +1172,14 @@ import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import HC_sankey from 'highcharts/modules/sankey';
 import HC_depwheel from 'highcharts/modules/dependency-wheel';
+import AwardBadges from '../../components/AwardBadges.vue';
 HC_sankey(Highcharts);
 HC_depwheel(Highcharts);
 
 export default {
     components: {
-        highcharts: Chart
+        highcharts: Chart,
+        AwardBadges
     },
     store,
     data: () => ({
