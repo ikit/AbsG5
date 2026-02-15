@@ -19,7 +19,7 @@
           <v-card-text>
             <!-- Informations utilisateur (lecture seule) -->
             <div class="row mb-4">
-              <div class="column" style="flex: 0 0 auto; margin-right: 24px;">
+              <div class="column profile-avatar-col">
                 <img
                   :src="avatarUrl"
                   class="profile-avatar"
@@ -60,8 +60,7 @@
               type="info"
               variant="tonal"
               density="compact"
-              class="my-6"
-              style="margin: 30px 0;"
+              class="my-6 profile-agpa-alert"
             >
               <v-icon start size="small">fas fa-trophy</v-icon>
               Les informations ci-dessous sont utilisees pour les différents jeux et le calcul des badges AGPA.
@@ -139,7 +138,7 @@
                       </v-list-item>
                     </template>
                     <template #selection="{ item }">
-                      <div style="display: flex; align-items: center; gap: 8px;">
+                      <div class="relation-selection">
                         <v-avatar size="24" class="relation-avatar">
                           <img :src="item.raw.url" class="relation-avatar-img">
                         </v-avatar>
@@ -170,7 +169,7 @@
                       </v-list-item>
                     </template>
                     <template #selection="{ item }">
-                      <div style="display: flex; align-items: center; gap: 8px;">
+                      <div class="relation-selection">
                         <v-avatar size="24" class="relation-avatar">
                           <img :src="item.raw.url" class="relation-avatar-img">
                         </v-avatar>
@@ -201,7 +200,7 @@
                       </v-list-item>
                     </template>
                     <template #selection="{ item }">
-                      <div style="display: flex; align-items: center; gap: 8px;">
+                      <div class="relation-selection">
                         <v-avatar size="24" class="relation-avatar">
                           <img :src="item.raw.url" class="relation-avatar-img">
                         </v-avatar>
@@ -236,7 +235,7 @@
           <v-card-text>
             <v-form ref="pwdForm" v-model="pwdValid">
               <div class="row align-center">
-                <div class="column" style="max-width: 200px;">
+                <div class="column profile-pwd-field">
                   <v-text-field
                     v-model="newPassword"
                     prepend-icon="fas fa-lock"
@@ -248,7 +247,7 @@
                     autocomplete="new-password"
                   />
                 </div>
-                <div class="column" style="max-width: 200px; margin-left: 16px;">
+                <div class="column profile-pwd-field profile-pwd-confirm">
                   <v-text-field
                     v-model="confirmPassword"
                     label="Confirmer"
@@ -259,7 +258,7 @@
                     autocomplete="new-password"
                   />
                 </div>
-                <div class="column" style="flex: 0 0 auto; margin-left: 16px;">
+                <div class="column profile-pwd-btn">
                   <v-btn
                     color="accent"
                     size="small"
@@ -292,7 +291,7 @@
           </v-card-title>
 
           <v-card-text>
-            <p class="text-caption mb-3" style="opacity: 0.6;">
+            <p class="text-caption mb-3 profile-trombi-hint">
               Une photo par an, format carre. Cliquez sur une photo pour la voir en grand.
             </p>
 
@@ -312,7 +311,7 @@
                 <div class="text-caption text-center mt-1">{{ trombi.year }}</div>
               </div>
             </div>
-            <div v-else class="text-center pa-4" style="opacity: 0.5;">
+            <div v-else class="text-center pa-4 profile-trombi-empty">
               <v-icon size="48">fas fa-image</v-icon>
               <div class="mt-2">Aucune photo dans le trombinoscope</div>
             </div>
@@ -351,7 +350,7 @@
           <ImageEditor
             ref="imgEditor"
             icon="fas fa-camera"
-            style="height: 280px;"
+            class="profile-img-editor"
             mode="square"
           />
 
@@ -724,7 +723,7 @@ h2 {
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #ddd;
+  border: 3px solid rgba(var(--v-theme-on-surface), 0.15);
 }
 
 .readonly-info {
@@ -748,7 +747,7 @@ h2 {
 
 .info-label {
   font-weight: 500;
-  color: #666;
+  color: rgba(var(--v-theme-on-surface), 0.6);
   min-width: 60px;
 }
 
@@ -786,9 +785,49 @@ h2 {
   align-items: center;
 }
 
+.profile-avatar-col {
+  flex: 0 0 auto;
+  margin-right: 24px;
+}
+
+.profile-agpa-alert {
+  margin: 30px 0;
+}
+
+.relation-selection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-pwd-field {
+  max-width: 200px;
+}
+
+.profile-pwd-confirm {
+  margin-left: 16px;
+}
+
+.profile-pwd-btn {
+  flex: 0 0 auto;
+  margin-left: 16px;
+}
+
+.profile-trombi-hint {
+  opacity: 0.6;
+}
+
+.profile-trombi-empty {
+  opacity: 0.5;
+}
+
+.profile-img-editor {
+  height: 280px;
+}
+
 .relation-avatar {
   overflow: hidden;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.15);
 }
 
 .relation-avatar-img {
