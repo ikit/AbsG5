@@ -1246,7 +1246,7 @@ export default {
 
 .thumb {
     margin: auto;
-    background: white;
+    background: rgb(var(--v-theme-surface));
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
     width: 100px;
@@ -1438,7 +1438,7 @@ export default {
 
 .memory-cell-back {
   transform: rotateY(180deg);
-  background: white;
+  background: rgb(var(--v-theme-surface));
   padding: 2px;
 
   img {
