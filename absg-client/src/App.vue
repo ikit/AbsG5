@@ -5,7 +5,7 @@
       v-model="drawerOpen"
       app
       temporary
-      style="height: 100%"
+      class="h-100"
     >
       <v-list
         nav
@@ -41,7 +41,8 @@
       v-if="user && user.id > 0"
       app
       fixed
-      :style="{ zIndex: 2000, background: themeColors.primary }"
+      color="primary"
+      :style="{ zIndex: 2000 }"
     >
       <v-app-bar-nav-icon
         v-if="!$vuetify.display.lgAndUp"
@@ -102,11 +103,11 @@
             color="primary"
             v-bind="props"
             data-cy="user"
-            style="margin-right: 12px"
+            class="mr-3"
           >
             <img
               :src="user.avatarUrl"
-              style="height: 40px;"
+              class="app-avatar"
               @error="(e) => e.target.style.display = 'none'"
             >
           </v-btn>
@@ -114,21 +115,21 @@
         <v-list nav>
           <v-list-item :to="{ path: '/profile'}">
             <v-list-item-title :key="1">
-              <v-icon style="width: 38px; margin-right: 8px; text-align: center;">
+              <v-icon class="app-menu-icon">
                 fas fa-user
               </v-icon>Mon profil
             </v-list-item-title>
           </v-list-item>
           <v-list-item @click="toggleDarkMode()">
             <v-list-item-title :key="2">
-              <v-icon style="width: 38px; margin-right: 8px; text-align: center;">
+              <v-icon class="app-menu-icon">
                 {{ isDarkMode ? 'fas fa-sun' : 'fas fa-moon' }}
               </v-icon>{{ isDarkMode ? 'Mode clair' : 'Mode sombre' }}
             </v-list-item-title>
           </v-list-item>
           <v-list-item @click="logout()">
             <v-list-item-title :key="4">
-              <v-icon style="width: 38px; margin-right: 8px; text-align: center;">
+              <v-icon class="app-menu-icon">
                 fas fa-power-off
               </v-icon>Se déconnecter
             </v-list-item-title>
@@ -143,7 +144,7 @@
         id="menu"
         data-cy="menu"
       >
-        <v-list style="background: none">
+        <v-list class="app-sidebar-list">
           <template v-for="item in menuItems">
             <div
               v-if="item.url && checkUserRolesMatch(item)"
@@ -154,28 +155,26 @@
                 <v-icon color="inherit">
                   {{ item.icon }}
                 </v-icon><br>
-                <span style="display: inline-block; line-height: 1.1em;">{{ item.name }}</span>
+                <span class="app-menu-label">{{ item.name }}</span>
               </router-link>
             </div>
           </template>
         </v-list>
 
         <div
-          class="menuItem"
-          style="position: absolute; bottom: 0; border-top: 1px solid rgba(0, 0, 0, 0.2)"
+          class="menuItem app-version-item"
         >
           <router-link>
             <v-icon color="inherit">
               far fa-question-circle
             </v-icon><br>
-            <span style="display: inline-block; line-height: 0.9em;">{{ version ? `v${version}` : "v5 - beta" }}</span>
+            <span class="app-menu-label">{{ version ? `v${version}` : "v5 - beta" }}</span>
           </router-link>
         </div>
       </div>
       <router-view
         :socket="ws"
-        style="min-height: 100%"
-        :style="{ 'margin-left': $vuetify.display.lgAndUp ? '85px' : '0' }"
+        :class="['app-content', { 'app-content--with-sidebar': $vuetify.display.lgAndUp }]"
       />
       <div
         v-if="user && user.id > 0 && photosGalleryDisplayed"
@@ -266,7 +265,7 @@
       <v-card>
         <v-card-title class="annonce">
           <v-icon
-            color="#fff"
+            color="white"
             left
           >
             fas fa-info-circle
@@ -298,7 +297,7 @@
       <v-card>
         <v-card-title class="warning">
           <v-icon
-            color="#fff"
+            color="white"
             left
           >
             fas fa-exclamation-triangle
@@ -330,7 +329,7 @@
       <v-card>
         <v-card-title class="error">
           <v-icon
-            color="#fff"
+            color="white"
             left
           >
             fas fa-exclamation-circle
@@ -340,10 +339,10 @@
           grid-list-sm
           class="pa-4"
         >
-          <pre><span style="font-weight: bold">Date:    </span> {{ error.log }}</pre>
-          <pre><span style="font-weight: bold">Requête: </span> {{ error.query ? error.query : "-" }}</pre>
-          <pre><span style="font-weight: bold">Status:  </span> {{ error.htmlError ? error.htmlError : "-" }}</pre>
-          <pre style="border: 1px solid #999; margin-top: 10px; padding: 5px; white-space: pre-line;">{{ error.msg ? error.msg : "Aucune information sur l'erreur :(" }}</pre>
+          <pre><span class="font-weight-bold">Date:    </span> {{ error.log }}</pre>
+          <pre><span class="font-weight-bold">Requête: </span> {{ error.query ? error.query : "-" }}</pre>
+          <pre><span class="font-weight-bold">Status:  </span> {{ error.htmlError ? error.htmlError : "-" }}</pre>
+          <pre class="app-error-detail">{{ error.msg ? error.msg : "Aucune information sur l'erreur :(" }}</pre>
         </v-container>
         <v-card-actions>
           <v-btn
@@ -455,28 +454,6 @@ export default {
         isDarkMode() {
             return this.$vuetify.theme.global.name === 'dark';
         },
-        themeColors() {
-            // Accède aux couleurs du thème actuel via Vuetify
-            // Vérification null pour éviter l'erreur lors de l'initialisation
-            const theme = this.$vuetify.theme.current?.value;
-            if (!theme?.colors) {
-                // Valeurs par défaut (thème light Ocean)
-                return {
-                    primary: '#1E3A5F',
-                    secondary: '#152A45',
-                    accent: '#FF6B6B',
-                    background: '#E8EDF2',
-                    surface: '#F5F7FA',
-                };
-            }
-            return {
-                primary: theme.colors.primary,
-                secondary: theme.colors.secondary,
-                accent: theme.colors.accent,
-                background: theme.colors.background,
-                surface: theme.colors.surface,
-            };
-        }
     },
     watch: {
         user(newValue, oldValue) {
@@ -586,7 +563,7 @@ export default {
     text-align: center;
     position: relative;
     padding-left: 15px;
-    border-bottom: 1px solid rgba(255,255,255, 0.2);
+    border-bottom: 1px solid rgba(var(--v-theme-on-primary), 0.2);
     img {
         height: 35px;
         margin-left: -15px;
@@ -600,8 +577,8 @@ export default {
 
         text-align: center;
         bottom: -7px;
-        color: rgba(255,255,255, 0.2);
-        background: #1E3A5F;
+        color: rgba(var(--v-theme-on-primary), 0.2);
+        background: rgb(var(--v-theme-primary));
         font-variant: all-small-caps;
         font-size: 11px;
     }
@@ -621,7 +598,7 @@ export default {
     bottom: 0;
     left: 0;
     width: 85px;
-    background: #1E3A5F;
+    background: rgb(var(--v-theme-primary));
     padding-top: 8px;
 
     a {
@@ -630,10 +607,10 @@ export default {
         vertical-align: middle;
         width: 85px;
         height: 75px;
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(var(--v-theme-on-primary), 0.9);
         text-decoration: none;
         cursor: pointer;
-        border-right: 1px solid rgba(0, 0, 0, 0.2);
+        border-right: 1px solid rgba(var(--v-theme-on-primary), 0.1);
 
         span {
             font-size: 0.8em
@@ -651,11 +628,11 @@ export default {
 }
 
 .menuItem {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(var(--v-theme-on-primary), 0.1);
 }
 
 .menuItem:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--v-theme-on-primary), 0.15);
 }
 
 .unreadNotification {
@@ -665,7 +642,7 @@ export default {
 }
 
 .theme--light.v-icon {
-    color: rgba(0,0,0,0.54);
+    color: rgba(var(--v-theme-on-surface), 0.54);
 }
 
 
@@ -678,7 +655,7 @@ export default {
     bottom: 0;
     background: rgba(0,0,0,0.95);
     text-align: center;
-    color: #aaa;
+    color: rgba(255, 255, 255, 0.7);
 
     .galleryControl {
         position: absolute;
@@ -741,7 +718,46 @@ export default {
 .vlb-caption-title {
     font-size: 1.5em;
     color: #fff;
+}
 
+.app-avatar {
+    height: 40px;
+}
+
+.app-menu-icon {
+    width: 38px;
+    margin-right: 8px;
+    text-align: center;
+}
+
+.app-menu-label {
+    display: inline-block;
+    line-height: 1.1em;
+}
+
+.app-sidebar-list {
+    background: none;
+}
+
+.app-version-item {
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid rgba(var(--v-theme-on-primary), 0.1);
+}
+
+.app-content {
+    min-height: 100%;
+
+    &--with-sidebar {
+        margin-left: 85px;
+    }
+}
+
+.app-error-detail {
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.3);
+    margin-top: 10px;
+    padding: 5px;
+    white-space: pre-line;
 }
 </style>
 
