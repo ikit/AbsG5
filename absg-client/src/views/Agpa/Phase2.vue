@@ -1,7 +1,7 @@
 <template>
   <section id="content">
     <div :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }">
-      <v-row style="padding: 15px">
+      <v-row class="phase2-header__row">
         <v-tooltip
           v-if="$vuetify.display.mdAndUp"
           bottom
@@ -9,7 +9,7 @@
           <template #activator="{ props }">
             <v-icon
               start
-              style="margin-top:-10px; font-size: 30px"
+              class="phase2-header__help-icon"
             >
               far fa-question-circle
             </v-icon>
@@ -33,7 +33,7 @@
               icon
               size="small"
               :disabled="isLoading"
-              style="margin-top: 3px;"
+              class="phase2-header__nav-btn"
               v-bind="props"
               @click="gotoNextCat(-1)"
             >
@@ -72,7 +72,7 @@
               icon
               size="small"
               :disabled="isLoading"
-              style="margin-top: 3px;"
+              class="phase2-header__nav-btn"
               v-bind="props"
               @click="gotoNextCat(1)"
             >
@@ -88,7 +88,7 @@
         v-if="isLoading"
         color="accent"
         indeterminate
-        style="position: absolute; bottom: -5px; left: 0; right: 0; height: 5px"
+        class="phase2-header__progress"
       />
     </div>
 
@@ -100,11 +100,11 @@
         <v-col
           v-for="(photo, index) in photosGalery"
           :key="photo.id"
-          style="min-width: 250px; width: 15%; margin: 15px"
+          class="phase2-photo-col"
         >
           <div>
-            <div style="width: 250px; height: 250px; margin: auto;">
-              <div style="width: 250px; height: 250px; display: table-cell; text-align: center; vertical-align: middle;">
+            <div class="phase2-photo__container">
+              <div class="phase2-photo__cell">
                 <img
                   class="thumb"
                   :src="photo.thumb"
@@ -112,31 +112,27 @@
                 >
               </div>
             </div>
-            <div style="" />
+            <div />
             <v-card
-              class="card"
-              style="margin-bottom: 50px"
+              class="card phase2-photo__card"
             >
-              <div
-                class="thumb-title"
-                style="text-align: center"
-              >
+              <div class="thumb-title phase2-photo__title">
                 {{ photo.title }}
               </div>
-              <div style="position: absolute; bottom: -17px; left: 0; right: 0; height: 30px;">
+              <div class="phase2-photo__action-wrap">
                 <v-tooltip bottom>
                   <template #activator="{ props }">
                     <v-btn
                       icon
                       size="small"
                       :disabled="isLoading"
-                      style="opacity: 1; background: #fff"
+                      class="phase2-photo__action-btn"
                       v-bind="props"
                       @click="displayPhotoDiscussion(photo)"
                     >
                       <v-icon
                         v-if="photo.error && photo.error.status !== 'accepted'"
-                        :style="{ color: photo.error.status === 'refused' ? '#d32f2f' : '#ff8f00' }"
+                        :color="photo.error.status === 'refused' ? 'error' : 'warning'"
                       >
                         fas fa-exclamation-circle
                       </v-icon>
@@ -192,29 +188,29 @@
           <template v-if="!isAdmin">
             <span
               v-if="photoDiscussion.status === 'accepted'"
-              style="color: #2e7d32"
+              class="text-success"
             >Statut: Acceptée</span>
             <span
               v-if="photoDiscussion.status === 'checking'"
-              style="color: #ff8f00"
+              class="text-warning"
             >Statut: En cours de vérification</span>
             <span
               v-if="photoDiscussion.status === 'refused'"
-              style="color: #d32f2f"
+              class="text-error"
             >Statut: Refusée</span>
           </template>
           <template v-else>
             <span
               v-if="photoDiscussion.status === 'accepted'"
-              style="color: #2e7d32"
+              class="text-success"
             >Statut: </span>
             <span
               v-if="photoDiscussion.status === 'checking'"
-              style="color: #ff8f00"
+              class="text-warning"
             >Statut: </span>
             <span
               v-if="photoDiscussion.status === 'refused'"
-              style="color: #d32f2f"
+              class="text-error"
             >Statut: </span>
             <v-select
               :items="status"
@@ -222,30 +218,29 @@
               item-title="text"
               item-value="value"
               solo
-              style="height: 50px; margin-left: 10px; width: 150px;"
+              class="phase2-dialog__status-select"
               @change="updatePhotoStatus($event)"
             />
           </template>
         </v-card-title>
-        <p style="opacity: 0.5; padding: 0 24px">
+        <p class="phase2-dialog__hint">
           Utilisez ce formulaire pour signaler un photo ne respectant pas le réglement de sa catégorie, ou bien pour
           poser des questions à l'organisation si vous avez des doutes.
         </p>
-        <div style="display: flex; margin: 0 24px">
-          <div style="flex: 1 1 auto">
-            <div style="text-align: center; margin-top: 10px">
+        <div class="phase2-dialog__layout">
+          <div class="phase2-dialog__photo-side">
+            <div class="phase2-dialog__photo-center">
               <img
                 :src="photoDiscussion.photo.thumb"
-                style="margin:auto"
-                class="thumb"
+                class="thumb phase2-dialog__thumb"
               >
-              <p style="margin: 10px;">
+              <p class="phase2-dialog__photo-title">
                 {{ photoDiscussion.photo.title }}
               </p>
             </div>
           </div>
 
-          <div style="flex: 1 1 auto;">
+          <div class="phase2-dialog__discussion-side">
             <p>Discussion:</p>
             <p
               v-if="photoDiscussion.discussion"
@@ -287,7 +282,7 @@
         <v-card-title class="bg-grey-lighten-4">
           Supprimer la photo ?
         </v-card-title>
-        <p style="padding: 0 24px">
+        <p class="phase2-dialog__confirm-text">
           Êtes-vous sûr de vouloir supprimer cette photo ?
         </p>
         <v-card-actions>
@@ -546,9 +541,121 @@ export default {
 }
 
 .thumb {
-    background: white;
+    background: rgb(var(--v-theme-surface));
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
     cursor: pointer;
+}
+
+// ============================================
+// Header bar
+// ============================================
+.phase2-header__row {
+    padding: 15px;
+}
+
+.phase2-header__help-icon {
+    margin-top: -10px;
+    font-size: 30px;
+}
+
+.phase2-header__nav-btn {
+    margin-top: 3px;
+}
+
+.phase2-header__progress {
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    right: 0;
+    height: 5px;
+}
+
+// ============================================
+// Photo grid
+// ============================================
+.phase2-photo-col {
+    min-width: 250px;
+    width: 15%;
+    margin: 15px;
+}
+
+.phase2-photo__container {
+    width: 250px;
+    height: 250px;
+    margin: auto;
+}
+
+.phase2-photo__cell {
+    width: 250px;
+    height: 250px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.phase2-photo__card {
+    margin-bottom: 50px;
+}
+
+.phase2-photo__title {
+    text-align: center;
+}
+
+.phase2-photo__action-wrap {
+    position: absolute;
+    bottom: -17px;
+    left: 0;
+    right: 0;
+    height: 30px;
+}
+
+.phase2-photo__action-btn {
+    opacity: 1;
+    background: rgb(var(--v-theme-surface));
+}
+
+// ============================================
+// Discussion dialog
+// ============================================
+.phase2-dialog__status-select {
+    height: 50px;
+    margin-left: 10px;
+    width: 150px;
+}
+
+.phase2-dialog__hint {
+    opacity: 0.5;
+    padding: 0 24px;
+}
+
+.phase2-dialog__layout {
+    display: flex;
+    margin: 0 24px;
+}
+
+.phase2-dialog__photo-side {
+    flex: 1 1 auto;
+}
+
+.phase2-dialog__photo-center {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.phase2-dialog__thumb {
+    margin: auto;
+}
+
+.phase2-dialog__photo-title {
+    margin: 10px;
+}
+
+.phase2-dialog__discussion-side {
+    flex: 1 1 auto;
+}
+
+.phase2-dialog__confirm-text {
+    padding: 0 24px;
 }
 </style>
