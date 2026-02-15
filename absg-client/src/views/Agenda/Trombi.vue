@@ -71,7 +71,7 @@
       </v-card>
     </v-container>
 
-    <v-container style="padding-top: 0;">
+    <v-container class="pt-0">
       <v-expansion-panels
         v-model="panel"
         multiple
@@ -86,7 +86,7 @@
             {{ p.fullname }}
             <v-spacer />
             {{ p.trombis.length }}/{{ p.trombiMax }}
-            <i class="fas fa-portrait" :class="p.cssStatus" style="margin-left: 10px; margin-right: 10px; flex: none"/>
+            <i class="fas fa-portrait trombi-status-icon" :class="p.cssStatus" />
           </v-expansion-panel-title>
           <v-expansion-panel-text>
             <v-tooltip
@@ -149,9 +149,8 @@
           <ImageEditor
             ref="imgEditor"
             icon="fas fa-camera"
-            style="height: 300px;"
             mode="square"
-            class="mt-4"
+            class="mt-4 trombi-img-editor"
           />
           <div v-if="trombiEditor.isLoading">
             Enregistrement en cours : {{ trombiEditor.complete }}%
@@ -248,7 +247,7 @@
           Memory Trombinoscope
           <v-spacer />
           <div class="memory-timer" :class="{ 'timer-warning': memory.timeLeft <= 30 }">
-            <v-icon size="small" class="mr-1" style="vertical-align: text-bottom">fas fa-clock</v-icon>
+            <v-icon size="small" class="mr-1 trombi-timer-icon">fas fa-clock</v-icon>
             {{ formatTime(memory.timeLeft) }}
           </div>
         </v-card-title>
@@ -344,7 +343,7 @@
           Chrono Trombi
           <v-spacer />
           <div class="memory-timer" :class="{ 'timer-warning': chrono.timeLeft <= 30 }">
-            <v-icon size="small" class="mr-1" style="vertical-align: text-bottom">fas fa-clock</v-icon>
+            <v-icon size="small" class="mr-1 trombi-timer-icon">fas fa-clock</v-icon>
             {{ formatTime(chrono.timeLeft) }}
           </div>
         </v-card-title>
@@ -367,7 +366,7 @@
               Classez {{ chrono.photosCount }} photos de {{ chrono.peopleCount }} personnes
               par âge croissant en moins de {{ formatTime(chrono.totalTime) }} !
             </p>
-            <p style="font-size: 0.85em; opacity: 0.6;">Cliquez sur deux photos pour les échanger de place.</p>
+            <p class="trombi-hint">Cliquez sur deux photos pour les échanger de place.</p>
             <v-btn color="accent" size="large" @click="launchChronoGame()">
               <v-icon start>fas fa-play</v-icon>
               Commencer
@@ -411,7 +410,7 @@
             </div>
 
             <!-- Victoire -->
-            <div v-if="chrono.status === 'won'" class="memory-result memory-won" style="padding-top: 16px;">
+            <div v-if="chrono.status === 'won'" class="memory-result memory-won pt-4">
               <v-icon size="48" color="success" class="mb-2">fas fa-trophy</v-icon>
               <h3>Niveau {{ chrono.level }} réussi !</h3>
               <p>{{ chrono.moves }} échanges en {{ formatTime(chrono.totalTime - chrono.timeLeft) }}</p>
@@ -425,7 +424,7 @@
             </div>
 
             <!-- Défaite -->
-            <div v-if="chrono.status === 'lost'" class="memory-result memory-lost" style="padding-top: 16px;">
+            <div v-if="chrono.status === 'lost'" class="memory-result memory-lost pt-4">
               <v-icon size="48" color="error" class="mb-2">fas fa-clock</v-icon>
               <h3>Temps écoulé !</h3>
               <v-btn color="accent" class="mt-2" @click="retryChronoLevel()">
@@ -1225,11 +1224,10 @@ export default {
   align-items: center;
   gap: 12px;
   background: rgba(var(--v-theme-surface-variant), 0.5);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .dialog-header {
-  color: white;
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
@@ -1237,7 +1235,7 @@ export default {
 
 .dialog-actions {
   background: rgba(var(--v-theme-surface-variant), 0.5);
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
 }
 
 .search-field {
@@ -1256,17 +1254,36 @@ export default {
     cursor: pointer;
 }
 
+.trombi-status-icon {
+  margin-left: 10px;
+  margin-right: 10px;
+  flex: none;
+}
+
+.trombi-img-editor {
+  height: 300px;
+}
+
+.trombi-timer-icon {
+  vertical-align: text-bottom;
+}
+
+.trombi-hint {
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
 .col100 {
-  color: #06A300;
+  color: rgb(var(--v-theme-success));
 }
 .col50 {
-  color: #FFA500;
+  color: rgb(var(--v-theme-warning));
 }
 .col1 {
-  color: #E00A16;
+  color: rgb(var(--v-theme-error));
 }
 .col0 {
-  color: #9E9E9E;
+  color: rgba(var(--v-theme-on-surface), 0.5);
 }
 
 .stats-content {
@@ -1336,10 +1353,10 @@ export default {
     }
   }
 
-  .col0-header { color: #9E9E9E; }
-  .col1-header { color: #E00A16; }
-  .col50-header { color: #FFA500; }
-  .col100-header { color: #06A300; }
+  .col0-header { color: rgba(var(--v-theme-on-surface), 0.5); }
+  .col1-header { color: rgb(var(--v-theme-error)); }
+  .col50-header { color: rgb(var(--v-theme-warning)); }
+  .col100-header { color: rgb(var(--v-theme-success)); }
 }
 
 // Memory Game Styles
@@ -1357,7 +1374,7 @@ export default {
 }
 
 .timer-warning {
-  background: rgba(255, 0, 0, 0.3);
+  background: rgba(var(--v-theme-error), 0.3);
   animation: pulse 1s infinite;
 }
 
