@@ -179,15 +179,20 @@
       <div
         v-if="user && user.id > 0 && photosGalleryDisplayed"
         class="gallery"
+        role="dialog"
+        aria-label="Visionneuse de photos"
+        aria-modal="true"
+        @keyup.esc="photosGalleryHide()"
       >
         <div
-          style="position: relative; padding: 50px; height: 100%;"
+          class="gallery__wrapper"
           @click="photosGalleryAuto()"
         >
           <div class="galleryControl">
             <div
               v-if="photosGallery.length > 1"
               class="count"
+              aria-live="polite"
             >
               {{ photosGalleryIndex + 1 }} / {{ photosGallery.length }}
             </div>
@@ -196,6 +201,7 @@
               v-if="photosGallery.length > 1"
               type="button"
               class="button"
+              aria-label="Photo précédente"
               @click.stop="photosGalleryPrev()"
               @keyup.left.stop="photosGalleryPrev()"
             >
@@ -205,6 +211,7 @@
               v-if="photosGallery.length > 1"
               type="button"
               class="button"
+              aria-label="Lecture automatique"
               @click.stop="photosGalleryPlayPause()"
               @keyup.space.stop="photosGalleryPlayPause()"
             >
@@ -214,6 +221,7 @@
               v-if="photosGallery.length > 1"
               type="button"
               class="button"
+              aria-label="Photo suivante"
               @click.stop="photosGalleryNext()"
               @keyup.right.stop="photosGalleryNext()"
             >
@@ -223,25 +231,28 @@
             <button
               type="button"
               class="close"
+              aria-label="Fermer la visionneuse"
               @click.stop="photosGalleryHide()"
-              @keyup.esc.stop="photosGalleryHide()"
             >
               <i class="fas fa-times" /> Fermer
             </button>
           </div>
-          <div style="display: flex; max-height: 100%;">
+          <div class="gallery__content">
             <!-- La photo -->
-            <div style="flex: 1 1 0; max-height: 100%;">
-              <img :src="photoDisplayed.url">
+            <div class="gallery__photo-container">
+              <img
+                :src="photoDisplayed.url"
+                :alt="photoDisplayed.title || 'Photo de la galerie'"
+              >
               <div
                 v-if="photoDisplayed.hasOwnProperty('title')"
-                style="text-align: center"
+                class="gallery__photo-title"
               >
                 {{ photoDisplayed.title }}
               </div>
               <div
                 v-if="photoDisplayed.hasOwnProperty('username')"
-                style="text-align: center; font-style: italic; opacity: 0.5"
+                class="gallery__photo-author"
               >
                 {{ photoDisplayed.username }}
               </div>
@@ -250,7 +261,7 @@
             <PhotoMetadataEditor
               v-if="photoMetadataEditorDisplayed"
               :photo="photoDisplayed"
-              style="flex: 0 1 0; min-width: 330px; padding: 15px; margin-left: 15px; margin-right: -30px; overflow: auto;"
+              class="gallery__metadata-editor"
             />
           </div>
         </div>
@@ -694,6 +705,41 @@ export default {
         border: 1px solid #000!important;
         max-height: 100%;
         max-width: 100%;
+    }
+
+    &__wrapper {
+        position: relative;
+        padding: 50px;
+        height: 100%;
+    }
+
+    &__content {
+        display: flex;
+        max-height: 100%;
+    }
+
+    &__photo-container {
+        flex: 1 1 0;
+        max-height: 100%;
+    }
+
+    &__photo-title {
+        text-align: center;
+    }
+
+    &__photo-author {
+        text-align: center;
+        font-style: italic;
+        opacity: 0.5;
+    }
+
+    &__metadata-editor {
+        flex: 0 1 0;
+        min-width: 330px;
+        padding: 15px;
+        margin-left: 15px;
+        margin-right: -30px;
+        overflow: auto;
     }
 }
 
