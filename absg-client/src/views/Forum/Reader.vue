@@ -4,13 +4,13 @@
       v-if="messages.length > 0"
       align="start"
       density="compact"
-      style="background: none; margin: auto; max-width: 700px; width: 100%;"
+      class="reader-timeline"
     >
       <v-timeline-item
         v-for="msg in messages.filter(m => m)"
         :key="msg.id"
         fill-dot
-        color="#fff"
+        color="surface"
       >
         <template #icon>
           <div>
@@ -18,7 +18,8 @@
               <template #activator="{ props }">
                 <img
                   :src="msg.poster.avatar"
-                  style="width: 50px;"
+                  class="reader-avatar"
+                  :alt="`Avatar de ${msg.poster.username}`"
                   v-bind="props"
                 >
               </template>
@@ -41,28 +42,27 @@
         />
         <v-card
           class="msg"
-          style="padding: 0 15px"
         >
           <div class="msgControls">
-            <v-tooltip bottom>
-              <template #activator="{ props }">
-                <a
-                  v-bind="props"
-                  @click="edit(msg)"
-                >Editer</a>
-              </template>
-              <span>Modifier le message</span>
-            </v-tooltip>
+            <v-btn
+              variant="text"
+              size="x-small"
+              density="compact"
+              aria-label="Modifier le message"
+              @click="edit(msg)"
+            >
+              Editer
+            </v-btn>
             -
-            <v-tooltip bottom>
-              <template #activator="{ props }">
-                <a
-                  v-bind="props"
-                  @click="supr(msg)"
-                >Supprimer</a>
-              </template>
-              <span>Supprimer le message</span>
-            </v-tooltip>
+            <v-btn
+              variant="text"
+              size="x-small"
+              density="compact"
+              aria-label="Supprimer le message"
+              @click="supr(msg)"
+            >
+              Supprimer
+            </v-btn>
           </div>
           <div v-html="msg.text" />
         </v-card>
@@ -77,11 +77,11 @@
         ref="newMsgEditor"
         v-model="newMessageText"
       />
-      <div>
+      <div class="reader-editor-actions">
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
-              style="margin: 5px 0 -5px 0;"
+              class="reader-editor-btn"
               v-bind="props"
               @click="post()"
             >
@@ -96,7 +96,7 @@
         >
           <template #activator="{ props }">
             <v-btn
-              style="margin: 5px 0 -5px 10px;"
+              class="reader-editor-btn reader-editor-btn--smilies"
               v-bind="props"
               @click="switchSmilies()"
             >
@@ -110,7 +110,7 @@
         v-if="displayEmojis"
         :emojis-by-row="10"
         :show-search="false"
-        style="width: 100%; margin-top: 10px;"
+        class="reader-emoji-picker"
         @select="selectEmoji"
       />
     </v-card>
@@ -123,7 +123,7 @@
         <v-card-title class="bg-grey-lighten-4">
           Supprimer le message
         </v-card-title>
-        <p style="margin: 0 24px;">
+        <p class="reader-dialog-text">
           Êtes vous sûr de vouloir supprimer ce message écrit par {{ msgDeletion.post.poster.username }} le {{ msgDeletion.post.dateLabel }}?
         </p>
         <v-card-actions>
@@ -157,7 +157,7 @@
         <TextEditor
           ref="msgEditor"
           v-model="editMessageText"
-          style="max-height: 80vh"
+          class="reader-edit-editor"
         />
 
         <v-card-actions>
@@ -393,12 +393,29 @@ export default {
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
 
+// ============================================
+// Timeline
+// ============================================
+.reader-timeline {
+    background: none;
+    margin: auto;
+    max-width: 700px;
+    width: 100%;
+}
 
+.reader-avatar {
+    width: 50px;
+}
 
+// ============================================
+// Messages
+// ============================================
 .msg {
     position: relative;
     margin-right: 5px;
+    padding: 0 15px;
 }
+
 .msgControls {
     display: none;
     position: absolute;
@@ -406,10 +423,11 @@ export default {
     left: 0;
     right: 0;
     font-size: 0.8em;
-    background: #eee;
+    background: rgba(var(--v-theme-on-surface), 0.08);
     padding-right: 5px;
     text-align: right;
 }
+
 .msg:hover .msgControls {
     display: block;
 }
@@ -426,36 +444,63 @@ export default {
     span {
         display: block;
     }
+
     .name {
         font-weight: bold;
     }
+
     .date {
         opacity: 0.5;
     }
 }
 
+// ============================================
+// Éditeur
+// ============================================
 .largeEditor {
     max-width: 700px;
     padding: 15px;
     margin: auto;
     margin-bottom: 25px;
-    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, #00000020 5px, #00000020 10px);
+    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, rgba(var(--v-theme-on-surface), 0.08) 5px, rgba(var(--v-theme-on-surface), 0.08) 10px);
 }
 
 .compactEditor {
     max-width: 700px;
     padding: 5px;
     margin: auto;
-    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, #00000020 5px, #00000020 10px);
+    background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 5px, rgba(var(--v-theme-on-surface), 0.08) 5px, rgba(var(--v-theme-on-surface), 0.08) 10px);
 }
 
+.reader-editor-actions {
+    display: flex;
+    gap: 10px;
+}
 
+.reader-editor-btn {
+    margin: 5px 0 -5px 0;
+}
 
+.reader-emoji-picker {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.reader-edit-editor {
+    max-height: 80vh;
+}
+
+.reader-dialog-text {
+    margin: 0 24px;
+}
+
+// ============================================
+// Citations (dark mode compatible)
+// ============================================
 .bb-quote, blockquote {
-    border-left: .25em solid #dfe2e5;
-    color: #6a737d;
+    border-left: .25em solid rgba(var(--v-theme-on-surface), 0.2);
+    color: rgba(var(--v-theme-on-surface), 0.6);
     padding-left: 1em;
-    margin: 20px 0 10px 20px!important;
+    margin: 20px 0 10px 20px !important;
 }
-
 </style>
