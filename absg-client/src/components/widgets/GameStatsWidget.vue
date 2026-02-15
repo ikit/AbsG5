@@ -164,7 +164,7 @@ export default {
   font-family: "Comfortaa", sans-serif;
   font-size: 1.1em;
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.08);
   display: flex;
   align-items: center;
 }
@@ -224,21 +224,21 @@ export default {
     border-radius: 50%;
     font-size: 0.75em;
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(var(--v-theme-on-surface), 0.1);
 
     &.gold {
       background: #ffd700;
-      color: #333;
+      color: rgba(0, 0, 0, 0.8);
     }
 
     &.silver {
       background: #c0c0c0;
-      color: #333;
+      color: rgba(0, 0, 0, 0.8);
     }
 
     &.bronze {
       background: #cd7f32;
-      color: #fff;
+      color: rgb(var(--v-theme-surface));
     }
   }
 

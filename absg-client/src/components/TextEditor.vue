@@ -65,7 +65,7 @@ export default {
 
 <style lang="scss">
 .text-editor {
-  border: 1px solid #ccc;
+  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
   border-radius: 4px;
   padding: 10px;
   min-height: 200px;
@@ -90,8 +90,8 @@ export default {
     }
 
     code {
-      background-color: rgba(#616161, 0.1);
-      color: #616161;
+      background-color: rgba(var(--v-theme-on-surface), 0.1);
+      color: rgba(var(--v-theme-on-surface), 0.6);
     }
 
     pre {
@@ -116,12 +116,12 @@ export default {
 
     blockquote {
       padding-left: 1rem;
-      border-left: 2px solid rgba(#0D0D0D, 0.1);
+      border-left: 2px solid rgba(var(--v-theme-on-surface), 0.1);
     }
 
     hr {
       border: none;
-      border-top: 2px solid rgba(#0D0D0D, 0.1);
+      border-top: 2px solid rgba(var(--v-theme-on-surface), 0.1);
       margin: 2rem 0;
     }
   }
