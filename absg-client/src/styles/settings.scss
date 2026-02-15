@@ -1,4 +1,9 @@
 // Vuetify 3 settings
+// Note: $utilities est désactivé car Vuetify 3.5 + Dart Sass ont un bug
+// de compatibilité (string.slice sur booléen dans _index.sass ligne 21).
+// Les classes utilitaires de base (h-100, pa-4, ma-2, etc.) restent
+// disponibles car elles font partie du core Vuetify, pas du module utilities.
+// TODO: Réactiver quand Vuetify corrigera le bug (>3.5.x)
 @use 'vuetify' with (
   $utilities: false
 );
