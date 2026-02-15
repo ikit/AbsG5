@@ -2,13 +2,13 @@
   <div>
     <v-container>
       <!-- Mode Debug Admin -->
-      <v-card v-if="showDebugPanel" style="margin-bottom: 20px; border: 2px solid #ff9800;">
-        <v-card-title style="background: #ff9800; color: white; padding: 10px 20px;">
+      <v-card v-if="showDebugPanel" class="palmares-debug">
+        <v-card-title class="palmares-debug__title">
           <v-icon start color="white">fas fa-user-secret</v-icon>
           Mode Debug Admin
         </v-card-title>
-        <v-card-text style="padding: 15px 20px;">
-          <div style="display: flex; align-items: center; gap: 15px;">
+        <v-card-text class="palmares-debug__content">
+          <div class="palmares-debug__row">
             <v-autocomplete
               v-model="debugUserId"
               :items="allUsers"
@@ -18,7 +18,7 @@
               prepend-icon="fas fa-user"
               clearable
               density="comfortable"
-              style="flex: 1;"
+              class="palmares-debug__autocomplete"
               @update:model-value="onDebugUserChange"
             >
               <template #item="{ props, item }">
@@ -35,7 +35,7 @@
                 </v-list-item>
               </template>
             </v-autocomplete>
-            <v-chip v-if="debugUserId" color="warning" style="font-weight: bold;">
+            <v-chip v-if="debugUserId" color="warning" class="palmares-debug__chip">
               Affichage: {{ debugUserName }}
             </v-chip>
             <v-btn
@@ -153,21 +153,21 @@
       </div>
 
       <!-- Palmarès et Badges côte à côte -->
-      <v-row style="margin-bottom: 20px;">
+      <v-row class="palmares-cards">
         <!-- Palmarès AGPA -->
         <v-col cols="12" md="6">
           <v-card
-            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
+            class="palmares-card"
             @click="showPalmaresDialog = true"
             hover
           >
-            <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <v-card-title class="palmares-card__title palmares-card__title--palmares">
               <v-icon start color="white">fas fa-trophy</v-icon>
               Palmarès AGPA
             </v-card-title>
-            <v-card-text style="padding: 30px; text-align: center;">
+            <v-card-text class="palmares-card__body">
               <!-- Label mode/période -->
-              <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
+              <div class="palmares-card__mode-label">
                 <span v-if="palmaresMode === 'sliding' && slidingYearFrom && slidingYearTo">
                   {{ slidingYearFrom }} - {{ slidingYearTo }}
                 </span>
@@ -177,54 +177,46 @@
               </div>
 
               <!-- Total points cumulés -->
-              <div style="margin-bottom: 25px;">
+              <div class="palmares-card__points">
                 <template v-if="currentPoints > 0">
-                  <div style="font-size: 3em; font-weight: bold; color: #667eea; margin-bottom: 5px;">
+                  <div class="palmares-card__points-value palmares-card__points-value--palmares">
                     {{ currentPoints }}
                   </div>
-                  <div style="font-size: 0.9em; color: #666;">
+                  <div class="palmares-card__points-label">
                     point{{ currentPoints > 1 ? 's' : '' }} cumulé{{ currentPoints > 1 ? 's' : '' }}
                   </div>
                 </template>
                 <template v-else>
-                  <div style="font-size: 2.5em; margin-bottom: 10px;">
-                    <i class="far fa-smile" style="color: #ffa726;"></i>
+                  <div class="palmares-card__empty-icon">
+                    <i class="far fa-smile palmares-card__empty-smiley"></i>
                   </div>
-                  <div style="font-size: 1em; color: #666; font-style: italic;">
+                  <div class="palmares-card__empty-text">
                     Ton heure viendra :)
                   </div>
                 </template>
               </div>
 
               <!-- Répartition des récompenses -->
-              <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;">
-                <div style="text-align: center;">
-                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <i class="fas fa-circle" style="color: #c68b00; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #c68b00;">{{ currentAwards.gold }}</span>
-                  </div>
+              <div class="palmares-awards">
+                <div class="palmares-awards__item">
+                  <i class="fas fa-circle palmares-awards__icon palmares-awards__icon--gold"></i>
+                  <span class="palmares-awards__count palmares-awards__count--gold">{{ currentAwards.gold }}</span>
                 </div>
-                <div style="text-align: center;">
-                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <i class="fas fa-circle" style="color: #9b9b9b; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #9b9b9b;">{{ currentAwards.sylver }}</span>
-                  </div>
+                <div class="palmares-awards__item">
+                  <i class="fas fa-circle palmares-awards__icon palmares-awards__icon--silver"></i>
+                  <span class="palmares-awards__count palmares-awards__count--silver">{{ currentAwards.sylver }}</span>
                 </div>
-                <div style="text-align: center;">
-                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <i class="fas fa-circle" style="color: #cd7f32; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #cd7f32;">{{ currentAwards.bronze }}</span>
-                  </div>
+                <div class="palmares-awards__item">
+                  <i class="fas fa-circle palmares-awards__icon palmares-awards__icon--bronze"></i>
+                  <span class="palmares-awards__count palmares-awards__count--bronze">{{ currentAwards.bronze }}</span>
                 </div>
-                <div style="text-align: center;">
-                  <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <i class="far fa-circle" style="color: #764ba2; font-size: 0.8em;"></i>
-                    <span style="font-size: 1.6em; font-weight: bold; color: #764ba2;">{{ currentAwards.nominated }}</span>
-                  </div>
+                <div class="palmares-awards__item">
+                  <i class="far fa-circle palmares-awards__icon palmares-awards__icon--nominated"></i>
+                  <span class="palmares-awards__count palmares-awards__count--nominated">{{ currentAwards.nominated }}</span>
                 </div>
               </div>
 
-              <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
+              <div class="palmares-card__cta">
                 Cliquez pour voir le palmarès complet
               </div>
             </v-card-text>
@@ -234,18 +226,18 @@
         <!-- Mes Succès -->
         <v-col cols="12" md="6">
           <v-card
-            style="cursor: pointer; transition: transform 0.2s; height: 100%;"
+            class="palmares-card"
             @click="showFamilyGalleryDialog = true"
             hover
           >
-            <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+            <v-card-title class="palmares-card__title palmares-card__title--badges">
               <v-icon start color="white">fas fa-award</v-icon>
               Mes Succès
             </v-card-title>
-            <v-card-text style="padding: 30px; text-align: center;">
+            <v-card-text class="palmares-card__body">
               <!-- Total badges actifs -->
-              <div style="margin-bottom: 25px;">
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
+              <div class="palmares-card__points">
+                <div class="palmares-card__mode-label">
                   <span v-if="palmaresMode === 'sliding' && slidingYearFrom && slidingYearTo">
                     {{ slidingYearFrom }} - {{ slidingYearTo }}
                   </span>
@@ -253,55 +245,42 @@
                     Tous les badges
                   </span>
                 </div>
-                <div style="font-size: 3em; font-weight: bold; color: #fa709a; margin-bottom: 5px;">
+                <div class="palmares-card__points-value palmares-card__points-value--badges">
                   {{ totalActiveBadges }}
                 </div>
-                <div style="font-size: 0.9em; color: #666;">
+                <div class="palmares-card__points-label">
                   Badge{{ totalActiveBadges > 1 ? 's' : '' }} actif{{ totalActiveBadges > 1 ? 's' : '' }}
                 </div>
               </div>
 
               <!-- Top 3 badges les plus rares -->
-              <div v-if="topRarestBadges.length > 0" style="margin-bottom: 15px;">
+              <div v-if="topRarestBadges.length > 0" class="palmares-badge-previews">
                 <div
                   v-for="(badgeData, index) in topRarestBadges"
                   :key="badgeData.badge.badge"
-                  style="margin-bottom: 10px; padding: 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                  class="palmares-badge-preview"
                   :style="{
                     background: `linear-gradient(135deg, ${badgeData.badge.color}22 0%, ${badgeData.badge.color}11 100%)`,
-                    border: `2px solid ${badgeData.badge.color}`
+                    borderColor: badgeData.badge.color
                   }"
                   @click.stop="showBadgesDialog = true"
-                  @mouseenter="$event.currentTarget.style.transform = 'scale(1.02)'"
-                  @mouseleave="$event.currentTarget.style.transform = 'scale(1)'"
                 >
-                  <div style="display: flex; align-items: center; gap: 12px;">
+                  <div class="palmares-badge-preview__row">
                     <!-- Icône du badge -->
-                    <div
-                      style="
-                        min-width: 50px;
-                        height: 50px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 50%;
-                        background: white;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                      "
-                    >
+                    <div class="palmares-badge-preview__icon-wrapper">
                       <i
                         :class="badgeData.badge.icon"
-                        style="font-size: 1.5em;"
+                        class="palmares-badge-preview__icon"
                         :style="{ color: badgeData.badge.color }"
                       ></i>
                     </div>
 
                     <!-- Infos du badge -->
-                    <div style="flex: 1; text-align: left;">
-                      <div style="font-weight: 600; font-size: 0.95em; color: #333; margin-bottom: 2px;">
+                    <div class="palmares-badge-preview__info">
+                      <div class="palmares-badge-preview__name">
                         {{ badgeData.badge.badge }}
                       </div>
-                      <div style="font-size: 0.75em; color: #666;">
+                      <div class="palmares-badge-preview__description">
                         {{ badgeData.badge.description }}
                       </div>
                     </div>
@@ -311,7 +290,7 @@
                       size="x-small"
                       :color="getBadgeTypeColor(badgeData.badge.type)"
                       variant="flat"
-                      style="min-width: 70px;"
+                      class="palmares-badge-preview__chip"
                     >
                       {{ getBadgeTypeLabel(badgeData.badge.type) }}
                     </v-chip>
@@ -320,12 +299,12 @@
               </div>
 
               <!-- Si moins de 3 badges -->
-              <div v-else style="padding: 30px; color: #999; font-style: italic;">
-                <i class="fas fa-trophy" style="font-size: 2em; opacity: 0.3; margin-bottom: 10px;"></i>
+              <div v-else class="palmares-card__empty-placeholder">
+                <i class="fas fa-trophy palmares-card__empty-trophy"></i>
                 <div>Obtenez des badges en participant aux AGPA !</div>
               </div>
 
-              <div style="margin-top: 20px; font-size: 0.9em; color: #999; font-style: italic;">
+              <div class="palmares-card__cta">
                 Cliquez pour voir la galerie par famille
               </div>
             </v-card-text>
@@ -424,14 +403,14 @@
       scrollable
     >
       <v-card>
-        <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; position: sticky; top: 0; z-index: 10;">
+        <v-card-title class="palmares-dialog-title palmares-dialog-title--badges">
           <v-icon start color="white">fas fa-award</v-icon>
           Tous les badges disponibles
         </v-card-title>
 
-        <v-card-text style="padding: 20px;">
+        <v-card-text class="palmares-dialog-content">
           <!-- Filtres -->
-          <div style="margin-bottom: 25px;">
+          <div class="palmares-dialog-filters">
             <v-chip-group
               v-model="badgeFilter"
               mandatory
@@ -462,9 +441,9 @@
           </div>
 
           <!-- Badges Votant -->
-          <div v-if="filteredVoterBadges.length > 0" style="margin-bottom: 30px;">
-            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-              <i class="fas fa-vote-yea" style="color: #2196f3;"></i>
+          <div v-if="filteredVoterBadges.length > 0" class="palmares-badge-section">
+            <h3 class="palmares-badge-section__header">
+              <i class="fas fa-vote-yea palmares-badge-section__icon palmares-badge-section__icon--voter"></i>
               Badges Votant ({{ filteredVoterBadges.length }})
             </h3>
             <v-row>
@@ -485,9 +464,9 @@
           </div>
 
           <!-- Badges Photographe -->
-          <div v-if="filteredPhotographerBadges.length > 0" style="margin-bottom: 30px;">
-            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-              <i class="fas fa-camera" style="color: #ff9800;"></i>
+          <div v-if="filteredPhotographerBadges.length > 0" class="palmares-badge-section">
+            <h3 class="palmares-badge-section__header">
+              <i class="fas fa-camera palmares-badge-section__icon palmares-badge-section__icon--photographer"></i>
               Badges Photographe ({{ filteredPhotographerBadges.length }})
             </h3>
             <v-row>
@@ -509,12 +488,12 @@
 
           <!-- Badges Combo -->
           <div v-if="filteredComboBadges.length > 0">
-            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-              <i class="fas fa-puzzle-piece" style="color: #9c27b0;"></i>
+            <h3 class="palmares-badge-section__header">
+              <i class="fas fa-puzzle-piece palmares-badge-section__icon palmares-badge-section__icon--combo"></i>
               Badges Combo ({{ filteredComboBadges.length }})
             </h3>
-            <div style="font-size: 0.9em; color: #666; margin-bottom: 15px; font-style: italic;">
-              <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
+            <div class="palmares-badge-section__subtitle">
+              <i class="fas fa-info-circle palmares-badge-section__subtitle-icon"></i>
               Les badges combo nécessitent des prérequis (badges votant ou photographe)
             </div>
             <v-row>
@@ -538,10 +517,10 @@
           <!-- Message si aucun badge ne correspond au filtre -->
           <div
             v-if="filteredVoterBadges.length === 0 && filteredPhotographerBadges.length === 0 && filteredComboBadges.length === 0"
-            style="text-align: center; padding: 50px; color: #999;"
+            class="palmares-empty-state"
           >
             <v-icon size="64" color="grey-lighten-2">fas fa-filter</v-icon>
-            <div style="margin-top: 20px; font-size: 1.1em;">
+            <div class="palmares-empty-state__text">
               Aucun badge ne correspond à ce filtre
             </div>
           </div>
@@ -567,14 +546,14 @@
       scrollable
     >
       <v-card>
-        <v-card-title style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; position: sticky; top: 0; z-index: 10;">
+        <v-card-title class="palmares-dialog-title palmares-dialog-title--badges">
           <v-icon start color="white">fas fa-users</v-icon>
           Galerie des Badges par Famille
         </v-card-title>
 
-        <v-card-text style="padding: 30px;">
+        <v-card-text class="palmares-dialog-content palmares-dialog-content--large">
           <!-- Sélecteur de famille -->
-          <div style="margin-bottom: 30px; text-align: center;">
+          <div class="palmares-family-selector">
             <v-btn-toggle
               v-model="selectedFamily"
               mandatory
@@ -598,24 +577,24 @@
           </div>
 
           <!-- Message de chargement -->
-          <div v-if="loadingFamilyMembers" style="text-align: center; padding: 50px;">
+          <div v-if="loadingFamilyMembers" class="palmares-empty-state">
             <v-progress-circular
               indeterminate
               color="primary"
               size="64"
             />
-            <div style="margin-top: 20px; color: #666;">
+            <div class="palmares-empty-state__text palmares-empty-state__text--muted">
               Chargement des membres de la famille...
             </div>
           </div>
 
           <!-- Message si pas de membres -->
-          <div v-else-if="!loadingFamilyMembers && familyMembers.length === 0" style="text-align: center; padding: 50px;">
+          <div v-else-if="!loadingFamilyMembers && familyMembers.length === 0" class="palmares-empty-state">
             <v-icon size="64" color="grey">fas fa-user-slash</v-icon>
-            <div style="margin-top: 20px; color: #666; font-size: 1.1em;">
+            <div class="palmares-empty-state__text">
               Aucun membre actif trouvé pour cette famille
             </div>
-            <div style="margin-top: 10px; color: #999; font-size: 0.9em;">
+            <div class="palmares-empty-state__subtext">
               (Actif = ayant participé aux AGPA ces 3 dernières années)
             </div>
           </div>
@@ -635,13 +614,12 @@
                 hover
                 elevation="2"
                 @click="showMemberDetails(member)"
-                style="cursor: pointer;"
               >
                 <!-- Avatar -->
-                <div style="text-align: center; padding: 20px 20px 10px 20px;">
+                <div class="member-card__avatar-wrapper">
                   <v-avatar
                     size="120"
-                    style="border: 4px solid #f5f5f5; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                    class="member-card__avatar"
                   >
                     <img
                       :src="`/files/avatars/${String(member.userId).padStart(3, '0')}.png`"
@@ -652,59 +630,44 @@
                 </div>
 
                 <!-- Nom d'utilisateur -->
-                <v-card-title style="text-align: center; padding: 10px 15px; font-size: 1.1em;">
+                <v-card-title class="member-card__title">
                   {{ member.username }}
                 </v-card-title>
 
                 <!-- Badge principal (le plus rare) -->
-                <v-card-text v-if="member.mainBadge" style="text-align: center; padding: 15px;">
-                  <div
-                    style="
-                      padding: 15px;
-                      border-radius: 12px;
-                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                      color: white;
-                      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-                    "
-                  >
-                    <div style="margin-bottom: 8px;">
+                <v-card-text v-if="member.mainBadge" class="member-card__badge-wrapper">
+                  <div class="member-card__main-badge">
+                    <div class="member-card__badge-icon-row">
                       <i
                         :class="member.mainBadge.icon"
-                        style="font-size: 2em;"
+                        class="member-card__badge-icon"
                         :style="{ color: member.mainBadge.color || '#ffffff' }"
                       ></i>
                     </div>
-                    <div style="font-weight: 600; font-size: 0.95em; margin-bottom: 4px;">
+                    <div class="member-card__badge-name">
                       {{ member.mainBadge.badge }}
                     </div>
-                    <div style="font-size: 0.75em; opacity: 0.9;">
+                    <div class="member-card__badge-description">
                       {{ member.mainBadge.description }}
                     </div>
-                    <div style="font-size: 0.7em; opacity: 0.7; margin-top: 6px;">
+                    <div class="member-card__badge-year">
                       Édition {{ member.mainBadge.year }}
                     </div>
                   </div>
                 </v-card-text>
 
                 <!-- Si pas de badge -->
-                <v-card-text v-else style="text-align: center; padding: 15px;">
-                  <div
-                    style="
-                      padding: 15px;
-                      border-radius: 12px;
-                      background: #f5f5f5;
-                      color: #999;
-                    "
-                  >
-                    <i class="fas fa-medal" style="font-size: 2em; opacity: 0.3;"></i>
-                    <div style="font-size: 0.85em; margin-top: 8px;">
+                <v-card-text v-else class="member-card__badge-wrapper">
+                  <div class="member-card__no-badge">
+                    <i class="fas fa-medal member-card__no-badge-icon"></i>
+                    <div class="member-card__no-badge-text">
                       Aucun badge obtenu
                     </div>
                   </div>
                 </v-card-text>
 
                 <!-- Nombre total de badges obtenus -->
-                <v-card-actions style="justify-content: center; padding: 10px;">
+                <v-card-actions class="member-card__actions">
                   <v-chip
                     v-if="member.totalBadges > 0"
                     color="primary"
@@ -750,9 +713,9 @@
     >
       <v-card v-if="selectedMember">
         <!-- En-tête avec avatar et nom -->
-        <v-card-title style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px;">
-          <div style="display: flex; align-items: center; gap: 20px;">
-            <v-avatar size="80" style="border: 3px solid white;">
+        <v-card-title class="palmares-member-dialog__title">
+          <div class="palmares-member-dialog__header">
+            <v-avatar size="80" class="palmares-member-dialog__avatar">
               <img
                 :src="`/files/avatars/${String(selectedMember.userId).padStart(3, '0')}.png`"
                 :alt="selectedMember.username"
@@ -760,10 +723,10 @@
               >
             </v-avatar>
             <div>
-              <div style="font-size: 1.5em; font-weight: 600;">
+              <div class="palmares-member-dialog__name">
                 {{ selectedMember.username }}
               </div>
-              <div style="font-size: 0.9em; opacity: 0.9; margin-top: 5px;">
+              <div class="palmares-member-dialog__count">
                 <v-icon start color="white" size="small">fas fa-award</v-icon>
                 {{ selectedMember.totalBadges }} badge{{ selectedMember.totalBadges > 1 ? 's' : '' }} obtenu{{ selectedMember.totalBadges > 1 ? 's' : '' }}
               </div>
@@ -772,12 +735,12 @@
         </v-card-title>
 
         <!-- Corps avec la liste des badges -->
-        <v-card-text style="padding: 25px; max-height: 500px;">
+        <v-card-text class="palmares-member-dialog__content">
           <div v-if="selectedMember.allBadges && selectedMember.allBadges.length > 0">
             <div
               v-for="(badge, index) in selectedMember.allBadges"
               :key="`${badge.badge}_${badge.year}_${badge.type}`"
-              style="margin-bottom: 15px;"
+              class="palmares-member-dialog__badge-item"
             >
               <v-card
                 :style="{
@@ -786,37 +749,26 @@
                 }"
                 elevation="1"
               >
-                <v-card-text style="padding: 20px;">
-                  <div style="display: flex; align-items: center; gap: 20px;">
+                <v-card-text class="palmares-member-dialog__badge-body">
+                  <div class="palmares-member-dialog__badge-row">
                     <!-- Icône du badge -->
-                    <div
-                      style="
-                        min-width: 60px;
-                        height: 60px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 50%;
-                        background: white;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                      "
-                    >
+                    <div class="palmares-member-dialog__badge-icon-wrapper">
                       <i
                         :class="badge.icon"
-                        style="font-size: 1.8em;"
-                        :style="{ color: badge.color || '#666' }"
+                        class="palmares-member-dialog__badge-icon"
+                        :style="{ color: badge.color || 'inherit' }"
                       ></i>
                     </div>
 
                     <!-- Infos du badge -->
-                    <div style="flex: 1;">
-                      <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 5px;">
+                    <div class="palmares-member-dialog__badge-info">
+                      <div class="palmares-member-dialog__badge-name">
                         {{ badge.badge }}
                       </div>
-                      <div style="color: #666; font-size: 0.9em; margin-bottom: 8px;">
+                      <div class="palmares-member-dialog__badge-description">
                         {{ badge.description }}
                       </div>
-                      <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                      <div class="palmares-member-dialog__badge-chips">
                         <v-chip
                           size="small"
                           :color="getBadgeTypeColor(badge.type)"
@@ -838,16 +790,16 @@
           </div>
 
           <!-- Message si aucun badge -->
-          <div v-else style="text-align: center; padding: 50px; color: #999;">
+          <div v-else class="palmares-empty-state">
             <v-icon size="64" color="grey-lighten-2">fas fa-medal</v-icon>
-            <div style="margin-top: 20px; font-size: 1.1em;">
+            <div class="palmares-empty-state__text">
               Aucun badge obtenu sur les 3 dernières années
             </div>
           </div>
         </v-card-text>
 
         <!-- Actions -->
-        <v-card-actions style="padding: 15px 25px; justify-content: flex-end;">
+        <v-card-actions class="palmares-member-dialog__actions">
           <v-btn
             color="primary"
             variant="text"
@@ -1966,6 +1918,19 @@ export default {
 <style lang="scss" scoped>
 @use '../../themes/global.scss' as *;
 
+// ============================================
+// Couleurs AGPA récompenses
+// ============================================
+$award-gold: #c68b00;
+$award-silver: #9b9b9b;
+$award-bronze: #cd7f32;
+$award-nominated: #764ba2;
+$gradient-palmares: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
+$gradient-badges: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+
+// ============================================
+// Toolbar (existant)
+// ============================================
 .palmares-toolbar {
   border-radius: 12px;
   padding: 12px 20px;
@@ -2042,12 +2007,500 @@ export default {
   }
 }
 
-.member-card {
-  transition: transform 0.2s, box-shadow 0.2s;
+// ============================================
+// Debug panel
+// ============================================
+.palmares-debug {
+  margin-bottom: 20px;
+  border: 2px solid rgb(var(--v-theme-warning));
+
+  &__title {
+    background: rgb(var(--v-theme-warning));
+    color: white;
+    padding: 10px 20px;
+  }
+
+  &__content {
+    padding: 15px 20px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  &__autocomplete {
+    flex: 1;
+  }
+
+  &__chip {
+    font-weight: bold;
+  }
 }
 
-.member-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+// ============================================
+// Cartes Palmarès & Mes Succès
+// ============================================
+.palmares-cards {
+  margin-bottom: 20px;
+}
+
+.palmares-card {
+  cursor: pointer;
+  transition: transform 0.2s;
+  height: 100%;
+
+  &__title {
+    color: white;
+
+    &--palmares {
+      background: $gradient-palmares;
+    }
+
+    &--badges {
+      background: $gradient-badges;
+    }
+  }
+
+  &__body {
+    padding: 30px;
+    text-align: center;
+  }
+
+  &__mode-label {
+    font-size: 0.85em;
+    color: rgba(var(--v-theme-on-surface), 0.5);
+    margin-bottom: 10px;
+  }
+
+  &__points {
+    margin-bottom: 25px;
+  }
+
+  &__points-value {
+    font-size: 3em;
+    font-weight: bold;
+    margin-bottom: 5px;
+
+    &--palmares {
+      color: rgb(var(--v-theme-primary));
+    }
+
+    &--badges {
+      color: #fa709a;
+    }
+  }
+
+  &__points-label {
+    font-size: 0.9em;
+    color: rgba(var(--v-theme-on-surface), 0.5);
+  }
+
+  &__empty-icon {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+  }
+
+  &__empty-smiley {
+    color: rgb(var(--v-theme-warning));
+  }
+
+  &__empty-text {
+    font-size: 1em;
+    color: rgba(var(--v-theme-on-surface), 0.5);
+    font-style: italic;
+  }
+
+  &__empty-placeholder {
+    padding: 30px;
+    color: rgba(var(--v-theme-on-surface), 0.4);
+    font-style: italic;
+  }
+
+  &__empty-trophy {
+    font-size: 2em;
+    opacity: 0.3;
+    margin-bottom: 10px;
+  }
+
+  &__cta {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: rgba(var(--v-theme-on-surface), 0.4);
+    font-style: italic;
+  }
+}
+
+// ============================================
+// Répartition des récompenses
+// ============================================
+.palmares-awards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+
+  &__item {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  &__icon {
+    font-size: 0.8em;
+
+    &--gold { color: $award-gold; }
+    &--silver { color: $award-silver; }
+    &--bronze { color: $award-bronze; }
+    &--nominated { color: $award-nominated; }
+  }
+
+  &__count {
+    font-size: 1.6em;
+    font-weight: bold;
+
+    &--gold { color: $award-gold; }
+    &--silver { color: $award-silver; }
+    &--bronze { color: $award-bronze; }
+    &--nominated { color: $award-nominated; }
+  }
+}
+
+// ============================================
+// Aperçu des badges (top 3 rarest)
+// ============================================
+.palmares-badge-previews {
+  margin-bottom: 15px;
+}
+
+.palmares-badge-preview {
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__icon-wrapper {
+    min-width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgb(var(--v-theme-surface));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &__icon {
+    font-size: 1.5em;
+  }
+
+  &__info {
+    flex: 1;
+    text-align: left;
+  }
+
+  &__name {
+    font-weight: 600;
+    font-size: 0.95em;
+    color: rgba(var(--v-theme-on-surface), 0.87);
+    margin-bottom: 2px;
+  }
+
+  &__description {
+    font-size: 0.75em;
+    color: rgba(var(--v-theme-on-surface), 0.5);
+  }
+
+  &__chip {
+    min-width: 70px;
+  }
+}
+
+// ============================================
+// Dialogs communs
+// ============================================
+.palmares-dialog-title {
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  &--badges {
+    background: $gradient-badges;
+  }
+}
+
+.palmares-dialog-content {
+  padding: 20px;
+
+  &--large {
+    padding: 30px;
+  }
+}
+
+.palmares-dialog-filters {
+  margin-bottom: 25px;
+}
+
+// ============================================
+// Sections de badges (votant/photographe/combo)
+// ============================================
+.palmares-badge-section {
+  margin-bottom: 30px;
+
+  &__header {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__icon {
+    &--voter { color: rgb(var(--v-theme-info)); }
+    &--photographer { color: rgb(var(--v-theme-warning)); }
+    &--combo { color: #9c27b0; }
+  }
+
+  &__subtitle {
+    font-size: 0.9em;
+    color: rgba(var(--v-theme-on-surface), 0.5);
+    margin-bottom: 15px;
+    font-style: italic;
+  }
+
+  &__subtitle-icon {
+    margin-right: 4px;
+  }
+}
+
+// ============================================
+// États vides
+// ============================================
+.palmares-empty-state {
+  text-align: center;
+  padding: 50px;
+  color: rgba(var(--v-theme-on-surface), 0.4);
+
+  &__text {
+    margin-top: 20px;
+    font-size: 1.1em;
+
+    &--muted {
+      color: rgba(var(--v-theme-on-surface), 0.5);
+    }
+  }
+
+  &__subtext {
+    margin-top: 10px;
+    color: rgba(var(--v-theme-on-surface), 0.4);
+    font-size: 0.9em;
+  }
+}
+
+// ============================================
+// Sélecteur de famille
+// ============================================
+.palmares-family-selector {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+// ============================================
+// Carte membre (galerie famille)
+// ============================================
+.member-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  &__avatar-wrapper {
+    text-align: center;
+    padding: 20px 20px 10px;
+  }
+
+  &__avatar {
+    border: 4px solid rgba(var(--v-theme-on-surface), 0.08);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &__title {
+    text-align: center;
+    padding: 10px 15px;
+    font-size: 1.1em;
+  }
+
+  &__badge-wrapper {
+    text-align: center;
+    padding: 15px;
+  }
+
+  &__main-badge {
+    padding: 15px;
+    border-radius: 12px;
+    background: $gradient-palmares;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &__badge-icon-row {
+    margin-bottom: 8px;
+  }
+
+  &__badge-icon {
+    font-size: 2em;
+  }
+
+  &__badge-name {
+    font-weight: 600;
+    font-size: 0.95em;
+    margin-bottom: 4px;
+  }
+
+  &__badge-description {
+    font-size: 0.75em;
+    opacity: 0.9;
+  }
+
+  &__badge-year {
+    font-size: 0.7em;
+    opacity: 0.7;
+    margin-top: 6px;
+  }
+
+  &__no-badge {
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(var(--v-theme-on-surface), 0.05);
+    color: rgba(var(--v-theme-on-surface), 0.4);
+  }
+
+  &__no-badge-icon {
+    font-size: 2em;
+    opacity: 0.3;
+  }
+
+  &__no-badge-text {
+    font-size: 0.85em;
+    margin-top: 8px;
+  }
+
+  &__actions {
+    justify-content: center;
+    padding: 10px;
+  }
+}
+
+// ============================================
+// Dialog détails membre
+// ============================================
+.palmares-member-dialog {
+  &__title {
+    background: $gradient-palmares;
+    color: white;
+    padding: 25px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__avatar {
+    border: 3px solid white;
+  }
+
+  &__name {
+    font-size: 1.5em;
+    font-weight: 600;
+  }
+
+  &__count {
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin-top: 5px;
+  }
+
+  &__content {
+    padding: 25px;
+    max-height: 500px;
+  }
+
+  &__badge-item {
+    margin-bottom: 15px;
+  }
+
+  &__badge-body {
+    padding: 20px;
+  }
+
+  &__badge-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__badge-icon-wrapper {
+    min-width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgb(var(--v-theme-surface));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &__badge-icon {
+    font-size: 1.8em;
+  }
+
+  &__badge-info {
+    flex: 1;
+  }
+
+  &__badge-name {
+    font-weight: 600;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+  }
+
+  &__badge-description {
+    color: rgba(var(--v-theme-on-surface), 0.5);
+    font-size: 0.9em;
+    margin-bottom: 8px;
+  }
+
+  &__badge-chips {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  &__actions {
+    padding: 15px 25px;
+    justify-content: flex-end;
+  }
 }
 </style>
