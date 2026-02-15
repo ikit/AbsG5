@@ -82,8 +82,8 @@
 
     <div v-if="current && agpaMeta">
       <!-- Titre des catégories -->
-      <div style="text-align: center; margin: 40px 20px 20px;">
-        <h2 style="font-family: 'Tangerine', serif; font-size: 3em; color: #666;">
+      <div class="archive-section-heading">
+        <h2 class="archive-section-title">
           Catégories
         </h2>
       </div>
@@ -117,15 +117,15 @@
               transform: $vuetify.display.mobile ? 'translateX(-50%)' : 'none'
             }"
           >
-          <div style="padding: 5px 15px; margin: 0; background: #efefef; border: 1px solid #ddd; border-width: 1px 0; display: flex; align-items: center; gap: 10px;">
-            <span style="font-family: 'Tangerine', serif; font-size: 2em">
+          <div class="archive-cat-header">
+            <span class="archive-cat-title">
               {{ current.categories[catIdx].title }}
             </span>
-            <div style="flex: 1" />
+            <div class="flex-grow-1" />
             <v-tooltip bottom>
               <template #activator="{ props }">
                 <span
-                  style="line-height: 48px"
+                  class="archive-stat-value"
                   v-bind="props"
                 ><i class="far fa-user" /> {{ current.categories[catIdx].totalUsers }}</span>
               </template>
@@ -134,7 +134,7 @@
             <v-tooltip bottom>
               <template #activator="{ props }">
                 <span
-                  style="line-height: 48px"
+                  class="archive-stat-value"
                   v-bind="props"
                 ><i class="far fa-image" /> {{ current.categories[catIdx].totalPhotos }}</span>
               </template>
@@ -149,7 +149,7 @@
                   v-for="p of current.categories[catIdx].photos"
                   :key="p.id"
                 >
-                  <td style="text-align: left">
+                  <td class="text-left">
                     <span
                       v-for="a of p.awards"
                       :key="a"
@@ -180,10 +180,10 @@
                       />
                     </span>
                   </td>
-                  <td style="text-align: left">
+                  <td class="text-left">
                     {{ p.user.username }}
                   </td>
-                  <td style="text-align: left">
+                  <td class="text-left">
                     {{ p.title }}
                   </td>
                 </tr>
@@ -194,7 +194,7 @@
           <v-tooltip bottom>
             <template #activator="{ props }">
               <v-btn
-                style="margin-top: 20px"
+                class="archive-gallery-btn"
                 :to="{path: `/agpa/archives/${year}/${catIdx}` }"
                 v-bind="props"
               >
@@ -250,7 +250,7 @@
       </div>
 
       <!-- Bouton de téléchargement des données -->
-      <div style="text-align: center; margin: 60px 20px 40px; padding-top: 40px; border-top: 1px solid #ddd;">
+      <div class="archive-download-section">
         <v-tooltip bottom>
           <template #activator="{ props }">
             <v-btn
@@ -393,6 +393,48 @@ export default {
     padding: 1px;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
     cursor: pointer;
+}
+
+.archive-section-heading {
+    text-align: center;
+    margin: 40px 20px 20px;
+}
+
+.archive-section-title {
+    font-family: 'Tangerine', serif;
+    font-size: 3em;
+    color: rgba(var(--v-theme-on-surface), 0.6);
+}
+
+.archive-cat-header {
+    padding: 5px 15px;
+    margin: 0;
+    background: rgba(var(--v-theme-on-surface), 0.05);
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.15);
+    border-width: 1px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.archive-cat-title {
+    font-family: 'Tangerine', serif;
+    font-size: 2em;
+}
+
+.archive-stat-value {
+    line-height: 48px;
+}
+
+.archive-gallery-btn {
+    margin-top: 20px;
+}
+
+.archive-download-section {
+    text-align: center;
+    margin: 60px 20px 40px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(var(--v-theme-on-surface), 0.15);
 }
 
 .loading-bar {

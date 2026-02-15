@@ -4,11 +4,11 @@
       Règlement officiel des AGPA – Version du 5 janvier 2026
     </div>
 
-    <v-expansion-panels style="padding: 10px; max-width: 800px; margin: auto">
+    <v-expansion-panels class="rules-panels">
       <!-- I.1. Présentation des AGPA -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">I.1.</i> Présentation des AGPA</span>
+          <span><i class="rules-section-num">I.1.</i> Présentation des AGPA</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -17,10 +17,9 @@
           </p>
           <p>Liste et description des catégories retenues :</p>
 
-          <v-card style="width: 100%;">
+          <v-card class="rules-table-card">
             <v-table
-              class="categories"
-              style="width: 100%; text-align: left;"
+              class="categories rules-categories-table"
             >
               <tbody>
                 <tr><th>Portrait</th><td>Photos mettant en évidence un personnage unique de plus de douze ans (âge pris lors de l'année en cours)</td></tr>
@@ -40,7 +39,7 @@
       <!-- I.2. Historique -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">I.2.</i> Historique</span>
+          <span><i class="rules-section-num">I.2.</i> Historique</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <dl>
@@ -116,7 +115,7 @@
       <!-- I.3. Organisation du concours -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">I.3.</i> Organisation du concours</span>
+          <span><i class="rules-section-num">I.3.</i> Organisation du concours</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -125,8 +124,8 @@
             Les candidats seront alors prévenus sur le forum Absolument G, et par le site des AGPA lui même.
           </p>
 
-          <v-card style="width: 100%; padding: 15px">
-            <table style="width: 100%; text-align: left;">
+          <v-card class="rules-table-card rules-table-card--padded">
+            <table class="rules-info-table">
               <tbody>
                 <tr><td>Phase n°1</td><td>1er oct. à 00h00</td><td>Enregistrement des photos</td></tr>
                 <tr><td>Phase n°2</td><td>19 déc. à 00h00</td><td>Validation des photos</td></tr>
@@ -142,7 +141,7 @@
       <!-- II.1. Participation et conditions générales -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.1.</i> Participation et conditions générales</span>
+          <span><i class="rules-section-num">II.1.</i> Participation et conditions générales</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -176,7 +175,7 @@
       <!-- II.2. Phase 1: Enregistrement des photos -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.2.</i> Phase 1: Enregistrement des photos</span>
+          <span><i class="rules-section-num">II.2.</i> Phase 1: Enregistrement des photos</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -209,7 +208,7 @@
       <!-- II.3. Phase 2: Validation des photos -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.3.</i> Phase 2: Validation des photos</span>
+          <span><i class="rules-section-num">II.3.</i> Phase 2: Validation des photos</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -236,7 +235,7 @@
       <!-- II.4. Phase 3: Votes -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.4.</i> Phase 3: Votes</span>
+          <span><i class="rules-section-num">II.4.</i> Phase 3: Votes</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -272,7 +271,7 @@
       <!-- II.5. Phase 4: Dépouillement -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.</i> Phase 4: Dépouillement</span>
+          <span><i class="rules-section-num">II.5.</i> Phase 4: Dépouillement</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -308,7 +307,7 @@
       <!-- II.5.a. Calcul des points (V2026) -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.a.</i> Calcul des notes (Algorithme V2026)</span>
+          <span><i class="rules-section-num">II.5.a.</i> Calcul des notes (Algorithme V2026)</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -326,11 +325,11 @@
           </ol>
 
           <p><strong>Formule de conversion :</strong></p>
-          <v-card style="padding: 15px; margin: 15px 0; font-family: monospace; background: #f5f5f5;">
+          <v-card class="rules-formula-card">
             Score = 100 × (RangMax - RangMoyen) / (RangMax - RangMin)
           </v-card>
 
-          <table style="width: 100%; text-align: left; margin: 15px 0">
+          <table class="rules-info-table rules-info-table--spaced">
             <tbody>
               <tr><td><i>RangMoyen</i></td><td>moyenne des rangs attribués par les trois familles</td></tr>
               <tr><td><i>RangMin</i></td><td>meilleur rang moyen de la catégorie (généralement proche de 1)</td></tr>
@@ -363,13 +362,13 @@
       <!-- II.5.a'. Ancien algorithme V2010 -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.a'</i> Ancien algorithme (V2010) - Historique</span>
+          <span><i class="rules-section-num">II.5.a'</i> Ancien algorithme (V2010) - Historique</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-alert
             type="info"
             variant="tonal"
-            style="margin-bottom: 20px;"
+            class="rules-alert-spacing"
           >
             <strong>Note :</strong> L'algorithme V2010, utilisé de 2008 à 2025, calculait une note unique
             basée sur le nombre total de points et de votes, pondérée par le nombre de photos de la catégorie.
@@ -390,7 +389,7 @@
             alt="NoteVts = VtsPhoto x NbPhotos /VtsCatégorie x 10^4/1001 "
           ><br>
 
-          <table style="width: 100%; text-align: left; margin: 15px 0">
+          <table class="rules-info-table rules-info-table--spaced">
             <tbody>
               <tr><td><i>PtsPhoto</i></td><td>nombre total de points recueillis par la photo</td></tr>
               <tr><td><i>PtsCatégorie</i></td><td>nombre total de points recueillis par l'ensemble des photos de la catégorie</td></tr>
@@ -415,7 +414,7 @@
       <!-- II.5.b. AGPA du meilleur titre -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.b.</i> AGPA du meilleur titre</span>
+          <span><i class="rules-section-num">II.5.b.</i> AGPA du meilleur titre</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -444,7 +443,7 @@
       <!-- II.5.c. AGPA de la meilleure photographie -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.c.</i> AGPA de la meilleure photographie</span>
+          <span><i class="rules-section-num">II.5.c.</i> AGPA de la meilleure photographie</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -462,7 +461,7 @@
       <!-- II.5.d. AGPA du meilleur photographe -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.d.</i> AGPA du meilleur photographe</span>
+          <span><i class="rules-section-num">II.5.d.</i> AGPA du meilleur photographe</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -484,7 +483,7 @@
       <!-- II.5.e. AGPA d'honneur -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.e.</i> AGPA d'honneur</span>
+          <span><i class="rules-section-num">II.5.e.</i> AGPA d'honneur</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -499,7 +498,7 @@
       <!-- II.5.f. AGPA de diamant -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.5.f.</i> AGPA de diamant</span>
+          <span><i class="rules-section-num">II.5.f.</i> AGPA de diamant</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -527,7 +526,7 @@
       <!-- II.6. Phase 5: Cérémonie des AGPA -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">II.6.</i> Phase 5: Cérémonie des AGPA</span>
+          <span><i class="rules-section-num">II.6.</i> Phase 5: Cérémonie des AGPA</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -570,7 +569,7 @@
       <!-- III. Palmarès -->
       <v-expansion-panel>
         <v-expansion-panel-title>
-          <span><i style="display: inline-block; width: 40px">III.</i> Palmarès</span>
+          <span><i class="rules-section-num">III.</i> Palmarès</span>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <p>
@@ -578,8 +577,8 @@
             Ce système permet notamment de départager les ex-æquo (en favorisant le palmarès cumulé le plus faible) ou d’établir un palmarès général,
             toutes éditions confondues. Ces points sont attribués à chaque candidat en fonction des récompenses reçues, selon le barème suivant :
           </p>
-          <v-card style="width: 100%;">
-            <table style="width: 100%; text-align: center;">
+          <v-card class="rules-table-card">
+            <table class="rules-scoring-table">
               <thead>
                 <tr><th>AGPA de diamant</th><th>AGPA d'or</th><th>AGPA d'argent</th><th>AGPA de bronze</th><th>Nominé</th></tr>
               </thead>
@@ -616,8 +615,7 @@ h1 {
     font-weight: bold;
     text-align: center;
     color: rgb(var(--v-theme-primary));
-    text-shadow: 0 -1px #000;
-    text-shadow: 0 1px #aaa;
+    text-shadow: 0 1px rgba(var(--v-theme-on-surface), 0.3);
     font-size: 40px;
     font-family: "Comfortaa", sans-serif;
     margin: 20px 0 60px 0;
@@ -628,7 +626,7 @@ dt {
 }
 dd {
     margin-left: 20px;
-    border-left: 3px solid #ddd;
+    border-left: 3px solid rgba(var(--v-theme-on-surface), 0.15);
     padding-left: 10px;
 
     ul {
@@ -671,6 +669,55 @@ ol li {
         vertical-align: top;
         padding: 5px 16px;
     }
+}
+
+.rules-panels {
+    padding: 10px;
+    max-width: 800px;
+    margin: auto;
+}
+
+.rules-section-num {
+    display: inline-block;
+    width: 40px;
+}
+
+.rules-table-card {
+    width: 100%;
+
+    &--padded {
+        padding: 15px;
+    }
+}
+
+.rules-categories-table {
+    width: 100%;
+    text-align: left;
+}
+
+.rules-info-table {
+    width: 100%;
+    text-align: left;
+
+    &--spaced {
+        margin: 15px 0;
+    }
+}
+
+.rules-formula-card {
+    padding: 15px;
+    margin: 15px 0;
+    font-family: monospace;
+    background: rgba(var(--v-theme-on-surface), 0.05);
+}
+
+.rules-scoring-table {
+    width: 100%;
+    text-align: center;
+}
+
+.rules-alert-spacing {
+    margin-bottom: 20px;
 }
 
 .version {
