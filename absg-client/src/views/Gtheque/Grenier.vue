@@ -2,7 +2,7 @@
   <div>
     <div
       :class="{ stickyHeader: $vuetify.display.lgAndUp, stickyHeaderSmall: !$vuetify.display.lgAndUp }"
-      style="padding: 15px"
+      class="grenier-header"
     >
       <router-link
         :to="{ path: `/gtheque/grenier` }"
@@ -11,7 +11,7 @@
         <v-icon>fas fa-home</v-icon>
         <span
           v-if="$vuetify.display.lgAndUp"
-          style="margin-left: 15px"
+          class="grenier-label"
         >Grenier</span>
       </router-link>
 
@@ -20,7 +20,7 @@
         :to="{ path: '/gtheque/grenier' + p.path }"
         tag="button"
         :key="p.path"
-        style="margin-left: 10px"
+        class="grenier-breadcrumb"
       >
         <v-icon>fas fa-chevron-right</v-icon>
         {{ p.label }}
@@ -35,14 +35,14 @@
         <v-col
           v-for="item in files"
           :key="item.name"
-          style="width: 300px; max-width: 300px; margin: 15px;"
+          class="grenier-item-col"
         >
           <router-link
             v-if="item.type === 'folder'"
             :to="{path: `/gtheque/grenier/${item.path}`}"
-            style="text-decoration: none"
+            class="grenier-link"
           >
-            <v-card style="display: block; ">
+            <v-card class="d-block">
               <v-img
                 :src="item.thumb"
                 aspect-ratio="1.5"
@@ -50,7 +50,7 @@
 
               <v-card-title
                 primary-title
-                style="position: relative"
+                class="grenier-card-title"
               >
                 {{ item.name }}
               </v-card-title>
@@ -65,7 +65,7 @@
             target="_blank" 
             :href="item.url"
             @click="logClickOnMedia(item)"
-            style="text-decoration: none">
+            class="grenier-link">
             <v-card>
               <v-img
                 :src="item.thumb"
@@ -74,7 +74,7 @@
 
               <v-card-title
                 primary-title
-                style="position: relative"
+                class="grenier-card-title"
               >
                 {{ item.name }}
               </v-card-title>
@@ -156,23 +156,49 @@ h1 {
 hr {
     width: 200px;
     border: 1px;
-    border-bottom: 1px solid #aaa;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.3);
     margin: auto;
     margin-top: -50px;
     margin-bottom: 70px;
 }
 p {
     text-align: center;
-    color: #999;
+    color: rgba(var(--v-theme-on-surface), 0.45);
     font-size: 1.5em;
 }
+.grenier-header {
+    padding: 15px;
+}
+
+.grenier-label {
+    margin-left: 15px;
+}
+
+.grenier-breadcrumb {
+    margin-left: 10px;
+}
+
+.grenier-item-col {
+    width: 300px;
+    max-width: 300px;
+    margin: 15px;
+}
+
+.grenier-link {
+    text-decoration: none;
+}
+
+.grenier-card-title {
+    position: relative;
+}
+
 p.token {
     font-family: monospace;
     width: 210px;
     margin: auto;
     margin-top: 50px;
-    border: 1px solid #999;
-    background: #fff;
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.45);
+    background: rgb(var(--v-theme-surface));
     text-align: center
 }
 </style>

@@ -52,14 +52,14 @@ h1 {
 hr {
     width: 200px;
     border: 1px;
-    border-bottom: 1px solid #aaa;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.3);
     margin: auto;
     margin-top: -50px;
     margin-bottom: 70px;
 }
 p {
     text-align: center;
-    color: #999;
+    color: rgba(var(--v-theme-on-surface), 0.45);
     font-size: 1.5em;
 }
 p.token {
@@ -67,8 +67,8 @@ p.token {
     width: 210px;
     margin: auto;
     margin-top: 50px;
-    border: 1px solid #999;
-    background: #fff;
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.45);
+    background: rgb(var(--v-theme-surface));
     text-align: center
 }
 </style>
