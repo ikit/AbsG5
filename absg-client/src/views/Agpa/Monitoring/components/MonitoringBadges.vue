@@ -38,7 +38,7 @@
 
             <div v-if="isComputing" class="d-flex align-center ga-2">
               <v-progress-circular indeterminate color="primary" size="20" />
-              <span class="text-body-2" style="color: #666;">Calcul en cours...</span>
+              <span class="text-body-2 monitoring-badges__muted">Calcul en cours...</span>
             </div>
           </v-col>
         </v-row>
@@ -265,3 +265,9 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.monitoring-badges__muted {
+  color: rgba(var(--v-theme-on-surface), 0.6);
+}
+</style>

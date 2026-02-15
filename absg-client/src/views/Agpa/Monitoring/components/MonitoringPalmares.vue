@@ -16,9 +16,9 @@
           <img
             v-if="item.url"
             :src="item.url"
-            style="height: 40px; margin-right: 15px; border-radius: 50%;"
+            class="monitoring-pal__avatar"
           >
-          <span style="font-size: 1.1em">{{ item.username }}</span>
+          <span class="monitoring-pal__username">{{ item.username }}</span>
           <v-chip v-if="item.rootFamily" size="x-small" :color="getFamilyColor(item.rootFamily)" class="ml-2">
             {{ item.rootFamily?.substring(0, 2).toUpperCase() }}
           </v-chip>
@@ -162,3 +162,14 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.monitoring-pal__avatar {
+  height: 40px;
+  margin-right: 15px;
+  border-radius: 50%;
+}
+.monitoring-pal__username {
+  font-size: 1.1em;
+}
+</style>

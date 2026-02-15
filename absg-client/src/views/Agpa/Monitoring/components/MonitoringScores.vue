@@ -11,7 +11,7 @@
         single-line
         hide-details
         density="compact"
-        style="max-width: 250px; min-width: 200px;"
+        class="monitoring-scores__search-field"
       />
       <v-select
         v-model="selectedCategory"
@@ -21,7 +21,7 @@
         label="Catégorie"
         density="compact"
         hide-details
-        style="max-width: 200px; min-width: 180px;"
+        class="monitoring-scores__cat-select"
       />
     </div>
 
@@ -55,7 +55,7 @@
       <v-card class="mb-4">
         <v-card-title>
           {{ getCategoryName(selectedCategory) }}
-          <span class="text-body-2 ml-2" style="opacity: 0.6;">
+          <span class="text-body-2 ml-2 monitoring-scores__muted">
             ({{ getCategoryPhotoCount(selectedCategory) }} photos)
           </span>
         </v-card-title>
@@ -73,7 +73,7 @@
 
             <template #[`item.photo`]="{ item }">
               <div class="d-flex align-center">
-                <span style="opacity: 0.5; margin-right: 8px;">({{ item.photoId }})</span>
+                <span class="monitoring-scores__photo-id">({{ item.photoId }})</span>
                 {{ item.title }}
               </div>
             </template>
@@ -200,7 +200,7 @@
 
           <template #[`item.photo`]="{ item }">
             <div class="d-flex align-center">
-              <span style="opacity: 0.5; margin-right: 8px;">({{ item.photoId }})</span>
+              <span class="monitoring-scores__photo-id">({{ item.photoId }})</span>
               {{ item.title }}
             </div>
           </template>
@@ -339,3 +339,24 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.monitoring-scores__search-field {
+  max-width: 250px;
+  min-width: 200px;
+}
+
+.monitoring-scores__cat-select {
+  max-width: 200px;
+  min-width: 180px;
+}
+
+.monitoring-scores__muted {
+  opacity: 0.6;
+}
+
+.monitoring-scores__photo-id {
+  opacity: 0.5;
+  margin-right: 8px;
+}
+</style>

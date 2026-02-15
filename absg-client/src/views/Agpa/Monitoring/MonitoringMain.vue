@@ -3,7 +3,7 @@
     v-if="isAdmin"
     id="content"
   >
-    <v-card style="margin: 24px">
+    <v-card class="monitoring-main-card">
       <!-- Header compact: édition, algorithme, phase sur une ligne -->
       <div class="monitoring-header d-flex align-center ga-3 pa-3 flex-wrap">
         <!-- Sélecteur d'édition -->
@@ -16,7 +16,7 @@
           density="compact"
           hide-details
           variant="outlined"
-          style="max-width: 160px; min-width: 130px;"
+          class="monitoring-select-edition"
           @update:model-value="onEditionChange"
         />
 
@@ -30,7 +30,7 @@
           density="compact"
           hide-details
           variant="outlined"
-          style="max-width: 150px; min-width: 120px;"
+          class="monitoring-select-algo"
           @update:model-value="onAlgorithmChange"
         />
 
@@ -38,7 +38,7 @@
 
         <!-- Indicateur de phase compact -->
         <div v-if="editionPhase" class="d-flex align-center ga-1">
-          <span class="text-caption mr-1" style="opacity: 0.7;">Phase:</span>
+          <span class="text-caption mr-1 monitoring-phase-label">Phase:</span>
           <v-chip
             v-for="phase in phaseItems"
             :key="phase.value"
@@ -168,7 +168,7 @@
   </section>
 
   <section v-else>
-    <div style="text-align: center; margin-top: 20px">
+    <div class="monitoring-access-denied">
       Accès réservé aux administrateurs
     </div>
   </section>
@@ -367,8 +367,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.monitoring-main-card {
+  margin: 24px;
+}
+
 .monitoring-header {
   background: rgba(var(--v-theme-on-surface), 0.03);
   border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.12);
+}
+
+.monitoring-select-edition {
+  max-width: 160px;
+  min-width: 130px;
+}
+
+.monitoring-select-algo {
+  max-width: 150px;
+  min-width: 120px;
+}
+
+.monitoring-phase-label {
+  opacity: 0.7;
+}
+
+.monitoring-access-denied {
+  text-align: center;
+  margin-top: 20px;
 }
 </style>

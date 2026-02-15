@@ -8,23 +8,23 @@
         <v-card>
           <v-card-title>Participation</v-card-title>
           <v-card-text>
-            <v-table density="compact" style="font-size: 0.85em;">
+            <v-table density="compact" class="monitoring-stats__compact-table">
               <thead>
                 <tr>
                   <th class="text-right">Catégorie</th>
-                  <th style="text-align: center;">Gueudelot</th>
-                  <th style="text-align: center;">Guibert</th>
-                  <th style="text-align: center;">Guyomard</th>
-                  <th style="text-align: center;">Adultes | Enfants</th>
+                  <th class="text-center">Gueudelot</th>
+                  <th class="text-center">Guibert</th>
+                  <th class="text-center">Guyomard</th>
+                  <th class="text-center">Adultes | Enfants</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="row in photosStats" :key="row.catId">
-                  <td style="text-align: right; font-weight: bold">{{ row.name }}</td>
-                  <td style="text-align: center;">{{ row.totalByFamilies?.gueudelot || 0 }}</td>
-                  <td style="text-align: center;">{{ row.totalByFamilies?.guibert || 0 }}</td>
-                  <td style="text-align: center;">{{ row.totalByFamilies?.guyomard || 0 }}</td>
-                  <td style="text-align: center;">
+                  <td class="text-right font-weight-bold">{{ row.name }}</td>
+                  <td class="text-center">{{ row.totalByFamilies?.gueudelot || 0 }}</td>
+                  <td class="text-center">{{ row.totalByFamilies?.guibert || 0 }}</td>
+                  <td class="text-center">{{ row.totalByFamilies?.guyomard || 0 }}</td>
+                  <td class="text-center">
                     {{ row.totalByAge?.adults || 0 }} | {{ row.totalByAge?.childdren || 0 }}
                   </td>
                 </tr>
@@ -327,5 +327,9 @@ export default {
 
 .monitoring-stats__v-table {
   font-size: 0.8em;
+}
+
+.monitoring-stats__compact-table {
+  font-size: 0.85em;
 }
 </style>

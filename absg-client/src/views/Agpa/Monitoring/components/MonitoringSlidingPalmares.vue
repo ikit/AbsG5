@@ -2,7 +2,7 @@
   <div class="monitoring-sliding-palmares pa-4">
     <h2>Évolution du palmarès glissant</h2>
 
-    <p class="text-body-2 mb-4" style="opacity: 0.7;">
+    <p class="text-body-2 mb-4 monitoring-sp__description">
       Le palmarès glissant calcule les classements sur une fenêtre de 3 ans.
       Cette vue montre l'évolution des positions au fil des années.
     </p>
@@ -18,7 +18,7 @@
           label="Période"
           density="compact"
           hide-details
-          style="max-width: 300px;"
+          class="monitoring-sp__window-select"
         />
       </v-card-text>
     </v-card>
@@ -84,7 +84,7 @@
                 <span class="text-error ml-1">{{ item.rankChange }}</span>
               </template>
               <template v-else>
-                <span style="opacity: 0.5;">—</span>
+                <span class="monitoring-sp__dash">—</span>
               </template>
             </div>
             <v-chip v-else size="x-small" color="info" variant="tonal">
@@ -93,7 +93,7 @@
           </template>
 
           <template #[`item.previousRank`]="{ item }">
-            <span v-if="item.previousRank !== null" style="opacity: 0.6;">
+            <span v-if="item.previousRank !== null" class="monitoring-sp__muted">
               {{ item.previousRank }}
             </span>
             <span v-else>-</span>
@@ -106,7 +106,7 @@
     <v-card v-if="evolution && evolution.windows && evolution.windows.length > 1" class="mt-4">
       <v-card-title>Évolution des top 5</v-card-title>
       <v-card-text>
-        <div style="height: 300px; display: flex; align-items: center; justify-content: center; opacity: 0.5;">
+        <div class="monitoring-sp__placeholder">
           Graphique d'évolution à venir...
         </div>
       </v-card-text>
@@ -173,3 +173,17 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.monitoring-sp__description { opacity: 0.7; }
+.monitoring-sp__window-select { max-width: 300px; }
+.monitoring-sp__dash { opacity: 0.5; }
+.monitoring-sp__muted { opacity: 0.6; }
+.monitoring-sp__placeholder {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+}
+</style>
