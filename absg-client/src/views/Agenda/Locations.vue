@@ -57,7 +57,7 @@
                 fas fa-home
               </v-icon>
             </div>
-            <span style="font-weight: bold">{{ item.name }}</span>
+            <span class="font-weight-bold">{{ item.name }}</span>
           </template>
 
           <template #[`item.actions`]="{ item }">
@@ -119,7 +119,7 @@
               <v-text-field
                 v-model="placeEditor.gps"
                 label="Coordonnées GPS"
-                style="margin-left: 33px;"
+                class="locations-field-indent"
               />
 
               <v-text-field
@@ -132,7 +132,7 @@
             <v-col>
               <ImageEditor
                 ref="imgEditor"
-                style="height: 300px; position: relative"
+                class="locations-img-editor"
               />
             </v-col>
           </v-row>
@@ -372,8 +372,8 @@ export default {
     img {
         max-height: 150px;
         max-width: 150px;
-        border: 1px solid #000;
-        background: #fff;
+        border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
+        background: rgb(var(--v-theme-surface));
         padding: 1px;
         cursor: pointer;
     }
@@ -386,9 +386,18 @@ export default {
     margin-top: 5px;
     margin-bottom: 5px;
     margin-right: 10px;
-    border: 1px solid #eee;
-    color: #eee;
-    background: #fafafa;
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+    color: rgba(var(--v-theme-on-surface), 0.15);
+    background: rgba(var(--v-theme-on-surface), 0.03);
+}
+
+.locations-field-indent {
+    margin-left: 33px;
+}
+
+.locations-img-editor {
+    height: 300px;
+    position: relative;
 }
 
 </style>

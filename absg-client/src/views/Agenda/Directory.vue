@@ -6,7 +6,7 @@
           <v-text-field
             v-model="filter.search"
             prepend-icon="fas fa-search"
-            style="max-width: 300px"
+            class="directory-search"
             label="Rechercher"
             single-line
             hide-details
@@ -63,26 +63,26 @@
           <template #[`item.name`]="{ item }">
             <div
               v-if="item.surname"
-              style="font-style: italic;"
+              class="font-italic"
             >
               {{ item.surname }}
             </div>
             <div
               v-if="item.lastname"
-              style="font-weight: bold"
+              class="font-weight-bold"
             >
               {{ item.lastname }}
             </div>
             <div v-if="item.lastname">
               {{ item.firstname }}
-              <span style="opacity:0.5">{{ item.firstname2 }}</span>
+              <span class="directory-secondary-name">{{ item.firstname2 }}</span>
             </div>
           </template>
 
           <template #[`item.age`]="{ item }">
             <div
               v-if="item.age.age"
-              style="font-weight: bold"
+              class="font-weight-bold"
             >
               {{ item.age.age }}
             </div>
@@ -140,19 +140,19 @@
                 <v-text-field
                   v-model="personEditor.firstname"
                   label="Prénom (principale)"
-                  style="margin-left: 33px;"
+                  class="directory-field-indent"
                 />
 
                 <v-text-field
                   v-model="personEditor.firstname2"
                   label="Prénoms secondaires"
-                  style="margin-left: 33px;"
+                  class="directory-field-indent"
                 />
 
                 <v-text-field
                   v-model="personEditor.surname"
                   label="Surnom (utilisé à la place du prénom dans la famille)"
-                  style="margin-left: 33px;"
+                  class="directory-field-indent"
                 />
 
                 <v-select
@@ -433,8 +433,8 @@ export default  {
     img {
         max-height: 150px;
         max-width: 150px;
-        border: 1px solid #000;
-        background: #fff;
+        border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
+        background: rgb(var(--v-theme-surface));
         padding: 1px;
         cursor: pointer;
     }
@@ -447,9 +447,21 @@ export default  {
     margin-top: 5px;
     margin-bottom: 5px;
     margin-right: 10px;
-    border: 1px solid #eee;
-    color: #eee;
-    background: #fafafa;
+    border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+    color: rgba(var(--v-theme-on-surface), 0.15);
+    background: rgba(var(--v-theme-on-surface), 0.03);
+}
+
+.directory-search {
+    max-width: 300px;
+}
+
+.directory-secondary-name {
+    opacity: 0.5;
+}
+
+.directory-field-indent {
+    margin-left: 33px;
 }
 
 </style>
