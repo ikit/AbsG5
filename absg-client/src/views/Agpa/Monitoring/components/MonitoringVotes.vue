@@ -5,30 +5,30 @@
     <!-- Résumé des votes -->
     <v-card v-if="votesSummary" class="mb-4" elevation="2">
       <v-card-text>
-        <h3 class="mb-3" style="color: #666;">Résumé des votes</h3>
+        <h3 class="mb-3 monitoring-section-title">Résumé des votes</h3>
 
         <v-row dense>
           <!-- Votants par famille -->
           <v-col cols="12" md="6">
-            <div class="font-weight-bold mb-2" style="color: #555;">Votants par famille</div>
-            <v-table density="compact" style="font-size: 0.85em;">
+            <div class="font-weight-bold mb-2 monitoring-subtitle">Votants par famille</div>
+            <v-table density="compact" class="monitoring-compact-table">
               <thead>
                 <tr>
-                  <th style="text-align: left;">Famille</th>
-                  <th style="text-align: center;">Votants</th>
-                  <th style="text-align: center;">Votes</th>
+                  <th class="text-left">Famille</th>
+                  <th class="text-center">Votants</th>
+                  <th class="text-center">Votes</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="family in votesSummary.byFamily" :key="family.name">
-                  <td style="text-align: left;">{{ family.name }}</td>
-                  <td style="text-align: center; font-weight: 500;">{{ family.voters }}</td>
-                  <td style="text-align: center;">{{ family.votes }}</td>
+                  <td class="text-left">{{ family.name }}</td>
+                  <td class="text-center font-weight-medium">{{ family.voters }}</td>
+                  <td class="text-center">{{ family.votes }}</td>
                 </tr>
-                <tr style="border-top: 2px solid #ccc; font-weight: bold;">
-                  <td style="text-align: left;">Total</td>
-                  <td style="text-align: center;">{{ votesSummary.totalVoters }}</td>
-                  <td style="text-align: center;">{{ votesSummary.totalVotes }}</td>
+                <tr class="monitoring-total-row">
+                  <td class="text-left">Total</td>
+                  <td class="text-center">{{ votesSummary.totalVoters }}</td>
+                  <td class="text-center">{{ votesSummary.totalVotes }}</td>
                 </tr>
               </tbody>
             </v-table>
@@ -36,24 +36,24 @@
 
           <!-- Votes par catégorie -->
           <v-col cols="12" md="6">
-            <div class="font-weight-bold mb-2" style="color: #555;">Votes par catégorie</div>
-            <v-table density="compact" style="font-size: 0.85em;">
+            <div class="font-weight-bold mb-2 monitoring-subtitle">Votes par catégorie</div>
+            <v-table density="compact" class="monitoring-compact-table">
               <thead>
                 <tr>
-                  <th style="text-align: left;">Catégorie</th>
-                  <th style="text-align: center;" title="Famille Gueudelot">Gd</th>
-                  <th style="text-align: center;" title="Famille Guibert">Gb</th>
-                  <th style="text-align: center;" title="Famille Guyomard">Gy</th>
-                  <th style="text-align: center;">Total</th>
+                  <th class="text-left">Catégorie</th>
+                  <th class="text-center" title="Famille Gueudelot">Gd</th>
+                  <th class="text-center" title="Famille Guibert">Gb</th>
+                  <th class="text-center" title="Famille Guyomard">Gy</th>
+                  <th class="text-center">Total</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="cat in votesSummary.byCategory" :key="cat.id">
-                  <td style="text-align: left;">{{ cat.name }}</td>
-                  <td style="text-align: center;">{{ cat.gueudelot || '-' }}</td>
-                  <td style="text-align: center;">{{ cat.guibert || '-' }}</td>
-                  <td style="text-align: center;">{{ cat.guyomard || '-' }}</td>
-                  <td style="text-align: center; font-weight: 500;">{{ cat.total }}</td>
+                  <td class="text-left">{{ cat.name }}</td>
+                  <td class="text-center">{{ cat.gueudelot || '-' }}</td>
+                  <td class="text-center">{{ cat.guibert || '-' }}</td>
+                  <td class="text-center">{{ cat.guyomard || '-' }}</td>
+                  <td class="text-center font-weight-medium">{{ cat.total }}</td>
                 </tr>
               </tbody>
             </v-table>
@@ -63,10 +63,10 @@
     </v-card>
 
     <!-- Tableau des votes par juré -->
-    <v-table style="text-align: left; font-size: 0.8em;">
+    <v-table class="text-left monitoring-votes-table">
       <template #default>
         <thead>
-          <tr style="vertical-align: baseline;">
+          <tr class="monitoring-header-row">
             <th>Juré</th>
             <th
               v-for="catId of votesCategories"
@@ -83,7 +83,7 @@
           >
             <td>
               {{ voter.username }}
-              <span style="opacity: 0.5">- {{ voter.age }} ans</span>
+              <span class="monitoring-muted">- {{ voter.age }} ans</span>
             </td>
             <td
               v-for="(cat, idx) of voter.votes"
@@ -91,18 +91,16 @@
             >
               <a
                 v-if="cat"
-                style="display: block; cursor: pointer;"
+                class="d-block monitoring-clickable"
                 @click="showVoteDetails(cat)"
               >
                 <i
                   v-if="cat.valid"
-                  class="fas fa-check"
-                  style="color: #2e7d32"
+                  class="fas fa-check text-success"
                 />
                 <i
                   v-else
-                  class="fas fa-exclamation-triangle"
-                  style="color: #ff8f00"
+                  class="fas fa-exclamation-triangle text-warning"
                 />
                 &nbsp; {{ cat.votes.length }}
               </a>
@@ -119,28 +117,28 @@
           Votes {{ selectedVote.username }}, catégorie {{ selectedVote.categoryTitle }}
         </v-card-title>
         <v-card-text>
-          <p style="opacity: 0.5;">
+          <p class="monitoring-muted">
             Le tableau de gauche montre tous les votes du juré pour la catégorie concernée.
             Les informations à droite permettent de contrôler la validité de ces votes.
           </p>
-          <div style="display: flex; gap: 20px;">
-            <div style="flex: 1;">
-              <v-table density="compact" style="font-size: 0.8em;">
+          <div class="monitoring-dialog-layout">
+            <div class="monitoring-dialog-col">
+              <v-table density="compact" class="monitoring-votes-table">
                 <thead>
                   <tr>
-                    <th style="text-align: left;">Photo</th>
-                    <th style="text-align: center;">Vote</th>
+                    <th class="text-left">Photo</th>
+                    <th class="text-center">Vote</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="vote of selectedVote.votes" :key="vote.id">
-                    <td style="text-align: left;">
+                    <td class="text-left">
                       {{ vote.photoId }} - {{ vote.title }}<br>
-                      <span style="opacity: 0.5; font-size: 0.85em;">
+                      <span class="monitoring-muted monitoring-compact-text">
                         uId: {{ vote.pUserId }} | catId: {{ vote.pCategoryId }}
                       </span>
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                       <i v-if="selectedVote.categoryId === -3" class="fas fa-feather-alt" />
                       <template v-else>
                         <i class="fas fa-star" /> {{ vote.score }}
@@ -150,7 +148,7 @@
                 </tbody>
               </v-table>
             </div>
-            <div style="flex: 1;">
+            <div class="monitoring-dialog-col">
               <b>Catégorie:</b>
               <ul>
                 <li>Titre: {{ selectedVote.categoryTitle }}</li>
@@ -168,7 +166,7 @@
               <b>Erreurs détectées:</b>
               <ul v-if="selectedVote.errors">
                 <li v-for="(val, key) in selectedVote.errors" :key="key">
-                  {{ key }}: <span :style="{ color: val ? 'red' : 'green' }">{{ val }}</span>
+                  {{ key }}: <span :class="val ? 'text-error' : 'text-success'">{{ val }}</span>
                 </li>
               </ul>
             </div>
@@ -315,3 +313,51 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.monitoring-section-title {
+  color: rgba(var(--v-theme-on-surface), 0.6);
+}
+
+.monitoring-subtitle {
+  color: rgba(var(--v-theme-on-surface), 0.5);
+}
+
+.monitoring-compact-table {
+  font-size: 0.85em;
+}
+
+.monitoring-total-row {
+  border-top: 2px solid rgba(var(--v-theme-on-surface), 0.2);
+  font-weight: bold;
+}
+
+.monitoring-votes-table {
+  font-size: 0.8em;
+}
+
+.monitoring-header-row {
+  vertical-align: baseline;
+}
+
+.monitoring-muted {
+  opacity: 0.5;
+}
+
+.monitoring-compact-text {
+  font-size: 0.85em;
+}
+
+.monitoring-clickable {
+  cursor: pointer;
+}
+
+.monitoring-dialog-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.monitoring-dialog-col {
+  flex: 1;
+}
+</style>

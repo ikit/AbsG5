@@ -9,30 +9,30 @@
       elevation="2"
     >
       <v-card-text>
-        <h3 class="mb-3" style="color: #666;">Résumé de la participation</h3>
+        <h3 class="mb-3 monitoring-section-title">Résumé de la participation</h3>
 
         <v-row dense>
           <!-- Participants par famille -->
           <v-col cols="12" md="6">
-            <div class="font-weight-bold mb-2" style="color: #555;">Participants par famille</div>
-            <v-table density="compact" style="font-size: 0.85em;">
+            <div class="font-weight-bold mb-2 monitoring-subtitle">Participants par famille</div>
+            <v-table density="compact" class="monitoring-compact-table">
               <thead>
                 <tr>
-                  <th style="text-align: left;">Famille</th>
-                  <th style="text-align: center;">Participants</th>
-                  <th style="text-align: center;">Photos</th>
+                  <th class="text-left">Famille</th>
+                  <th class="text-center">Participants</th>
+                  <th class="text-center">Photos</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="family in participationSummary.byFamily" :key="family.name">
-                  <td style="text-align: left;">{{ family.name }}</td>
-                  <td style="text-align: center; font-weight: 500;">{{ family.participants }}</td>
-                  <td style="text-align: center;">{{ family.photos }}</td>
+                  <td class="text-left">{{ family.name }}</td>
+                  <td class="text-center font-weight-medium">{{ family.participants }}</td>
+                  <td class="text-center">{{ family.photos }}</td>
                 </tr>
-                <tr style="border-top: 2px solid #ccc; font-weight: bold;">
-                  <td style="text-align: left;">Total</td>
-                  <td style="text-align: center;">{{ participationSummary.totalParticipants }}</td>
-                  <td style="text-align: center;">{{ participationSummary.totalPhotos }}</td>
+                <tr class="monitoring-total-row">
+                  <td class="text-left">Total</td>
+                  <td class="text-center">{{ participationSummary.totalParticipants }}</td>
+                  <td class="text-center">{{ participationSummary.totalPhotos }}</td>
                 </tr>
               </tbody>
             </v-table>
@@ -40,24 +40,24 @@
 
           <!-- Photos par catégorie -->
           <v-col cols="12" md="6">
-            <div class="font-weight-bold mb-2" style="color: #555;">Photos par catégorie</div>
-            <v-table density="compact" style="font-size: 0.85em;">
+            <div class="font-weight-bold mb-2 monitoring-subtitle">Photos par catégorie</div>
+            <v-table density="compact" class="monitoring-compact-table">
               <thead>
                 <tr>
-                  <th style="text-align: left;">Catégorie</th>
-                  <th style="text-align: center;" title="Famille Gueudelot">Gd</th>
-                  <th style="text-align: center;" title="Famille Guibert">Gb</th>
-                  <th style="text-align: center;" title="Famille Guyomard">Gy</th>
-                  <th style="text-align: center;">Total</th>
+                  <th class="text-left">Catégorie</th>
+                  <th class="text-center" title="Famille Gueudelot">Gd</th>
+                  <th class="text-center" title="Famille Guibert">Gb</th>
+                  <th class="text-center" title="Famille Guyomard">Gy</th>
+                  <th class="text-center">Total</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="cat in participationSummary.byCategory" :key="cat.id">
-                  <td style="text-align: left;">{{ cat.name }}</td>
-                  <td style="text-align: center;">{{ cat.gueudelot || '-' }}</td>
-                  <td style="text-align: center;">{{ cat.guibert || '-' }}</td>
-                  <td style="text-align: center;">{{ cat.guyomard || '-' }}</td>
-                  <td style="text-align: center; font-weight: 500;">{{ cat.total }}</td>
+                  <td class="text-left">{{ cat.name }}</td>
+                  <td class="text-center">{{ cat.gueudelot || '-' }}</td>
+                  <td class="text-center">{{ cat.guibert || '-' }}</td>
+                  <td class="text-center">{{ cat.guyomard || '-' }}</td>
+                  <td class="text-center font-weight-medium">{{ cat.total }}</td>
                 </tr>
               </tbody>
             </v-table>
@@ -82,12 +82,12 @@
     </v-card>
 
     <!-- Tableau des photos -->
-    <v-table style="text-align: left; font-size: 0.8em;">
+    <v-table class="text-left monitoring-photos-table">
       <template #default>
         <thead>
-          <tr style="vertical-align: baseline;">
-            <th style="width: 200px;">Auteur</th>
-            <th style="width: 150px;">Catégorie</th>
+          <tr class="monitoring-header-row">
+            <th class="monitoring-col-author">Auteur</th>
+            <th class="monitoring-col-category">Catégorie</th>
             <th>Photos</th>
           </tr>
         </thead>
@@ -96,28 +96,27 @@
             v-for="group of filteredPhotosByAuthorAndCategory"
             :key="`${group.userId}-${group.categoryId}`"
           >
-            <td style="vertical-align: top; padding-top: 10px;">
+            <td class="monitoring-cell-top">
               {{ group.username }}
             </td>
-            <td style="vertical-align: top; padding-top: 10px;">
+            <td class="monitoring-cell-top">
               {{ group.categoryTitle }}
             </td>
             <td>
-              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              <div class="monitoring-photos-grid">
                 <div
                   v-for="photo in group.photos"
                   :key="photo.id"
-                  style="display: inline-block; text-align: center;"
+                  class="monitoring-photo-item"
                 >
                   <img
-                    class="thumb"
+                    class="thumb d-block mb-1 monitoring-clickable"
                     :src="photo.thumb"
                     @click="showPhotoGallery(photo)"
-                    style="display: block; margin-bottom: 5px; cursor: pointer;"
                   >
                   <div
                     @click="openPhotoEditor(photo)"
-                    style="cursor: pointer; font-size: 0.9em; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1976d2;"
+                    class="monitoring-photo-title"
                     :title="photo.title"
                   >
                     {{ photo.title }}
@@ -139,7 +138,7 @@
         <v-card-text class="pa-4">
           <v-row>
             <v-col cols="12" md="6">
-              <div style="text-align: center;">
+              <div class="text-center">
                 <img
                   :src="selectedPhoto.thumb"
                   :style="{
@@ -351,16 +350,79 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .thumb {
   max-width: 150px;
   max-height: 100px;
   object-fit: cover;
   border-radius: 4px;
   cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
-.thumb:hover {
-  opacity: 0.8;
+.monitoring-section-title {
+  color: rgba(var(--v-theme-on-surface), 0.6);
+}
+
+.monitoring-subtitle {
+  color: rgba(var(--v-theme-on-surface), 0.5);
+}
+
+.monitoring-compact-table {
+  font-size: 0.85em;
+}
+
+.monitoring-total-row {
+  border-top: 2px solid rgba(var(--v-theme-on-surface), 0.2);
+  font-weight: bold;
+}
+
+.monitoring-photos-table {
+  font-size: 0.8em;
+}
+
+.monitoring-header-row {
+  vertical-align: baseline;
+}
+
+.monitoring-col-author {
+  width: 200px;
+}
+
+.monitoring-col-category {
+  width: 150px;
+}
+
+.monitoring-cell-top {
+  vertical-align: top;
+  padding-top: 10px;
+}
+
+.monitoring-photos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.monitoring-photo-item {
+  display: inline-block;
+  text-align: center;
+}
+
+.monitoring-clickable {
+  cursor: pointer;
+}
+
+.monitoring-photo-title {
+  cursor: pointer;
+  font-size: 0.9em;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgb(var(--v-theme-primary));
 }
 </style>
