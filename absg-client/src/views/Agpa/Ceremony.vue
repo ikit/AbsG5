@@ -16,7 +16,7 @@
           <section
             v-for="(slide, cidx) in slides"
             :key="cidx"
-            style="width:100%; height:100%"
+            class="ceremony-slide-full"
           >
             <div v-if="slide.type === 'category'">
               <h3>{{ slide.title }}</h3>
@@ -26,7 +26,7 @@
               >
             </div>
             <div v-if="slide.type === 'photo'">
-              <div style="position: absolute; top:0; left:0; right:0; bottom:0">
+              <div class="ceremony-slide-overlay">
                 <v-img
                   class="photo"
                   :src="slide.url"
@@ -44,12 +44,12 @@
             </div>
             <div
               v-if="slide.type === 'awardWaiting'"
-              style="width:100%; height:100%"
+              class="ceremony-slide-full"
             >
-              <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+              <div class="ceremony-deliberation-row">
                 <div class="photoDeliberating">
                   <v-img
-                    style="height: 100%;"
+                    class="h-100"
                     :src="slide.photos[0]"
                     :contain="true"
                     aspect-ratio="1"
@@ -57,17 +57,17 @@
                 </div>
                 <div class="photoDeliberating">
                   <v-img
-                    style="height: 100%;"
+                    class="h-100"
                     :src="slide.photos[1]"
                     :contain="true"
                     aspect-ratio="1"
                   />
                 </div>
               </div>
-              <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+              <div class="ceremony-deliberation-row">
                 <div class="photoDeliberating">
                   <v-img
-                    style="height: 100%;"
+                    class="h-100"
                     :src="slide.photos[2]"
                     :contain="true"
                     aspect-ratio="1"
@@ -75,7 +75,7 @@
                 </div>
                 <div class="photoDeliberating">
                   <v-img
-                    style="height: 100%;"
+                    class="h-100"
                     :src="slide.photos[3]"
                     :contain="true"
                     aspect-ratio="1"
@@ -84,7 +84,7 @@
               </div>
             </div>
             <div v-if="slide.type === 'photoAward'">
-              <div style="position: absolute; top:0; left:0; right:0; bottom:0">
+              <div class="ceremony-slide-overlay">
                 <v-img
                   class="photo"
                   :src="slide.url"
@@ -116,7 +116,7 @@
             </div>
             <div
               v-if="slide.type === 'bestAuthorAward'"
-              style="width:100%; height:100%"
+              class="ceremony-slide-full"
             >
               <img
                 :src="slide.avatar"
@@ -128,13 +128,13 @@
                 class="award"
               >
               <!--
-                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                        <div class="ceremony-deliberation-row">
                             <div class="photoDeliberating">
                                 <img :src="slide.avatar" class="authorAvatar"/>
                             </div>
                             <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[0]" :contain="true" aspect-ratio="1"></v-img></div>
                         </div>
-                        <div style="position: relative; display: flex; flex-direction: row; flex-wrap: wrap; height: 50%">
+                        <div class="ceremony-deliberation-row">
                             <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[1]" :contain="true" aspect-ratio="1"></v-img></div>
                             <div class="photoDeliberating"><v-img style="height: 100%;" :src="slide.photos[2]" :contain="true" aspect-ratio="1"></v-img></div>
                         </div> -->
@@ -529,6 +529,27 @@ export default {
         }
     }
 
+}
+
+.ceremony-slide-full {
+    width: 100%;
+    height: 100%;
+}
+
+.ceremony-slide-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.ceremony-deliberation-row {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 50%;
 }
 
 .controls {

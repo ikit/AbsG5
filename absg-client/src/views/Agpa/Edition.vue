@@ -1,17 +1,17 @@
 <template>
-  <v-container style="max-width: 100%; margin: 0; padding: 0;">
+  <v-container class="edition-container">
     <!-- Ecran d'attente entre 2 éditions (février-septembre) -->
     <v-card
       v-if="currentMonth > 0 && currentMonth < 9"
-      style="margin: auto; margin-top: 50px; width: 600px; position: relative; padding: 40px 10px 10px 10px; overflow: visible;"
+      class="edition-main-card"
     >
       <img
         src="/img/agpa/cupesMaxi/c1.png"
         height="100px"
-        style="position: absolute; top: -50px; left: calc(50% - 56px); z-index: 1;"
+        class="edition-cup-icon"
       >
-      <p style="text-align: center; font-size: 2em; font-weight: bold; font-family: 'Tangerine', serif; color: #c0b44f; line-height: 1em;">
-        L'édition <span style="font-size: 2em; font-weight: normal; padding-right: 3px;"> {{ currentYear }}</span> des A.G.P.A. n'a pas encore démarrée.
+      <p class="edition-title">
+        L'édition <span class="edition-title-year"> {{ currentYear }}</span> des A.G.P.A. n'a pas encore démarrée.
       </p>
       <v-timeline>
         <v-timeline-item
@@ -28,32 +28,32 @@
       </v-timeline>
       <v-card
         v-if="agpaMeta && agpaMeta.categories[8] && agpaMeta.categories[8].title"
-        style="margin: 15px; text-align: center; padding: 15px"
+        class="edition-inner-card edition-theme-card"
       >
-        <p style="opacity: 0.5; ">
+        <p class="edition-theme-label">
           Thème de l'année
         </p>
-        <p style="font-weight: bold; font-size: 1.1em; margin-bottom: 0">
+        <p class="edition-theme-title">
           {{ agpaMeta.categories[8].title }}
         </p>
-        <p style="font-style: italic">
+        <p class="edition-theme-description">
           {{ agpaMeta.categories[8].description }}
         </p>
       </v-card>
       <v-card
         v-else
-        style="margin: 15px; font-weight: bold; color: #ff8f00; padding: 15px"
+        class="edition-inner-card edition-warning-card text-warning"
       >
         <v-icon
           color="warning"
-          style="width: 50px"
+          class="edition-icon"
         >
           fas fa-exclamation-triangle
         </v-icon>
         Aucun thème pour la catégorie spéciale n'a été décidé
       </v-card>
-      <v-card style="margin: 15px; padding: 15px">
-        <v-icon style="width: 50px">
+      <v-card class="edition-inner-card">
+        <v-icon class="edition-icon">
           fas fa-info
         </v-icon>
         N'hésitez pas à discuter de l'organisation sur WhatApps.
@@ -63,7 +63,7 @@
     <section v-else>
       <div
         v-if="isLoading"
-        style="width: 50px; margin: 50px auto;"
+        class="edition-loader"
       >
         <v-progress-circular
           :size="50"
@@ -151,8 +151,69 @@ export default {
 }
 h2 {
     font-family: 'Tangerine', serif;
-    color: orange;
+    color: rgb(var(--v-theme-warning));
     font-size: 3em;
+}
+
+.edition-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+.edition-main-card {
+    margin: auto;
+    margin-top: 50px;
+    width: 600px;
+    position: relative;
+    padding: 40px 10px 10px 10px;
+    overflow: visible;
+}
+.edition-cup-icon {
+    position: absolute;
+    top: -50px;
+    left: calc(50% - 56px);
+    z-index: 1;
+}
+.edition-title {
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+    font-family: 'Tangerine', serif;
+    color: #c0b44f;
+    line-height: 1em;
+}
+.edition-title-year {
+    font-size: 2em;
+    font-weight: normal;
+    padding-right: 3px;
+}
+.edition-inner-card {
+    margin: 15px;
+    padding: 15px;
+}
+.edition-theme-card {
+    text-align: center;
+}
+.edition-theme-label {
+    opacity: 0.5;
+}
+.edition-theme-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 0;
+}
+.edition-theme-description {
+    font-style: italic;
+}
+.edition-warning-card {
+    font-weight: bold;
+}
+.edition-icon {
+    width: 50px;
+}
+.edition-loader {
+    width: 50px;
+    margin: 50px auto;
 }
 </style>
 

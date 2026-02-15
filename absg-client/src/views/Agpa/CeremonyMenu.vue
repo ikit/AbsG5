@@ -12,7 +12,7 @@
         border: '2px solid #ffc107'
       }"
     >
-      <div style="text-align: center; margin-bottom: 10px;">
+      <div class="text-center mb-3">
         <strong>🔧 Mode Debug - Simulation de Phase</strong>
       </div>
       <v-row dense>
@@ -57,7 +57,7 @@
           </v-btn>
         </v-col>
       </v-row>
-      <div style="margin-top: 10px; font-size: 0.8em; text-align: center; opacity: 0.7;">
+      <div class="ceremony-menu__debug-hint">
         <span v-if="debugPhase === 'phase1-4'">Période 1: Nouvelle édition (oct-déc/jan) - Affiche timer</span>
         <span v-else-if="debugPhase === 'phase5'">Période 2: Post-cérémonie (janv) - Revoir la cérémonie</span>
         <span v-else-if="debugPhase === 'interlude'">Période 3: Interlude (fév-sept) - Annonce prochaine édition</span>
@@ -122,7 +122,7 @@
       />
       <div
         v-else
-        style="text-align: center;"
+        class="text-center"
       >
         <v-btn
           color="primary"
@@ -223,7 +223,7 @@
             v-if="edition.photos && edition.photos.length > 0"
             :href="`/agpa/ceremony/${edition.year}`"
             target="_blank"
-            style="text-decoration: none"
+            class="text-decoration-none"
           >
             <v-card
               :style="{
@@ -258,7 +258,7 @@
     <div :class="{ ceremony: current.displayed, hiddenCeremony: !current.displayed }">
       <video
         ref="video"
-        style="margin: auto;"
+        class="ceremony-menu__video"
         width="100%"
         height="100%"
         controls
@@ -614,6 +614,17 @@ export default {
    0%  {opacity:0;}
    100% {opacity:1;}
 }
+.ceremony-menu__debug-hint {
+    margin-top: 10px;
+    font-size: 0.8em;
+    text-align: center;
+    opacity: 0.7;
+}
+
+.ceremony-menu__video {
+    margin: auto;
+}
+
 .preloadInfo {
     text-align: center;
     font-size: 1em;
