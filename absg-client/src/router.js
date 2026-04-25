@@ -113,6 +113,10 @@ export const router = createRouter({
                     path: "browser",
                     component: () => import("./views/Photos/Browser.vue"),
                 },
+                {
+                    path: "pcloud",
+                    component: () => import("./views/Photos/PCloudSorter.vue"),
+                },
             ]
         },
         // Forum

@@ -20,7 +20,8 @@ import {
     eventService,
     userService,
     forumService,
-    gthequeService
+    gthequeService,
+    pcloudService
 } from "./services";
 import { albumService } from "./services/AlbumService";
 
@@ -40,6 +41,7 @@ AppDataSource.initialize()
         userService.initService();
         albumService.initService();
         gthequeService.initService();
+        pcloudService.initService();
         logger.info("AbsG services initialized");
 
         // Create base Express app first
