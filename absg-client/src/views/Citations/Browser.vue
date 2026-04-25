@@ -14,6 +14,19 @@
             variant="outlined"
             class="search-field"
           />
+          <v-autocomplete
+            v-model="filter.authorId"
+            prepend-inner-icon="fas fa-user"
+            label="Filtrer par auteur"
+            :items="persons"
+            item-title="fullname"
+            item-value="id"
+            clearable
+            hide-details
+            density="compact"
+            variant="outlined"
+            class="author-filter"
+          />
           <v-spacer />
           <v-btn
             v-if="$vuetify.display.mdAndUp"
@@ -38,7 +51,7 @@
         <!-- Contenu principal -->
         <v-data-table
           :headers="headers"
-          :items="citations"
+          :items="filteredCitations"
           :search="filter.search"
           loading-text="Récupération des citations..."
           no-data-text="Aucune citation enregistrée."
@@ -226,7 +239,7 @@ export default {
         ],
         citations: [],
         persons: [],
-        filter: { search: "" },
+        filter: { search: "", authorId: null },
         citationEditor: {
             open: false, // si oui ou non la boite de dialogue pour créer/éditer une citation est affichée
             id: null, // l'ID de la citation (vaut -1 si pour la création)
@@ -242,6 +255,10 @@ export default {
     computed: {
         numberOfPages () {
             return Math.ceil(this.citations.length / this.filter.pageSize)
+        },
+        filteredCitations () {
+            if (!this.filter.authorId) return this.citations;
+            return this.citations.filter(c => c.author && c.author.id === this.filter.authorId);
         }
     },
     mounted () {
@@ -363,6 +380,10 @@ export default {
   max-width: 300px;
 }
 
+.author-filter {
+  max-width: 280px;
+}
+
 .citation :deep(.note) {
   color: rgba(var(--v-theme-on-surface), 0.45) !important;
   flex: 1 0 1;
@@ -421,7 +442,8 @@ export default {
     flex-wrap: wrap;
   }
 
-  .search-field {
+  .search-field,
+  .author-filter {
     flex: 1;
     min-width: 150px;
     max-width: unset;
