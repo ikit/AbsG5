@@ -32,3 +32,10 @@ export default {
   }
 };
 </script>
+
+<style lang="scss">
+.award-diamond { color: #c3f1ff; }
+.award-gold { color: #c68b00; }
+.award-silver { color: #9b9b9b; }
+.award-bronze { color: #964c31; }
+</style>
