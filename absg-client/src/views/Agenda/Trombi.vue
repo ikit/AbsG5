@@ -40,15 +40,6 @@
           <v-spacer />
 
           <v-btn-toggle :disabled="isLoading">
-            <v-tooltip bottom v-if="isAdmin">
-              <template #activator="{ props }">
-                <v-btn @click.stop="rebuildTrombis()" v-bind="props">
-                  <v-icon>fas fa-redo</v-icon>
-                </v-btn>
-              </template>
-              <span>Reconstruire la liste des trombi</span>
-            </v-tooltip>
-
             <v-tooltip bottom>
               <template #activator="{ props }">
                 <v-btn @click.stop="displayStats()" v-bind="props">
@@ -464,7 +455,6 @@ import {Chart} from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import HC_sankey from 'highcharts/modules/sankey';
 import HC_depwheel from 'highcharts/modules/dependency-wheel';
-import { mapState } from '../../stores/helpers';
 HC_sankey(Highcharts);
 HC_depwheel(Highcharts);
 
@@ -476,7 +466,6 @@ export default {
     store,
     data: () => ({
         isLoading: false,
-        isAdmin: false,
         panel: [],
         persons: [],
         displayedPersons: [],
@@ -553,18 +542,12 @@ export default {
     }),
 
     computed: {
-        ...mapState([
-            'user'
-        ]),
       numberOfPages () {
         return Math.ceil(this.photos.length / this.filter.pageSize)
       }
     },
 
     mounted () {
-        if (this.user) {
-            this.isAdmin = this.user.roles.indexOf("admin") > -1;
-        }
       this.isLoading = true;
       // On récupère la liste des photos
       axios.get(`/api/agenda/persons/`).then(response => {
@@ -794,21 +777,6 @@ export default {
           }
         }
         store.commit('photosGalleryReset', photos);
-      },
-
-      rebuildTrombis() {
-        this.isLoading = true;
-        // On récupère la liste des photos
-        axios.get(`/api/agenda/trombi/`).then(response => {
-          this.persons = parseAxiosResponse(response).map(e => ({
-            ...e,
-            trombiCount: e.trombis.length,
-            cssStatus: this.computeCssStatus(e)
-          }));
-          this.applyFilter();
-
-          this.isLoading = false;
-        });
       },
 
       // Memory Game Methods
