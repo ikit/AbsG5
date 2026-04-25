@@ -189,8 +189,8 @@ export class AgpaController {
     }
 
     @Get("/palmares")
-    getPalmares(@QueryParam("algorithm") algorithm?: string) {
-        return agpaService.getPalmaresData(algorithm);
+    getPalmares() {
+        return agpaService.getPalmaresData();
     }
 
     /**
@@ -199,10 +199,9 @@ export class AgpaController {
     @Get("/palmares/sliding")
     getSlidingPalmares(
         @QueryParam("yearFrom") yearFrom?: number,
-        @QueryParam("yearTo") yearTo?: number,
-        @QueryParam("algorithm") algorithm?: string
+        @QueryParam("yearTo") yearTo?: number
     ) {
-        return agpaService.getSlidingPalmaresData(yearFrom, yearTo, algorithm);
+        return agpaService.getSlidingPalmaresData(yearFrom, yearTo);
     }
 
     /**

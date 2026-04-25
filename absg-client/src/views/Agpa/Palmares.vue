@@ -105,19 +105,6 @@
 
           <div class="palmares-toolbar-separator" />
 
-          <!-- Toggle algorithme -->
-          <v-btn-toggle
-            v-model="selectedAlgorithm"
-            mandatory
-            density="comfortable"
-            class="palmares-toolbar-toggle"
-          >
-            <v-btn value="V2010" size="small">v2010</v-btn>
-            <v-btn value="V2026" size="small">v2026</v-btn>
-          </v-btn-toggle>
-
-          <div class="palmares-toolbar-separator" />
-
           <!-- Toggle mode -->
           <v-btn-toggle
             v-model="palmaresMode"
@@ -323,6 +310,9 @@
       :sliding-year-to="slidingYearTo"
       :loading="isLoading"
       :initial-mode="palmaresMode"
+      :slider-min="sliderMin"
+      :slider-max="sliderMax"
+      @update:sliding-period="onDialogPeriodChange"
     />
 
     <!-- Dialog Détails Palmarès Utilisateur -->
@@ -873,7 +863,6 @@ export default {
         memberDetailsDialog: false,
         selectedMember: null,
         // Barre de contrôles
-        selectedAlgorithm: 'V2026',
         palmaresMode: 'sliding',
         selectedSlidingPeriod: null,
         showPeriodSlider: false,
@@ -926,7 +915,7 @@ export default {
 
             for (const badge of allBadges) {
                 const badgeStatus = this.badgesHistory[badge.badge];
-                if (badgeStatus && badgeStatus.isActive) {
+                if (this.isBadgeActiveInPeriod(badgeStatus)) {
                     activeBadges.push({
                         badge: badge,
                         status: badgeStatus
@@ -1012,11 +1001,10 @@ export default {
                 return 0;
             }
 
-            // Compter tous les badges actifs (isActive = true)
+            // Compter tous les badges actifs pour la période sélectionnée
             let count = 0;
             for (const badgeName in this.badgesHistory) {
-                const badgeStatus = this.badgesHistory[badgeName];
-                if (badgeStatus && badgeStatus.isActive) {
+                if (this.isBadgeActiveInPeriod(this.badgesHistory[badgeName])) {
                     count++;
                 }
             }
@@ -1057,7 +1045,7 @@ export default {
                 const badgeStatus = this.badgesHistory[comboBadge.badge];
 
                 // Skip if combo badge is already obtained
-                if (badgeStatus && badgeStatus.isActive) {
+                if (this.isBadgeActiveInPeriod(badgeStatus)) {
                     continue;
                 }
 
@@ -1070,7 +1058,7 @@ export default {
                 let activeCount = 0;
                 for (const requiredBadge of comboBadge.requires) {
                     const requiredStatus = this.badgesHistory[requiredBadge];
-                    if (requiredStatus && requiredStatus.isActive) {
+                    if (this.isBadgeActiveInPeriod(requiredStatus)) {
                         activeCount++;
                     }
                 }
@@ -1208,14 +1196,11 @@ export default {
                 this.loadFamilyMembers();
             }
         },
-        selectedAlgorithm() {
-            if (this.initialized) this.reloadPalmaresData();
-        },
         palmaresMode() {
             if (this.initialized) this.reloadPalmaresData();
         },
         selectedSlidingPeriod(newVal) {
-            if (this.initialized && newVal && this.palmaresMode === 'sliding') {
+            if (this.initialized && !this._skipPeriodWatch && newVal && this.palmaresMode === 'sliding') {
                 this.reloadPalmaresData();
             }
         }
@@ -1262,11 +1247,10 @@ export default {
 
         async initView() {
             this.isLoading = true;
-            const algo = this.selectedAlgorithm;
 
             // Charger le palmarès global
             try {
-                const response = await axios.get(`/api/agpa/palmares?algorithm=${algo}`);
+                const response = await axios.get('/api/agpa/palmares');
                 const palmaresData = parseAxiosResponse(response);
 
                 if (palmaresData && Array.isArray(palmaresData)) {
@@ -1288,9 +1272,9 @@ export default {
 
             // Charger le palmarès glissant
             try {
-                let slidingUrl = `/api/agpa/palmares/sliding?algorithm=${algo}`;
+                let slidingUrl = '/api/agpa/palmares/sliding';
                 if (this.selectedSlidingPeriod) {
-                    slidingUrl += `&yearFrom=${this.selectedSlidingPeriod.from}&yearTo=${this.selectedSlidingPeriod.to}`;
+                    slidingUrl += `?yearFrom=${this.selectedSlidingPeriod.from}&yearTo=${this.selectedSlidingPeriod.to}`;
                 }
                 const response = await axios.get(slidingUrl);
                 const data = parseAxiosResponse(response);
@@ -1330,11 +1314,10 @@ export default {
 
         async reloadPalmaresData() {
             this.isLoading = true;
-            const algo = this.selectedAlgorithm;
 
             try {
                 // Recharger le palmarès global
-                const globalResponse = await axios.get(`/api/agpa/palmares?algorithm=${algo}`);
+                const globalResponse = await axios.get('/api/agpa/palmares');
                 const globalData = parseAxiosResponse(globalResponse);
                 this.palmares = (globalData && Array.isArray(globalData))
                     ? globalData.map(e => ({ ...e, ...getPeopleAvatar(e) }))
@@ -1342,9 +1325,9 @@ export default {
                 this.calculateMyGlobalStats();
 
                 // Recharger le palmarès glissant
-                let slidingUrl = `/api/agpa/palmares/sliding?algorithm=${algo}`;
+                let slidingUrl = '/api/agpa/palmares/sliding';
                 if (this.selectedSlidingPeriod) {
-                    slidingUrl += `&yearFrom=${this.selectedSlidingPeriod.from}&yearTo=${this.selectedSlidingPeriod.to}`;
+                    slidingUrl += `?yearFrom=${this.selectedSlidingPeriod.from}&yearTo=${this.selectedSlidingPeriod.to}`;
                 }
                 const slidingResponse = await axios.get(slidingUrl);
                 const slidingData = parseAxiosResponse(slidingResponse);
@@ -1362,6 +1345,7 @@ export default {
                 }
 
                 this.calculateMySlidingStats();
+                await this.calculateMySlidingBadges();
             } catch (err) {
                 console.error('Erreur lors du rechargement:', err);
             }
@@ -1408,9 +1392,15 @@ export default {
             this.slidingYearFrom = yearFrom;
             this.slidingYearTo = yearTo;
 
+            // Sync toolbar slider (with guard to prevent watcher double-reload)
+            this._skipPeriodWatch = true;
+            this.selectedSlidingPeriod = { from: yearFrom, to: yearTo };
+            this.sliderYearTo = yearTo;
+            this.$nextTick(() => { this._skipPeriodWatch = false; });
+
             // Reload sliding palmares with the selected period
             try {
-                const response = await axios.get(`/api/agpa/palmares/sliding?yearFrom=${yearFrom}&yearTo=${yearTo}&algorithm=${this.selectedAlgorithm}`);
+                const response = await axios.get(`/api/agpa/palmares/sliding?yearFrom=${yearFrom}&yearTo=${yearTo}`);
                 const data = parseAxiosResponse(response);
 
                 if (!data) {
@@ -1438,6 +1428,10 @@ export default {
                 console.error('Erreur lors du chargement de la période glissante:', err);
                 this.slidingPalmares = [];
             }
+        },
+
+        onDialogPeriodChange({ from, to }) {
+            this.changeSlidingPeriod(from, to);
         },
 
         async loadVoteProfiles(year) {
@@ -1500,11 +1494,15 @@ export default {
         async calculateMySlidingBadges() {
             if (!this.user) return;
 
-            const currentYear = new Date().getFullYear();
-            const years = [currentYear, currentYear - 1, currentYear - 2];
+            const yearTo = this.slidingYearTo || new Date().getFullYear();
+            const yearFrom = this.slidingYearFrom || (yearTo - 2);
+            const years = [];
+            for (let y = yearTo; y >= yearFrom; y--) {
+                years.push(y);
+            }
             const slidingBadges = [];
 
-            // Charger les profils pour les 3 dernières années
+            // Charger les profils pour la période sélectionnée
             for (const year of years) {
                 const profiles = await this.loadVoteProfiles(year);
 
@@ -1606,7 +1604,7 @@ export default {
                 return 0;
             }
 
-            // Count active badges (obtained in last 3 editions) of the given type
+            // Count active badges for the selected period of the given type
             let count = 0;
             const badgesToCheck = type === 'voter' ? this.voterBadges :
                                  type === 'photographer' ? this.photographerBadges :
@@ -1614,7 +1612,7 @@ export default {
 
             for (const badge of badgesToCheck) {
                 const badgeStatus = this.badgesHistory[badge.badge];
-                if (badgeStatus && badgeStatus.isActive) {
+                if (this.isBadgeActiveInPeriod(badgeStatus)) {
                     count++;
                 }
             }
@@ -1698,11 +1696,10 @@ export default {
 
         async loadPalmaresData(userId) {
             this.isLoading = true;
-            const algo = this.selectedAlgorithm;
 
             try {
                 // Charger le palmarès global
-                const globalResponse = await axios.get(`/api/agpa/palmares?algorithm=${algo}`);
+                const globalResponse = await axios.get('/api/agpa/palmares');
                 const globalData = parseAxiosResponse(globalResponse);
                 if (globalData) {
                     this.palmares = globalData;
@@ -1710,7 +1707,7 @@ export default {
                 }
 
                 // Charger le palmarès glissant
-                const slidingResponse = await axios.get(`/api/agpa/palmares/sliding?algorithm=${algo}`);
+                const slidingResponse = await axios.get('/api/agpa/palmares/sliding');
                 const slidingData = parseAxiosResponse(slidingResponse);
                 if (slidingData) {
                     this.slidingPalmares = slidingData.palmares || [];
@@ -1853,6 +1850,23 @@ export default {
             return icons[type] || 'fas fa-medal';
         },
 
+        // Vérifie si un badge est actif pour la période sélectionnée
+        isBadgeActiveInPeriod(badgeStatus) {
+            if (!badgeStatus || !badgeStatus.everObtained) return false;
+
+            // En mode global, utiliser le flag serveur
+            if (this.palmaresMode === 'global') {
+                return badgeStatus.isActive;
+            }
+
+            // En mode glissant, vérifier si le badge a été obtenu dans la période sélectionnée
+            if (!this.slidingYearFrom || !this.slidingYearTo || !badgeStatus.years) {
+                return badgeStatus.isActive;
+            }
+
+            return badgeStatus.years.some(y => y >= this.slidingYearFrom && y <= this.slidingYearTo);
+        },
+
         // Filter badges based on selected filter
         filterBadgesByType(badgesList) {
             if (!badgesList || badgesList.length === 0) {
@@ -1872,15 +1886,15 @@ export default {
                         return badgeStatus && badgeStatus.everObtained;
 
                     case 'active':
-                        // Badges actifs (obtenus sur les 3 dernières éditions)
-                        return badgeStatus && badgeStatus.isActive;
+                        // Badges actifs pour la période sélectionnée
+                        return this.isBadgeActiveInPeriod(badgeStatus);
 
                     case 'almostCombo':
                         // Only for combo badges: user has some (but not all) ACTIVE prerequisites
                         if (badge.type !== 'combo') {
                             return false;
                         }
-                        if (badgeStatus && badgeStatus.isActive) {
+                        if (this.isBadgeActiveInPeriod(badgeStatus)) {
                             return false; // Already obtained
                         }
 
@@ -1893,7 +1907,7 @@ export default {
                         let activeCount = 0;
                         for (const requiredBadge of badge.requires) {
                             const requiredStatus = this.badgesHistory[requiredBadge];
-                            if (requiredStatus && requiredStatus.isActive) {
+                            if (this.isBadgeActiveInPeriod(requiredStatus)) {
                                 activeCount++;
                             }
                         }

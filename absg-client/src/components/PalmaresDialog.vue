@@ -31,6 +31,52 @@
             density="comfortable"
             class="palmares-dialog__family-select"
           />
+          <!-- Sélecteur de période glissante -->
+          <v-menu
+            v-model="showPeriodMenu"
+            :close-on-content-click="false"
+            location="bottom"
+          >
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                size="small"
+                variant="flat"
+                color="primary"
+                :disabled="mode !== 'sliding'"
+              >
+                <v-icon start size="small">fas fa-calendar-alt</v-icon>
+                <span v-if="slidingYearFrom && slidingYearTo">
+                  {{ slidingYearFrom }}-{{ slidingYearTo }}
+                </span>
+                <span v-else>Période</span>
+                <v-icon end size="x-small">fas fa-caret-down</v-icon>
+              </v-btn>
+            </template>
+            <v-card class="palmares-dialog__period-card">
+              <div class="palmares-dialog__period-label">Période glissante (3 ans)</div>
+              <v-slider
+                v-model="localSliderYear"
+                :min="sliderMin"
+                :max="sliderMax"
+                :step="1"
+                show-ticks="always"
+                thumb-label="always"
+                color="primary"
+                hide-details
+                @end="onSliderEnd"
+              >
+                <template #thumb-label="{ modelValue }">
+                  {{ modelValue - 2 }}-{{ modelValue }}
+                </template>
+              </v-slider>
+              <div class="palmares-dialog__period-range">
+                <span>{{ sliderMin - 2 }}</span>
+                <span>{{ sliderMax }}</span>
+              </div>
+            </v-card>
+          </v-menu>
+
           <v-btn-toggle
             v-model="mode"
             mandatory
@@ -40,12 +86,7 @@
           >
             <v-btn value="sliding" size="small">
               <v-icon start size="small">fas fa-chart-line</v-icon>
-              <span v-if="slidingYearFrom && slidingYearTo">
-                {{ slidingYearFrom }}-{{ slidingYearTo }}
-              </span>
-              <span v-else>
-                Glissant
-              </span>
+              Glissant
             </v-btn>
             <v-btn value="global" size="small">
               <v-icon start size="small">fas fa-history</v-icon>
@@ -127,16 +168,6 @@
               <span class="palmares-dialog__score">{{ item.totalPoints }} </span>
               <template v-if="item.totalPoints > 1">pts</template>
               <template v-else>pt</template>
-            </template>
-
-            <template #[`item.participation`]="{ item }">
-              <span class="palmares-dialog__score">{{ item.participation.total }}</span> fois
-              <template v-if="item.participation.first != item.participation.last">
-                <span class="palmares-dialog__muted">(de {{ item.participation.first }} à {{ item.participation.last }})</span>
-              </template>
-              <template v-else>
-                <span class="palmares-dialog__muted">(en {{ item.participation.first }})</span>
-              </template>
             </template>
 
             <template #[`item.bestYear`]="{ item }">
@@ -246,17 +277,27 @@ export default {
     initialMode: {
       type: String,
       default: 'sliding'
+    },
+    sliderMin: {
+      type: Number,
+      default: 2008
+    },
+    sliderMax: {
+      type: Number,
+      default: () => new Date().getFullYear()
     }
   },
+  emits: ['update:modelValue', 'update:slidingPeriod'],
   data() {
     return {
       mode: 'sliding',
       searchText: '',
       familyFilter: null,
+      showPeriodMenu: false,
+      localSliderYear: null,
       headers: [
         { title: 'Photographe', key: 'photographe' },
         { title: 'Score', key: 'score' },
-        { title: 'Participation', key: 'participation' },
         { title: 'Récompenses', key: 'awards' },
         { title: 'Meilleure année', key: 'bestYear' },
         { title: 'Meilleure catégorie', key: 'bestCat' },
@@ -308,12 +349,16 @@ export default {
     modelValue(newVal) {
       if (newVal) {
         this.mode = this.initialMode;
+        this.localSliderYear = this.slidingYearTo || this.sliderMax;
       }
     }
   },
   methods: {
     close() {
       this.show = false;
+    },
+    onSliderEnd(value) {
+      this.$emit('update:slidingPeriod', { from: value - 2, to: value });
     }
   }
 };
@@ -353,6 +398,30 @@ export default {
 
   &__mode-toggle {
     flex: 0 0 auto;
+  }
+
+  &__period-card {
+    min-width: 320px;
+    padding: 16px 24px 8px;
+
+    :deep(.v-slider-thumb__label) {
+      color: white !important;
+    }
+  }
+
+  &__period-label {
+    font-size: 0.85em;
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+
+  &__period-range {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75em;
+    opacity: 0.4;
+    margin-top: -4px;
+    padding: 0 2px;
   }
 
   &__table-container {

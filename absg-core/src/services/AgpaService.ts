@@ -455,25 +455,25 @@ class AgpaService {
     /**
      * Récupère toutes les statistiques "palmarès" de l'ensemble des éditions
      */
-    getPalmaresData(algorithm?: string) {
-        return palmaresData(null, null, algorithm);
+    getPalmaresData() {
+        return palmaresData();
     }
 
     /**
      * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
      * avec calcul de la variation du rang par rapport à la période précédente
      */
-    async getSlidingPalmaresData(yearFrom?: number, yearTo?: number, algorithm?: string) {
+    async getSlidingPalmaresData(yearFrom?: number, yearTo?: number) {
         const maxYear = yearTo || getMaxArchiveEdition();
         const fromYear = yearFrom || Math.max(2006, maxYear - 2); // 3 dernières années
 
         // Palmarès de la période actuelle
-        const currentPalmares = await palmaresData(fromYear, maxYear, algorithm);
+        const currentPalmares = await palmaresData(fromYear, maxYear);
 
         // Palmarès de la période précédente (3 éditions d'avant)
         const prevFromYear = Math.max(2006, fromYear - 3);
         const prevToYear = Math.max(2006, maxYear - 3);
-        const previousPalmares = prevToYear >= 2006 ? await palmaresData(prevFromYear, prevToYear, algorithm) : [];
+        const previousPalmares = prevToYear >= 2006 ? await palmaresData(prevFromYear, prevToYear) : [];
 
         // Créer un mapping userId -> rang pour la période précédente
         const previousRankMap = new Map();
