@@ -1,8 +1,10 @@
 import { getRepository } from "../middleware/database";
 import { Citation, User, Person, LogModule } from "../entities";
-import { isNumber, isString } from "util";
 import { logger } from "../middleware/logger";
 import { BadRequestError } from "routing-controllers";
+
+const isNumber = (v: unknown): v is number => typeof v === "number" && !Number.isNaN(v);
+const isString = (v: unknown): v is string => typeof v === "string";
 
 class CitationService {
     private citationsRepo = null;
