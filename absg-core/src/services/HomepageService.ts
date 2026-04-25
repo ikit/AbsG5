@@ -1,5 +1,5 @@
 import { getRepository } from "../middleware/database";
-import { Person } from "../entities";
+import { Person, AgpaPhoto, AgpaAward } from "../entities";
 import { eventService } from "./EventService";
 import { citationService } from "./CitationService";
 import { addDays } from "date-fns";
@@ -23,9 +23,13 @@ export interface UpcomingEvent {
 
 class HomepageService {
     private personsRepo = null;
+    private photosRepo = null;
+    private awardsRepo = null;
 
     public initService() {
         this.personsRepo = getRepository(Person);
+        this.photosRepo = getRepository(AgpaPhoto);
+        this.awardsRepo = getRepository(AgpaAward);
     }
 
     /**
@@ -345,19 +349,58 @@ class HomepageService {
     }
 
     /**
+     * Récupère une photo AGPA aléatoire parmi les éditions archivées
+     */
+    public async getRandomAgpaPhoto() {
+        try {
+            // Récupérer une photo au hasard avec son auteur et sa catégorie
+            const photo = await this.photosRepo
+                .createQueryBuilder("p")
+                .leftJoinAndSelect("p.user", "u")
+                .leftJoinAndSelect("p.category", "c")
+                .where("p.year < :currentYear", { currentYear: new Date().getFullYear() })
+                .orderBy("RANDOM()")
+                .limit(1)
+                .getOne();
+
+            if (!photo) return null;
+
+            // Chercher si cette photo a reçu un award
+            const award = await this.awardsRepo
+                .createQueryBuilder("a")
+                .where("a.photoId = :photoId", { photoId: photo.id })
+                .getOne();
+
+            return {
+                url: `/files/agpa/${photo.year}/mini/${photo.filename}`,
+                title: photo.title,
+                author: photo.user?.username || "Inconnu",
+                year: photo.year,
+                category: photo.category?.title || null,
+                award: award?.award || null
+            };
+        } catch (error) {
+            console.error("Error fetching random AGPA photo:", error);
+            return null;
+        }
+    }
+
+    /**
      * Récupère toutes les données pour les widgets de la homepage
      */
     public async getHomepageWidgets() {
-        const [upcomingEvents, citation, onThisDay] = await Promise.all([
+        const [upcomingEvents, citation, onThisDay, agpaPhoto] = await Promise.all([
             this.getUpcomingEvents(30),
             this.getRandomCitation(),
-            this.getOnThisDay()
+            this.getOnThisDay(),
+            this.getRandomAgpaPhoto()
         ]);
 
         return {
             upcomingEvents,
             citation,
-            onThisDay
+            onThisDay,
+            agpaPhoto
         };
     }
 }
