@@ -194,6 +194,14 @@ export class AgpaController {
     }
 
     /**
+     * Récupère les meilleures photos de l'utilisateur connecté pour le mini-diaporama
+     */
+    @Get("/my-best-photos")
+    getMyBestPhotos(@CurrentUser() user: User) {
+        return agpaService.getMyBestPhotos(user.id);
+    }
+
+    /**
      * Récupère les statistiques "palmarès glissant" pour une période donnée
      */
     @Get("/palmares/sliding")

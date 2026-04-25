@@ -460,6 +460,40 @@ class AgpaService {
     }
 
     /**
+     * Récupère un échantillon aléatoire (10) parmi les meilleures photos (top 50) d'un utilisateur
+     * pour le mini-diaporama du palmarès. Top 50 = trié par récompense puis score décroissant.
+     */
+    async getMyBestPhotos(userId: number, sampleSize: number = 10, poolSize: number = 50) {
+        const repo = getRepository(AgpaPhoto);
+        const sql = `
+            SELECT * FROM (
+                SELECT p.year, p.filename, p.title, p.score, a.award, c.title as "catTitle"
+                FROM agpa_award a
+                INNER JOIN agpa_photo p ON a."photoId" = p.id
+                INNER JOIN agpa_category c ON a."categoryId" = c.id
+                WHERE a."userId" = $1
+                  AND p.filename IS NOT NULL
+                  AND a.award IN ('diamond', 'gold', 'sylver', 'bronze', 'nominated')
+                ORDER BY
+                  CASE a.award
+                    WHEN 'diamond' THEN 5
+                    WHEN 'gold' THEN 4
+                    WHEN 'sylver' THEN 3
+                    WHEN 'bronze' THEN 2
+                    WHEN 'nominated' THEN 1
+                    ELSE 0
+                  END DESC,
+                  p.score DESC NULLS LAST,
+                  p.year DESC
+                LIMIT $2
+            ) top
+            ORDER BY RANDOM()
+            LIMIT $3
+        `;
+        return await repo.query(sql, [userId, poolSize, sampleSize]);
+    }
+
+    /**
      * Récupère les statistiques "palmarès glissant" pour les 3 dernières éditions
      * avec calcul de la variation du rang par rapport à la période précédente
      */

@@ -153,6 +153,30 @@
               Palmarès AGPA
             </v-card-title>
             <v-card-text class="palmares-card__body">
+              <!-- Mini-diaporama des meilleures photos -->
+              <div v-if="bestPhotos.length > 0" class="palmares-slideshow" @click.stop="openCurrentPhoto">
+                <transition name="slideshow-fade" mode="out-in">
+                  <div :key="currentPhotoIndex" class="palmares-slideshow__slide">
+                    <img
+                      :src="`/files/agpa/${bestPhotos[currentPhotoIndex].year}/mini/${bestPhotos[currentPhotoIndex].filename}`"
+                      :alt="bestPhotos[currentPhotoIndex].title"
+                      class="palmares-slideshow__img"
+                    />
+                    <div class="palmares-slideshow__caption">
+                      <span class="palmares-slideshow__title">{{ bestPhotos[currentPhotoIndex].title }}</span>
+                      <span class="palmares-slideshow__sep">·</span>
+                      <span class="palmares-slideshow__year">{{ bestPhotos[currentPhotoIndex].year }}</span>
+                      <span
+                        class="palmares-slideshow__award"
+                        :class="`palmares-slideshow__award--${bestPhotos[currentPhotoIndex].award}`"
+                      >
+                        <i class="fas fa-circle"></i>
+                      </span>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+
               <!-- Label mode/période -->
               <div class="palmares-card__mode-label">
                 <span v-if="palmaresMode === 'sliding' && slidingYearFrom && slidingYearTo">
@@ -806,7 +830,7 @@
 
 <script>
 import axios from 'axios';
-import { mapState } from '../../stores/helpers';
+import store, { mapState } from '../../stores/helpers';
 import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 import BadgeCard from '../../components/BadgeCard.vue';
 import PalmaresDialog from '../../components/PalmaresDialog.vue';
@@ -838,6 +862,9 @@ export default {
         palmares: [],
         slidingPalmares: [],
         palmaresDetails: null,
+        bestPhotos: [],
+        currentPhotoIndex: 0,
+        slideshowTimer: null,
         showPalmaresDialog: false,
         palmaresTab: 'sliding',
         myGlobalRank: null,
@@ -1218,6 +1245,7 @@ export default {
     },
     beforeUnmount() {
         this.removeKeyboardShortcut();
+        this.stopSlideshow();
     },
     methods: {
         onSliderEnd(value) {
@@ -1309,7 +1337,52 @@ export default {
             await this.calculateMySlidingBadges();
             await this.loadBadgeHistory();
 
+            // Charger les meilleures photos pour le mini-diaporama
+            await this.loadBestPhotos();
+
             this.initialized = true;
+        },
+
+        async loadBestPhotos() {
+            try {
+                const response = await axios.get('/api/agpa/my-best-photos');
+                const data = parseAxiosResponse(response);
+                this.bestPhotos = Array.isArray(data) ? data : [];
+                this.currentPhotoIndex = 0;
+                this.startSlideshow();
+            } catch (err) {
+                console.error('Erreur chargement meilleures photos:', err);
+                this.bestPhotos = [];
+            }
+        },
+
+        startSlideshow() {
+            this.stopSlideshow();
+            if (this.bestPhotos.length > 1) {
+                this.slideshowTimer = setInterval(() => {
+                    this.currentPhotoIndex = (this.currentPhotoIndex + 1) % this.bestPhotos.length;
+                }, 10000);
+            }
+        },
+
+        stopSlideshow() {
+            if (this.slideshowTimer) {
+                clearInterval(this.slideshowTimer);
+                this.slideshowTimer = null;
+            }
+        },
+
+        openCurrentPhoto() {
+            if (!this.bestPhotos.length) return;
+            const gallery = this.bestPhotos.map(p => ({
+                url: `/files/agpa/${p.year}/mini/${p.filename}`,
+                thumb: `/files/agpa/${p.year}/mini/vignette_${p.filename}`,
+                title: p.title,
+                username: this.user?.username || ''
+            }));
+            store.commit('photosGalleryReset', gallery);
+            store.commit('photosGallerySetIndex', this.currentPhotoIndex);
+            store.commit('photosGalleryDisplay');
         },
 
         async reloadPalmaresData() {
@@ -2140,6 +2213,80 @@ $gradient-palmares: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(
     color: rgba(var(--v-theme-on-surface), 0.4);
     font-style: italic;
   }
+}
+
+// ============================================
+// Mini-diaporama (10 meilleures photos)
+// ============================================
+.palmares-slideshow {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  cursor: pointer;
+
+  &__slide {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 12px 8px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+    color: #fff;
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-weight: 600;
+  }
+
+  &__sep {
+    opacity: 0.5;
+  }
+
+  &__year {
+    opacity: 0.85;
+  }
+
+  &__award {
+    margin-left: 4px;
+
+    &--diamond { color: #c3f1ff; }
+    &--gold { color: #ffd700; }
+    &--sylver { color: #c0c0c0; }
+    &--bronze { color: #cd7f32; }
+    &--nominated { color: rgba(255, 255, 255, 0.6); }
+  }
+}
+
+.slideshow-fade-enter-active,
+.slideshow-fade-leave-active {
+  transition: opacity 0.6s ease;
+}
+
+.slideshow-fade-enter-from,
+.slideshow-fade-leave-to {
+  opacity: 0;
 }
 
 // ============================================
