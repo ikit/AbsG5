@@ -19,11 +19,6 @@
           fab fa-stack-overflow
         </v-icon> Trier
       </v-tab>
-      <v-tab v-if="isArchivist" :to="{path:'/photos/pcloud'}">
-        <v-icon start>
-          fas fa-cloud
-        </v-icon> pCloud
-      </v-tab>
     </v-tabs>
     <router-view />
   </div>
@@ -32,18 +27,7 @@
 
 
 <script>
-import { mapState } from '../stores/helpers';
-
 export default  {
-    data: () => ({
-        isArchivist: false
-    }),
-    computed: {
-        ...mapState(['user']),
-    },
-    mounted() {
-        this.isArchivist = this.user?.roles?.indexOf('archivist') > -1 || false;
-    }
 };
 </script>
 

@@ -11,4 +11,3 @@ export * from "./AgendaService";
 export * from "./UserService";
 export * from "./VoyagService";
 export * from "./WebsocketService";
-export * from "./PCloudService";

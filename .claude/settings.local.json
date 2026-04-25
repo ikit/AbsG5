@@ -24,7 +24,8 @@
       "Bash(awk:*)",
       "Bash(npx vue-tsc:*)",
       "Bash(git checkout:*)",
-      "Bash(npx tsc --noEmit)"
+      "Bash(npx tsc --noEmit)",
+      "Bash(xargs cat:*)"
     ]
   }
 }
