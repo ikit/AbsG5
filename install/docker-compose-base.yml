@@ -1,29 +1,6 @@
-version: "3.5"
-
 networks:
   absg5_net:
     name: absg5_net
-
-# WORKS WITH WIN10 BUT NOT WITH UBUNTU XENIAL ..... why... :'(
-# volumes:
-#   absg5-db-data:
-#     driver: local
-#       driver_opts:
-#         type: "none"
-#         o: "bind"
-#         device: "/var/absg5/absg5_db"
-#   absg5-files-data:
-#     driver: local
-#       driver_opts:
-#         type: "none"
-#         o: "bind"
-#         device: "/var/absg5/absg5_files"
-#   absg5-pgadmin-data:
-#     driver: local
-#       driver_opts:
-#         type: "none"
-#         o: "bind"
-#         device: "/var/absg5/pgadmin"
 
 services:
   absg5_db:
@@ -70,7 +47,8 @@ services:
       - PGADMIN_DEFAULT_EMAIL=pgSuperAdmin@domain.com
       - PGADMIN_DEFAULT_PASSWORD=pgSuperAdminSecretPassword
     depends_on:
-      - absg5_db
+      absg5_db:
+        condition: service_healthy
     networks:
       - absg5_net
     ports:
@@ -81,10 +59,10 @@ services:
     image: absg5-core-image
     restart: always
     volumes:
-      # - absg5-files-data:/var/absg5/files
       - /var/absg5/absg5_files:/var/absg5/files
     depends_on:
-      - absg5_db
+      absg5_db:
+        condition: service_healthy
     environment:
       - NODE_ENV=production
       - API_PORT=5010
@@ -112,6 +90,7 @@ services:
     ports:
       - "9012:80"
     depends_on:
-      - absg5_core
+      absg5_core:
+        condition: service_started
     networks:
       - absg5_net

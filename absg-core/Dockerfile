@@ -1,33 +1,28 @@
 # Stage I - Build dependencies
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 
 # Install build dependencies for native modules (bcrypt, etc.)
 RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
-COPY  . .
-
+COPY package*.json ./
 RUN npm ci
+
+COPY . .
 RUN npm run build
 
 # Stage II - Production
-FROM node:20-alpine as prod
-
-# Install production dependencies for native modules
-RUN apk add --no-cache python3 make g++
+FROM node:20-alpine AS prod
 
 RUN mkdir -p /app && chown -R node:node /app
 WORKDIR /app
 
 USER node
 
-COPY --chown=node:node --from=build  ./app/build ./build
+COPY --chown=node:node --from=build /app/build ./build
+COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node package*.json ./
-
-RUN node --version
-RUN npm ci --production --ignore-scripts
-RUN npm rebuild bcrypt --build-from-source
 
 EXPOSE 5010 5011
 
