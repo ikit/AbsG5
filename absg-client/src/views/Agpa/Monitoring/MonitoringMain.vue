@@ -50,6 +50,16 @@
             {{ phase.value }}
           </v-chip>
         </div>
+
+        <v-spacer />
+
+        <v-progress-circular
+          v-if="isLoading"
+          indeterminate
+          size="20"
+          width="2"
+          color="primary"
+        />
       </div>
 
       <!-- Onglets -->
@@ -91,7 +101,6 @@
 
       <!-- Contenu des onglets -->
       <v-window v-model="currentTab" :touch="false">
-        <!-- Onglet Photos -->
         <v-window-item value="photos">
           <MonitoringPhotos
             v-if="monitoringData"
@@ -101,7 +110,6 @@
           />
         </v-window-item>
 
-        <!-- Onglet Votes -->
         <v-window-item value="votes">
           <MonitoringVotes
             v-if="monitoringData"
@@ -110,7 +118,6 @@
           />
         </v-window-item>
 
-        <!-- Onglet Calculs V2026 -->
         <v-window-item value="scores">
           <MonitoringScores
             v-if="v2026Steps"
@@ -125,7 +132,6 @@
           </div>
         </v-window-item>
 
-        <!-- Onglet Palmarès -->
         <v-window-item value="palmares">
           <MonitoringPalmares
             v-if="monitoringData"
@@ -135,7 +141,6 @@
           />
         </v-window-item>
 
-        <!-- Onglet Palmarès Glissant -->
         <v-window-item value="sliding">
           <MonitoringSlidingPalmares
             v-if="slidingEvolution"
@@ -148,7 +153,6 @@
           </div>
         </v-window-item>
 
-        <!-- Onglet Stats -->
         <v-window-item value="stats">
           <MonitoringStats
             v-if="monitoringData"
@@ -157,7 +161,6 @@
           />
         </v-window-item>
 
-        <!-- Onglet Badges -->
         <v-window-item value="badges">
           <MonitoringBadges
             :year="selectedYear"
