@@ -15,8 +15,7 @@ services:
     networks:
       - absg5_net
     volumes:
-      # - absg5-db-data:/var/lib/postgresql/data
-      - /var/absg5/absg5_db:/var/lib/postgresql/data
+      - /var/absg5/database:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U absg -d absg"]
       interval: 10s
@@ -57,9 +56,12 @@ services:
   absg5_core:
     container_name: absg5_core
     image: absg5-core-image
+    build:
+      context: ../absg-core
+      dockerfile: Dockerfile
     restart: always
     volumes:
-      - /var/absg5/absg5_files:/var/absg5/files
+      - /var/absg5/files:/var/absg5/files
     depends_on:
       absg5_db:
         condition: service_healthy
@@ -79,13 +81,19 @@ services:
       - URL_FILES=https://domain.com/files/
     networks:
       - absg5_net
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
     ports:
-      - "9010:5010"
-      - "9011:5011"
+      - "127.0.0.1:9010:5010"
+      - "127.0.0.1:9011:5011"
 
   absg5_client:
     container_name: absg5_client
     image: absg5-client-image
+    build:
+      context: ../absg-client
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "9012:80"
