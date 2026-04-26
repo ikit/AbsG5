@@ -8,6 +8,10 @@ const isDev = process.env.NODE_ENV === "development";
 const srcPath = isDev ? "src" : "build";
 const fileExt = isDev ? "ts" : "js";
 
+// Synchronize schema in dev OR when explicitly requested via DB_SYNCHRONIZE=true
+// (use case: one-shot schema migration in production after a major upgrade)
+const synchronize = isDev || process.env.DB_SYNCHRONIZE === "true";
+
 export const AppDataSource = new DataSource({
     type: (process.env.DB_TYPE_DEFAULT as any) || "postgres",
     host: process.env.DB_HOST_DEFAULT || "localhost",
@@ -15,7 +19,7 @@ export const AppDataSource = new DataSource({
     username: process.env.DB_USER_DEFAULT || "postgres",
     password: process.env.DB_PASSWORD_DEFAULT,
     database: process.env.DB_NAME_DEFAULT || "absg5",
-    synchronize: isDev, // Only in development
+    synchronize,
     logging: isDev ? ["error", "warn"] : false,
     entities: [`${srcPath}/entities/**/*.${fileExt}`],
     migrations: [`${srcPath}/migrations/**/*.${fileExt}`],
