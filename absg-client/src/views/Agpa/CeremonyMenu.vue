@@ -204,55 +204,25 @@
       v-if="!current.displayed"
       fluid
     >
-      <v-row
-        row
-        wrap
-      >
-        <v-col
+      <div class="ceremony-editions-grid">
+        <a
           v-for="edition in formerEditions"
           :key="edition.year"
-          :cols="6"
-          :sm="4"
-          :md="3"
-          :style="{
-            minWidth: $vuetify.display.xs ? '150px' : '250px',
-            margin: $vuetify.display.smAndDown ? '10px auto' : '15px'
-          }"
+          v-show="edition.photos && edition.photos.length > 0"
+          :href="`/agpa/ceremony/${edition.year}`"
+          target="_blank"
+          class="text-decoration-none ceremony-edition-link"
         >
-          <a
-            v-if="edition.photos && edition.photos.length > 0"
-            :href="`/agpa/ceremony/${edition.year}`"
-            target="_blank"
-            class="text-decoration-none"
-          >
-            <v-card
-              :style="{
-                width: $vuetify.display.xs ? '100%' : '250px',
-                margin: 'auto'
-              }"
-            >
-              <v-img
-                :src="`/files/agpa/${edition.year}/mini/${edition.photos[0].filename}`"
-                :height="$vuetify.display.xs ? '120px' : '150px'"
-                cover
-              />
-              <p
-                :style="{
-                  margin: 0,
-                  textAlign: 'center',
-                  fontSize: $vuetify.display.xs ? '2em' : '3em',
-                  fontWeight: 'bold',
-                  fontFamily: 'Tangerine, serif',
-                  opacity: 0.5,
-                  lineHeight: '1em'
-                }"
-              >
-                {{ edition.year }}
-              </p>
-            </v-card>
-          </a>
-        </v-col>
-      </v-row>
+          <v-card class="ceremony-edition-card">
+            <v-img
+              :src="`/files/agpa/${edition.year}/mini/${edition.photos[0].filename}`"
+              :height="$vuetify.display.xs ? 120 : 150"
+              cover
+            />
+            <p class="ceremony-edition-year">{{ edition.year }}</p>
+          </v-card>
+        </a>
+      </div>
     </v-container>
 
     <div :class="{ ceremony: current.displayed, hiddenCeremony: !current.displayed }">
@@ -575,8 +545,56 @@ export default {
 @use '../../themes/agpa.scss' as *;
 
 
+.ceremony-editions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+}
+
+.ceremony-edition-link,
+.ceremony-edition-link:hover,
+.ceremony-edition-link:visited,
+.ceremony-edition-link:active {
+  text-decoration: none !important;
+  flex: 0 0 auto;
+
+  & * {
+    text-decoration: none !important;
+  }
+}
+
+.ceremony-edition-card {
+  width: 250px;
+}
+
+.ceremony-edition-year {
+  margin: 0;
+  text-align: center;
+  font-size: 3em;
+  font-weight: bold;
+  font-family: 'Tangerine', serif;
+  opacity: 0.5;
+  line-height: 1em;
+}
+
+@media (max-width: 600px) {
+  .ceremony-editions-grid {
+    gap: 12px;
+  }
+
+  .ceremony-edition-card {
+    width: 150px;
+  }
+
+  .ceremony-edition-year {
+    font-size: 2em;
+  }
+}
+
 .hiddenCeremony {
-    visibility: hidden;
+    display: none;
 }
 .ceremony {
     opacity:0;
