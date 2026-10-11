@@ -8,7 +8,7 @@ services:
     image: docker.io/postgres:16-alpine
     restart: always
     environment:
-      - POSTGRES_PASSWORD=postgresSecretPassword
+      - POSTGRES_PASSWORD=${DB_PASSWORD:?DB_PASSWORD manquant dans install/.env}
       - POSTGRES_DB=absg
       - POSTGRES_USER=absg
       - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C
@@ -43,8 +43,8 @@ services:
     image: dpage/pgadmin4
     restart: always
     environment:
-      - PGADMIN_DEFAULT_EMAIL=pgSuperAdmin@domain.com
-      - PGADMIN_DEFAULT_PASSWORD=pgSuperAdminSecretPassword
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:?PGADMIN_EMAIL manquant dans install/.env}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:?PGADMIN_PASSWORD manquant dans install/.env}
     depends_on:
       absg5_db:
         condition: service_healthy
@@ -70,12 +70,12 @@ services:
       - API_PORT=5010
       - WS_PORT=5011
       - AUTH_SESSION_DURATION_MS=86400000
-      - AUTH_SESSION_SALT=jwtSecretSalt
+      - AUTH_SESSION_SALT=${AUTH_SESSION_SALT:?AUTH_SESSION_SALT manquant dans install/.env}
       - DB_TYPE_DEFAULT=postgres
       - DB_HOST_DEFAULT=absg5_db
       - DB_PORT_DEFAULT=5432
       - DB_USER_DEFAULT=absg
-      - DB_PASSWORD_DEFAULT=postgresSecretPassword
+      - DB_PASSWORD_DEFAULT=${DB_PASSWORD:?DB_PASSWORD manquant dans install/.env}
       - DB_NAME_DEFAULT=absg
       - PATH_FILES=/var/absg5/files
       - URL_FILES=https://domain.com/files/
