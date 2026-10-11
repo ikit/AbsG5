@@ -27,6 +27,12 @@ import { albumService } from "./services/AlbumService";
 AppDataSource.initialize()
     .then(() => {
         logger.info("TypeORM DataSource initialized successfully");
+        if (AppDataSource.options.synchronize && process.env.NODE_ENV === "production") {
+            logger.warning(
+                "DB_SYNCHRONIZE=true en production : le schéma de la base a été synchronisé avec les entités. " +
+                    "Retirer cette variable et redémarrer une fois la migration terminée."
+            );
+        }
 
         // Une fois la connection créé, on peut initialialiser les services
         agendaService.initService();
