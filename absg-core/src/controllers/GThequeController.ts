@@ -1,7 +1,5 @@
 import { JsonController, Get, Authorized, CurrentUser, Post, Body } from "routing-controllers";
 import { LogModule, User } from "../entities";
-import { fetchFolder } from "../middleware/commonHelper";
-import * as path from "path";
 import { gthequeService } from "../services";
 import { logger } from "../middleware/logger";
 

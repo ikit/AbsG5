@@ -2,9 +2,7 @@ import { AgpaPhoto, User } from "../entities";
 import { getRepository } from "./database";
 import {
     getMetaData,
-    getCurrentEdition,
     checkValidYear,
-    getPhasesBoundaries,
     getMaxArchiveEdition
 } from "./agpaCommonHelpers";
 
@@ -176,7 +174,7 @@ export async function archiveEdition(year: number, user: User): Promise<any> {
         p.fromJSON(row);
 
         // On initialise la catégorie si besoin
-        if (!edition.categories[p.categoryId].hasOwnProperty("photos")) {
+        if (!Object.hasOwn(edition.categories[p.categoryId], "photos")) {
             edition.categories[p.categoryId].photos = [];
             edition.categories[p.categoryId].userPhotos = [];
         }

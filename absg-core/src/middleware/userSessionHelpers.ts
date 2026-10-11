@@ -238,7 +238,7 @@ export async function jwtAuthorizationChecker(action: Action, roles: string[]) {
         const isAuthorized = !!user && !!tokenPayload && user.id && checkRoles([], roles);
 
         return isAuthorized;
-    } catch (e) {
+    } catch {
         return false;
     }
 }

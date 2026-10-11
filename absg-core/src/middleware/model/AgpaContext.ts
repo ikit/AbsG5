@@ -1,7 +1,6 @@
 import { AgpaCategory, AgpaPhoto } from "../../entities";
 import { getRepository } from "../database";
 import { AgpaPhase } from "./AgpaPhase";
-import { differenceInHours } from "date-fns";
 import { getPhasesBoundaries, getCurrentEdition, agpaCtx } from "../agpaCommonHelpers";
 
 export class AgpaContext {
@@ -21,11 +20,9 @@ export class AgpaContext {
      * Vérifie en fonction de la date courante si les infos du contexte doivent être rafraichient
      * @param refYear, l'année de référence pour le contexte (par défaut prend l'année en cours)
      */
-    async checkForReset(refYear = null): Promise<AgpaContext> {
-        const currentYear = refYear ? refYear : getCurrentEdition();
-
+    async checkForReset(_refYear = null): Promise<AgpaContext> {
         // Si pas encore init ou bien dernier reset à plus de 24h: il faut rafraichir le contexte
-        const needToRefresh = true; // !this.lastUpdateRefDate || differenceInHours(currentYear, this.lastUpdateRefDate) >= 24;
+        const needToRefresh = true; // !this.lastUpdateRefDate || differenceInHours(_refYear ?? getCurrentEdition(), this.lastUpdateRefDate) >= 24;
 
         // On recalcul le contexte
         if (needToRefresh) {

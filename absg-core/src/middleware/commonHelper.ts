@@ -29,7 +29,7 @@ export function cleanString(str: string): string {
  * @param dataString
  */
 export function decodeBase64Image(dataString) {
-    const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    const matches = dataString.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
 
     if (matches.length !== 3) {
         throw new Error("Invalid input string");

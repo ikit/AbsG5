@@ -1,10 +1,11 @@
-require("dotenv").config();
+import "dotenv/config";
 import "reflect-metadata";
 import { AppDataSource } from "./data-source";
 import { useExpressServer } from "routing-controllers";
 import { logger, errorLogHandler, accessLogHandler } from "./middleware/logger";
 import { jwtAuthorizationChecker, currentUserChecker } from "./middleware";
 import express from "express";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const fileUpload = require("express-fileupload");
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";

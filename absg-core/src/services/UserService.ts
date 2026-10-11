@@ -38,7 +38,7 @@ class UserService {
     public async createUser(userData: any) {
         // On vérifie qu'on a bien reçu tous les champs nécessaires
         const hasMissingField =
-            !userData || ["id", "username", "password", "roles"].some(field => !userData.hasOwnProperty(field));
+            !userData || ["id", "username", "password", "roles"].some(field => !Object.hasOwn(userData, field));
 
         if (hasMissingField) {
             throw new BadRequestError(

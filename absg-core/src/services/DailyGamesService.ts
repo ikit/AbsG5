@@ -258,7 +258,7 @@ class DailyGamesService {
             const escapedWord = variant.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
             const regex = new RegExp(escapedWord, "gi");
 
-            const newText = maskedText.replace(regex, (match) => {
+            const newText = maskedText.replace(regex, () => {
                 replacements++;
                 return "???";
             });
@@ -275,7 +275,7 @@ class DailyGamesService {
     /**
      * Devine la catégorie d'un article
      */
-    private guessCategory(description: string, title: string): string {
+    private guessCategory(description: string, _title: string): string {
         const desc = description.toLowerCase();
 
         if (desc.includes("personnalité") || desc.includes("acteur") || desc.includes("chanteur") ||
@@ -304,7 +304,7 @@ class DailyGamesService {
     /**
      * Génère des indices progressifs
      */
-    private generateHints(title: string, description: string, extract: string): string[] {
+    private generateHints(title: string, description: string, _extract: string): string[] {
         const hints: string[] = [];
 
         // Utiliser le titre principal sans parenthèses pour les indices

@@ -15,7 +15,7 @@ export class AuthController {
     @Post("/login")
     async login(@Body() payload) {
         // On vérifie qu'on a bien reçu tous les champs nécessaires
-        const hasMissingField = !payload || ["username", "password"].some(field => !payload.hasOwnProperty(field));
+        const hasMissingField = !payload || ["username", "password"].some(field => !Object.hasOwn(payload, field));
 
         if (hasMissingField) {
             throw new BadRequestError(`Vous devez fournir un identifiant et un mot de passe pour vous authentifier.`);

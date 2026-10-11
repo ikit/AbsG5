@@ -17,7 +17,7 @@ export class PhotosController {
      * Récupère la liste des photos pour l'explorateur
      */
     @Get("/all")
-    async toCheck(@QueryParam("collection") collection: string) {
+    async toCheck(@QueryParam("collection") _collection: string) {
         // On récupère les photos à checker
         // Par défaut on les trie par ordre chronologique (celles sans dates sont à la fin par ordre d'id)
         const photos = await this.repo

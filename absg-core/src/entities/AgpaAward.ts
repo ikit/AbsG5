@@ -36,7 +36,7 @@ export class AgpaAward {
 
     @Column("enum", {
         enum: ["honor", "nominated", "bronze", "sylver", "gold", "diamond"],
-        comment: `'L\'agpa décerné`
+        comment: `'L'agpa décerné`
     })
     award: AgpaAwardType;
 

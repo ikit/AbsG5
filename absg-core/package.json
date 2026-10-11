@@ -15,6 +15,7 @@
         "npm": ">=10.0.0"
     },
     "devDependencies": {
+        "@eslint/js": "^9.39.5",
         "@types/archiver": "^7.0.0",
         "@types/bcrypt": "^5.0.2",
         "@types/cookie-parser": "^1.4.6",
@@ -27,10 +28,13 @@
         "@types/supertest": "^6.0.3",
         "@types/ws": "^8.5.10",
         "@vitest/ui": "^4.0.14",
+        "eslint": "^9.39.5",
+        "globals": "^17.13.0",
         "husky": "^9.0.0",
         "supertest": "^7.1.4",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.3.3",
+        "typescript-eslint": "^8.71.1",
         "vitest": "^4.0.14"
     },
     "dependencies": {
@@ -67,7 +71,7 @@
         "start:prod": "pm2 start ./ecosystem.config.js --env production",
         "prebuild": "rimraf build",
         "build": "tsc",
-        "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\"",
+        "lint": "eslint --fix src",
         "test": "vitest",
         "test:ui": "vitest --ui",
         "test:run": "vitest run",

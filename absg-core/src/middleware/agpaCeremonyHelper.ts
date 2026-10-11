@@ -30,7 +30,7 @@ export async function ceremonyData(year: number) {
     const result = await repo.query(sql);
     for (const p of result) {
         if (p.award === "honor") {
-            if (!edition.categories.hasOwnProperty("-4")) {
+            if (!Object.hasOwn(edition.categories, "-4")) {
                 edition.categories[-4] = {};
             }
             edition.categories[-4].nominated.push(p);

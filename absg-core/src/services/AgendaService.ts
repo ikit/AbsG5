@@ -5,7 +5,6 @@ import { logger } from "../middleware/logger";
 import * as fs from "fs";
 import * as path from "path";
 import { saveImage } from "../middleware/commonHelper";
-import { format } from "date-fns";
 
 class AgendaService {
     private personsRepo: Repository<Person> = null;
@@ -136,7 +135,7 @@ class AgendaService {
         const persons = {};
         for (const p of personsData) {
             // On ignore les personnes qui n'ont pas de date de naissance (Zaffa par exemple)
-            if (!!p.dateOfBirth) {
+            if (p.dateOfBirth) {
                 persons[p.id] = p;
                 persons[p.id].trombis = [];
                 const maxDate = persons[p.id].dateOfDeath ? new Date(persons[p.id].dateOfDeath) : new Date();
@@ -149,7 +148,7 @@ class AgendaService {
         files.forEach(file => {
             if (fs.statSync(path.join(folderPath, file)).isFile() && file.endsWith("jpg")) {
                 const tokens = file.substring(0, file.length - 4).split("_");
-                if (tokens.length === 2 && persons.hasOwnProperty(tokens[0])) {
+                if (tokens.length === 2 && Object.hasOwn(persons, tokens[0])) {
                     const pid = tokens[0];
                     const year = Number.parseInt(tokens[1]);
                     const p = persons[pid];

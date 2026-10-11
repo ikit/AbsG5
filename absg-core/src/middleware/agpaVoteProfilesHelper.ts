@@ -329,7 +329,7 @@ function analyzeVoterProfile(
     // Calculer le maximum de points théoriquement distribuables
     // Règle: pour chaque catégorie, max = round(nbPhotos / 2)
     let maxPointsAvailable = 0;
-    Object.entries(photoCountByCategory).forEach(([categoryId, photoCount]) => {
+    Object.entries(photoCountByCategory).forEach(([, photoCount]) => {
         maxPointsAvailable += Math.round(photoCount / 2);
     });
 
