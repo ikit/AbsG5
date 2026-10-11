@@ -17,11 +17,8 @@
 <script>
 import axios from 'axios';
 import { mapState } from '../../stores/helpers';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
-import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget.vue';
 import store from '../../stores/helpers';
 
 export default {
@@ -33,7 +30,7 @@ export default {
         'agpaMeta'
     ])},
     watch: {
-        $route(to, from) {
+        $route() {
             this.refresh();
         },
         'agpaMeta': function () {

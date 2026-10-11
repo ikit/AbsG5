@@ -395,11 +395,10 @@
 
 <script>
 import store from "./store";
-import axios from "axios";
 import { mapState } from "./stores/helpers";
 import { useUserStore } from "./stores/user";
-import { MODULES, parseAxiosResponse } from  "./middleware/CommonHelper";
-import { logoutUser, checkAutentication } from "./middleware/AuthHelper";
+import { MODULES } from "./middleware/CommonHelper";
+import { logoutUser } from "./middleware/AuthHelper";
 import PhotoMetadataEditor from "./components/PhotoMetadataEditor.vue";
 
 
@@ -473,7 +472,7 @@ export default {
                 this.init();
             }
         },
-        wsMessage(newValue, oldValue) {
+        wsMessage(newValue) {
             if (newValue.message === "onlineUsers") {
                 // on met à jours la liste des utilisateurs en ligne
                 const now = new Date().getTime();

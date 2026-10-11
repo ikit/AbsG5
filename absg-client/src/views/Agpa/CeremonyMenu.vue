@@ -252,9 +252,7 @@ import axios from 'axios';
 import store from '../../stores/helpers';
 import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
-import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import { padNumber } from '../../middleware/CommonHelper';
-import { addDays, addSeconds, format } from 'date-fns';
+import { addDays, addSeconds } from 'date-fns';
 import Timer from '../../components/Timer.vue';
 
 import localforage from 'localforage';
@@ -477,7 +475,7 @@ export default {
                             const d = parseAxiosResponse(response);
                             if (d) {
                                 // On sauvegarde localement la vidéo
-                                that.vlf.setItem('ceremonyData', d).then(v => {
+                                that.vlf.setItem('ceremonyData', d).then(() => {
                                     that.preloadImages(d);
                                 });
                             }

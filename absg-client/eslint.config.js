@@ -22,7 +22,17 @@ export default [
             'indent': 'off',
             'no-multiple-empty-lines': ['error', { max: 3, maxEOF: 1 }],
             'vue/no-v-html': 'off',
-            'vue/no-mutating-props': 'off'
+            'vue/no-mutating-props': 'off',
+            'vue/multi-word-component-names': 'off',
+            'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrors: 'none' }]
+        }
+    },
+    {
+        // Les espaces insécables du texte HTML sont voulus (typographie française)
+        files: ['**/*.vue'],
+        rules: {
+            'no-irregular-whitespace': 'off',
+            'vue/no-irregular-whitespace': ['error', { skipHTMLTextContents: true }]
         }
     }
 ]

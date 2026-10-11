@@ -27,7 +27,7 @@ export default {
         }
       }
       
-      socket.onopen = (event) => {
+      socket.onopen = () => {
         console.log('WebSocket connected')
         reconnectCount = 0
         if (mainStore) {
@@ -38,7 +38,7 @@ export default {
         window.$socket = socket
       }
       
-      socket.onclose = (event) => {
+      socket.onclose = () => {
         console.log('WebSocket disconnected')
         if (mainStore) {
           mainStore.wsOnline = false

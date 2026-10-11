@@ -32,7 +32,7 @@ export const router = createRouter({
             children: [
                 {
                     path: "",
-                    redirect: (to) => {
+                    redirect: () => {
                         // Rediriger vers settings pour les admins, resetpwd pour les autres
                         const user = store.state.user;
                         const isAdmin = user?.roles?.includes("admin") || false;
@@ -264,7 +264,7 @@ export const router = createRouter({
     ]
 })
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
     // Si la page nécessite une authent ou non
     const publicPages = ["/login", "/forgotten"]
     if (publicPages.includes(to.path)) {

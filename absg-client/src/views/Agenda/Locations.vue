@@ -162,8 +162,7 @@
 <script>
 import axios from 'axios';
 import store from '../../stores/helpers';
-import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
-import { differenceInMonths, format } from 'date-fns';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import ImageEditor from '../../components/ImageEditor.vue';
 
 export default {
@@ -302,7 +301,6 @@ export default {
 
             // On récupère l'image
             const imgUrl = imgEditor.imageUrl();
-            let img = null;
             if (imgUrl) {
                 axios.get(imgEditor.imageUrl(), { responseType: 'blob' }).then(
                     response => {

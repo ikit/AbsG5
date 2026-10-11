@@ -165,7 +165,7 @@ export default {
         'photosGallery'
     ])},
     watch: {
-        $route(to, from) {
+        $route() {
             this.initView();
         }
     },

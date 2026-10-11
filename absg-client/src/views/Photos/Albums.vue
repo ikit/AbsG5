@@ -5,14 +5,19 @@
       style="padding: 15px"
     >
       <router-link
+        v-slot="{ navigate }"
         :to="{ path: `/photos/albums` }"
-        tag="button"
+        custom
       >
-        <v-icon>fas fa-home</v-icon>
-        <span
-          v-if="$vuetify.display.lgAndUp"
-          style="margin-left: 15px"
-        >Liste des albums</span>
+        <button
+          @click="navigate"
+        >
+          <v-icon>fas fa-home</v-icon>
+          <span
+            v-if="$vuetify.display.lgAndUp"
+            style="margin-left: 15px"
+          >Liste des albums</span>
+        </button>
       </router-link>
 
       <v-btn

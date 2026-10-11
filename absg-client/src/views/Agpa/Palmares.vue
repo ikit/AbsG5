@@ -267,7 +267,7 @@
               <!-- Top 3 badges les plus rares -->
               <div v-if="topRarestBadges.length > 0" class="palmares-badge-previews">
                 <div
-                  v-for="(badgeData, index) in topRarestBadges"
+                  v-for="badgeData in topRarestBadges"
                   :key="badgeData.badge.badge"
                   class="palmares-badge-preview"
                   :style="{
@@ -752,7 +752,7 @@
         <v-card-text class="palmares-member-dialog__content">
           <div v-if="selectedMember.allBadges && selectedMember.allBadges.length > 0">
             <div
-              v-for="(badge, index) in selectedMember.allBadges"
+              v-for="badge in selectedMember.allBadges"
               :key="`${badge.badge}_${badge.year}_${badge.type}`"
               class="palmares-member-dialog__badge-item"
             >
@@ -1976,17 +1976,9 @@ export default {
                             return false;
                         }
 
-                        // Count how many ACTIVE required badges the user has
-                        let activeCount = 0;
-                        for (const requiredBadge of badge.requires) {
-                            const requiredStatus = this.badgesHistory[requiredBadge];
-                            if (this.isBadgeActiveInPeriod(requiredStatus)) {
-                                activeCount++;
-                            }
-                        }
-
                         // Return true if user has at least 1 active prerequisite but not all of them
-                        return activeCount > 0 && activeCount < badge.requires.length;
+                        return badge.requires.some(r => this.isBadgeActiveInPeriod(this.badgesHistory[r]))
+                            && !badge.requires.every(r => this.isBadgeActiveInPeriod(this.badgesHistory[r]));
 
                     case 'neverObtained':
                         // Badges jamais obtenus

@@ -107,12 +107,6 @@
 
 
 <script>
-import axios from 'axios';
-import { mapState } from '../../../stores/helpers';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../../middleware/CommonHelper';
-import { format } from 'date-fns';
-import { fr } from "date-fns/locale";
-import { Photo } from '../../../model/Photo';
 
 export default {
     name: 'PhotoWidget',

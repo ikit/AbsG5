@@ -448,7 +448,7 @@
 
 <script>
 import axios from 'axios';
-import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../stores/helpers';
 import {Chart} from 'highcharts-vue';

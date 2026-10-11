@@ -353,11 +353,9 @@
 <script>
 import axios from 'axios';
 import { mapState } from '../../stores/helpers';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
-import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget.vue';
 import store from '../../stores/helpers';
 import Help from './components/Help.vue';
 
@@ -397,7 +395,7 @@ export default {
         'user'
     ])},
     watch: {
-        $route(to, from) {
+        $route() {
             this.refreshCategory();
             this.refreshVotes();
         },
@@ -457,7 +455,6 @@ export default {
                 }
             } else {
                 // pour le résumé, on affiche les photos sélectionné pour le meilleur titre
-                const photos = [];
                 for (const v of this.votes.votes) {
                     // On cherche la catégorie/photos impacté par le vote
                     if (v.categoryId === -3) {
@@ -609,7 +606,7 @@ export default {
             }
             this.savePhotoApiCall(this.photoDiscussion.photo.id, this.photoDiscussion.photo.error);
         },
-        savePhotoApiCall(photoId, error) {
+        savePhotoApiCall() {
             // const formData = new FormData();
             // formData.append("error", JSON.stringify(error));
             // formData.append("id", photoId);

@@ -184,8 +184,7 @@
 <script>
 import axios from 'axios';
 import store from '../../stores/helpers';
-import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
-import { differenceInMonths, format } from 'date-fns';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import TextEditor from '../../components/TextEditor.vue';
 import VEmojiPicker from 'vue3-emoji-picker';
 import 'vue3-emoji-picker/css';
@@ -324,7 +323,7 @@ export default {
         },
         suprMsg() {
             axios.delete(`/api/forum/post/${this.msgDeletion.post.id}`)
-            .then( response => {
+            .then(() => {
                 const idx = this.messages.findIndex(e => e.id === this.msgDeletion.post.id);
                 if (idx > -1) {
                     // Maj citation existante

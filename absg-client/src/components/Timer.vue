@@ -66,7 +66,7 @@ export default {
         }
     },
     watch: {
-        now(value) {
+        now() {
             this.diff = this.date - this.now;
             if(this.diff <= 0){
                 this.diff = 0;

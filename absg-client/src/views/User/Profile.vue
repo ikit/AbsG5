@@ -390,7 +390,7 @@
 <script>
 import axios from 'axios';
 import store from '../../stores/helpers';
-import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { mapState } from '../../stores/helpers';
 import ImageEditor from '../../components/ImageEditor.vue';
 

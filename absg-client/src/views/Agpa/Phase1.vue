@@ -292,7 +292,7 @@ import { mapState } from '../../stores/helpers';
 import { useMainStore } from '../../stores/main';
 import { usePhotoGalleryStore } from '../../stores/photoGallery';
 import { useAgpaStore } from '../../stores/agpa';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import PhotoWidget from './components/PhotoWidget.vue';
@@ -441,7 +441,7 @@ export default {
                     this.photoEditor.complete = (progressEvent.loaded / progressEvent.total * 100 || 0);
                 }
             })
-            .then(newPhoto => {
+            .then(() => {
                 this.refreshGallery();
                 this.resetEditor();
             })
@@ -452,7 +452,7 @@ export default {
 
         deletePhoto() {
             axios.delete(`/api/agpa/photo/${this.photoDeletion.photo.id}`)
-                .then(response => {
+                .then(() => {
                     this.photoDeletion.open = false;
                     this.photoDeletion.photo = null;
                     this.refreshGallery();
@@ -461,7 +461,7 @@ export default {
                     this.mainStore.onError(err);
                 });
         },
-        onNewPhoto(catId, photoId = null) {
+        onNewPhoto(catId) {
             this.resetEditor(true);
             this.photoEditor.categoryId = catId;
         },

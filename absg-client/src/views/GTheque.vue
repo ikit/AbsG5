@@ -22,7 +22,6 @@
 
 
 <script>
-import { format } from 'date-fns';
 import { mapState } from '../stores/helpers';
 
 export default {

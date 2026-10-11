@@ -344,7 +344,7 @@
 <script>
 import axios from 'axios';
 import store from '../../stores/helpers';
-import { parseAxiosResponse, getPeopleAvatar, cleanString } from '../../middleware/CommonHelper';
+import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
 
 export default {
     store,

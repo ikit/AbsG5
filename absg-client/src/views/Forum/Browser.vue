@@ -5,14 +5,19 @@
       style="padding: 15px"
     >
       <router-link
+        v-slot="{ navigate }"
         :to="{ path: `/forum/browse` }"
-        tag="button"
+        custom
       >
-        <v-icon>fas fa-home</v-icon>
-        <span
-          v-if="$vuetify.display.lgAndUp"
-          style="margin-left: 15px"
-        >Liste des forums</span>
+        <button
+          @click="navigate"
+        >
+          <v-icon>fas fa-home</v-icon>
+          <span
+            v-if="$vuetify.display.lgAndUp"
+            style="margin-left: 15px"
+          >Liste des forums</span>
+        </button>
       </router-link>
 
       <div
@@ -21,12 +26,17 @@
         style="display: inline-block; margin-left: 15px"
       >
         <router-link
+          v-slot="{ navigate }"
           :to="{ path: path.url }"
-          tag="button"
+          custom
         >
-          <v-icon start>
-            fas fa-chevron-right
-          </v-icon> {{ path.label }}
+          <button
+            @click="navigate"
+          >
+            <v-icon start>
+              fas fa-chevron-right
+            </v-icon> {{ path.label }}
+          </button>
         </router-link>
       </div>
 
@@ -86,53 +96,63 @@
           <template #item="{item}">
             <router-link
               v-if="breadcrumb.length === 0"
+              v-slot="{ navigate }"
               :to="{ path: item.id === 2 ? `/forum/tbz` : `/forum/browse/${item.id}` }"
-              tag="tr"
-              style="cursor: pointer"
-              :style="{ opacity: item.archived ? '0.5' : '1'}"
+              custom
             >
-              <td style="font-size: 1.1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
-                <v-icon>fas fa-archive</v-icon>  {{ item.name }}
-              </td>
-              <td v-if="$vuetify.display.lgAndUp">
-                {{ item.description }}
-              </td>
-              <td>
-                <img
-                  v-if="$vuetify.display.lgAndUp"
-                  :src="item.last.avatar"
-                  :alt="item.last.username"
-                  style="display: block; margin-right: 15px; float: left; height: 40px"
-                >
-                <span style="font-weight: bold">{{ item.last.username }}</span>
-                <br>
-                <span style="opacity: 0.5">{{ item.last.dateLabel }}</span>
-              </td>
+              <tr
+                style="cursor: pointer"
+                :style="{ opacity: item.archived ? '0.5' : '1'}"
+                @click="navigate"
+              >
+                <td style="font-size: 1.1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
+                  <v-icon>fas fa-archive</v-icon>  {{ item.name }}
+                </td>
+                <td v-if="$vuetify.display.lgAndUp">
+                  {{ item.description }}
+                </td>
+                <td>
+                  <img
+                    v-if="$vuetify.display.lgAndUp"
+                    :src="item.last.avatar"
+                    :alt="item.last.username"
+                    style="display: block; margin-right: 15px; float: left; height: 40px"
+                  >
+                  <span style="font-weight: bold">{{ item.last.username }}</span>
+                  <br>
+                  <span style="opacity: 0.5">{{ item.last.dateLabel }}</span>
+                </td>
+              </tr>
             </router-link>
 
             <router-link
               v-if="breadcrumb.length === 1"
+              v-slot="{ navigate }"
               :to="{ path: `/forum/read/${item.id}#post_${item.last.id}` }"
-              tag="tr"
-              style="cursor: pointer"
+              custom
             >
-              <td style="font-size: 1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
-                <v-icon>far fa-comment-dots</v-icon> {{ item.name }}
-              </td>
-              <td v-if="$vuetify.display.lgAndUp">
-                {{ item.first.username }}<br><span style="opacity: 0.5">{{ item.first.dateLabel }}</span>
-              </td>
-              <td>
-                <img
-                  v-if="$vuetify.display.lgAndUp"
-                  :src="item.last.avatar"
-                  :alt="item.last.username"
-                  style="display: block; margin-right: 15px; float: left; height: 40px"
-                >
-                <span style="font-weight: bold">{{ item.last.username }}</span>
-                <br>
-                <span style="opacity: 0.5">{{ item.last.dateLabel }}</span>
-              </td>
+              <tr
+                style="cursor: pointer"
+                @click="navigate"
+              >
+                <td style="font-size: 1em; font-weight: bold; font-family: 'Comfortaa', sans-serif;">
+                  <v-icon>far fa-comment-dots</v-icon> {{ item.name }}
+                </td>
+                <td v-if="$vuetify.display.lgAndUp">
+                  {{ item.first.username }}<br><span style="opacity: 0.5">{{ item.first.dateLabel }}</span>
+                </td>
+                <td>
+                  <img
+                    v-if="$vuetify.display.lgAndUp"
+                    :src="item.last.avatar"
+                    :alt="item.last.username"
+                    style="display: block; margin-right: 15px; float: left; height: 40px"
+                  >
+                  <span style="font-weight: bold">{{ item.last.username }}</span>
+                  <br>
+                  <span style="opacity: 0.5">{{ item.last.dateLabel }}</span>
+                </td>
+              </tr>
             </router-link>
           </template>
         </v-data-table>
@@ -229,8 +249,8 @@
 import axios from 'axios';
 import store from '../../stores/helpers';
 import { fr } from "date-fns/locale";
-import { differenceInMonths, format } from 'date-fns';
-import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
+import { format } from 'date-fns';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import TextEditor from '../../components/TextEditor.vue';
 import VEmojiPicker from 'vue3-emoji-picker';
 import 'vue3-emoji-picker/css';
@@ -266,7 +286,7 @@ export default {
         },
     }),
     watch: {
-        $route(change) {
+        $route() {
             this.init();
         }
     },

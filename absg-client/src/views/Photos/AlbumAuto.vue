@@ -5,14 +5,19 @@
       style="padding: 15px"
     >
       <router-link
+        v-slot="{ navigate }"
         :to="{ path: `/photos/albums` }"
-        tag="button"
+        custom
       >
-        <v-icon>fas fa-home</v-icon>
-        <span
-          v-if="$vuetify.display.lgAndUp"
-          style="margin-left: 15px"
-        >Liste des albums</span>
+        <button
+          @click="navigate"
+        >
+          <v-icon>fas fa-home</v-icon>
+          <span
+            v-if="$vuetify.display.lgAndUp"
+            style="margin-left: 15px"
+          >Liste des albums</span>
+        </button>
       </router-link>
 
       <div
@@ -126,7 +131,7 @@ export default {
     methods: {
       initFilters() {
         console.log("init")
-        axios.get("/api/albums/auto").then(response => {
+        axios.get("/api/albums/auto").then(() => {
                 console.log("isLoaded");
                 // let idx = 0;
                 // this.photos = parseAxiosResponse(response).map(e => ({ ...e, index: idx++ }));

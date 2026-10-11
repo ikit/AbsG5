@@ -123,7 +123,7 @@
             item-key="number">
             <template v-slot:body="{ items, headers }">
               <tbody>
-                <tr v-for="(item,idx,k) in items" :key="idx">
+                <tr v-for="(item,idx) in items" :key="idx">
                   <td v-for="(header,key) in headers" :key="key">
                     {{ item[header.value] }}
                     <!-- TODO: v-edit-dialog n'existe plus dans Vuetify 3, à remplacer par un dialog custom -->
@@ -192,8 +192,7 @@
 
 <script>
 import axios from 'axios';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
-import { format } from 'date-fns';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {
     data: () => ({
@@ -212,7 +211,6 @@ export default {
         ],
         selectedType: null,
         filter: {
-            type: "nom",
             type: "nom",
             search: null,
         },

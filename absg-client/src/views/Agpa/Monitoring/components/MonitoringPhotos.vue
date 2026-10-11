@@ -194,7 +194,6 @@
 <script>
 import axios from 'axios';
 import store from '../../../../stores/helpers';
-import { parseAxiosResponse } from '../../../../middleware/CommonHelper';
 import { agpaPhotoToGalleryPhoto } from '../../../../middleware/AgpaHelper';
 
 export default {

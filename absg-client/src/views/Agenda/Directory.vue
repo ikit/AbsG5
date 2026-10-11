@@ -381,7 +381,7 @@ export default  {
             // On envoie au serveur
             axios.post(`/api/agenda/person`, this.personEditor)
             .then( response => {
-                const savedPerson = parseAxiosResponse(response);
+                parseAxiosResponse(response);
                 // on reset l'IHM
                 this.resetDialog();
                 // On ajoute ou met à jour la liste
@@ -412,7 +412,9 @@ export default  {
                     }
                     return `${year.toString().padStart(4, "0")}.${month.toString().padStart(2, "0")}.${day.toString().padStart(2, "0")}`;
                 }
-            } catch (err) {}
+            } catch {
+                // date invalide : on renvoie null
+            }
             return null;
         }
     }

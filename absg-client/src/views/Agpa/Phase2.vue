@@ -310,12 +310,9 @@
 <script>
 import axios from 'axios';
 import { mapState } from '../../stores/helpers';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
-import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
-import PhotoWidget from './components/PhotoWidget.vue';
-import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../stores/helpers';
 import Help from './components/Help.vue';
 
@@ -355,7 +352,7 @@ export default {
         'user'
     ])},
     watch: {
-        $route(to, from) {
+        $route() {
             this.initView();
         },
         'agpaMeta': function () {

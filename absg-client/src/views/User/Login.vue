@@ -59,7 +59,7 @@
 <script>
 import axios from "axios";
 import store from "../../store";
-import { parseAxiosResponse, getPeopleAvatar } from "../../middleware/CommonHelper";
+import { parseAxiosResponse } from "../../middleware/CommonHelper";
 import { logUser } from "../../middleware/AuthHelper";
 
 export default {

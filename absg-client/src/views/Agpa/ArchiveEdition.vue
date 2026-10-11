@@ -294,7 +294,7 @@ export default {
         ])
     },
     watch: {
-        $route(to, from) {
+        $route() {
             this.initView();
         }
     },
@@ -317,7 +317,6 @@ export default {
                     const photosGalery = [];
                     let idx = 0;
                     for (let catId in this.current.categories) {
-                        const cat = this.current.categories[catId];
                         if (catId > 0) {
                             for (let photoIdx = 0;  photoIdx < this.current.categories[catId].photos.length; photoIdx++) {
                                 const p = agpaPhotoToGalleryPhoto(this.current.categories[catId].photos[photoIdx]);

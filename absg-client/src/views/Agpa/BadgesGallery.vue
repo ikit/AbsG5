@@ -183,7 +183,7 @@
         <v-card-text class="badges-dialog__body">
           <div v-if="selectedMember.allBadges && selectedMember.allBadges.length > 0">
             <div
-              v-for="(badge, index) in selectedMember.allBadges"
+              v-for="badge in selectedMember.allBadges"
               :key="`${badge.badge}_${badge.year}_${badge.type}`"
               class="badges-dialog__badge-item"
             >

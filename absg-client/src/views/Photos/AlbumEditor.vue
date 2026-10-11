@@ -5,14 +5,19 @@
       style="padding: 15px"
     >
       <router-link
+        v-slot="{ navigate }"
         :to="{ path: `/photos/albums` }"
-        tag="button"
+        custom
       >
-        <v-icon>fas fa-home</v-icon>
-        <span
-          v-if="$vuetify.display.lgAndUp"
-          style="margin-left: 15px"
-        >Liste des albums</span>
+        <button
+          @click="navigate"
+        >
+          <v-icon>fas fa-home</v-icon>
+          <span
+            v-if="$vuetify.display.lgAndUp"
+            style="margin-left: 15px"
+          >Liste des albums</span>
+        </button>
       </router-link>
 
       <div
@@ -20,15 +25,20 @@
         style="display: inline-block;"
       >
         <router-link
+          v-slot="{ navigate }"
           :to="{ path: `/photos/albums/${album.id}` }"
-          tag="button"
+          custom
         >
-          <v-icon
-            left
-            style="margin-left: 15px"
+          <button
+            @click="navigate"
           >
-            fas fa-chevron-right
-          </v-icon> {{ album.title }}
+            <v-icon
+              left
+              style="margin-left: 15px"
+            >
+              fas fa-chevron-right
+            </v-icon> {{ album.title }}
+          </button>
         </router-link>
         
         <v-icon
@@ -293,7 +303,7 @@ export default {
         },
 
         deletePhoto(photo) {
-          axios.delete(`/api/albums/${this.albumId}/${photo.id}`).then(response => {
+          axios.delete(`/api/albums/${this.albumId}/${photo.id}`).then(() => {
             this.refresh();
           }).catch( err => {
             store.commit('onError', err);

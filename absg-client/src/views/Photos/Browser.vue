@@ -178,7 +178,7 @@ export default {
             else this.filter.pageIndex = this.numberOfPages;
         },
         gotoPage () {
-            this.filter.pageIndex = pageIndex;
+            this.filter.pageIndex = Number(this.filter.pageIndex) || 1;
             if (this.filter.pageIndex > this.numberOfPages) this.filter.pageIndex = this.numberOfPages;
             if (this.filter.pageIndex < 1) this.filter.pageIndex = 1;
             

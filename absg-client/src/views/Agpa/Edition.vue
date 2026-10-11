@@ -84,7 +84,6 @@
 <script>
 import store from '../../stores/helpers';
 import { mapState } from '../../stores/helpers';
-import { getModuleInfo, getPeopleAvatar } from '../../middleware/CommonHelper';
 import { format } from 'date-fns';
 import { fr } from "date-fns/locale";
 import Phase1 from './Phase1.vue';

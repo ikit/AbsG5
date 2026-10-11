@@ -178,7 +178,7 @@
 
 <script>
 import axios from 'axios';
-import { parseAxiosResponse, getPeopleAvatar, padNumber } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import { addDays, format } from 'date-fns';
 import ImageEditor from '../../components/ImageEditor.vue';
 import store from '../../stores/helpers';
@@ -214,7 +214,6 @@ export default {
         if (!this.authors) {
             // Il faut initialiser la vue
             this.isLoading = true;
-            const t = new Date();
             this.todayId = format(new Date(), "yyyy_DDD", { useAdditionalDayOfYearTokens: true });
 
             axios.get(`/api/immt/`).then(response => {

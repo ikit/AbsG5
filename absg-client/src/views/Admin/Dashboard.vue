@@ -30,8 +30,7 @@
 <script>
 import store from "../../store";
 import axios from "axios";
-import { MODULES, parseAxiosResponse } from  "../../middleware/CommonHelper";
-import { mapState } from "../../stores/helpers";
+import { parseAxiosResponse } from "../../middleware/CommonHelper";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 

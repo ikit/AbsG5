@@ -5,25 +5,35 @@
       class="grenier-header"
     >
       <router-link
+        v-slot="{ navigate }"
         :to="{ path: `/gtheque/grenier` }"
-        tag="button"
+        custom
       >
-        <v-icon>fas fa-home</v-icon>
-        <span
-          v-if="$vuetify.display.lgAndUp"
-          class="grenier-label"
-        >Grenier</span>
+        <button
+          @click="navigate"
+        >
+          <v-icon>fas fa-home</v-icon>
+          <span
+            v-if="$vuetify.display.lgAndUp"
+            class="grenier-label"
+          >Grenier</span>
+        </button>
       </router-link>
 
       <router-link
         v-for="p of paths"
+        v-slot="{ navigate }"
         :to="{ path: '/gtheque/grenier' + p.path }"
-        tag="button"
         :key="p.path"
-        class="grenier-breadcrumb"
+        custom
       >
-        <v-icon>fas fa-chevron-right</v-icon>
-        {{ p.label }}
+        <button
+          class="grenier-breadcrumb"
+          @click="navigate"
+        >
+          <v-icon>fas fa-chevron-right</v-icon>
+          {{ p.label }}
+        </button>
       </router-link>
     </div>
     
@@ -92,9 +102,7 @@
 
 <script>
 import axios from 'axios';
-import { mapState } from '../../stores/helpers';
-import { getModuleInfo, getPeopleAvatar, parseAxiosResponse } from '../../middleware/CommonHelper';
-import { format } from 'date-fns';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {
     data: () => ({

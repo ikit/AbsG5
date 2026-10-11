@@ -18,12 +18,17 @@
         style="display: inline-block; margin-left: 15px"
       >
         <router-link
+          v-slot="{ navigate }"
           :to="{ path: path.url }"
-          tag="button"
+          custom
         >
-          <v-icon start>
-            fas fa-chevron-right
-          </v-icon> {{ path.label }}
+          <button
+            @click="navigate"
+          >
+            <v-icon start>
+              fas fa-chevron-right
+            </v-icon> {{ path.label }}
+          </button>
         </router-link>
       </div>
 
@@ -61,9 +66,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../stores/helpers';
-import { parseAxiosResponse, getPeopleAvatar } from '../../middleware/CommonHelper';
-import { differenceInMonths, format } from 'date-fns';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 import Reader from "./Reader.vue";
 
 export default {
@@ -77,7 +80,7 @@ export default {
         topicId: null,
     }),
     watch: {
-        $route(change) {
+        $route() {
             this.init();
         }
     },

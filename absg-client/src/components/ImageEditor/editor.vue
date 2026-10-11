@@ -134,15 +134,12 @@ export default {
                 case 'remove':
                     this.reset();
                     return;
-                    break;
                 case 'clear':
                     this.clear();
                     return;
-                    break;
                 case 'applyCrop':
                     this.crop();
                     return;
-                    break;
                 default:
             }
 

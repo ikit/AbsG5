@@ -41,7 +41,6 @@
 <script>
 import axios from 'axios';
 import store from "../../store";
-import { format } from 'date-fns';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {

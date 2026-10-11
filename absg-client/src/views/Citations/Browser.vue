@@ -227,7 +227,7 @@
 <script>
 import axios from 'axios';
 import store, { mapState } from '../../stores/helpers';
-import { parseAxiosResponse, getPeopleAvatar, cleanString } from '../../middleware/CommonHelper';
+import { parseAxiosResponse } from '../../middleware/CommonHelper';
 
 export default {
     store,
@@ -314,7 +314,7 @@ export default {
 
             // On envoie au serveur
             axios.post(`/api/citations/`, data).then(
-                response => {
+                () => {
                     // on ferme la boite de dialogue
                     this.resetDialog();
 
@@ -338,7 +338,7 @@ export default {
         deleteCitation: function () {
             const citationId = this.citationDeletion.citation.id;
             axios.delete(`/api/citations/${citationId}`).then(
-                response => {
+                () => {
                     // On ferme la boite de dialogue
                     this.citationDeletion.citation = null;
                     this.citationDeletion.open = false;

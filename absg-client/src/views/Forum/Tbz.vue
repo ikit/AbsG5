@@ -124,9 +124,8 @@
 
 <script>
 import axios from 'axios';
-import store from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
-import { addMonths, addYears } from 'date-fns';
+import { addMonths } from 'date-fns';
 import Reader from "./Reader.vue";
 
 export default {

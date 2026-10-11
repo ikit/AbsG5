@@ -193,7 +193,6 @@
 import axios from 'axios';
 import { mapState } from '../../stores/helpers';
 import { parseAxiosResponse } from '../../middleware/CommonHelper';
-import { agpaPhotoToGalleryPhoto } from '../../middleware/AgpaHelper';
 import { padNumber } from '../../middleware/CommonHelper';
 import {Chart} from 'highcharts-vue';
 import md5 from "md5";
@@ -258,7 +257,7 @@ export default {
         "wsMessage",
     ])},
     watch: {
-        wsMessage(newValue, oldValue) {
+        wsMessage(newValue) {
             if (newValue.message === "agpaSynchSlide") {
                 // On va au slide du maitre de cérémonie automatiquement
                 const slideIdx = newValue.payload.slide;
