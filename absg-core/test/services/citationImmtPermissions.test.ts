@@ -26,7 +26,7 @@ vi.mock('../../src/middleware/logger', () => ({
 
 import { citationService } from '../../src/services/CitationService'
 import { immtService } from '../../src/services/ImmtService'
-import { Citation, Immt, User } from '../../src/entities'
+import { Citation, Immt, Person, User } from '../../src/entities'
 
 function makeUser(id: number, roles: string[] = []): User {
   return Object.assign(new User(), { id, username: `user${id}`, roles })
@@ -63,9 +63,9 @@ describe('CitationService.remove', () => {
     expect(repo.remove).toHaveBeenCalledWith(latest)
   })
 
-  it('refuse au posteur une citation qui n\'est plus la dernière', async () => {
-    await expect(citationService.remove(poster, older.id)).rejects.toBeInstanceOf(ForbiddenError)
-    expect(repo.remove).not.toHaveBeenCalled()
+  it('autorise le posteur à supprimer une de ses anciennes citations', async () => {
+    await citationService.remove(poster, older.id)
+    expect(repo.remove).toHaveBeenCalledWith(older)
   })
 
   it('refuse à un autre utilisateur', async () => {
@@ -117,5 +117,36 @@ describe('ImmtService.remove', () => {
 
   it('signale une immt inexistante', async () => {
     await expect(immtService.remove(2000, 1, admin)).rejects.toBeInstanceOf(BadRequestError)
+  })
+})
+
+describe('CitationService.save', () => {
+  let repo: any
+  const existing = { id: 10, poster: { id: poster.id } }
+  const citationData = (extra = {}) => ({ author: 7, citation: 'Bonjour', year: 2020, ...extra })
+
+  beforeEach(() => {
+    repo = {
+      findOne: vi.fn(async ({ where }) => (where.id === existing.id ? existing : null)),
+      save: vi.fn(async c => c)
+    }
+    repos.set(Citation, repo)
+    repos.set(Person, { findOne: vi.fn(async () => ({ id: 7, dateOfBirth: null })) })
+    citationService.initService()
+  })
+
+  it('attribue une nouvelle citation à celui qui la poste', async () => {
+    await citationService.save(other, citationData())
+    expect(repo.save.mock.calls[0][0].poster).toBe(other)
+  })
+
+  it('conserve le posteur d\'origine lors d\'une correction', async () => {
+    await citationService.save(other, citationData({ id: existing.id, poster: other }))
+    expect(repo.save.mock.calls[0][0].poster).toBe(existing.poster)
+  })
+
+  it('refuse de corriger une citation inexistante', async () => {
+    await expect(citationService.save(other, citationData({ id: 999 }))).rejects.toBeInstanceOf(BadRequestError)
+    expect(repo.save).not.toHaveBeenCalled()
   })
 })

@@ -326,11 +326,10 @@ export default {
                 }
             );
         },
-        // Un admin peut tout supprimer, le posteur seulement sa dernière citation
+        // Seul un admin ou le posteur de la citation peut la supprimer
         canDelete(item) {
             if (this.user?.roles?.includes("admin")) return true;
-            const last = this.citations[0];
-            return !!this.user && item.posterId === this.user.id && last?.id === item.id;
+            return !!this.user && item.posterId === this.user.id;
         },
         deleteCitationConfirmation: function(item) {
             this.citationDeletion.open = true;

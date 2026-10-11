@@ -109,8 +109,17 @@ class CitationService {
 
         // On enregistre la citation
         citation.author = author;
-        citation.poster = user;
         const newCitation = citation.id || null;
+        if (newCitation) {
+            // En cas de correction, on conserve le posteur d'origine
+            const existing = await this.citationsRepo.findOne({ where: { id: citation.id }, relations: ["poster"] });
+            if (!existing) {
+                throw new BadRequestError(`La citation n°${citation.id} n'existe pas.`);
+            }
+            citation.poster = existing.poster;
+        } else {
+            citation.poster = user;
+        }
         await this.citationsRepo.save(citation);
 
         logger.notice(
@@ -124,8 +133,7 @@ class CitationService {
 
     /**
      * Supprime une citation
-     * Une citation ne peut être supprimé que par un admin,
-     * ou bien par le poster si il s'agit de la dernière citation ajouté
+     * Une citation ne peut être supprimée que par un admin ou par son posteur
      */
     public async remove(user: User, id: number) {
         const citation = await this.citationsRepo.findOne({ where: { id }, relations: ["poster"] });
@@ -133,11 +141,8 @@ class CitationService {
             throw new BadRequestError(`La citation n°${id} n'existe pas.`);
         }
 
-        if (!user.is("admin")) {
-            const last = await this.citationsRepo.findOne({ where: {}, order: { id: "DESC" } });
-            if (citation.poster?.id !== user.id || last?.id !== citation.id) {
-                throw new ForbiddenError("Seul un admin ou l'auteur de la dernière citation peut la supprimer.");
-            }
+        if (!user.is("admin") && citation.poster?.id !== user.id) {
+            throw new ForbiddenError("Seul un admin ou le posteur de la citation peut la supprimer.");
         }
 
         logger.notice(`Citation n°${id} supprimée par ${user.username}`, {
