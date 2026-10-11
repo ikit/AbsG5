@@ -1,7 +1,7 @@
 import { getRepository } from "../middleware/database";
 import { Citation, User, Person, LogModule } from "../entities";
 import { logger } from "../middleware/logger";
-import { BadRequestError } from "routing-controllers";
+import { BadRequestError, ForbiddenError } from "routing-controllers";
 
 const isNumber = (v: unknown): v is number => typeof v === "number" && !Number.isNaN(v);
 const isString = (v: unknown): v is string => typeof v === "string";
@@ -38,6 +38,8 @@ class CitationService {
         const citations = await this.citationsRepo
             .createQueryBuilder("c")
             .leftJoinAndSelect("c.author", "a")
+            .leftJoin("c.poster", "p")
+            .addSelect("p.id")
             .where(authorId ? `a.id = ${authorId}` : 1)
             .orderBy("c.id", "DESC")
             .getMany();
@@ -48,6 +50,7 @@ class CitationService {
                 id: c.id,
                 citation: c.citation,
                 year: c.year,
+                posterId: e.poster?.id ?? null,
                 author: {
                     id: c.author.id,
                     fullname: c.author.getFullname(),
@@ -125,10 +128,16 @@ class CitationService {
      * ou bien par le poster si il s'agit de la dernière citation ajouté
      */
     public async remove(user: User, id: number) {
-        // TODO: retrieve user info to check permission to delete
-        const citation = await this.citationsRepo.findOne({ where: { id } });
+        const citation = await this.citationsRepo.findOne({ where: { id }, relations: ["poster"] });
         if (!citation) {
             throw new BadRequestError(`La citation n°${id} n'existe pas.`);
+        }
+
+        if (!user.is("admin")) {
+            const last = await this.citationsRepo.findOne({ where: {}, order: { id: "DESC" } });
+            if (citation.poster?.id !== user.id || last?.id !== citation.id) {
+                throw new ForbiddenError("Seul un admin ou l'auteur de la dernière citation peut la supprimer.");
+            }
         }
 
         logger.notice(`Citation n°${id} supprimée par ${user.username}`, {

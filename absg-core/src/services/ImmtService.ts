@@ -4,7 +4,7 @@ import { Immt, User, LogModule } from "../entities";
 import * as path from "path";
 import { logger } from "../middleware/logger";
 import { saveImage } from "../middleware/commonHelper";
-import { BadRequestError } from "routing-controllers";
+import { BadRequestError, ForbiddenError } from "routing-controllers";
 
 class ImmtService {
     private immtsRepo = null;
@@ -109,11 +109,16 @@ class ImmtService {
      * @param user l'utilisateur qui fait la demande
      */
     public async remove(year: number, day: number, user: User) {
-        // TODO: retrieve user info to check permission to delete
-
-        const immt = await this.immtsRepo.find({ where: { year, day }, take: 1 });
+        const immt = await this.immtsRepo.findOne({ where: { year, day }, relations: ["user"] });
         if (!immt) {
             throw new BadRequestError(`Immt was not found.`);
+        }
+
+        if (!user.is("admin")) {
+            const last = await this.last();
+            if (immt.user?.id !== user.id || last?.year !== immt.year || last?.day !== immt.day) {
+                throw new ForbiddenError("Seul un admin ou l'auteur de la dernière image du moment peut la supprimer.");
+            }
         }
 
         logger.notice(`Image du moment ${year}_${day} supprimé par ${user.username}`, {

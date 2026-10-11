@@ -98,6 +98,7 @@
               fa-pen
             </v-icon>
             <v-icon
+              v-if="canDelete(item)"
               small
               class="mr-2"
               @click="deleteCitationConfirmation(item)"
@@ -225,7 +226,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../../stores/helpers';
+import store, { mapState } from '../../stores/helpers';
 import { parseAxiosResponse, getPeopleAvatar, cleanString } from '../../middleware/CommonHelper';
 
 export default {
@@ -253,6 +254,9 @@ export default {
         }
     }),
     computed: {
+        ...mapState([
+            "user",
+        ]),
         numberOfPages () {
             return Math.ceil(this.citations.length / this.filter.pageSize)
         },
@@ -321,6 +325,12 @@ export default {
                     store.commit('onError', err);
                 }
             );
+        },
+        // Un admin peut tout supprimer, le posteur seulement sa dernière citation
+        canDelete(item) {
+            if (this.user?.roles?.includes("admin")) return true;
+            const last = this.citations[0];
+            return !!this.user && item.posterId === this.user.id && last?.id === item.id;
         },
         deleteCitationConfirmation: function(item) {
             this.citationDeletion.open = true;
